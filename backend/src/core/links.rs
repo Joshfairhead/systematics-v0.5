@@ -131,9 +131,9 @@ mod tests {
 
     #[test]
     fn test_connective_link() {
-        let link = Link::connective("loc_3_1", "loc_3_2").with_tag("char_act1");
+        let link = Link::connective("loc_3_1", "loc_3_2").with_tag("char_canonical_generation");
         assert!(link.is_connective());
-        assert_eq!(link.character_id(), Some("char_act1"));
+        assert_eq!(link.character_id(), Some("char_canonical_generation"));
         assert_eq!(link.base_single(), Some("loc_3_1"));
         assert_eq!(link.target_single(), Some("loc_3_2"));
     }

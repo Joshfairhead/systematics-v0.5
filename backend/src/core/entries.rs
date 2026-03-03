@@ -141,7 +141,7 @@ pub struct Character {
     pub id: String,
     /// The vocabulary language (Canonical, Energy, Values, Society)
     pub language: Language,
-    /// The semantic value (e.g., "Will", "act1")
+    /// The semantic value (e.g., "Will", "Generation")
     pub value: String,
 }
 
