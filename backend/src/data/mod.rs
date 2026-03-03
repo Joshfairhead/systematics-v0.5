@@ -258,7 +258,7 @@ fn add_canonical_characters(graph: &mut Graph) {
     }
 
     // Connective characters for Triad (Acts)
-    for value in ["Act1", "Act2", "Act3"] {
+    for value in ["Generation", "Consent", "Decision"] {
         graph.add_entry(Entry::Character(Character::with_auto_id(
             Language::Canonical,
             value,
@@ -406,9 +406,9 @@ fn add_system_links(graph: &mut Graph, order: u8) {
         3 => {
             // Triad: Acts between locations (simplex-anchored)
             let acts = [
-                ("loc_3_1", "loc_3_2", "act1"),
-                ("loc_3_2", "loc_3_3", "act2"),
-                ("loc_3_3", "loc_3_1", "act3"),
+                ("loc_3_1", "loc_3_2", "generation"),
+                ("loc_3_2", "loc_3_3", "consent"),
+                ("loc_3_3", "loc_3_1", "decision"),
             ];
             for (from, to, act) in acts {
                 let char_id = format!("char_canonical_{}", act);
