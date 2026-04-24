@@ -10,4 +10,4 @@ server = ["async-graphql"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-async-graphql = { version = "=7.0.7", optional = true }
+async-graphql = { version = "=7.2.1", optional = true }
