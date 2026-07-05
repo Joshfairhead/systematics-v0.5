@@ -2632,6 +2632,7 @@ dependencies = [
  "async-graphql-axum",
  "axum 0.7.9",
  "serde",
+ "serde_json",
  "shuttle-axum",
  "shuttle-runtime",
  "systematics-middleware",

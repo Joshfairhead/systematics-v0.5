@@ -3,7 +3,7 @@
 //! This module implements a category-theoretic foundation with anchor types:
 //! - Order: the system level (1-12)
 //! - Position: abstract "n-th place" (1-12)
-//! - Location: the pullback of Order × Position
+//! - Location: the pullback of Order × Position (× Position?) — entry- or link-shaped
 //!
 //! Other entries map TO these anchors:
 //! - Order-level entries (SystemName, CoherenceAttribute, etc.) reference Order
@@ -11,6 +11,13 @@
 //!
 //! The Entry enum is a sum type for storing heterogeneous entries in a single collection,
 //! enabling the Graph to hold all entry types in one `entries` field.
+//!
+//! # Fixed order metadata
+//!
+//! `SystemName`, `CoherenceAttribute`, `TermDesignation`, and `ConnectiveDesignation`
+//! are schema-level metadata for each Order. They are populated once at graph
+//! construction and are **not** mutated at runtime — the GraphQL mutation surface
+//! deliberately exposes no create/update/delete for these four types.
 
 use serde::{Deserialize, Serialize};
 
@@ -94,24 +101,54 @@ impl Position {
     }
 }
 
-/// Location: the pullback of Order × Position
-/// Location-level entries (Term, Coordinate, Colour) reference this.
-/// A Location binds a specific position within a specific order.
+/// Location: the pullback of Order × Position (× Position?)
+///
+/// A Location binds one or two positions within an order:
+/// - **Entry-shaped** (`position_secondary = None`): binds a single position;
+///   Term/Coordinate/Colour attach here.
+/// - **Link-shaped** (`position_secondary = Some(_)`): binds two positions,
+///   addressing a connective (an edge within an order). A Term attached to a
+///   link-shaped Location supplies the vocabulary for that connective.
+///
+/// The entry/link distinction is preserved so the model ports cleanly to
+/// Holochain's entry/link primitives.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Location {
     pub id: String,
     /// References Order entry ID
     pub order: String,
-    /// References Position entry ID
+    /// References the primary Position entry ID
     pub position: String,
+    /// References an optional secondary Position entry ID.
+    /// When present, this Location is link-shaped (addresses a connective).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub position_secondary: Option<String>,
 }
 
 impl Location {
+    /// Create an entry-shaped Location (single position).
     pub fn new(order: u8, position: u8) -> Self {
         Self {
             id: format!("loc_{}_{}", order, position),
             order: format!("order_{}", order),
             position: format!("position_{}", position),
+            position_secondary: None,
+        }
+    }
+
+    /// Create a link-shaped Location (two positions, canonical undirected form).
+    ///
+    /// The lower position becomes primary; the higher becomes secondary. This
+    /// yields a stable canonical ID regardless of argument order, so
+    /// `Location::link(3, 1, 2)` and `Location::link(3, 2, 1)` produce the
+    /// same Location.
+    pub fn link(order: u8, p1: u8, p2: u8) -> Self {
+        let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
+        Self {
+            id: format!("loc_{}_{}_{}", order, lo, hi),
+            order: format!("order_{}", order),
+            position: format!("position_{}", lo),
+            position_secondary: Some(format!("position_{}", hi)),
         }
     }
 
@@ -127,6 +164,24 @@ impl Location {
         self.position
             .strip_prefix("position_")
             .and_then(|s| s.parse().ok())
+    }
+
+    /// Extract the secondary position value (link-shaped Locations only)
+    pub fn position_secondary_value(&self) -> Option<u8> {
+        self.position_secondary
+            .as_deref()
+            .and_then(|s| s.strip_prefix("position_"))
+            .and_then(|s| s.parse().ok())
+    }
+
+    /// This Location addresses a single point (an entry).
+    pub fn is_entry(&self) -> bool {
+        self.position_secondary.is_none()
+    }
+
+    /// This Location addresses a connective (a link between two positions).
+    pub fn is_link(&self) -> bool {
+        self.position_secondary.is_some()
     }
 }
 
@@ -379,6 +434,18 @@ impl Term {
         }
     }
 
+    /// Create a term targeting a link-shaped Location (a connective).
+    ///
+    /// Uses the same canonical p1 < p2 form as `Location::link`.
+    pub fn for_link(order: u8, p1: u8, p2: u8, character: impl Into<String>) -> Self {
+        let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
+        Self {
+            id: format!("term_{}_{}_{}", order, lo, hi),
+            location: format!("loc_{}_{}_{}", order, lo, hi),
+            character: character.into(),
+        }
+    }
+
     /// Extract order value from location reference ID
     pub fn order_value(&self) -> Option<u8> {
         self.location
@@ -393,6 +460,19 @@ impl Term {
             .strip_prefix("loc_")
             .and_then(|s| s.split('_').nth(1))
             .and_then(|s| s.parse().ok())
+    }
+
+    /// Extract secondary position value if this term targets a link-shaped Location.
+    pub fn position_secondary_value(&self) -> Option<u8> {
+        self.location
+            .strip_prefix("loc_")
+            .and_then(|s| s.split('_').nth(2))
+            .and_then(|s| s.parse().ok())
+    }
+
+    /// True when this term targets a link-shaped Location (a connective).
+    pub fn is_link_term(&self) -> bool {
+        self.position_secondary_value().is_some()
     }
 }
 
@@ -643,8 +723,33 @@ mod tests {
         assert_eq!(loc.id, "loc_3_1");
         assert_eq!(loc.order, "order_3");
         assert_eq!(loc.position, "position_1");
+        assert_eq!(loc.position_secondary, None);
         assert_eq!(loc.order_value(), Some(3));
         assert_eq!(loc.position_value(), Some(1));
+        assert_eq!(loc.position_secondary_value(), None);
+        assert!(loc.is_entry());
+        assert!(!loc.is_link());
+    }
+
+    #[test]
+    fn test_location_link_creation() {
+        let loc = Location::link(3, 1, 2);
+        assert_eq!(loc.id, "loc_3_1_2");
+        assert_eq!(loc.order, "order_3");
+        assert_eq!(loc.position, "position_1");
+        assert_eq!(loc.position_secondary.as_deref(), Some("position_2"));
+        assert_eq!(loc.position_secondary_value(), Some(2));
+        assert!(loc.is_link());
+        assert!(!loc.is_entry());
+    }
+
+    #[test]
+    fn test_location_link_canonical_order() {
+        // Argument order doesn't matter; canonical form always has p1 < p2.
+        let a = Location::link(3, 2, 1);
+        let b = Location::link(3, 1, 2);
+        assert_eq!(a, b);
+        assert_eq!(a.id, "loc_3_1_2");
     }
 
     #[test]
@@ -662,6 +767,24 @@ mod tests {
         assert_eq!(term.location, "loc_3_1");
         assert_eq!(term.order_value(), Some(3));
         assert_eq!(term.position_value(), Some(1));
+        assert_eq!(term.position_secondary_value(), None);
+        assert!(!term.is_link_term());
+    }
+
+    #[test]
+    fn test_term_for_link() {
+        let term = Term::for_link(3, 1, 2, "char_canonical_generation");
+        assert_eq!(term.id, "term_3_1_2");
+        assert_eq!(term.location, "loc_3_1_2");
+        assert_eq!(term.order_value(), Some(3));
+        assert_eq!(term.position_value(), Some(1));
+        assert_eq!(term.position_secondary_value(), Some(2));
+        assert!(term.is_link_term());
+
+        // Argument order doesn't matter — canonical form.
+        let flipped = Term::for_link(3, 2, 1, "char_canonical_generation");
+        assert_eq!(flipped.id, "term_3_1_2");
+        assert_eq!(flipped.location, "loc_3_1_2");
     }
 
     #[test]

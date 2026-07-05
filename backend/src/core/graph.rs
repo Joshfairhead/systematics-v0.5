@@ -13,6 +13,7 @@ use super::entries::{
     Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Location,
     Order, Position, SystemName, Term, TermDesignation,
 };
+use super::functors::Functor;
 use super::language::Language;
 use super::links::{Link, LinkType};
 
@@ -21,6 +22,8 @@ use super::links::{Link, LinkType};
 pub struct Graph {
     pub entries: Vec<Entry>,
     pub links: Vec<Link>,
+    #[serde(default)]
+    pub functors: Vec<Functor>,
 }
 
 impl Graph {
@@ -90,46 +93,95 @@ impl Graph {
             .collect()
     }
 
-    /// Get a Location entry by order and position values
+    /// Get an entry-shaped Location by order and position values
     pub fn location(&self, order: u8, position: u8) -> Option<&Location> {
         let order_id = format!("order_{}", order);
         let position_id = format!("position_{}", position);
         self.entries.iter().find_map(|e| match e {
-            Entry::Location(l) if l.order == order_id && l.position == position_id => Some(l),
+            Entry::Location(l)
+                if l.order == order_id
+                    && l.position == position_id
+                    && l.position_secondary.is_none() =>
+            {
+                Some(l)
+            }
             _ => None,
         })
     }
 
-    /// Get all Location entries
+    /// Get a link-shaped Location by order and the two positions (undirected).
+    /// Argument order is normalised to canonical form.
+    pub fn link_location(&self, order: u8, p1: u8, p2: u8) -> Option<&Location> {
+        let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
+        let order_id = format!("order_{}", order);
+        let position_id = format!("position_{}", lo);
+        let secondary_id = format!("position_{}", hi);
+        self.entries.iter().find_map(|e| match e {
+            Entry::Location(l)
+                if l.order == order_id
+                    && l.position == position_id
+                    && l.position_secondary.as_deref() == Some(secondary_id.as_str()) =>
+            {
+                Some(l)
+            }
+            _ => None,
+        })
+    }
+
+    /// Get all entry-shaped Location entries (bind a single position).
+    /// Use `link_locations` for link-shaped ones.
     pub fn locations(&self) -> Vec<&Location> {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Location(l) => Some(l),
+                Entry::Location(l) if l.is_entry() => Some(l),
                 _ => None,
             })
             .collect()
     }
 
-    /// Get all Locations for a given order
+    /// Get all entry-shaped Locations for a given order.
     pub fn locations_for_order(&self, order: u8) -> Vec<&Location> {
         let order_id = format!("order_{}", order);
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Location(l) if l.order == order_id => Some(l),
+                Entry::Location(l) if l.order == order_id && l.is_entry() => Some(l),
                 _ => None,
             })
             .collect()
     }
 
-    /// Get all Locations for a given position (across all orders)
+    /// Get all entry-shaped Locations for a given position (across all orders).
     pub fn locations_for_position(&self, position: u8) -> Vec<&Location> {
         let position_id = format!("position_{}", position);
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Location(l) if l.position == position_id => Some(l),
+                Entry::Location(l) if l.position == position_id && l.is_entry() => Some(l),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// Get all link-shaped Locations (bind two positions).
+    pub fn link_locations(&self) -> Vec<&Location> {
+        self.entries
+            .iter()
+            .filter_map(|e| match e {
+                Entry::Location(l) if l.is_link() => Some(l),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// Get all link-shaped Locations for a given order.
+    pub fn link_locations_for_order(&self, order: u8) -> Vec<&Location> {
+        let order_id = format!("order_{}", order);
+        self.entries
+            .iter()
+            .filter_map(|e| match e {
+                Entry::Location(l) if l.order == order_id && l.is_link() => Some(l),
                 _ => None,
             })
             .collect()
@@ -187,13 +239,14 @@ impl Graph {
 
     // -------------------- Location-Level Systematic Queries --------------------
 
-    /// Get all terms for an order, optionally filtered by language of their character
+    /// Get all entry-shaped terms for an order, optionally filtered by language of their character.
+    /// Excludes terms attached to link-shaped Locations; use `terms_for_order_links` for those.
     pub fn terms(&self, order: u8, language: Option<Language>) -> Vec<&Term> {
         let terms: Vec<&Term> = self
             .entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Term(t) if t.order_value() == Some(order) => Some(t),
+                Entry::Term(t) if t.order_value() == Some(order) && !t.is_link_term() => Some(t),
                 _ => None,
             })
             .collect();
@@ -212,13 +265,35 @@ impl Graph {
         }
     }
 
-    /// Get a specific term by order and position
+    /// Get a specific term by order and position (entry-shaped Location)
     pub fn term(&self, order: u8, position: u8) -> Option<&Term> {
         let location_id = format!("loc_{}_{}", order, position);
         self.entries.iter().find_map(|e| match e {
             Entry::Term(t) if t.location == location_id => Some(t),
             _ => None,
         })
+    }
+
+    /// Get the term attached to a link-shaped Location (a connective vocabulary).
+    /// Argument order is normalised to canonical form.
+    pub fn term_at_link_location(&self, order: u8, p1: u8, p2: u8) -> Option<&Term> {
+        let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
+        let location_id = format!("loc_{}_{}_{}", order, lo, hi);
+        self.entries.iter().find_map(|e| match e {
+            Entry::Term(t) if t.location == location_id => Some(t),
+            _ => None,
+        })
+    }
+
+    /// Get all terms attached to link-shaped Locations for a given order.
+    pub fn terms_for_order_links(&self, order: u8) -> Vec<&Term> {
+        self.entries
+            .iter()
+            .filter_map(|e| match e {
+                Entry::Term(t) if t.order_value() == Some(order) && t.is_link_term() => Some(t),
+                _ => None,
+            })
+            .collect()
     }
 
     /// Get all terms at a specific location
@@ -309,11 +384,21 @@ impl Graph {
 
     // -------------------- Cross-Cutting Systematic Queries --------------------
 
-    /// Get all entries at a specific order+position (the "slice" / fiber)
+    /// Get all entries at a specific order+position (the "slice" / fiber).
+    /// Excludes link-shaped Locations and Terms; a slice describes one position, not a connective.
     pub fn slice(&self, order: u8, position: u8) -> Vec<&Entry> {
         self.entries
             .iter()
-            .filter(|e| e.order() == Some(order) && e.position() == Some(position))
+            .filter(|e| {
+                if e.order() != Some(order) || e.position() != Some(position) {
+                    return false;
+                }
+                match e {
+                    Entry::Location(l) => l.is_entry(),
+                    Entry::Term(t) => !t.is_link_term(),
+                    _ => true,
+                }
+            })
             .collect()
     }
 
@@ -412,6 +497,65 @@ impl Graph {
             None => vec![],
         }
     }
+
+    // ==========================================================================
+    // Functor Queries and Mutations
+    // ==========================================================================
+
+    /// Get a Functor by ID
+    pub fn functor(&self, id: &str) -> Option<&Functor> {
+        self.functors.iter().find(|f| f.id == id)
+    }
+
+    /// Get a Functor by name (first match)
+    pub fn functor_by_name(&self, name: &str) -> Option<&Functor> {
+        self.functors.iter().find(|f| f.name == name)
+    }
+
+    /// All stored Functors
+    pub fn functors(&self) -> &[Functor] {
+        &self.functors
+    }
+
+    /// Add a Functor to the graph.
+    pub fn add_functor(&mut self, functor: Functor) {
+        self.functors.push(functor);
+    }
+
+    /// Replace an existing Functor by ID. Returns the replaced Functor if it
+    /// existed, or None if no Functor with that ID was found.
+    pub fn update_functor(&mut self, functor: Functor) -> Option<Functor> {
+        let idx = self.functors.iter().position(|f| f.id == functor.id)?;
+        Some(std::mem::replace(&mut self.functors[idx], functor))
+    }
+
+    /// Remove a Functor by ID. Returns the removed Functor if it existed.
+    pub fn delete_functor(&mut self, id: &str) -> Option<Functor> {
+        let idx = self.functors.iter().position(|f| f.id == id)?;
+        Some(self.functors.remove(idx))
+    }
+
+    /// Apply a stored Functor by ID: materialise Terms into `entries` and
+    /// return the produced Terms. Returns None if no Functor with that ID exists.
+    ///
+    /// Idempotency: existing Terms with the same ID are replaced; duplicates
+    /// are not accumulated. This lets `applyFunctor` be called safely more
+    /// than once.
+    pub fn apply_functor(&mut self, id: &str) -> Option<Vec<Term>> {
+        let functor = self.functor(id)?.clone();
+        let produced = functor.apply();
+        for term in &produced {
+            let term_id = term.id.clone();
+            self.entries
+                .retain(|e| !matches!(e, Entry::Term(t) if t.id == term_id));
+            self.entries.push(Entry::Term(term.clone()));
+        }
+        Some(produced)
+    }
+
+    // ==========================================================================
+    // Line Link Queries
+    // ==========================================================================
 
     /// Get all line links for an order
     pub fn lines(&self, order: u8) -> Vec<&Link> {
@@ -616,5 +760,37 @@ mod tests {
         let iso = graph.isomorphic_terms(3, 1);
         assert_eq!(iso.len(), 1);
         assert_eq!(iso[0].1.value, "Will");
+    }
+
+    #[test]
+    fn test_functor_crud_and_apply() {
+        use super::super::functors::{Functor, FunctorMapping};
+
+        let mut graph = create_test_graph();
+        let functor = Functor::new(
+            "f_alt_triad",
+            "alt-triad",
+            Some(Language::Canonical),
+            vec![
+                FunctorMapping::new("char_canonical_generation", "loc_3_1_2"),
+                FunctorMapping::new("char_canonical_consent", "loc_3_2_3"),
+            ],
+        );
+        graph.add_functor(functor);
+        assert_eq!(graph.functors().len(), 1);
+        assert!(graph.functor("f_alt_triad").is_some());
+        assert!(graph.functor_by_name("alt-triad").is_some());
+
+        let produced = graph.apply_functor("f_alt_triad").unwrap();
+        assert_eq!(produced.len(), 2);
+        // Apply is idempotent — running again shouldn't duplicate.
+        let again = graph.apply_functor("f_alt_triad").unwrap();
+        assert_eq!(again.len(), 2);
+        let link_terms = graph.terms_for_order_links(3);
+        assert_eq!(link_terms.len(), 2);
+
+        let removed = graph.delete_functor("f_alt_triad").unwrap();
+        assert_eq!(removed.id, "f_alt_triad");
+        assert!(graph.functor("f_alt_triad").is_none());
     }
 }

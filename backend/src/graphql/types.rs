@@ -1,11 +1,28 @@
 //! GraphQL types and schema for the Systematics property graph API.
 
+use std::sync::Arc;
+
+use tokio::sync::RwLock;
+
 use crate::core::{
-    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Graph,
-    Language, Link, LinkType, Location, Order, Position, SystemName, Term, TermDesignation,
+    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Functor,
+    FunctorMapping, Graph, Language, Link, LinkType, Location, Order, Position, SystemName, Term,
+    TermDesignation,
 };
-use crate::data;
 use async_graphql::*;
+
+/// Shared, mutable graph passed to the GraphQL schema as context data.
+pub type SharedGraph = Arc<RwLock<Graph>>;
+
+/// Take a cheap snapshot of the shared graph for read-only resolvers.
+async fn graph_snapshot(ctx: &Context<'_>) -> Graph {
+    ctx.data_unchecked::<SharedGraph>().read().await.clone()
+}
+
+/// Access the shared graph for mutation resolvers.
+fn shared_graph<'a>(ctx: &'a Context<'_>) -> &'a SharedGraph {
+    ctx.data_unchecked::<SharedGraph>()
+}
 
 /// Root query object
 #[derive(Clone, Default)]
@@ -18,8 +35,8 @@ impl QueryRoot {
     // ========================================================================
 
     /// Get the full graph with all entries and links
-    async fn graph(&self) -> GqlGraph {
-        GqlGraph::new(data::build_graph())
+    async fn graph(&self, ctx: &Context<'_>) -> GqlGraph {
+        GqlGraph::new(graph_snapshot(ctx).await)
     }
 
     // ========================================================================
@@ -27,19 +44,19 @@ impl QueryRoot {
     // ========================================================================
 
     /// Get an Order anchor by value (1-12)
-    async fn order(&self, value: i32) -> Option<GqlOrder> {
+    async fn order(&self, ctx: &Context<'_>, value: i32) -> Option<GqlOrder> {
         if !(1..=12).contains(&value) {
             return None;
         }
-        let graph = data::build_graph();
+        let graph = graph_snapshot(ctx).await;
         graph
             .order(value as u8)
             .map(|o| GqlOrder::new(o.clone(), graph.clone()))
     }
 
     /// Get all Order anchors
-    async fn orders(&self) -> Vec<GqlOrder> {
-        let graph = data::build_graph();
+    async fn orders(&self, ctx: &Context<'_>) -> Vec<GqlOrder> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .orders()
             .into_iter()
@@ -48,19 +65,19 @@ impl QueryRoot {
     }
 
     /// Get a Position anchor by value (1-12)
-    async fn position(&self, value: i32) -> Option<GqlPosition> {
+    async fn position(&self, ctx: &Context<'_>, value: i32) -> Option<GqlPosition> {
         if !(1..=12).contains(&value) {
             return None;
         }
-        let graph = data::build_graph();
+        let graph = graph_snapshot(ctx).await;
         graph
             .position(value as u8)
             .map(|p| GqlPosition::new(p.clone(), graph.clone()))
     }
 
     /// Get all Position anchors
-    async fn positions(&self) -> Vec<GqlPosition> {
-        let graph = data::build_graph();
+    async fn positions(&self, ctx: &Context<'_>) -> Vec<GqlPosition> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .positions()
             .into_iter()
@@ -69,19 +86,19 @@ impl QueryRoot {
     }
 
     /// Get a Location anchor by order and position
-    async fn location(&self, order: i32, position: i32) -> Option<GqlLocation> {
+    async fn location(&self, ctx: &Context<'_>, order: i32, position: i32) -> Option<GqlLocation> {
         if !(1..=12).contains(&order) || position < 1 || position > order {
             return None;
         }
-        let graph = data::build_graph();
+        let graph = graph_snapshot(ctx).await;
         graph
             .location(order as u8, position as u8)
             .map(|l| GqlLocation::new(l.clone(), graph.clone()))
     }
 
     /// Get all Location anchors
-    async fn locations(&self) -> Vec<GqlLocation> {
-        let graph = data::build_graph();
+    async fn locations(&self, ctx: &Context<'_>) -> Vec<GqlLocation> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .locations()
             .into_iter()
@@ -90,8 +107,8 @@ impl QueryRoot {
     }
 
     /// Get all Locations for a given order
-    async fn locations_for_order(&self, order: i32) -> Vec<GqlLocation> {
-        let graph = data::build_graph();
+    async fn locations_for_order(&self, ctx: &Context<'_>, order: i32) -> Vec<GqlLocation> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .locations_for_order(order as u8)
             .into_iter()
@@ -100,8 +117,8 @@ impl QueryRoot {
     }
 
     /// Get all Locations for a given position (across all orders)
-    async fn locations_for_position(&self, position: i32) -> Vec<GqlLocation> {
-        let graph = data::build_graph();
+    async fn locations_for_position(&self, ctx: &Context<'_>, position: i32) -> Vec<GqlLocation> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .locations_for_position(position as u8)
             .into_iter()
@@ -114,24 +131,24 @@ impl QueryRoot {
     // ========================================================================
 
     /// Get system by order (1-12)
-    async fn system(&self, order: i32) -> Option<GqlSystemView> {
+    async fn system(&self, ctx: &Context<'_>, order: i32) -> Option<GqlSystemView> {
         if !(1..=12).contains(&order) {
             return None;
         }
-        let graph = data::build_graph();
+        let graph = graph_snapshot(ctx).await;
         Some(GqlSystemView::new(order as u8, graph))
     }
 
     /// Get all systems (1-12)
-    async fn all_systems(&self) -> Vec<GqlSystemView> {
-        let graph = data::build_graph();
+    async fn all_systems(&self, ctx: &Context<'_>) -> Vec<GqlSystemView> {
+        let graph = graph_snapshot(ctx).await;
         (1..=12)
             .map(|order| GqlSystemView::new(order, graph.clone()))
             .collect()
     }
 
     /// Get system by name (e.g., "Triad")
-    async fn system_by_name(&self, name: String) -> Option<GqlSystemView> {
+    async fn system_by_name(&self, ctx: &Context<'_>, name: String) -> Option<GqlSystemView> {
         let order = match name.to_lowercase().as_str() {
             "monad" => 1,
             "dyad" => 2,
@@ -147,7 +164,7 @@ impl QueryRoot {
             "dodecad" => 12,
             _ => return None,
         };
-        let graph = data::build_graph();
+        let graph = graph_snapshot(ctx).await;
         Some(GqlSystemView::new(order, graph))
     }
 
@@ -156,16 +173,21 @@ impl QueryRoot {
     // ========================================================================
 
     /// Get term at a specific order and position
-    async fn term(&self, order: i32, position: i32) -> Option<GqlTerm> {
-        let graph = data::build_graph();
+    async fn term(&self, ctx: &Context<'_>, order: i32, position: i32) -> Option<GqlTerm> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .term(order as u8, position as u8)
             .map(|t| GqlTerm::new(t.clone(), &graph))
     }
 
     /// Get all terms for an order
-    async fn terms(&self, order: i32, language: Option<GqlLanguage>) -> Vec<GqlTerm> {
-        let graph = data::build_graph();
+    async fn terms(
+        &self,
+        ctx: &Context<'_>,
+        order: i32,
+        language: Option<GqlLanguage>,
+    ) -> Vec<GqlTerm> {
+        let graph = graph_snapshot(ctx).await;
         let lang = language.map(|l| l.into());
         graph
             .terms(order as u8, lang)
@@ -179,8 +201,8 @@ impl QueryRoot {
     // ========================================================================
 
     /// Get all characters for a language
-    async fn characters(&self, language: GqlLanguage) -> Vec<GqlCharacter> {
-        let graph = data::build_graph();
+    async fn characters(&self, ctx: &Context<'_>, language: GqlLanguage) -> Vec<GqlCharacter> {
+        let graph = graph_snapshot(ctx).await;
         graph
             .characters(language.into())
             .into_iter()
@@ -193,8 +215,8 @@ impl QueryRoot {
     // ========================================================================
 
     /// Get slice (all entries at order+position)
-    async fn slice(&self, order: i32, position: i32) -> GqlSlice {
-        let graph = data::build_graph();
+    async fn slice(&self, ctx: &Context<'_>, order: i32, position: i32) -> GqlSlice {
+        let graph = graph_snapshot(ctx).await;
         GqlSlice::new(order as u8, position as u8, graph)
     }
 
@@ -222,6 +244,103 @@ impl QueryRoot {
             GqlLanguage::Values,
             GqlLanguage::Society,
         ]
+    }
+
+    // ========================================================================
+    // Functor Queries
+    // ========================================================================
+
+    /// All Functors in the graph
+    async fn functors(&self, ctx: &Context<'_>) -> Vec<GqlFunctor> {
+        let graph = graph_snapshot(ctx).await;
+        graph
+            .functors()
+            .iter()
+            .map(|f| GqlFunctor::new(f.clone()))
+            .collect()
+    }
+
+    /// Get a Functor by ID
+    async fn functor(&self, ctx: &Context<'_>, id: String) -> Option<GqlFunctor> {
+        let graph = graph_snapshot(ctx).await;
+        graph.functor(&id).map(|f| GqlFunctor::new(f.clone()))
+    }
+}
+
+// ============================================================================
+// Mutation Root
+// ============================================================================
+
+/// Root mutation object.
+///
+/// Deliberately exposes only Functor CRUD — the fixed order metadata
+/// (`SystemName`, `CoherenceAttribute`, `TermDesignation`, `ConnectiveDesignation`)
+/// is treated as schema-level and is not mutable at runtime.
+#[derive(Clone, Default)]
+pub struct MutationRoot;
+
+#[Object]
+impl MutationRoot {
+    /// Create a Functor. If `id` is None, one is generated from the name.
+    async fn create_functor(
+        &self,
+        ctx: &Context<'_>,
+        input: FunctorInput,
+    ) -> async_graphql::Result<GqlFunctor> {
+        let functor: Functor = input.into_functor();
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.functor(&functor.id).is_some() {
+            return Err(Error::new(format!(
+                "Functor with id '{}' already exists",
+                functor.id
+            )));
+        }
+        graph.add_functor(functor.clone());
+        Ok(GqlFunctor::new(functor))
+    }
+
+    /// Replace an existing Functor's fields by ID.
+    async fn update_functor(
+        &self,
+        ctx: &Context<'_>,
+        id: String,
+        input: FunctorInput,
+    ) -> async_graphql::Result<GqlFunctor> {
+        let mut functor: Functor = input.into_functor();
+        functor.id = id.clone();
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.update_functor(functor.clone()).is_none() {
+            return Err(Error::new(format!("Functor '{}' not found", id)));
+        }
+        Ok(GqlFunctor::new(functor))
+    }
+
+    /// Delete a Functor by ID. Returns true on success.
+    async fn delete_functor(&self, ctx: &Context<'_>, id: String) -> bool {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        graph.delete_functor(&id).is_some()
+    }
+
+    /// Apply a stored Functor, materialising its mappings as Terms in the graph.
+    /// Returns the Terms produced (idempotent — re-application replaces).
+    async fn apply_functor(
+        &self,
+        ctx: &Context<'_>,
+        id: String,
+    ) -> async_graphql::Result<Vec<GqlTerm>> {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        let produced = graph
+            .apply_functor(&id)
+            .ok_or_else(|| Error::new(format!("Functor '{}' not found", id)))?;
+        let snapshot = graph.clone();
+        Ok(produced
+            .into_iter()
+            .map(|t| GqlTerm::new(t, &snapshot))
+            .collect())
     }
 }
 
@@ -1460,20 +1579,129 @@ impl GqlSlice {
 }
 
 // ============================================================================
+// Functor Types
+// ============================================================================
+
+/// A single (base → target) mapping within a Functor.
+#[derive(SimpleObject, Clone)]
+pub struct GqlFunctorMapping {
+    pub base: String,
+    pub target: String,
+}
+
+impl From<&FunctorMapping> for GqlFunctorMapping {
+    fn from(m: &FunctorMapping) -> Self {
+        Self {
+            base: m.base.clone(),
+            target: m.target.clone(),
+        }
+    }
+}
+
+/// A stored Functor.
+pub struct GqlFunctor {
+    functor: Functor,
+}
+
+impl GqlFunctor {
+    pub fn new(functor: Functor) -> Self {
+        Self { functor }
+    }
+}
+
+#[Object]
+impl GqlFunctor {
+    async fn id(&self) -> &str {
+        &self.functor.id
+    }
+
+    async fn name(&self) -> &str {
+        &self.functor.name
+    }
+
+    async fn description(&self) -> Option<&str> {
+        self.functor.description.as_deref()
+    }
+
+    async fn source_language(&self) -> Option<GqlLanguage> {
+        self.functor.source_language.map(Into::into)
+    }
+
+    async fn mappings(&self) -> Vec<GqlFunctorMapping> {
+        self.functor.mappings.iter().map(Into::into).collect()
+    }
+
+    /// The Terms this Functor would produce if applied (a preview — does not
+    /// mutate the graph). Use `applyFunctor` mutation to persist.
+    async fn preview(&self, ctx: &Context<'_>) -> Vec<GqlTerm> {
+        let snapshot = graph_snapshot(ctx).await;
+        self.functor
+            .apply()
+            .into_iter()
+            .map(|t| GqlTerm::new(t, &snapshot))
+            .collect()
+    }
+}
+
+/// Input for a single mapping in a Functor CRUD payload.
+#[derive(InputObject, Clone)]
+pub struct FunctorMappingInput {
+    pub base: String,
+    pub target: String,
+}
+
+impl From<FunctorMappingInput> for FunctorMapping {
+    fn from(m: FunctorMappingInput) -> Self {
+        FunctorMapping::new(m.base, m.target)
+    }
+}
+
+/// Input for creating or updating a Functor.
+#[derive(InputObject, Clone)]
+pub struct FunctorInput {
+    /// Optional ID. If omitted, one is derived from `name`.
+    pub id: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub source_language: Option<GqlLanguage>,
+    pub mappings: Vec<FunctorMappingInput>,
+}
+
+impl FunctorInput {
+    fn into_functor(self) -> Functor {
+        let id = self.id.unwrap_or_else(|| {
+            let slug = self
+                .name
+                .to_lowercase()
+                .chars()
+                .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                .collect::<String>();
+            format!("functor_{}", slug)
+        });
+        let source_language = self.source_language.map(Into::into);
+        let mappings = self.mappings.into_iter().map(Into::into).collect();
+        let mut functor = Functor::new(id, self.name, source_language, mappings);
+        if let Some(desc) = self.description {
+            functor = functor.with_description(desc);
+        }
+        functor
+    }
+}
+
+// ============================================================================
 // Schema
 // ============================================================================
 
-pub type SystematicsSchema = async_graphql::Schema<
-    QueryRoot,
-    async_graphql::EmptyMutation,
-    async_graphql::EmptySubscription,
->;
+pub type SystematicsSchema =
+    async_graphql::Schema<QueryRoot, MutationRoot, async_graphql::EmptySubscription>;
 
-pub fn create_schema() -> SystematicsSchema {
+/// Build the schema with a shared graph as context data.
+pub fn create_schema(graph: SharedGraph) -> SystematicsSchema {
     async_graphql::Schema::build(
         QueryRoot,
-        async_graphql::EmptyMutation,
+        MutationRoot,
         async_graphql::EmptySubscription,
     )
+    .data(graph)
     .finish()
 }

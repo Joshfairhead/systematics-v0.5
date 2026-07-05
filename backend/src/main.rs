@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
@@ -6,7 +8,8 @@ use axum::{
     routing::get,
     Router,
 };
-use systematics_backend::create_schema;
+use systematics_backend::{create_schema, data};
+use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -37,9 +40,14 @@ fn init_tracing() {
         .init();
 }
 
-/// Build the GraphQL API router (shared between local and Shuttle)
+/// Build the GraphQL API router (shared between local and Shuttle).
+///
+/// The graph is seeded once at startup and shared behind an `Arc<RwLock<_>>`
+/// so mutations (Functor CRUD, applyFunctor) persist across requests within
+/// a single process. Restarting the process resets to seed state.
 fn build_api_router() -> Router {
-    let schema = create_schema();
+    let shared_graph = Arc::new(RwLock::new(data::build_graph()));
+    let schema = create_schema(shared_graph);
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
@@ -71,7 +79,11 @@ async fn main() {
         .nest("/", api_router)
         .fallback_service(static_files);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    let port: u16 = std::env::var("PORT")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(8000);
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     tracing::info!("GraphQL API configured at /graphql");
     tracing::info!("Static files served from frontend/dist");
     tracing::info!("Server running at http://{}", addr);

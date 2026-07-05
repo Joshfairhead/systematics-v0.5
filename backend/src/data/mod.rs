@@ -15,6 +15,24 @@ use crate::core::{
     Language, Link, Location, Order, Point3d, Position, SystemName, Term, TermDesignation,
 };
 
+/// Add a connective link between two positions of an order AND its corresponding
+/// vocabulary Term at the link-shaped Location. This is the unified
+/// "vocabulary → location" pattern: whether the location is entry- or link-shaped,
+/// the vocabulary attaches via a Term.
+fn add_connective_with_term(
+    graph: &mut Graph,
+    order: u8,
+    p1: u8,
+    p2: u8,
+    character_slug: &str,
+) {
+    let char_id = format!("char_canonical_{}", character_slug);
+    let from = format!("loc_{}_{}", order, p1);
+    let to = format!("loc_{}_{}", order, p2);
+    graph.add_link(Link::connective(&from, &to).with_tag(&char_id));
+    graph.add_entry(Entry::Term(Term::for_link(order, p1, p2, &char_id)));
+}
+
 /// Build the complete graph with all systems (1-12)
 pub fn build_graph() -> Graph {
     let mut graph = Graph::new();
@@ -65,11 +83,23 @@ fn add_positions(graph: &mut Graph) {
     }
 }
 
-/// Add all Location entries (pullback of Order × Position)
+/// Add all Location entries.
+///
+/// Emits both:
+/// - Entry-shaped Locations (`loc_{order}_{p}`) for every position in every order.
+/// - Link-shaped Locations (`loc_{order}_{p1}_{p2}` with `p1 < p2`) for every
+///   undirected pair of positions in every order.
+///
+/// Totals across orders 1..=12: 78 entry-shaped + 220 link-shaped = 298 Locations.
 fn add_locations(graph: &mut Graph) {
     for order in 1..=12u8 {
         for position in 1..=order {
             graph.add_entry(Entry::Location(Location::new(order, position)));
+        }
+        for p1 in 1..=order {
+            for p2 in (p1 + 1)..=order {
+                graph.add_entry(Entry::Location(Location::link(order, p1, p2)));
+            }
         }
     }
 }
@@ -399,58 +429,53 @@ fn add_terms(graph: &mut Graph, order: u8) {
 // Links - Connectives and Lines
 // =============================================================================
 
-/// Add links (connectives and lines) for a system
+/// Add links (connectives and lines) for a system.
+///
+/// For each connective this emits both a `Link::connective` edge (for rendering)
+/// and a `Term::for_link` (for unified vocabulary lookup at the link-shaped
+/// Location).
 fn add_system_links(graph: &mut Graph, order: u8) {
-    // Add connective links for specific orders
+    // Add connective links for specific orders.
+    // Entries are (base_position, target_position, canonical character slug).
     match order {
         3 => {
-            // Triad: Acts between locations (simplex-anchored)
-            let acts = [
-                ("loc_3_1", "loc_3_2", "generation"),
-                ("loc_3_2", "loc_3_3", "consent"),
-                ("loc_3_3", "loc_3_1", "decision"),
-            ];
-            for (from, to, act) in acts {
-                let char_id = format!("char_canonical_{}", act);
-                graph.add_link(Link::connective(from, to).with_tag(&char_id));
+            // Triad: Acts
+            let acts = [(1, 2, "generation"), (2, 3, "consent"), (3, 1, "decision")];
+            for (p1, p2, slug) in acts {
+                add_connective_with_term(graph, 3, p1, p2, slug);
             }
         }
         4 => {
-            // Tetrad: Interplays between locations (simplex-anchored)
-            // The structural edges are invariant; vocabulary-coupling happens
-            // via dynamic Term lookup at render time (future Option B)
+            // Tetrad: Interplays
             let interplays = [
-                ("loc_4_1", "loc_4_2", "motivational_imperative"), // Position 1 → Position 2
-                ("loc_4_3", "loc_4_4", "demonstrable_activity"),   // Position 3 → Position 4
-                ("loc_4_4", "loc_4_1", "effectual_compatibility"), // Position 4 → Position 1
-                ("loc_4_3", "loc_4_1", "receptive_regard"),        // Position 3 → Position 1
-                ("loc_4_3", "loc_4_2", "material_mastery"),        // Position 3 → Position 2
-                ("loc_4_4", "loc_4_2", "technical_power"),         // Position 4 → Position 2
+                (1, 2, "motivational_imperative"),
+                (3, 4, "demonstrable_activity"),
+                (4, 1, "effectual_compatibility"),
+                (3, 1, "receptive_regard"),
+                (3, 2, "material_mastery"),
+                (4, 2, "technical_power"),
             ];
-            for (from, to, name) in interplays {
-                let char_id = format!("char_canonical_{}", name);
-                graph.add_link(Link::connective(from, to).with_tag(&char_id));
+            for (p1, p2, slug) in interplays {
+                add_connective_with_term(graph, 4, p1, p2, slug);
             }
         }
         5 => {
-            // Pentad: Mutualities between locations (simplex-anchored)
-            // Structural positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
-            // Vocabulary-coupling happens via dynamic Term lookup at render time (future Option B)
+            // Pentad: Mutualities
+            // Positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
             let mutualities = [
-                ("loc_5_3", "loc_5_4", "range_of_potential"), // Position 3 → Position 4
-                ("loc_5_5", "loc_5_2", "range_of_significance"), // Position 5 → Position 2
-                ("loc_5_1", "loc_5_3", "aspiration"),         // Position 1 → Position 3
-                ("loc_5_1", "loc_5_4", "operation"),          // Position 1 → Position 4
-                ("loc_5_3", "loc_5_5", "output"),             // Position 3 → Position 5
-                ("loc_5_4", "loc_5_2", "input"),              // Position 4 → Position 2
-                ("loc_5_1", "loc_5_5", "qualitative_match"),  // Position 1 → Position 5
-                ("loc_5_1", "loc_5_2", "quantitative_match"), // Position 1 → Position 2
-                ("loc_5_4", "loc_5_5", "form"),               // Position 4 → Position 5
-                ("loc_5_3", "loc_5_2", "function"),           // Position 3 → Position 2
+                (3, 4, "range_of_potential"),
+                (5, 2, "range_of_significance"),
+                (1, 3, "aspiration"),
+                (1, 4, "operation"),
+                (3, 5, "output"),
+                (4, 2, "input"),
+                (1, 5, "qualitative_match"),
+                (1, 2, "quantitative_match"),
+                (4, 5, "form"),
+                (3, 2, "function"),
             ];
-            for (from, to, name) in mutualities {
-                let char_id = format!("char_canonical_{}", name);
-                graph.add_link(Link::connective(from, to).with_tag(&char_id));
+            for (p1, p2, slug) in mutualities {
+                add_connective_with_term(graph, 5, p1, p2, slug);
             }
         }
         6..=12 => {
@@ -471,26 +496,25 @@ fn add_system_links(graph: &mut Graph, order: u8) {
     }
 }
 
-/// Add placeholder connective links for orders 6-12 (simplex-anchored)
+/// Add placeholder connective links for orders 6-12 (simplex-anchored).
+/// Emits both the edge `Link` and a `Term::for_link` at the link-shaped Location.
 fn add_placeholder_connectives(graph: &mut Graph, order: u8) {
-    let (prefix, _designation) = match order {
-        6 => ("step", "Steps"),
-        7 => ("interval", "Intervals"),
-        8 => ("component", "Components"),
-        9 => ("transmutation", "Transmutations"),
-        10 => ("progression", "Progressions"),
-        11 => ("correlation", "Correlations"),
-        12 => ("harmony", "Harmonies"),
+    let prefix = match order {
+        6 => "step",
+        7 => "interval",
+        8 => "component",
+        9 => "transmutation",
+        10 => "progression",
+        11 => "correlation",
+        12 => "harmony",
         _ => return,
     };
 
     let mut idx = 1;
     for i in 1..=order {
         for j in (i + 1)..=order {
-            let from = format!("loc_{}_{}", order, i);
-            let to = format!("loc_{}_{}", order, j);
-            let char_id = format!("char_canonical_{}_{}_needs_research", prefix, idx);
-            graph.add_link(Link::connective(&from, &to).with_tag(&char_id));
+            let slug = format!("{}_{}_needs_research", prefix, idx);
+            add_connective_with_term(graph, order, i, j, &slug);
             idx += 1;
         }
     }

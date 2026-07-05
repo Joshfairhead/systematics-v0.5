@@ -7,6 +7,7 @@
 //! - `graph` - Graph structure with query methods
 
 pub mod entries;
+pub mod functors;
 pub mod graph;
 pub mod language;
 pub mod links;
@@ -22,6 +23,9 @@ pub use entries::{
 
 // Re-export link types
 pub use links::{Link, LinkType};
+
+// Re-export functor types
+pub use functors::{Functor, FunctorMapping};
 
 // Re-export graph types
 pub use graph::Graph;
