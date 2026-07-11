@@ -1,31 +1,30 @@
 //! Core types for the Systematics property graph.
 //!
-//! This module provides the fundamental building blocks:
-//! - `Language` - Semantic vocabularies and representation types
-//! - `entries` - Entry types (Character, Term, Coordinate, Colour, etc.) and the Entry enum
-//! - `links` - Link types (Line, Connective)
-//! - `graph` - Graph structure with query methods
+//! Layered ontology:
+//! - `entries` — the substrate (Order, Position, Point, Line, Coordinate,
+//!   Segment, Character) plus the `Entry` sum type.
+//! - `links` — Link entries (currently `Line` for coordinate-to-coordinate
+//!   rendering; `Connective` shim retained during frontend migration).
+//! - `vocabularies` — `TopologicalVocabulary`, `GeometricVocabulary`,
+//!   `SemanticVocabulary` — ordered per-Order references into the substrate.
+//! - `grammars` — `Grammar`: validation rules + inline metadata that
+//!   reconcile the three vocabularies.
+//! - `graph` — the container plus queries and mutations.
 
 pub mod entries;
-pub mod functors;
+pub mod grammars;
 pub mod graph;
-pub mod language;
 pub mod links;
+pub mod vocabularies;
 
-// Re-export language types
-pub use language::Language;
-
-// Re-export entry types (including Entry enum and anchor types)
 pub use entries::{
-    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Location,
-    Order, Point3d, Position, SystemName, Term, TermDesignation,
+    Character, Coordinate, Entry, Line, Order, Point, Point3d, Position, Segment,
 };
 
-// Re-export link types
 pub use links::{Link, LinkType};
 
-// Re-export functor types
-pub use functors::{Functor, FunctorMapping};
+pub use vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
 
-// Re-export graph types
+pub use grammars::Grammar;
+
 pub use graph::Graph;

@@ -1,730 +1,55 @@
-//! Data module for populating the property graph.
+//! Seed the property graph.
 //!
-//! This module provides functions to build the complete graph with all
-//! system data including anchor types, Characters, Terms, Coordinates,
-//! Colours, and Links.
-//!
-//! Data loading follows the category-theoretic structure:
-//! 1. Create anchor entries first (Order, Position, Location)
-//! 2. Add geometry (Coordinates, Colours, Lines) - invariant structure
-//! 3. Add order-level metadata (SystemName, Coherence, Designations)
-//! 4. Add vocabulary-specific content (Characters, Terms, Connectives)
+//! Emits substrate entries (Order, Position, Point, Line, Coordinate, Segment,
+//! Character) followed by the canonical Topological / Geometric / Semantic
+//! Vocabularies and one Canonical Grammar per Order.
 
 use crate::core::{
-    Character, CoherenceAttribute, Colour, ConnectiveDesignation, Coordinate, Entry, Graph,
-    Language, Link, Location, Order, Point3d, Position, SystemName, Term, TermDesignation,
+    Character, Coordinate, Entry, GeometricVocabulary, Grammar, Graph, Line, Link, Order, Point,
+    Point3d, Position, SemanticVocabulary, Segment, TopologicalVocabulary,
 };
 
-/// Add a connective link between two positions of an order AND its corresponding
-/// vocabulary Term at the link-shaped Location. This is the unified
-/// "vocabulary → location" pattern: whether the location is entry- or link-shaped,
-/// the vocabulary attaches via a Term.
-fn add_connective_with_term(
-    graph: &mut Graph,
-    order: u8,
-    p1: u8,
-    p2: u8,
-    character_slug: &str,
-) {
-    let char_id = format!("char_canonical_{}", character_slug);
-    let from = format!("loc_{}_{}", order, p1);
-    let to = format!("loc_{}_{}", order, p2);
-    graph.add_link(Link::connective(&from, &to).with_tag(&char_id));
-    graph.add_entry(Entry::Term(Term::for_link(order, p1, p2, &char_id)));
-}
-
-/// Build the complete graph with all systems (1-12)
+/// Build the complete graph with all systems (1-12).
 pub fn build_graph() -> Graph {
     let mut graph = Graph::new();
 
-    // 1. Create anchor entries first (invariant structure)
     add_orders(&mut graph);
     add_positions(&mut graph);
-    add_locations(&mut graph);
-
-    // 2. Add geometry (invariant, references Location)
-    for order in 1..=12 {
-        add_coordinates(&mut graph, order);
-        add_colours(&mut graph, order);
-    }
-
-    // 3. Add order-level metadata (references Order)
-    add_system_metadata(&mut graph);
-
-    // 4. Add vocabulary-specific content (references Location)
-    add_canonical_characters(&mut graph);
-    for order in 1..=12 {
-        add_terms(&mut graph, order);
-    }
-
-    // 5. Add links (connectives and lines)
-    for order in 1..=12 {
-        add_system_links(&mut graph, order);
-    }
+    add_substrate(&mut graph);
+    add_canonical_vocabularies_and_grammars(&mut graph);
+    add_canonical_colour_vocabularies(&mut graph);
+    add_rendering_line_links(&mut graph);
 
     graph
 }
 
-// =============================================================================
-// Anchor Creation - Fundamental structure
-// =============================================================================
-
-/// Add all Order entries (1-12)
-fn add_orders(graph: &mut Graph) {
-    for i in 1..=12 {
-        graph.add_entry(Entry::Order(Order::new(i)));
-    }
-}
-
-/// Add all Position entries (1-12)
-fn add_positions(graph: &mut Graph) {
-    for i in 1..=12 {
-        graph.add_entry(Entry::Position(Position::new(i)));
-    }
-}
-
-/// Add all Location entries.
-///
-/// Emits both:
-/// - Entry-shaped Locations (`loc_{order}_{p}`) for every position in every order.
-/// - Link-shaped Locations (`loc_{order}_{p1}_{p2}` with `p1 < p2`) for every
-///   undirected pair of positions in every order.
-///
-/// Totals across orders 1..=12: 78 entry-shaped + 220 link-shaped = 298 Locations.
-fn add_locations(graph: &mut Graph) {
+/// Seed one canonical hex-colour Character per unique colour + one Canonical
+/// Colour SemanticVocabulary per Order (terms only, no connectives).
+fn add_canonical_colour_vocabularies(graph: &mut Graph) {
     for order in 1..=12u8 {
-        for position in 1..=order {
-            graph.add_entry(Entry::Location(Location::new(order, position)));
-        }
-        for p1 in 1..=order {
-            for p2 in (p1 + 1)..=order {
-                graph.add_entry(Entry::Location(Location::link(order, p1, p2)));
+        let hex_codes = get_colours(order);
+        // Ensure each hex code has a Character entry (content-addressed).
+        for hex in &hex_codes {
+            let id = format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase());
+            if graph.character(&id).is_none() {
+                graph.add_entry(Entry::Character(Character::new(&id, "hex", *hex)));
             }
         }
-    }
-}
-
-// =============================================================================
-// Geometry - Invariant structure mapped to Locations
-// =============================================================================
-
-/// Add coordinates for a specific system order
-fn add_coordinates(graph: &mut Graph, order: u8) {
-    let coords = get_coordinates(order);
-    for (idx, coord) in coords.iter().enumerate() {
-        let position = (idx + 1) as u8;
-        graph.add_entry(Entry::Coordinate(Coordinate::with_auto_id(
-            order, position, *coord,
-        )));
-    }
-}
-
-/// Add colours for a specific system order
-fn add_colours(graph: &mut Graph, order: u8) {
-    let colours = get_colours(order);
-    for (idx, colour) in colours.iter().enumerate() {
-        let position = (idx + 1) as u8;
-        graph.add_entry(Entry::Colour(Colour::with_auto_id(
+        let terms: Vec<String> = hex_codes
+            .iter()
+            .map(|hex| format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase()))
+            .collect();
+        let name = format!("Canonical Colours {}", canonical_system_name(order));
+        graph.add_semantic_vocab(SemanticVocabulary::with_auto_id(
+            name,
             order,
-            position,
-            Language::Hex,
-            *colour,
-        )));
-    }
-}
-
-// =============================================================================
-// Order-Level Metadata - References Order anchor
-// =============================================================================
-
-/// Add system-level metadata for all orders
-fn add_system_metadata(graph: &mut Graph) {
-    // System names
-    let names = [
-        (1, "Monad"),
-        (2, "Dyad"),
-        (3, "Triad"),
-        (4, "Tetrad"),
-        (5, "Pentad"),
-        (6, "Hexad"),
-        (7, "Heptad"),
-        (8, "Octad"),
-        (9, "Ennead"),
-        (10, "Decad"),
-        (11, "Undecad"),
-        (12, "Dodecad"),
-    ];
-
-    for (order, name) in names {
-        graph.add_entry(Entry::SystemName(SystemName::with_auto_id(order, name)));
-    }
-
-    // Coherence attributes
-    let coherences = [
-        (1, "Universality"),
-        (2, "Complementarity"),
-        (3, "Dynamism"),
-        (4, "Activity Field"),
-        (5, "Significance and Potential"),
-        (6, "Coalescence"),
-        (7, "Generation"),
-        (8, "Self-Sufficiency"),
-        (9, "Transformation"),
-        (10, "Intrinsic Harmony"),
-        (11, "Articulate Symmetry"),
-        (12, "Perfection"),
-    ];
-
-    for (order, coherence) in coherences {
-        graph.add_entry(Entry::CoherenceAttribute(CoherenceAttribute::with_auto_id(
-            order, coherence,
-        )));
-    }
-
-    // Term designations
-    let term_designations = [
-        (1, "Totality"),
-        (2, "Poles"),
-        (3, "Impulses"),
-        (4, "Sources"),
-        (5, "Limits"),
-        (6, "Laws"),
-        (7, "States"),
-        (8, "Elements"),
-        (9, "Needs Research"),
-        (10, "Needs Research"),
-        (11, "Needs Research"),
-        (12, "Needs Research"),
-    ];
-
-    for (order, designation) in term_designations {
-        graph.add_entry(Entry::TermDesignation(TermDesignation::with_auto_id(
-            order,
-            designation,
-        )));
-    }
-
-    // Connective designations
-    let connective_designations = [
-        (1, "Unity"),
-        (2, "Force"),
-        (3, "Acts"),
-        (4, "Interplays"),
-        (5, "Mutualities"),
-        (6, "Steps"),
-        (7, "Intervals"),
-        (8, "Components"),
-        (9, "Needs Research"),
-        (10, "Needs Research"),
-        (11, "Needs Research"),
-        (12, "Needs Research"),
-    ];
-
-    for (order, designation) in connective_designations {
-        graph.add_entry(Entry::ConnectiveDesignation(
-            ConnectiveDesignation::with_auto_id(order, designation),
+            terms,
+            vec![], // colours have no connectives; validate() is not called on this vocab.
         ));
     }
 }
 
-// =============================================================================
-// Vocabulary-Specific Content - Characters and Terms
-// =============================================================================
-
-/// Add canonical vocabulary characters
-fn add_canonical_characters(graph: &mut Graph) {
-    let characters = [
-        // Monad
-        "Unity",
-        // Dyad
-        "Essence",
-        "Existence",
-        // Triad
-        "Will",
-        "Function",
-        "Being",
-        // Tetrad
-        "Ideal",
-        "Directive",
-        "Instrumental",
-        "Ground",
-        // Pentad
-        "Purpose",
-        "Higher Potential",
-        "Quintessence",
-        "Lower Potential",
-        "Source",
-        // Hexad
-        "Resources",
-        "Values",
-        "Options",
-        "Criteria",
-        "Facts",
-        "Priorities",
-        // Heptad
-        "Insight",
-        "Research",
-        "Design",
-        "Synthesis",
-        "Application",
-        "Delivery",
-        "Value",
-        // Octad
-        "Smallest Significant Holon",
-        "Critical Functions",
-        "Supportive Platform",
-        "Necessary Resourcing",
-        "Integrative Totality",
-        "Inherent Values",
-        "Intrinsic Nature",
-        "Organisational Modes",
-    ];
-
-    for value in characters {
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            value,
-        )));
-    }
-
-    // Connective characters for Triad (Acts)
-    for value in ["Generation", "Consent", "Decision"] {
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            value,
-        )));
-    }
-
-    // Connective characters for Tetrad (Interplays)
-    for value in [
-        "Receptive Regard",
-        "Effectual Compatibility",
-        "Motivational Imperative",
-        "Demonstrable Activity",
-        "Material Mastery",
-        "Technical Power",
-    ] {
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            value,
-        )));
-    }
-
-    // Connective characters for Pentad (Mutualities)
-    for value in [
-        "Range of Potential",
-        "Range of Significance",
-        "Aspiration",
-        "Operation",
-        "Output",
-        "Input",
-        "Qualitative Match",
-        "Quantitative Match",
-        "Form",
-        "Function",
-    ] {
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            value,
-        )));
-    }
-
-    // Connective characters for Hexad (Steps) - placeholders
-    for i in 1..=15 {
-        let value = format!("Step {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Connective characters for Heptad (Intervals) - placeholders
-    for i in 1..=21 {
-        let value = format!("Interval {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Connective characters for Octad (Components) - placeholders
-    for i in 1..=28 {
-        let value = format!("Component {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Connective characters for Ennead (Transmutations) - placeholders
-    for i in 1..=36 {
-        let value = format!("Transmutation {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Connective characters for Decad (Progressions) - placeholders
-    for i in 1..=45 {
-        let value = format!("Progression {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Connective characters for Undecad (Correlations) - placeholders
-    for i in 1..=55 {
-        let value = format!("Correlation {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Connective characters for Dodecad (Harmonies) - placeholders
-    for i in 1..=66 {
-        let value = format!("Harmony {} Needs Research", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Generic terms for orders 9-12
-    for i in 1..=12 {
-        let value = format!("Term {}", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-
-    // Index-based terms for orders 9-12
-    for i in 1..=12 {
-        let value = format!("Index {}", i);
-        graph.add_entry(Entry::Character(Character::with_auto_id(
-            Language::Canonical,
-            &value,
-        )));
-    }
-}
-
-/// Add terms for a specific order (references Location)
-fn add_terms(graph: &mut Graph, order: u8) {
-    let term_chars = get_term_characters(order);
-
-    for (idx, char_name) in term_chars.iter().enumerate() {
-        let position = (idx + 1) as u8;
-        let char_id = format!(
-            "char_canonical_{}",
-            char_name.to_lowercase().replace(' ', "_")
-        );
-        graph.add_entry(Entry::Term(Term::with_auto_id(order, position, &char_id)));
-    }
-}
-
-// =============================================================================
-// Links - Connectives and Lines
-// =============================================================================
-
-/// Add links (connectives and lines) for a system.
-///
-/// For each connective this emits both a `Link::connective` edge (for rendering)
-/// and a `Term::for_link` (for unified vocabulary lookup at the link-shaped
-/// Location).
-fn add_system_links(graph: &mut Graph, order: u8) {
-    // Add connective links for specific orders.
-    // Entries are (base_position, target_position, canonical character slug).
-    match order {
-        3 => {
-            // Triad: Acts
-            let acts = [(1, 2, "generation"), (2, 3, "consent"), (3, 1, "decision")];
-            for (p1, p2, slug) in acts {
-                add_connective_with_term(graph, 3, p1, p2, slug);
-            }
-        }
-        4 => {
-            // Tetrad: Interplays
-            let interplays = [
-                (1, 2, "motivational_imperative"),
-                (3, 4, "demonstrable_activity"),
-                (4, 1, "effectual_compatibility"),
-                (3, 1, "receptive_regard"),
-                (3, 2, "material_mastery"),
-                (4, 2, "technical_power"),
-            ];
-            for (p1, p2, slug) in interplays {
-                add_connective_with_term(graph, 4, p1, p2, slug);
-            }
-        }
-        5 => {
-            // Pentad: Mutualities
-            // Positions: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
-            let mutualities = [
-                (3, 4, "range_of_potential"),
-                (5, 2, "range_of_significance"),
-                (1, 3, "aspiration"),
-                (1, 4, "operation"),
-                (3, 5, "output"),
-                (4, 2, "input"),
-                (1, 5, "qualitative_match"),
-                (1, 2, "quantitative_match"),
-                (4, 5, "form"),
-                (3, 2, "function"),
-            ];
-            for (p1, p2, slug) in mutualities {
-                add_connective_with_term(graph, 5, p1, p2, slug);
-            }
-        }
-        6..=12 => {
-            // Higher orders: Add placeholder connective links for all term pairs
-            add_placeholder_connectives(graph, order);
-        }
-        _ => {}
-    }
-
-    // Add line links between all coordinates (complete graph)
-    for i in 1..=order {
-        for j in (i + 1)..=order {
-            graph.add_link(Link::line(
-                format!("coord_{}_{}", order, i),
-                format!("coord_{}_{}", order, j),
-            ));
-        }
-    }
-}
-
-/// Add placeholder connective links for orders 6-12 (simplex-anchored).
-/// Emits both the edge `Link` and a `Term::for_link` at the link-shaped Location.
-fn add_placeholder_connectives(graph: &mut Graph, order: u8) {
-    let prefix = match order {
-        6 => "step",
-        7 => "interval",
-        8 => "component",
-        9 => "transmutation",
-        10 => "progression",
-        11 => "correlation",
-        12 => "harmony",
-        _ => return,
-    };
-
-    let mut idx = 1;
-    for i in 1..=order {
-        for j in (i + 1)..=order {
-            let slug = format!("{}_{}_needs_research", prefix, idx);
-            add_connective_with_term(graph, order, i, j, &slug);
-            idx += 1;
-        }
-    }
-}
-
-// =============================================================================
-// Data Helpers
-// =============================================================================
-
-/// Get term characters for an order
-fn get_term_characters(order: u8) -> Vec<&'static str> {
-    match order {
-        1 => vec!["Unity"],
-        2 => vec!["Essence", "Existence"],
-        3 => vec!["Will", "Function", "Being"],
-        4 => vec!["Ideal", "Ground", "Directive", "Instrumental"],
-        // Pentad: 1=Quintessence, 2=Source, 3=Higher Potential, 4=Lower Potential, 5=Purpose
-        5 => vec![
-            "Quintessence",
-            "Source",
-            "Higher Potential",
-            "Lower Potential",
-            "Purpose",
-        ],
-        // Hexad: 1=Priorities, 2=Criteria, 3=Values, 4=Resources, 5=Options, 6=Facts
-        6 => vec![
-            "Priorities",
-            "Criteria",
-            "Values",
-            "Resources",
-            "Options",
-            "Facts",
-        ],
-        // Heptad: 1=Insight, 2=Application, 3=Design, 4=Research, 5=Synthesis, 6=Delivery, 7=Value
-        7 => vec![
-            "Insight",
-            "Application",
-            "Design",
-            "Research",
-            "Synthesis",
-            "Delivery",
-            "Value",
-        ],
-        // Octad: Position N = Term mapping
-        // 1=Inherent Values, 2=Critical Functions, 3=Organisational Modes, 4=Necessary Resourcing
-        // 5=Intrinsic Nature, 6=Smallest Holon, 7=Integrative Totality, 8=Supportive Platform
-        8 => vec![
-            "Inherent Values",
-            "Critical Functions",
-            "Organisational Modes",
-            "Necessary Resourcing",
-            "Intrinsic Nature",
-            "Smallest Significant Holon",
-            "Integrative Totality",
-            "Supportive Platform",
-        ],
-        // Ennead: Sequential positions 1-9
-        9 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9",
-        ],
-        // Decad: Sequential positions 1-10
-        10 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9", "Term 10",
-        ],
-        // Undecad: Sequential positions 1-11
-        11 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9", "Term 10", "Term 11",
-        ],
-        // Dodecad: Sequential positions 1-12
-        12 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9", "Term 10", "Term 11", "Term 12",
-        ],
-        _ => vec![],
-    }
-}
-
-/// Get coordinates for an order (from curated data files)
-fn get_coordinates(order: u8) -> Vec<Point3d> {
-    match order {
-        1 => vec![Point3d::new(0.0, 0.0, 0.0)],
-        2 => vec![
-            Point3d::new(-1.0, 0.0, 0.0), // Essence (left)
-            Point3d::new(1.0, 0.0, 0.0),  // Existence (right)
-        ],
-        3 => vec![
-            Point3d::new(0.0, 1.0, 0.0),  // Will (top left)
-            Point3d::new(0.0, -1.0, 0.0), // Function (bottom left)
-            Point3d::new(1.0, 0.0, 0.0),  // Being (right, midpoint vertically)
-        ],
-        4 => vec![
-            Point3d::new(0.0, 1.0, 0.0),  // Ideal (top)
-            Point3d::new(0.0, -1.0, 0.0), // Ground (bottom)
-            Point3d::new(1.0, 0.0, 0.0),  // Directive (right)
-            Point3d::new(-1.0, 0.0, 0.0), // Instrumental (left)
-        ],
-        5 => vec![
-            Point3d::new(-0.75, 0.0, 0.0), // Quintessence (left-center, middle)
-            Point3d::new(1.0, -0.75, 0.0), // Source (right, bottom)
-            Point3d::new(0.0, 0.5, 0.0),   // Higher Potential (center, upper)
-            Point3d::new(0.0, -0.5, 0.0),  // Lower Potential (center, lower)
-            Point3d::new(1.0, 0.75, 0.0),  // Purpose (right, top)
-        ],
-        6 => vec![
-            Point3d::new(-0.866, -0.5, 0.0), // Priorities (lower left)
-            Point3d::new(0.866, -0.5, 0.0),  // Criteria (lower right)
-            Point3d::new(0.0, 1.0, 0.0),     // Values (top)
-            Point3d::new(-0.866, 0.5, 0.0),  // Resources (upper left)
-            Point3d::new(0.866, 0.5, 0.0),   // Options (upper right)
-            Point3d::new(0.0, -1.0, 0.0),    // Facts (bottom)
-        ],
-        7 => vec![
-            Point3d::new(0.0, 1.0, 0.0),             // Insight (top center)
-            Point3d::new(-0.433884, -0.900969, 0.0), // Application
-            Point3d::new(0.974370, -0.222521, 0.0),  // Design
-            Point3d::new(0.781831, 0.623489, 0.0),   // Research
-            Point3d::new(0.433884, -0.900969, 0.0),  // Synthesis
-            Point3d::new(-0.974370, -0.222521, 0.0), // Delivery
-            Point3d::new(-0.781831, 0.623489, 0.0),  // Value
-        ],
-        8 => vec![
-            Point3d::new(
-                -std::f64::consts::FRAC_1_SQRT_2,
-                std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ), // Inherent Values (upper left)
-            Point3d::new(
-                std::f64::consts::FRAC_1_SQRT_2,
-                -std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ), // Critical Functions (lower right)
-            Point3d::new(
-                std::f64::consts::FRAC_1_SQRT_2,
-                std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ), // Organisational Modes (upper right)
-            Point3d::new(
-                -std::f64::consts::FRAC_1_SQRT_2,
-                -std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ), // Necessary Resourcing (lower left)
-            Point3d::new(0.0, 1.0, 0.0),  // Intrinsic Nature (top)
-            Point3d::new(1.0, 0.0, 0.0),  // Smallest Significant Holon (right)
-            Point3d::new(-1.0, 0.0, 0.0), // Integrative Totality (left)
-            Point3d::new(0.0, -1.0, 0.0), // Supportive Platform (bottom)
-        ],
-        // Ennead: 9 points arranged in a circle
-        9 => vec![
-            Point3d::new(-0.64278760968, 0.76604444311, 0.0), // Position 1
-            Point3d::new(0.86602540378, -0.5, 0.0),           // Position 2
-            Point3d::new(0.64278760968, 0.76604444311, 0.0),  // Position 3
-            Point3d::new(-0.34202014333, -0.93969262079, 0.0), // Position 4
-            Point3d::new(0.0, 1.0, 0.0),                      // Position 5
-            Point3d::new(0.98480775301, 0.17364817767, 0.0),  // Position 6
-            Point3d::new(-0.98480775301, 0.17364817767, 0.0), // Position 7
-            Point3d::new(0.34202014333, -0.93969262079, 0.0), // Position 8
-            Point3d::new(-0.86602540378, -0.5, 0.0),          // Position 9
-        ],
-        // Decad: 10 points arranged in a circle
-        10 => vec![
-            Point3d::new(-0.80901699437, 0.58778525229, 0.0), // Position 1
-            Point3d::new(0.80901699437, -0.58778525229, 0.0), // Position 2
-            Point3d::new(0.30901699437, 0.95105651630, 0.0),  // Position 3
-            Point3d::new(-0.30901699437, -0.95105651630, 0.0), // Position 4
-            Point3d::new(-0.30901699437, 0.95105651630, 0.0), // Position 5
-            Point3d::new(0.80901699437, 0.58778525229, 0.0),  // Position 6
-            Point3d::new(-1.0, 0.0, 0.0),                     // Position 7
-            Point3d::new(0.30901699437, -0.95105651630, 0.0), // Position 8
-            Point3d::new(1.0, 0.0, 0.0),                      // Position 9
-            Point3d::new(-0.80901699437, -0.58778525229, 0.0), // Position 10
-        ],
-        // Undecad: 11 points arranged in a circle
-        11 => vec![
-            Point3d::new(-0.909632, 0.415415, 0.0),           // Position 1
-            Point3d::new(0.755750, -0.654861, 0.0),           // Position 2
-            Point3d::new(0.54064081745, 0.84125353283, 0.0),  // Position 3
-            Point3d::new(-0.281733, -0.959493, 0.0),          // Position 4
-            Point3d::new(-0.54064081745, 0.84125353283, 0.0), // Position 5
-            Point3d::new(0.909632, 0.415415, 0.0),            // Position 6
-            Point3d::new(-0.989821, -0.142315, 0.0),          // Position 7
-            Point3d::new(0.281733, -0.959493, 0.0),           // Position 8
-            Point3d::new(0.989821, -0.142315, 0.0),           // Position 9
-            Point3d::new(-0.755750, -0.654861, 0.0),          // Position 10
-            Point3d::new(0.0, 1.0, 0.0),                      // Position 11
-        ],
-        // Dodecad: 12 points arranged in a circle
-        12 => vec![
-            Point3d::new(-0.5, 0.86602540378, 0.0),  // Position 1
-            Point3d::new(0.86602540378, -0.5, 0.0),  // Position 2
-            Point3d::new(0.86602540378, 0.5, 0.0),   // Position 3
-            Point3d::new(-0.86602540378, -0.5, 0.0), // Position 4
-            Point3d::new(1.0, 0.0, 0.0),             // Position 5
-            Point3d::new(0.5, 0.86602540378, 0.0),   // Position 6
-            Point3d::new(0.0, -1.0, 0.0),            // Position 7
-            Point3d::new(-0.5, -0.86602540378, 0.0), // Position 8
-            Point3d::new(0.0, 1.0, 0.0),             // Position 9
-            Point3d::new(0.5, -0.86602540378, 0.0),  // Position 10
-            Point3d::new(-1.0, 0.0, 0.0),            // Position 11
-            Point3d::new(-0.86602540378, 0.5, 0.0),  // Position 12
-        ],
-        _ => vec![],
-    }
-}
-
-/// Get position colours for an order
 fn get_colours(order: u8) -> Vec<&'static str> {
-    // Color palette
     const RED: &str = "#FF0000";
     const BLUE: &str = "#0000FF";
     const YELLOW: &str = "#FFFF00";
@@ -747,12 +72,8 @@ fn get_colours(order: u8) -> Vec<&'static str> {
         6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
         7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
         8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
-        9 => vec![
-            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA,
-        ],
-        10 => vec![
-            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE,
-        ],
+        9 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA],
+        10 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE],
         11 => vec![
             RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
         ],
@@ -764,96 +85,512 @@ fn get_colours(order: u8) -> Vec<&'static str> {
     }
 }
 
+// =============================================================================
+// Substrate creation
+// =============================================================================
+
+fn add_orders(graph: &mut Graph) {
+    for i in 1..=12u8 {
+        graph.add_entry(Entry::Order(Order::new(i)));
+    }
+}
+
+fn add_positions(graph: &mut Graph) {
+    for i in 1..=12u8 {
+        graph.add_entry(Entry::Position(Position::new(i)));
+    }
+}
+
+fn add_substrate(graph: &mut Graph) {
+    for order in 1..=12u8 {
+        // Points at every position.
+        for position in 1..=order {
+            graph.add_entry(Entry::Point(Point::new(order, position)));
+        }
+        // Lines at every canonical pair (p1 < p2).
+        for p1 in 1..=order {
+            for p2 in (p1 + 1)..=order {
+                graph.add_entry(Entry::Line(Line::new(order, p1, p2)));
+            }
+        }
+        // Coordinates at every Point.
+        let coords = get_coordinates(order);
+        for (idx, coord) in coords.iter().enumerate() {
+            let position = (idx + 1) as u8;
+            graph.add_entry(Entry::Coordinate(Coordinate::from_point3d(
+                order, position, *coord,
+            )));
+        }
+        // Segments at every Line.
+        for p1 in 1..=order {
+            for p2 in (p1 + 1)..=order {
+                graph.add_entry(Entry::Segment(Segment::new(order, p1, p2)));
+            }
+        }
+        // Per-order topological and geometric vocabularies.
+        graph.add_topological_vocab(TopologicalVocabulary::canonical_for(order));
+        graph.add_geometric_vocab(GeometricVocabulary::canonical_for(order));
+    }
+}
+
+fn add_canonical_vocabularies_and_grammars(graph: &mut Graph) {
+    for order in 1..=12u8 {
+        let term_slugs = get_term_character_slugs(order);
+        let connective_slugs = get_canonical_connective_slugs(order);
+
+        // Emit Character entries for every referenced slug (word Characters
+        // are content-addressed by `char_word_{slug}`).
+        for slug in term_slugs.iter().chain(connective_slugs.iter()) {
+            let id = format!("char_word_{}", slug);
+            if graph.character(&id).is_none() {
+                let value = word_from_slug(slug);
+                graph.add_entry(Entry::Character(Character::new(&id, "word", value)));
+            }
+        }
+
+        let term_char_ids: Vec<String> = term_slugs
+            .iter()
+            .map(|s| format!("char_word_{}", s))
+            .collect();
+        let connective_char_ids: Vec<String> = connective_slugs
+            .iter()
+            .map(|s| format!("char_word_{}", s))
+            .collect();
+
+        let semvocab = SemanticVocabulary::with_auto_id(
+            format!("Canonical {}", canonical_system_name(order)),
+            order,
+            term_char_ids,
+            connective_char_ids,
+        );
+        let semvocab_id = semvocab.id.clone();
+        graph.add_semantic_vocab(semvocab);
+
+        let topvocab_id = format!("topvocab_{}", order);
+        let geovocab_id = format!("geovocab_{}", order);
+
+        let gram = Grammar::with_auto_id(
+            format!("Canonical {}", canonical_system_name(order)),
+            order,
+            canonical_coherence(order),
+            canonical_term_designation(order),
+            canonical_connective_designation(order),
+            &topvocab_id,
+            &geovocab_id,
+            &semvocab_id,
+        );
+        graph.add_grammar(gram);
+    }
+}
+
+/// Emit `Link::line` edges between coordinates (rendering shim; retained
+/// until the frontend consumes `Segment` entries directly).
+fn add_rendering_line_links(graph: &mut Graph) {
+    for order in 1..=12u8 {
+        for p1 in 1..=order {
+            for p2 in (p1 + 1)..=order {
+                graph.add_link(Link::line(
+                    format!("coord_{}_{}", order, p1),
+                    format!("coord_{}_{}", order, p2),
+                ));
+            }
+        }
+    }
+}
+
+// =============================================================================
+// Canonical vocabulary data
+// =============================================================================
+
+/// Term-character values in position order for each canonical system.
+fn get_term_characters(order: u8) -> Vec<&'static str> {
+    match order {
+        1 => vec!["Unity"],
+        2 => vec!["Essence", "Existence"],
+        3 => vec!["Will", "Function", "Being"],
+        4 => vec!["Ideal", "Ground", "Directive", "Instrumental"],
+        5 => vec![
+            "Quintessence",
+            "Source",
+            "Higher Potential",
+            "Lower Potential",
+            "Purpose",
+        ],
+        6 => vec![
+            "Priorities",
+            "Criteria",
+            "Values",
+            "Resources",
+            "Options",
+            "Facts",
+        ],
+        7 => vec![
+            "Insight",
+            "Application",
+            "Design",
+            "Research",
+            "Synthesis",
+            "Delivery",
+            "Value",
+        ],
+        8 => vec![
+            "Inherent Values",
+            "Critical Functions",
+            "Organisational Modes",
+            "Necessary Resourcing",
+            "Intrinsic Nature",
+            "Smallest Significant Holon",
+            "Integrative Totality",
+            "Supportive Platform",
+        ],
+        9 => vec![
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9",
+        ],
+        10 => vec![
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9", "Term 10",
+        ],
+        11 => vec![
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9", "Term 10", "Term 11",
+        ],
+        12 => vec![
+            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+            "Term 9", "Term 10", "Term 11", "Term 12",
+        ],
+        _ => vec![],
+    }
+}
+
+fn get_term_character_slugs(order: u8) -> Vec<String> {
+    get_term_characters(order).into_iter().map(slugify).collect()
+}
+
+/// Canonical connective slugs in canonical topological order (p1 < p2).
+fn get_canonical_connective_slugs(order: u8) -> Vec<String> {
+    match order {
+        1 => vec![],
+        2 => vec!["force_1_needs_research".into()],
+        3 => vec![
+            "generation".into(),
+            "decision".into(),
+            "consent".into(),
+        ],
+        4 => vec![
+            "motivational_imperative".into(),
+            "receptive_regard".into(),
+            "effectual_compatibility".into(),
+            "material_mastery".into(),
+            "technical_power".into(),
+            "demonstrable_activity".into(),
+        ],
+        5 => vec![
+            "quantitative_match".into(),
+            "aspiration".into(),
+            "operation".into(),
+            "qualitative_match".into(),
+            "function".into(),
+            "input".into(),
+            "range_of_significance".into(),
+            "range_of_potential".into(),
+            "output".into(),
+            "form".into(),
+        ],
+        _ => {
+            let prefix = match order {
+                6 => "step",
+                7 => "interval",
+                8 => "component",
+                9 => "transmutation",
+                10 => "progression",
+                11 => "correlation",
+                12 => "harmony",
+                _ => return vec![],
+            };
+            let n = order as usize;
+            let count = n * (n - 1) / 2;
+            (1..=count)
+                .map(|i| format!("{}_{}_needs_research", prefix, i))
+                .collect()
+        }
+    }
+}
+
+fn slugify(s: &str) -> String {
+    s.to_lowercase().replace(' ', "_")
+}
+
+fn word_from_slug(slug: &str) -> String {
+    slug.split('_')
+        .map(|part| {
+            let mut chars = part.chars();
+            match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn canonical_system_name(order: u8) -> &'static str {
+    match order {
+        1 => "Monad",
+        2 => "Dyad",
+        3 => "Triad",
+        4 => "Tetrad",
+        5 => "Pentad",
+        6 => "Hexad",
+        7 => "Heptad",
+        8 => "Octad",
+        9 => "Ennead",
+        10 => "Decad",
+        11 => "Undecad",
+        12 => "Dodecad",
+        _ => "Unknown",
+    }
+}
+
+fn canonical_coherence(order: u8) -> &'static str {
+    match order {
+        1 => "Universality",
+        2 => "Complementarity",
+        3 => "Dynamism",
+        4 => "Activity Field",
+        5 => "Significance and Potential",
+        6 => "Coalescence",
+        7 => "Generation",
+        8 => "Self-Sufficiency",
+        9 => "Transformation",
+        10 => "Intrinsic Harmony",
+        11 => "Articulate Symmetry",
+        12 => "Perfection",
+        _ => "Unknown",
+    }
+}
+
+fn canonical_term_designation(order: u8) -> &'static str {
+    match order {
+        1 => "Totality",
+        2 => "Poles",
+        3 => "Impulses",
+        4 => "Sources",
+        5 => "Limits",
+        6 => "Laws",
+        7 => "States",
+        8 => "Elements",
+        _ => "Needs Research",
+    }
+}
+
+fn canonical_connective_designation(order: u8) -> &'static str {
+    match order {
+        1 => "Unity",
+        2 => "Force",
+        3 => "Acts",
+        4 => "Interplays",
+        5 => "Mutualities",
+        6 => "Steps",
+        7 => "Intervals",
+        8 => "Components",
+        _ => "Needs Research",
+    }
+}
+
+// =============================================================================
+// Coordinate data — same geometry as the pre-refactor codebase.
+// =============================================================================
+
+fn get_coordinates(order: u8) -> Vec<Point3d> {
+    match order {
+        1 => vec![Point3d::new(0.0, 0.0, 0.0)],
+        2 => vec![
+            Point3d::new(-1.0, 0.0, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+        ],
+        3 => vec![
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(0.0, -1.0, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+        ],
+        4 => vec![
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(0.0, -1.0, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+            Point3d::new(-1.0, 0.0, 0.0),
+        ],
+        5 => vec![
+            Point3d::new(-0.75, 0.0, 0.0),
+            Point3d::new(1.0, -0.75, 0.0),
+            Point3d::new(0.0, 0.5, 0.0),
+            Point3d::new(0.0, -0.5, 0.0),
+            Point3d::new(1.0, 0.75, 0.0),
+        ],
+        6 => vec![
+            Point3d::new(-0.866, -0.5, 0.0),
+            Point3d::new(0.866, -0.5, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(-0.866, 0.5, 0.0),
+            Point3d::new(0.866, 0.5, 0.0),
+            Point3d::new(0.0, -1.0, 0.0),
+        ],
+        7 => vec![
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(-0.433884, -0.900969, 0.0),
+            Point3d::new(0.974370, -0.222521, 0.0),
+            Point3d::new(0.781831, 0.623489, 0.0),
+            Point3d::new(0.433884, -0.900969, 0.0),
+            Point3d::new(-0.974370, -0.222521, 0.0),
+            Point3d::new(-0.781831, 0.623489, 0.0),
+        ],
+        8 => vec![
+            Point3d::new(
+                -std::f64::consts::FRAC_1_SQRT_2,
+                std::f64::consts::FRAC_1_SQRT_2,
+                0.0,
+            ),
+            Point3d::new(
+                std::f64::consts::FRAC_1_SQRT_2,
+                -std::f64::consts::FRAC_1_SQRT_2,
+                0.0,
+            ),
+            Point3d::new(
+                std::f64::consts::FRAC_1_SQRT_2,
+                std::f64::consts::FRAC_1_SQRT_2,
+                0.0,
+            ),
+            Point3d::new(
+                -std::f64::consts::FRAC_1_SQRT_2,
+                -std::f64::consts::FRAC_1_SQRT_2,
+                0.0,
+            ),
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+            Point3d::new(-1.0, 0.0, 0.0),
+            Point3d::new(0.0, -1.0, 0.0),
+        ],
+        9 => vec![
+            Point3d::new(-0.64278760968, 0.76604444311, 0.0),
+            Point3d::new(0.86602540378, -0.5, 0.0),
+            Point3d::new(0.64278760968, 0.76604444311, 0.0),
+            Point3d::new(-0.34202014333, -0.93969262079, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(0.98480775301, 0.17364817767, 0.0),
+            Point3d::new(-0.98480775301, 0.17364817767, 0.0),
+            Point3d::new(0.34202014333, -0.93969262079, 0.0),
+            Point3d::new(-0.86602540378, -0.5, 0.0),
+        ],
+        10 => vec![
+            Point3d::new(-0.80901699437, 0.58778525229, 0.0),
+            Point3d::new(0.80901699437, -0.58778525229, 0.0),
+            Point3d::new(0.30901699437, 0.95105651630, 0.0),
+            Point3d::new(-0.30901699437, -0.95105651630, 0.0),
+            Point3d::new(-0.30901699437, 0.95105651630, 0.0),
+            Point3d::new(0.80901699437, 0.58778525229, 0.0),
+            Point3d::new(-1.0, 0.0, 0.0),
+            Point3d::new(0.30901699437, -0.95105651630, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+            Point3d::new(-0.80901699437, -0.58778525229, 0.0),
+        ],
+        11 => vec![
+            Point3d::new(-0.909632, 0.415415, 0.0),
+            Point3d::new(0.755750, -0.654861, 0.0),
+            Point3d::new(0.54064081745, 0.84125353283, 0.0),
+            Point3d::new(-0.281733, -0.959493, 0.0),
+            Point3d::new(-0.54064081745, 0.84125353283, 0.0),
+            Point3d::new(0.909632, 0.415415, 0.0),
+            Point3d::new(-0.989821, -0.142315, 0.0),
+            Point3d::new(0.281733, -0.959493, 0.0),
+            Point3d::new(0.989821, -0.142315, 0.0),
+            Point3d::new(-0.755750, -0.654861, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),
+        ],
+        12 => vec![
+            Point3d::new(-0.5, 0.86602540378, 0.0),
+            Point3d::new(0.86602540378, -0.5, 0.0),
+            Point3d::new(0.86602540378, 0.5, 0.0),
+            Point3d::new(-0.86602540378, -0.5, 0.0),
+            Point3d::new(1.0, 0.0, 0.0),
+            Point3d::new(0.5, 0.86602540378, 0.0),
+            Point3d::new(0.0, -1.0, 0.0),
+            Point3d::new(-0.5, -0.86602540378, 0.0),
+            Point3d::new(0.0, 1.0, 0.0),
+            Point3d::new(0.5, -0.86602540378, 0.0),
+            Point3d::new(-1.0, 0.0, 0.0),
+            Point3d::new(-0.86602540378, 0.5, 0.0),
+        ],
+        _ => vec![],
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_build_graph_has_anchors() {
-        let graph = build_graph();
-
-        // Should have Order entries
-        assert!(graph.order(1).is_some());
-        assert!(graph.order(12).is_some());
-
-        // Should have Position entries
-        assert!(graph.position(1).is_some());
-        assert!(graph.position(12).is_some());
-
-        // Should have Location entries
-        assert!(graph.location(3, 1).is_some());
-        assert!(graph.location(12, 12).is_some());
+    fn test_build_graph_substrate() {
+        let g = build_graph();
+        assert!(g.order(1).is_some());
+        assert!(g.order(12).is_some());
+        assert!(g.point(3, 1).is_some());
+        assert!(g.line(3, 1, 2).is_some());
+        assert!(g.coordinate(3, 1).is_some());
+        assert!(g.segment(3, 1, 2).is_some());
+        assert_eq!(g.coordinate(3, 1).unwrap().point_ref, "point_3_1");
     }
 
     #[test]
-    fn test_build_graph_has_metadata() {
-        let graph = build_graph();
-
-        // Should have entries for all 12 systems
-        assert!(graph.system_name(1).is_some());
-        assert!(graph.system_name(12).is_some());
-
-        // Check triad
-        assert_eq!(graph.system_name(3).unwrap().value, "Triad");
-        assert_eq!(graph.coherence(3).unwrap().value, "Dynamism");
-        assert_eq!(graph.term_designation(3).unwrap().value, "Impulses");
+    fn test_build_graph_canonical_grammars() {
+        let g = build_graph();
+        for order in 1..=12u8 {
+            assert!(g.topological_vocab_for_order(order).is_some());
+            assert!(g.geometric_vocab_for_order(order).is_some());
+            let name = format!("Canonical {}", canonical_system_name(order));
+            let semvocab_id = format!(
+                "semvocab_{}_{}",
+                name.to_lowercase().replace(' ', "_"),
+                order
+            );
+            assert!(g.semantic_vocab(&semvocab_id).is_some());
+            let grammar_id = format!(
+                "grammar_{}_{}",
+                name.to_lowercase().replace(' ', "_"),
+                order
+            );
+            assert!(g.grammar(&grammar_id).is_some());
+            assert!(
+                g.validate_grammar(&grammar_id).is_ok(),
+                "Grammar {} failed validation: {:?}",
+                grammar_id,
+                g.validate_grammar(&grammar_id)
+            );
+        }
     }
 
     #[test]
-    fn test_build_graph_has_terms() {
-        let graph = build_graph();
-
-        // Check terms exist
-        let triad_terms = graph.terms(3, None);
-        assert_eq!(triad_terms.len(), 3);
-
-        // Verify term references location
-        let term = graph.term(3, 1).unwrap();
-        assert_eq!(term.location, "loc_3_1");
+    fn test_character_at_point_canonical_triad() {
+        let g = build_graph();
+        assert_eq!(
+            g.character_at_point("semvocab_canonical_triad_3", "point_3_1")
+                .unwrap()
+                .value,
+            "Will"
+        );
+        assert_eq!(
+            g.character_at_line("semvocab_canonical_triad_3", "line_3_1_2")
+                .unwrap()
+                .value,
+            "Generation"
+        );
     }
 
     #[test]
-    fn test_coordinates_reference_location() {
-        let graph = build_graph();
-
-        let coord = graph.coordinate(3, 1).unwrap();
-        assert_eq!(coord.location, "loc_3_1");
-    }
-
-    #[test]
-    fn test_slices_include_location() {
-        let graph = build_graph();
-
-        // Slice at (3, 1) should include Location, Term, Coordinate, Colour
-        let slice = graph.slice(3, 1);
-        assert!(slice.len() >= 4);
-
-        // Verify Location is in the slice
-        let has_location = slice.iter().any(|e| matches!(e, Entry::Location(_)));
-        assert!(has_location);
-    }
-
-    #[test]
-    fn test_locations_for_order() {
-        let graph = build_graph();
-
-        let triad_locs = graph.locations_for_order(3);
-        assert_eq!(triad_locs.len(), 3);
-
-        let dodecad_locs = graph.locations_for_order(12);
-        assert_eq!(dodecad_locs.len(), 12);
-    }
-
-    #[test]
-    fn test_locations_for_position() {
-        let graph = build_graph();
-
-        // Position 1 exists in all 12 orders
-        let pos1_locs = graph.locations_for_position(1);
-        assert_eq!(pos1_locs.len(), 12);
-
-        // Position 12 only exists in Dodecad
-        let pos12_locs = graph.locations_for_position(12);
-        assert_eq!(pos12_locs.len(), 1);
+    fn test_rendering_line_links_exist() {
+        let g = build_graph();
+        // Triad has 3 rendering lines.
+        assert_eq!(g.lines(3).len(), 3);
+        // Dodecad has C(12,2) = 66.
+        assert_eq!(g.lines(12).len(), 66);
     }
 }

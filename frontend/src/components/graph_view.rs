@@ -96,14 +96,14 @@ impl ApiGraphView {
             .lines
             .iter()
             .map(|line| {
-                // Get positions (1-based from API)
-                let base_pos = line.base_position.unwrap_or(0);
-                let target_pos = line.target_position.unwrap_or(0);
+                // Positions come directly (1-based).
+                let base_pos = line.base_position;
+                let target_pos = line.target_position;
 
                 web_sys::console::log_1(
                     &format!(
-                        "Line: {} -> {} (base_pos={}, target_pos={})",
-                        line.base_id, line.target_id, base_pos, target_pos
+                        "Line: {} (base_pos={}, target_pos={})",
+                        line.id, base_pos, target_pos
                     )
                     .into(),
                 );
@@ -180,14 +180,12 @@ impl ApiGraphView {
         );
 
         system.lines.iter().enumerate().map(|(line_idx, line)| {
-            let line_base_pos = line.base_position.unwrap_or(0);
-            let line_target_pos = line.target_position.unwrap_or(0);
+            let line_base_pos = line.base_position;
+            let line_target_pos = line.target_position;
 
-            // Find the connective that matches this line's positions (bidirectional match)
-            // Lines are stored with smaller position first, but connectives preserve semantic direction
             let matching_connective = system.connectives.iter().enumerate().find(|(_, conn)| {
-                let conn_base = conn.base_position.unwrap_or(0);
-                let conn_target = conn.target_position.unwrap_or(0);
+                let conn_base = conn.base_position;
+                let conn_target = conn.target_position;
                 (conn_base == line_base_pos && conn_target == line_target_pos) ||
                 (conn_base == line_target_pos && conn_target == line_base_pos)
             });
@@ -198,11 +196,7 @@ impl ApiGraphView {
                 return html! {};
             };
 
-            // Get the label from the connective's character
-            let label = connective.character
-                .as_ref()
-                .map(|c| c.value.as_str())
-                .unwrap_or("");
+            let label = connective.character_value.as_str();
 
             if label.is_empty() {
                 return html! {};
