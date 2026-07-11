@@ -116,10 +116,7 @@ impl Component for ApiApp {
                 // Add current system to breadcrumbs before navigating
                 if let Some(ref current) = self.selected_system {
                     self.breadcrumbs.push(Breadcrumb {
-                        system_name: current
-                            .name
-                            .clone()
-                            .unwrap_or_else(|| current.display_name()),
+                        system_name: current.name.clone(),
                     });
                 }
 
@@ -221,7 +218,7 @@ impl Component for ApiApp {
                                 // Convert SystemView to SystemDisplay for SystemSelector
                                 let display_systems: Vec<SystemDisplay> = self.systems.iter().map(|sys| {
                                     SystemDisplay {
-                                        name: sys.name.clone().unwrap_or_else(|| sys.display_name().to_lowercase()),
+                                        name: sys.name.to_lowercase(),
                                         display_name: sys.display_name(),
                                         k_notation: sys.k_notation(),
                                     }
@@ -229,7 +226,7 @@ impl Component for ApiApp {
 
                                 let selected_name = self.selected_system
                                     .as_ref()
-                                    .map(|s| s.name.clone().unwrap_or_else(|| s.display_name().to_lowercase()))
+                                    .map(|s| s.name.to_lowercase())
                                     .unwrap_or_else(|| "monad".to_string());
 
                                 html! {

@@ -1,82 +1,98 @@
-//! System view types for Systematics wire format
+//! Populated system view — a compat shape produced by the backend by joining
+//! a Canonical Grammar with its topological / geometric / semantic /
+//! colour vocabularies. Kept as a wire type so the current frontend
+//! renderer can consume it without knowing about Grammars directly.
 
-use super::{Colour, Coordinate, Link, Term};
 use serde::{Deserialize, Serialize};
+
+use super::Coordinate;
 
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;
 
-/// SystemView - a complete view of a system at a given order
+/// A rendered term at a specific position within a system.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "server", derive(SimpleObject))]
+pub struct SystemTerm {
+    pub position: i32,
+    pub character_id: String,
+    pub value: String,
+}
+
+/// A colour at a specific position within a system (hex form).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "server", derive(SimpleObject))]
+pub struct SystemColour {
+    pub position: i32,
+    pub value: String,
+}
+
+/// A rendering edge between two coordinates.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "server", derive(SimpleObject))]
+pub struct SystemLine {
+    pub id: String,
+    #[serde(rename = "basePosition")]
+    pub base_position: i32,
+    #[serde(rename = "targetPosition")]
+    pub target_position: i32,
+}
+
+/// A connective within a system, with its character label and endpoints.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "server", derive(SimpleObject))]
+pub struct SystemConnective {
+    pub id: String,
+    #[serde(rename = "basePosition")]
+    pub base_position: i32,
+    #[serde(rename = "targetPosition")]
+    pub target_position: i32,
+    #[serde(rename = "characterValue")]
+    pub character_value: String,
+}
+
+/// A complete rendered view of a system at a given order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct SystemView {
     pub order: i32,
-    pub name: Option<String>,
-    pub coherence: Option<String>,
+    pub name: String,
+    pub coherence: String,
     #[serde(rename = "termDesignation")]
-    pub term_designation: Option<String>,
+    pub term_designation: String,
     #[serde(rename = "connectiveDesignation")]
-    pub connective_designation: Option<String>,
-    pub terms: Vec<Term>,
+    pub connective_designation: String,
+    pub terms: Vec<SystemTerm>,
     pub coordinates: Vec<Coordinate>,
-    pub colours: Vec<Colour>,
-    pub connectives: Vec<Link>,
-    pub lines: Vec<Link>,
-    /// All links (both lines and connectives)
-    #[serde(default)]
-    pub links: Vec<Link>,
+    pub colours: Vec<SystemColour>,
+    pub lines: Vec<SystemLine>,
+    pub connectives: Vec<SystemConnective>,
 }
 
 impl SystemView {
-    /// Get the system name, falling back to order-based name
     pub fn display_name(&self) -> String {
-        self.name.clone().unwrap_or_else(|| {
-            match self.order {
-                1 => "Monad",
-                2 => "Dyad",
-                3 => "Triad",
-                4 => "Tetrad",
-                5 => "Pentad",
-                6 => "Hexad",
-                7 => "Heptad",
-                8 => "Octad",
-                9 => "Ennead",
-                10 => "Decad",
-                11 => "Undecad",
-                12 => "Dodecad",
-                _ => "Unknown",
-            }
-            .to_string()
-        })
+        self.name.clone()
     }
 
-    /// Get the K-notation for this system (e.g., "K3" for Triad)
     pub fn k_notation(&self) -> String {
         format!("K{}", self.order)
     }
 
-    /// Get the description/coherence for this system
     pub fn description(&self) -> String {
-        self.coherence
-            .clone()
-            .unwrap_or_else(|| self.display_name())
+        self.coherence.clone()
     }
 
-    /// Get the number of nodes in this system
     pub fn node_count(&self) -> usize {
         self.order as usize
     }
 
-    /// Get the term value at a position (1-based)
     pub fn term_at(&self, position: i32) -> Option<&str> {
         self.terms
             .iter()
             .find(|t| t.position == position)
-            .and_then(|t| t.character.as_ref())
-            .map(|c| c.value.as_str())
+            .map(|t| t.value.as_str())
     }
 
-    /// Get the colour value at a position (1-based)
     pub fn colour_at(&self, position: i32) -> Option<&str> {
         self.colours
             .iter()
@@ -84,7 +100,6 @@ impl SystemView {
             .map(|c| c.value.as_str())
     }
 
-    /// Get the coordinate at a position (1-based)
     pub fn coordinate_at(&self, position: i32) -> Option<&Coordinate> {
         self.coordinates.iter().find(|c| c.position == position)
     }

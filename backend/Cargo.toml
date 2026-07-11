@@ -21,3 +21,6 @@ shuttle-axum = { version = "0.50.0", optional = true }
 
 [features]
 shuttle = ["dep:shuttle-runtime", "dep:shuttle-axum"]
+
+[dev-dependencies]
+serde_json = "1"

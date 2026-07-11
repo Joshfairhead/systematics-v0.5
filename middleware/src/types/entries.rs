@@ -1,37 +1,37 @@
-//! Entry types for Systematics wire format
+//! Substrate wire types (Point, Line, Coordinate, Segment, Character).
 
-use super::Language;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;
 
-/// Character - a reusable vocabulary element
+/// A topological anchor at a single vertex.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Character {
-    pub id: String,
-    pub language: Language,
-    pub value: String,
-}
-
-/// Term - a positional entry with character reference
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Term {
+pub struct Point {
     pub id: String,
     pub order: i32,
     pub position: i32,
-    #[serde(rename = "characterId")]
-    pub character_id: String,
-    pub character: Option<Character>,
 }
 
-/// Coordinate - a 3D point at a specific location
+/// A topological anchor at an edge (two vertices).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "server", derive(SimpleObject))]
+pub struct Line {
+    pub id: String,
+    pub order: i32,
+    pub position: i32,
+    #[serde(rename = "positionSecondary")]
+    pub position_secondary: i32,
+}
+
+/// A geometric coordinate bound to a Point.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct Coordinate {
     pub id: String,
+    #[serde(rename = "pointRef")]
+    pub point_ref: String,
     pub order: i32,
     pub position: i32,
     pub x: f64,
@@ -39,24 +39,24 @@ pub struct Coordinate {
     pub z: f64,
 }
 
-/// Colour - a color value at a specific location
+/// A geometric segment bound to a Line.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Colour {
+pub struct Segment {
     pub id: String,
-    pub order: i32,
-    pub position: i32,
-    pub language: Language,
-    pub value: String,
+    #[serde(rename = "lineRef")]
+    pub line_ref: String,
+    #[serde(rename = "startCoordRef")]
+    pub start_coord_ref: String,
+    #[serde(rename = "endCoordRef")]
+    pub end_coord_ref: String,
 }
 
-/// Slice - all entries at a specific order+position
+/// A semantic value (content only — anchor comes from vocabulary lookup).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Slice {
-    pub order: i32,
-    pub position: i32,
-    pub term: Option<Term>,
-    pub coordinate: Option<Coordinate>,
-    pub colour: Option<Colour>,
+pub struct Character {
+    pub id: String,
+    pub kind: String,
+    pub value: String,
 }

@@ -1,12 +1,14 @@
-//! Link types for Systematics wire format
+//! Link wire type (edge rendering shim).
 
-use super::{Character, Coordinate, LinkType};
 use serde::{Deserialize, Serialize};
+
+use super::LinkType;
 
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;
 
-/// Link - a connection between entries (either Line or Connective)
+/// A rendering-line edge between two coordinates (retained until the frontend
+/// consumes `Segment` entries directly).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct Link {
@@ -17,20 +19,5 @@ pub struct Link {
     pub target_id: String,
     #[serde(rename = "linkType")]
     pub link_type: LinkType,
-    #[serde(rename = "characterId")]
-    pub character_id: Option<String>,
-    pub tag: Option<String>,
     pub order: Option<i32>,
-    #[serde(rename = "basePosition")]
-    pub base_position: Option<i32>,
-    #[serde(rename = "targetPosition")]
-    pub target_position: Option<i32>,
-    /// Resolved character for this link (for connectives)
-    pub character: Option<Character>,
-    /// Resolved base coordinate
-    #[serde(rename = "baseCoordinate")]
-    pub base_coordinate: Option<Coordinate>,
-    /// Resolved target coordinate
-    #[serde(rename = "targetCoordinate")]
-    pub target_coordinate: Option<Coordinate>,
 }
