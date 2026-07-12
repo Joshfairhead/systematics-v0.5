@@ -11,6 +11,7 @@
 //!   reconcile the three vocabularies.
 //! - `graph` — the container plus queries and mutations.
 
+pub mod content;
 pub mod entries;
 pub mod grammars;
 pub mod graph;
@@ -26,5 +27,7 @@ pub use links::{Link, LinkType};
 pub use vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
 
 pub use grammars::Grammar;
+
+pub use content::GraphContent;
 
 pub use graph::Graph;

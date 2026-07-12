@@ -8,7 +8,7 @@ use axum::{
     routing::get,
     Router,
 };
-use systematics_backend::{create_schema, data};
+use systematics_backend::{create_schema_with_store, data, persistence};
 use tokio::sync::RwLock;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -46,8 +46,16 @@ fn init_tracing() {
 /// so mutations (Functor CRUD, applyFunctor) persist across requests within
 /// a single process. Restarting the process resets to seed state.
 fn build_api_router() -> Router {
-    let shared_graph = Arc::new(RwLock::new(data::build_graph()));
-    let schema = create_schema(shared_graph);
+    // Build the canonical graph, then merge the writable user store over it.
+    let mut graph = data::build_graph();
+    let store_path = persistence::resolve_store_path();
+    if let Err(e) = persistence::load_into(&mut graph, &store_path) {
+        tracing::error!("failed to load user store from {}: {}", store_path.display(), e);
+    }
+    tracing::info!("User store: {}", store_path.display());
+
+    let shared_graph = Arc::new(RwLock::new(graph));
+    let schema = create_schema_with_store(shared_graph, Some(store_path));
 
     let cors = CorsLayer::new()
         .allow_origin(Any)

@@ -3,8 +3,11 @@
 //! The Graph holds substrate entries + the four higher-level tables
 //! (topological, geometric, semantic vocabularies, and grammars).
 
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 
+use super::content::GraphContent;
 use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
 use super::grammars::Grammar;
 use super::links::{Link, LinkType};
@@ -24,6 +27,10 @@ pub struct Graph {
     pub semantic_vocabs: Vec<SemanticVocabulary>,
     #[serde(default)]
     pub grammars: Vec<Grammar>,
+    /// IDs of content that came from the canonical seed. Runtime-only; used to
+    /// separate user additions from canonical when persisting. Never serialised.
+    #[serde(skip)]
+    canonical_ids: HashSet<String>,
 }
 
 impl Graph {
@@ -319,6 +326,94 @@ impl Graph {
         self.semantic_vocabs
             .iter()
             .find(|v| v.order == order && v.name.starts_with("Canonical Colours"))
+    }
+
+    // ==========================================================================
+    // Content: apply / snapshot / user-vs-canonical separation
+    // ==========================================================================
+
+    /// Upsert a Character by id (replace if present, else append).
+    pub fn upsert_character(&mut self, character: Character) {
+        let id = character.id.clone();
+        self.entries
+            .retain(|e| !matches!(e, Entry::Character(c) if c.id == id));
+        self.entries.push(Entry::Character(character));
+    }
+
+    /// Upsert a Coordinate by id.
+    pub fn upsert_coordinate(&mut self, coordinate: Coordinate) {
+        let id = coordinate.id.clone();
+        self.entries
+            .retain(|e| !matches!(e, Entry::Coordinate(c) if c.id == id));
+        self.entries.push(Entry::Coordinate(coordinate));
+    }
+
+    /// Apply a content bundle onto the graph, upserting every item by id.
+    pub fn apply_content(&mut self, content: &GraphContent) {
+        for c in &content.characters {
+            self.upsert_character(c.clone());
+        }
+        for c in &content.coordinates {
+            self.upsert_coordinate(c.clone());
+        }
+        for v in &content.semantic_vocabs {
+            if self.update_semantic_vocab(v.clone()).is_none() {
+                self.add_semantic_vocab(v.clone());
+            }
+        }
+        for g in &content.grammars {
+            if self.update_grammar(g.clone()).is_none() {
+                self.add_grammar(g.clone());
+            }
+        }
+    }
+
+    /// Snapshot the entire data layer as a content bundle.
+    pub fn content_snapshot(&self) -> GraphContent {
+        GraphContent {
+            characters: self.characters(None).into_iter().cloned().collect(),
+            coordinates: self.coordinates(None).into_iter().cloned().collect(),
+            semantic_vocabs: self.semantic_vocabs.clone(),
+            grammars: self.grammars.clone(),
+        }
+    }
+
+    /// Mark everything currently in the data layer as canonical. Called once
+    /// after the canonical seed is applied, before any user store is loaded.
+    pub fn mark_canonical(&mut self) {
+        self.canonical_ids = self.content_snapshot().ids().into_iter().collect();
+    }
+
+    /// The user-added slice of the data layer (everything whose id is not
+    /// canonical). This is what gets persisted.
+    pub fn user_content(&self) -> GraphContent {
+        let is_user = |id: &str| !self.canonical_ids.contains(id);
+        GraphContent {
+            characters: self
+                .characters(None)
+                .into_iter()
+                .filter(|c| is_user(&c.id))
+                .cloned()
+                .collect(),
+            coordinates: self
+                .coordinates(None)
+                .into_iter()
+                .filter(|c| is_user(&c.id))
+                .cloned()
+                .collect(),
+            semantic_vocabs: self
+                .semantic_vocabs
+                .iter()
+                .filter(|v| is_user(&v.id))
+                .cloned()
+                .collect(),
+            grammars: self
+                .grammars
+                .iter()
+                .filter(|g| is_user(&g.id))
+                .cloned()
+                .collect(),
+        }
     }
 
     // ==========================================================================

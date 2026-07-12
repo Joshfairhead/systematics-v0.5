@@ -1,0 +1,3058 @@
+{
+  "characters": [
+    {
+      "id": "char_word_unity",
+      "kind": "word",
+      "value": "Unity"
+    },
+    {
+      "id": "char_hex_ff0000",
+      "kind": "hex",
+      "value": "#FF0000"
+    },
+    {
+      "id": "char_word_essence",
+      "kind": "word",
+      "value": "Essence"
+    },
+    {
+      "id": "char_word_existence",
+      "kind": "word",
+      "value": "Existence"
+    },
+    {
+      "id": "char_word_force_1_needs_research",
+      "kind": "word",
+      "value": "Force 1 Needs Research"
+    },
+    {
+      "id": "char_hex_0000ff",
+      "kind": "hex",
+      "value": "#0000FF"
+    },
+    {
+      "id": "char_word_will",
+      "kind": "word",
+      "value": "Will"
+    },
+    {
+      "id": "char_word_function",
+      "kind": "word",
+      "value": "Function"
+    },
+    {
+      "id": "char_word_being",
+      "kind": "word",
+      "value": "Being"
+    },
+    {
+      "id": "char_word_generation",
+      "kind": "word",
+      "value": "Generation"
+    },
+    {
+      "id": "char_word_decision",
+      "kind": "word",
+      "value": "Decision"
+    },
+    {
+      "id": "char_word_consent",
+      "kind": "word",
+      "value": "Consent"
+    },
+    {
+      "id": "char_hex_ffff00",
+      "kind": "hex",
+      "value": "#FFFF00"
+    },
+    {
+      "id": "char_word_ideal",
+      "kind": "word",
+      "value": "Ideal"
+    },
+    {
+      "id": "char_word_ground",
+      "kind": "word",
+      "value": "Ground"
+    },
+    {
+      "id": "char_word_directive",
+      "kind": "word",
+      "value": "Directive"
+    },
+    {
+      "id": "char_word_instrumental",
+      "kind": "word",
+      "value": "Instrumental"
+    },
+    {
+      "id": "char_word_motivational_imperative",
+      "kind": "word",
+      "value": "Motivational Imperative"
+    },
+    {
+      "id": "char_word_receptive_regard",
+      "kind": "word",
+      "value": "Receptive Regard"
+    },
+    {
+      "id": "char_word_effectual_compatibility",
+      "kind": "word",
+      "value": "Effectual Compatibility"
+    },
+    {
+      "id": "char_word_material_mastery",
+      "kind": "word",
+      "value": "Material Mastery"
+    },
+    {
+      "id": "char_word_technical_power",
+      "kind": "word",
+      "value": "Technical Power"
+    },
+    {
+      "id": "char_word_demonstrable_activity",
+      "kind": "word",
+      "value": "Demonstrable Activity"
+    },
+    {
+      "id": "char_hex_099902",
+      "kind": "hex",
+      "value": "#099902"
+    },
+    {
+      "id": "char_word_quintessence",
+      "kind": "word",
+      "value": "Quintessence"
+    },
+    {
+      "id": "char_word_source",
+      "kind": "word",
+      "value": "Source"
+    },
+    {
+      "id": "char_word_higher_potential",
+      "kind": "word",
+      "value": "Higher Potential"
+    },
+    {
+      "id": "char_word_lower_potential",
+      "kind": "word",
+      "value": "Lower Potential"
+    },
+    {
+      "id": "char_word_purpose",
+      "kind": "word",
+      "value": "Purpose"
+    },
+    {
+      "id": "char_word_quantitative_match",
+      "kind": "word",
+      "value": "Quantitative Match"
+    },
+    {
+      "id": "char_word_aspiration",
+      "kind": "word",
+      "value": "Aspiration"
+    },
+    {
+      "id": "char_word_operation",
+      "kind": "word",
+      "value": "Operation"
+    },
+    {
+      "id": "char_word_qualitative_match",
+      "kind": "word",
+      "value": "Qualitative Match"
+    },
+    {
+      "id": "char_word_input",
+      "kind": "word",
+      "value": "Input"
+    },
+    {
+      "id": "char_word_range_of_significance",
+      "kind": "word",
+      "value": "Range Of Significance"
+    },
+    {
+      "id": "char_word_range_of_potential",
+      "kind": "word",
+      "value": "Range Of Potential"
+    },
+    {
+      "id": "char_word_output",
+      "kind": "word",
+      "value": "Output"
+    },
+    {
+      "id": "char_word_form",
+      "kind": "word",
+      "value": "Form"
+    },
+    {
+      "id": "char_hex_9900ff",
+      "kind": "hex",
+      "value": "#9900FF"
+    },
+    {
+      "id": "char_word_priorities",
+      "kind": "word",
+      "value": "Priorities"
+    },
+    {
+      "id": "char_word_criteria",
+      "kind": "word",
+      "value": "Criteria"
+    },
+    {
+      "id": "char_word_values",
+      "kind": "word",
+      "value": "Values"
+    },
+    {
+      "id": "char_word_resources",
+      "kind": "word",
+      "value": "Resources"
+    },
+    {
+      "id": "char_word_options",
+      "kind": "word",
+      "value": "Options"
+    },
+    {
+      "id": "char_word_facts",
+      "kind": "word",
+      "value": "Facts"
+    },
+    {
+      "id": "char_word_step_1_needs_research",
+      "kind": "word",
+      "value": "Step 1 Needs Research"
+    },
+    {
+      "id": "char_word_step_2_needs_research",
+      "kind": "word",
+      "value": "Step 2 Needs Research"
+    },
+    {
+      "id": "char_word_step_3_needs_research",
+      "kind": "word",
+      "value": "Step 3 Needs Research"
+    },
+    {
+      "id": "char_word_step_4_needs_research",
+      "kind": "word",
+      "value": "Step 4 Needs Research"
+    },
+    {
+      "id": "char_word_step_5_needs_research",
+      "kind": "word",
+      "value": "Step 5 Needs Research"
+    },
+    {
+      "id": "char_word_step_6_needs_research",
+      "kind": "word",
+      "value": "Step 6 Needs Research"
+    },
+    {
+      "id": "char_word_step_7_needs_research",
+      "kind": "word",
+      "value": "Step 7 Needs Research"
+    },
+    {
+      "id": "char_word_step_8_needs_research",
+      "kind": "word",
+      "value": "Step 8 Needs Research"
+    },
+    {
+      "id": "char_word_step_9_needs_research",
+      "kind": "word",
+      "value": "Step 9 Needs Research"
+    },
+    {
+      "id": "char_word_step_10_needs_research",
+      "kind": "word",
+      "value": "Step 10 Needs Research"
+    },
+    {
+      "id": "char_word_step_11_needs_research",
+      "kind": "word",
+      "value": "Step 11 Needs Research"
+    },
+    {
+      "id": "char_word_step_12_needs_research",
+      "kind": "word",
+      "value": "Step 12 Needs Research"
+    },
+    {
+      "id": "char_word_step_13_needs_research",
+      "kind": "word",
+      "value": "Step 13 Needs Research"
+    },
+    {
+      "id": "char_word_step_14_needs_research",
+      "kind": "word",
+      "value": "Step 14 Needs Research"
+    },
+    {
+      "id": "char_word_step_15_needs_research",
+      "kind": "word",
+      "value": "Step 15 Needs Research"
+    },
+    {
+      "id": "char_hex_ffa500",
+      "kind": "hex",
+      "value": "#FFA500"
+    },
+    {
+      "id": "char_word_insight",
+      "kind": "word",
+      "value": "Insight"
+    },
+    {
+      "id": "char_word_application",
+      "kind": "word",
+      "value": "Application"
+    },
+    {
+      "id": "char_word_design",
+      "kind": "word",
+      "value": "Design"
+    },
+    {
+      "id": "char_word_research",
+      "kind": "word",
+      "value": "Research"
+    },
+    {
+      "id": "char_word_synthesis",
+      "kind": "word",
+      "value": "Synthesis"
+    },
+    {
+      "id": "char_word_delivery",
+      "kind": "word",
+      "value": "Delivery"
+    },
+    {
+      "id": "char_word_value",
+      "kind": "word",
+      "value": "Value"
+    },
+    {
+      "id": "char_word_interval_1_needs_research",
+      "kind": "word",
+      "value": "Interval 1 Needs Research"
+    },
+    {
+      "id": "char_word_interval_2_needs_research",
+      "kind": "word",
+      "value": "Interval 2 Needs Research"
+    },
+    {
+      "id": "char_word_interval_3_needs_research",
+      "kind": "word",
+      "value": "Interval 3 Needs Research"
+    },
+    {
+      "id": "char_word_interval_4_needs_research",
+      "kind": "word",
+      "value": "Interval 4 Needs Research"
+    },
+    {
+      "id": "char_word_interval_5_needs_research",
+      "kind": "word",
+      "value": "Interval 5 Needs Research"
+    },
+    {
+      "id": "char_word_interval_6_needs_research",
+      "kind": "word",
+      "value": "Interval 6 Needs Research"
+    },
+    {
+      "id": "char_word_interval_7_needs_research",
+      "kind": "word",
+      "value": "Interval 7 Needs Research"
+    },
+    {
+      "id": "char_word_interval_8_needs_research",
+      "kind": "word",
+      "value": "Interval 8 Needs Research"
+    },
+    {
+      "id": "char_word_interval_9_needs_research",
+      "kind": "word",
+      "value": "Interval 9 Needs Research"
+    },
+    {
+      "id": "char_word_interval_10_needs_research",
+      "kind": "word",
+      "value": "Interval 10 Needs Research"
+    },
+    {
+      "id": "char_word_interval_11_needs_research",
+      "kind": "word",
+      "value": "Interval 11 Needs Research"
+    },
+    {
+      "id": "char_word_interval_12_needs_research",
+      "kind": "word",
+      "value": "Interval 12 Needs Research"
+    },
+    {
+      "id": "char_word_interval_13_needs_research",
+      "kind": "word",
+      "value": "Interval 13 Needs Research"
+    },
+    {
+      "id": "char_word_interval_14_needs_research",
+      "kind": "word",
+      "value": "Interval 14 Needs Research"
+    },
+    {
+      "id": "char_word_interval_15_needs_research",
+      "kind": "word",
+      "value": "Interval 15 Needs Research"
+    },
+    {
+      "id": "char_word_interval_16_needs_research",
+      "kind": "word",
+      "value": "Interval 16 Needs Research"
+    },
+    {
+      "id": "char_word_interval_17_needs_research",
+      "kind": "word",
+      "value": "Interval 17 Needs Research"
+    },
+    {
+      "id": "char_word_interval_18_needs_research",
+      "kind": "word",
+      "value": "Interval 18 Needs Research"
+    },
+    {
+      "id": "char_word_interval_19_needs_research",
+      "kind": "word",
+      "value": "Interval 19 Needs Research"
+    },
+    {
+      "id": "char_word_interval_20_needs_research",
+      "kind": "word",
+      "value": "Interval 20 Needs Research"
+    },
+    {
+      "id": "char_word_interval_21_needs_research",
+      "kind": "word",
+      "value": "Interval 21 Needs Research"
+    },
+    {
+      "id": "char_hex_00ffff",
+      "kind": "hex",
+      "value": "#00FFFF"
+    },
+    {
+      "id": "char_word_inherent_values",
+      "kind": "word",
+      "value": "Inherent Values"
+    },
+    {
+      "id": "char_word_critical_functions",
+      "kind": "word",
+      "value": "Critical Functions"
+    },
+    {
+      "id": "char_word_organisational_modes",
+      "kind": "word",
+      "value": "Organisational Modes"
+    },
+    {
+      "id": "char_word_necessary_resourcing",
+      "kind": "word",
+      "value": "Necessary Resourcing"
+    },
+    {
+      "id": "char_word_intrinsic_nature",
+      "kind": "word",
+      "value": "Intrinsic Nature"
+    },
+    {
+      "id": "char_word_smallest_significant_holon",
+      "kind": "word",
+      "value": "Smallest Significant Holon"
+    },
+    {
+      "id": "char_word_integrative_totality",
+      "kind": "word",
+      "value": "Integrative Totality"
+    },
+    {
+      "id": "char_word_supportive_platform",
+      "kind": "word",
+      "value": "Supportive Platform"
+    },
+    {
+      "id": "char_word_component_1_needs_research",
+      "kind": "word",
+      "value": "Component 1 Needs Research"
+    },
+    {
+      "id": "char_word_component_2_needs_research",
+      "kind": "word",
+      "value": "Component 2 Needs Research"
+    },
+    {
+      "id": "char_word_component_3_needs_research",
+      "kind": "word",
+      "value": "Component 3 Needs Research"
+    },
+    {
+      "id": "char_word_component_4_needs_research",
+      "kind": "word",
+      "value": "Component 4 Needs Research"
+    },
+    {
+      "id": "char_word_component_5_needs_research",
+      "kind": "word",
+      "value": "Component 5 Needs Research"
+    },
+    {
+      "id": "char_word_component_6_needs_research",
+      "kind": "word",
+      "value": "Component 6 Needs Research"
+    },
+    {
+      "id": "char_word_component_7_needs_research",
+      "kind": "word",
+      "value": "Component 7 Needs Research"
+    },
+    {
+      "id": "char_word_component_8_needs_research",
+      "kind": "word",
+      "value": "Component 8 Needs Research"
+    },
+    {
+      "id": "char_word_component_9_needs_research",
+      "kind": "word",
+      "value": "Component 9 Needs Research"
+    },
+    {
+      "id": "char_word_component_10_needs_research",
+      "kind": "word",
+      "value": "Component 10 Needs Research"
+    },
+    {
+      "id": "char_word_component_11_needs_research",
+      "kind": "word",
+      "value": "Component 11 Needs Research"
+    },
+    {
+      "id": "char_word_component_12_needs_research",
+      "kind": "word",
+      "value": "Component 12 Needs Research"
+    },
+    {
+      "id": "char_word_component_13_needs_research",
+      "kind": "word",
+      "value": "Component 13 Needs Research"
+    },
+    {
+      "id": "char_word_component_14_needs_research",
+      "kind": "word",
+      "value": "Component 14 Needs Research"
+    },
+    {
+      "id": "char_word_component_15_needs_research",
+      "kind": "word",
+      "value": "Component 15 Needs Research"
+    },
+    {
+      "id": "char_word_component_16_needs_research",
+      "kind": "word",
+      "value": "Component 16 Needs Research"
+    },
+    {
+      "id": "char_word_component_17_needs_research",
+      "kind": "word",
+      "value": "Component 17 Needs Research"
+    },
+    {
+      "id": "char_word_component_18_needs_research",
+      "kind": "word",
+      "value": "Component 18 Needs Research"
+    },
+    {
+      "id": "char_word_component_19_needs_research",
+      "kind": "word",
+      "value": "Component 19 Needs Research"
+    },
+    {
+      "id": "char_word_component_20_needs_research",
+      "kind": "word",
+      "value": "Component 20 Needs Research"
+    },
+    {
+      "id": "char_word_component_21_needs_research",
+      "kind": "word",
+      "value": "Component 21 Needs Research"
+    },
+    {
+      "id": "char_word_component_22_needs_research",
+      "kind": "word",
+      "value": "Component 22 Needs Research"
+    },
+    {
+      "id": "char_word_component_23_needs_research",
+      "kind": "word",
+      "value": "Component 23 Needs Research"
+    },
+    {
+      "id": "char_word_component_24_needs_research",
+      "kind": "word",
+      "value": "Component 24 Needs Research"
+    },
+    {
+      "id": "char_word_component_25_needs_research",
+      "kind": "word",
+      "value": "Component 25 Needs Research"
+    },
+    {
+      "id": "char_word_component_26_needs_research",
+      "kind": "word",
+      "value": "Component 26 Needs Research"
+    },
+    {
+      "id": "char_word_component_27_needs_research",
+      "kind": "word",
+      "value": "Component 27 Needs Research"
+    },
+    {
+      "id": "char_word_component_28_needs_research",
+      "kind": "word",
+      "value": "Component 28 Needs Research"
+    },
+    {
+      "id": "char_hex_8b4513",
+      "kind": "hex",
+      "value": "#8B4513"
+    },
+    {
+      "id": "char_word_term_1",
+      "kind": "word",
+      "value": "Term 1"
+    },
+    {
+      "id": "char_word_term_2",
+      "kind": "word",
+      "value": "Term 2"
+    },
+    {
+      "id": "char_word_term_3",
+      "kind": "word",
+      "value": "Term 3"
+    },
+    {
+      "id": "char_word_term_4",
+      "kind": "word",
+      "value": "Term 4"
+    },
+    {
+      "id": "char_word_term_5",
+      "kind": "word",
+      "value": "Term 5"
+    },
+    {
+      "id": "char_word_term_6",
+      "kind": "word",
+      "value": "Term 6"
+    },
+    {
+      "id": "char_word_term_7",
+      "kind": "word",
+      "value": "Term 7"
+    },
+    {
+      "id": "char_word_term_8",
+      "kind": "word",
+      "value": "Term 8"
+    },
+    {
+      "id": "char_word_term_9",
+      "kind": "word",
+      "value": "Term 9"
+    },
+    {
+      "id": "char_word_transmutation_1_needs_research",
+      "kind": "word",
+      "value": "Transmutation 1 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_2_needs_research",
+      "kind": "word",
+      "value": "Transmutation 2 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_3_needs_research",
+      "kind": "word",
+      "value": "Transmutation 3 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_4_needs_research",
+      "kind": "word",
+      "value": "Transmutation 4 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_5_needs_research",
+      "kind": "word",
+      "value": "Transmutation 5 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_6_needs_research",
+      "kind": "word",
+      "value": "Transmutation 6 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_7_needs_research",
+      "kind": "word",
+      "value": "Transmutation 7 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_8_needs_research",
+      "kind": "word",
+      "value": "Transmutation 8 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_9_needs_research",
+      "kind": "word",
+      "value": "Transmutation 9 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_10_needs_research",
+      "kind": "word",
+      "value": "Transmutation 10 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_11_needs_research",
+      "kind": "word",
+      "value": "Transmutation 11 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_12_needs_research",
+      "kind": "word",
+      "value": "Transmutation 12 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_13_needs_research",
+      "kind": "word",
+      "value": "Transmutation 13 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_14_needs_research",
+      "kind": "word",
+      "value": "Transmutation 14 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_15_needs_research",
+      "kind": "word",
+      "value": "Transmutation 15 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_16_needs_research",
+      "kind": "word",
+      "value": "Transmutation 16 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_17_needs_research",
+      "kind": "word",
+      "value": "Transmutation 17 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_18_needs_research",
+      "kind": "word",
+      "value": "Transmutation 18 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_19_needs_research",
+      "kind": "word",
+      "value": "Transmutation 19 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_20_needs_research",
+      "kind": "word",
+      "value": "Transmutation 20 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_21_needs_research",
+      "kind": "word",
+      "value": "Transmutation 21 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_22_needs_research",
+      "kind": "word",
+      "value": "Transmutation 22 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_23_needs_research",
+      "kind": "word",
+      "value": "Transmutation 23 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_24_needs_research",
+      "kind": "word",
+      "value": "Transmutation 24 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_25_needs_research",
+      "kind": "word",
+      "value": "Transmutation 25 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_26_needs_research",
+      "kind": "word",
+      "value": "Transmutation 26 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_27_needs_research",
+      "kind": "word",
+      "value": "Transmutation 27 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_28_needs_research",
+      "kind": "word",
+      "value": "Transmutation 28 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_29_needs_research",
+      "kind": "word",
+      "value": "Transmutation 29 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_30_needs_research",
+      "kind": "word",
+      "value": "Transmutation 30 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_31_needs_research",
+      "kind": "word",
+      "value": "Transmutation 31 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_32_needs_research",
+      "kind": "word",
+      "value": "Transmutation 32 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_33_needs_research",
+      "kind": "word",
+      "value": "Transmutation 33 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_34_needs_research",
+      "kind": "word",
+      "value": "Transmutation 34 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_35_needs_research",
+      "kind": "word",
+      "value": "Transmutation 35 Needs Research"
+    },
+    {
+      "id": "char_word_transmutation_36_needs_research",
+      "kind": "word",
+      "value": "Transmutation 36 Needs Research"
+    },
+    {
+      "id": "char_hex_ff00ff",
+      "kind": "hex",
+      "value": "#FF00FF"
+    },
+    {
+      "id": "char_word_term_10",
+      "kind": "word",
+      "value": "Term 10"
+    },
+    {
+      "id": "char_word_progression_1_needs_research",
+      "kind": "word",
+      "value": "Progression 1 Needs Research"
+    },
+    {
+      "id": "char_word_progression_2_needs_research",
+      "kind": "word",
+      "value": "Progression 2 Needs Research"
+    },
+    {
+      "id": "char_word_progression_3_needs_research",
+      "kind": "word",
+      "value": "Progression 3 Needs Research"
+    },
+    {
+      "id": "char_word_progression_4_needs_research",
+      "kind": "word",
+      "value": "Progression 4 Needs Research"
+    },
+    {
+      "id": "char_word_progression_5_needs_research",
+      "kind": "word",
+      "value": "Progression 5 Needs Research"
+    },
+    {
+      "id": "char_word_progression_6_needs_research",
+      "kind": "word",
+      "value": "Progression 6 Needs Research"
+    },
+    {
+      "id": "char_word_progression_7_needs_research",
+      "kind": "word",
+      "value": "Progression 7 Needs Research"
+    },
+    {
+      "id": "char_word_progression_8_needs_research",
+      "kind": "word",
+      "value": "Progression 8 Needs Research"
+    },
+    {
+      "id": "char_word_progression_9_needs_research",
+      "kind": "word",
+      "value": "Progression 9 Needs Research"
+    },
+    {
+      "id": "char_word_progression_10_needs_research",
+      "kind": "word",
+      "value": "Progression 10 Needs Research"
+    },
+    {
+      "id": "char_word_progression_11_needs_research",
+      "kind": "word",
+      "value": "Progression 11 Needs Research"
+    },
+    {
+      "id": "char_word_progression_12_needs_research",
+      "kind": "word",
+      "value": "Progression 12 Needs Research"
+    },
+    {
+      "id": "char_word_progression_13_needs_research",
+      "kind": "word",
+      "value": "Progression 13 Needs Research"
+    },
+    {
+      "id": "char_word_progression_14_needs_research",
+      "kind": "word",
+      "value": "Progression 14 Needs Research"
+    },
+    {
+      "id": "char_word_progression_15_needs_research",
+      "kind": "word",
+      "value": "Progression 15 Needs Research"
+    },
+    {
+      "id": "char_word_progression_16_needs_research",
+      "kind": "word",
+      "value": "Progression 16 Needs Research"
+    },
+    {
+      "id": "char_word_progression_17_needs_research",
+      "kind": "word",
+      "value": "Progression 17 Needs Research"
+    },
+    {
+      "id": "char_word_progression_18_needs_research",
+      "kind": "word",
+      "value": "Progression 18 Needs Research"
+    },
+    {
+      "id": "char_word_progression_19_needs_research",
+      "kind": "word",
+      "value": "Progression 19 Needs Research"
+    },
+    {
+      "id": "char_word_progression_20_needs_research",
+      "kind": "word",
+      "value": "Progression 20 Needs Research"
+    },
+    {
+      "id": "char_word_progression_21_needs_research",
+      "kind": "word",
+      "value": "Progression 21 Needs Research"
+    },
+    {
+      "id": "char_word_progression_22_needs_research",
+      "kind": "word",
+      "value": "Progression 22 Needs Research"
+    },
+    {
+      "id": "char_word_progression_23_needs_research",
+      "kind": "word",
+      "value": "Progression 23 Needs Research"
+    },
+    {
+      "id": "char_word_progression_24_needs_research",
+      "kind": "word",
+      "value": "Progression 24 Needs Research"
+    },
+    {
+      "id": "char_word_progression_25_needs_research",
+      "kind": "word",
+      "value": "Progression 25 Needs Research"
+    },
+    {
+      "id": "char_word_progression_26_needs_research",
+      "kind": "word",
+      "value": "Progression 26 Needs Research"
+    },
+    {
+      "id": "char_word_progression_27_needs_research",
+      "kind": "word",
+      "value": "Progression 27 Needs Research"
+    },
+    {
+      "id": "char_word_progression_28_needs_research",
+      "kind": "word",
+      "value": "Progression 28 Needs Research"
+    },
+    {
+      "id": "char_word_progression_29_needs_research",
+      "kind": "word",
+      "value": "Progression 29 Needs Research"
+    },
+    {
+      "id": "char_word_progression_30_needs_research",
+      "kind": "word",
+      "value": "Progression 30 Needs Research"
+    },
+    {
+      "id": "char_word_progression_31_needs_research",
+      "kind": "word",
+      "value": "Progression 31 Needs Research"
+    },
+    {
+      "id": "char_word_progression_32_needs_research",
+      "kind": "word",
+      "value": "Progression 32 Needs Research"
+    },
+    {
+      "id": "char_word_progression_33_needs_research",
+      "kind": "word",
+      "value": "Progression 33 Needs Research"
+    },
+    {
+      "id": "char_word_progression_34_needs_research",
+      "kind": "word",
+      "value": "Progression 34 Needs Research"
+    },
+    {
+      "id": "char_word_progression_35_needs_research",
+      "kind": "word",
+      "value": "Progression 35 Needs Research"
+    },
+    {
+      "id": "char_word_progression_36_needs_research",
+      "kind": "word",
+      "value": "Progression 36 Needs Research"
+    },
+    {
+      "id": "char_word_progression_37_needs_research",
+      "kind": "word",
+      "value": "Progression 37 Needs Research"
+    },
+    {
+      "id": "char_word_progression_38_needs_research",
+      "kind": "word",
+      "value": "Progression 38 Needs Research"
+    },
+    {
+      "id": "char_word_progression_39_needs_research",
+      "kind": "word",
+      "value": "Progression 39 Needs Research"
+    },
+    {
+      "id": "char_word_progression_40_needs_research",
+      "kind": "word",
+      "value": "Progression 40 Needs Research"
+    },
+    {
+      "id": "char_word_progression_41_needs_research",
+      "kind": "word",
+      "value": "Progression 41 Needs Research"
+    },
+    {
+      "id": "char_word_progression_42_needs_research",
+      "kind": "word",
+      "value": "Progression 42 Needs Research"
+    },
+    {
+      "id": "char_word_progression_43_needs_research",
+      "kind": "word",
+      "value": "Progression 43 Needs Research"
+    },
+    {
+      "id": "char_word_progression_44_needs_research",
+      "kind": "word",
+      "value": "Progression 44 Needs Research"
+    },
+    {
+      "id": "char_word_progression_45_needs_research",
+      "kind": "word",
+      "value": "Progression 45 Needs Research"
+    },
+    {
+      "id": "char_hex_ffffff",
+      "kind": "hex",
+      "value": "#FFFFFF"
+    },
+    {
+      "id": "char_word_term_11",
+      "kind": "word",
+      "value": "Term 11"
+    },
+    {
+      "id": "char_word_correlation_1_needs_research",
+      "kind": "word",
+      "value": "Correlation 1 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_2_needs_research",
+      "kind": "word",
+      "value": "Correlation 2 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_3_needs_research",
+      "kind": "word",
+      "value": "Correlation 3 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_4_needs_research",
+      "kind": "word",
+      "value": "Correlation 4 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_5_needs_research",
+      "kind": "word",
+      "value": "Correlation 5 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_6_needs_research",
+      "kind": "word",
+      "value": "Correlation 6 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_7_needs_research",
+      "kind": "word",
+      "value": "Correlation 7 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_8_needs_research",
+      "kind": "word",
+      "value": "Correlation 8 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_9_needs_research",
+      "kind": "word",
+      "value": "Correlation 9 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_10_needs_research",
+      "kind": "word",
+      "value": "Correlation 10 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_11_needs_research",
+      "kind": "word",
+      "value": "Correlation 11 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_12_needs_research",
+      "kind": "word",
+      "value": "Correlation 12 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_13_needs_research",
+      "kind": "word",
+      "value": "Correlation 13 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_14_needs_research",
+      "kind": "word",
+      "value": "Correlation 14 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_15_needs_research",
+      "kind": "word",
+      "value": "Correlation 15 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_16_needs_research",
+      "kind": "word",
+      "value": "Correlation 16 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_17_needs_research",
+      "kind": "word",
+      "value": "Correlation 17 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_18_needs_research",
+      "kind": "word",
+      "value": "Correlation 18 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_19_needs_research",
+      "kind": "word",
+      "value": "Correlation 19 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_20_needs_research",
+      "kind": "word",
+      "value": "Correlation 20 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_21_needs_research",
+      "kind": "word",
+      "value": "Correlation 21 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_22_needs_research",
+      "kind": "word",
+      "value": "Correlation 22 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_23_needs_research",
+      "kind": "word",
+      "value": "Correlation 23 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_24_needs_research",
+      "kind": "word",
+      "value": "Correlation 24 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_25_needs_research",
+      "kind": "word",
+      "value": "Correlation 25 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_26_needs_research",
+      "kind": "word",
+      "value": "Correlation 26 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_27_needs_research",
+      "kind": "word",
+      "value": "Correlation 27 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_28_needs_research",
+      "kind": "word",
+      "value": "Correlation 28 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_29_needs_research",
+      "kind": "word",
+      "value": "Correlation 29 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_30_needs_research",
+      "kind": "word",
+      "value": "Correlation 30 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_31_needs_research",
+      "kind": "word",
+      "value": "Correlation 31 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_32_needs_research",
+      "kind": "word",
+      "value": "Correlation 32 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_33_needs_research",
+      "kind": "word",
+      "value": "Correlation 33 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_34_needs_research",
+      "kind": "word",
+      "value": "Correlation 34 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_35_needs_research",
+      "kind": "word",
+      "value": "Correlation 35 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_36_needs_research",
+      "kind": "word",
+      "value": "Correlation 36 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_37_needs_research",
+      "kind": "word",
+      "value": "Correlation 37 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_38_needs_research",
+      "kind": "word",
+      "value": "Correlation 38 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_39_needs_research",
+      "kind": "word",
+      "value": "Correlation 39 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_40_needs_research",
+      "kind": "word",
+      "value": "Correlation 40 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_41_needs_research",
+      "kind": "word",
+      "value": "Correlation 41 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_42_needs_research",
+      "kind": "word",
+      "value": "Correlation 42 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_43_needs_research",
+      "kind": "word",
+      "value": "Correlation 43 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_44_needs_research",
+      "kind": "word",
+      "value": "Correlation 44 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_45_needs_research",
+      "kind": "word",
+      "value": "Correlation 45 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_46_needs_research",
+      "kind": "word",
+      "value": "Correlation 46 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_47_needs_research",
+      "kind": "word",
+      "value": "Correlation 47 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_48_needs_research",
+      "kind": "word",
+      "value": "Correlation 48 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_49_needs_research",
+      "kind": "word",
+      "value": "Correlation 49 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_50_needs_research",
+      "kind": "word",
+      "value": "Correlation 50 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_51_needs_research",
+      "kind": "word",
+      "value": "Correlation 51 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_52_needs_research",
+      "kind": "word",
+      "value": "Correlation 52 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_53_needs_research",
+      "kind": "word",
+      "value": "Correlation 53 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_54_needs_research",
+      "kind": "word",
+      "value": "Correlation 54 Needs Research"
+    },
+    {
+      "id": "char_word_correlation_55_needs_research",
+      "kind": "word",
+      "value": "Correlation 55 Needs Research"
+    },
+    {
+      "id": "char_hex_c0c0c0",
+      "kind": "hex",
+      "value": "#C0C0C0"
+    },
+    {
+      "id": "char_word_term_12",
+      "kind": "word",
+      "value": "Term 12"
+    },
+    {
+      "id": "char_word_harmony_1_needs_research",
+      "kind": "word",
+      "value": "Harmony 1 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_2_needs_research",
+      "kind": "word",
+      "value": "Harmony 2 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_3_needs_research",
+      "kind": "word",
+      "value": "Harmony 3 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_4_needs_research",
+      "kind": "word",
+      "value": "Harmony 4 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_5_needs_research",
+      "kind": "word",
+      "value": "Harmony 5 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_6_needs_research",
+      "kind": "word",
+      "value": "Harmony 6 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_7_needs_research",
+      "kind": "word",
+      "value": "Harmony 7 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_8_needs_research",
+      "kind": "word",
+      "value": "Harmony 8 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_9_needs_research",
+      "kind": "word",
+      "value": "Harmony 9 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_10_needs_research",
+      "kind": "word",
+      "value": "Harmony 10 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_11_needs_research",
+      "kind": "word",
+      "value": "Harmony 11 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_12_needs_research",
+      "kind": "word",
+      "value": "Harmony 12 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_13_needs_research",
+      "kind": "word",
+      "value": "Harmony 13 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_14_needs_research",
+      "kind": "word",
+      "value": "Harmony 14 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_15_needs_research",
+      "kind": "word",
+      "value": "Harmony 15 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_16_needs_research",
+      "kind": "word",
+      "value": "Harmony 16 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_17_needs_research",
+      "kind": "word",
+      "value": "Harmony 17 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_18_needs_research",
+      "kind": "word",
+      "value": "Harmony 18 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_19_needs_research",
+      "kind": "word",
+      "value": "Harmony 19 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_20_needs_research",
+      "kind": "word",
+      "value": "Harmony 20 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_21_needs_research",
+      "kind": "word",
+      "value": "Harmony 21 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_22_needs_research",
+      "kind": "word",
+      "value": "Harmony 22 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_23_needs_research",
+      "kind": "word",
+      "value": "Harmony 23 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_24_needs_research",
+      "kind": "word",
+      "value": "Harmony 24 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_25_needs_research",
+      "kind": "word",
+      "value": "Harmony 25 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_26_needs_research",
+      "kind": "word",
+      "value": "Harmony 26 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_27_needs_research",
+      "kind": "word",
+      "value": "Harmony 27 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_28_needs_research",
+      "kind": "word",
+      "value": "Harmony 28 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_29_needs_research",
+      "kind": "word",
+      "value": "Harmony 29 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_30_needs_research",
+      "kind": "word",
+      "value": "Harmony 30 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_31_needs_research",
+      "kind": "word",
+      "value": "Harmony 31 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_32_needs_research",
+      "kind": "word",
+      "value": "Harmony 32 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_33_needs_research",
+      "kind": "word",
+      "value": "Harmony 33 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_34_needs_research",
+      "kind": "word",
+      "value": "Harmony 34 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_35_needs_research",
+      "kind": "word",
+      "value": "Harmony 35 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_36_needs_research",
+      "kind": "word",
+      "value": "Harmony 36 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_37_needs_research",
+      "kind": "word",
+      "value": "Harmony 37 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_38_needs_research",
+      "kind": "word",
+      "value": "Harmony 38 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_39_needs_research",
+      "kind": "word",
+      "value": "Harmony 39 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_40_needs_research",
+      "kind": "word",
+      "value": "Harmony 40 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_41_needs_research",
+      "kind": "word",
+      "value": "Harmony 41 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_42_needs_research",
+      "kind": "word",
+      "value": "Harmony 42 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_43_needs_research",
+      "kind": "word",
+      "value": "Harmony 43 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_44_needs_research",
+      "kind": "word",
+      "value": "Harmony 44 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_45_needs_research",
+      "kind": "word",
+      "value": "Harmony 45 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_46_needs_research",
+      "kind": "word",
+      "value": "Harmony 46 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_47_needs_research",
+      "kind": "word",
+      "value": "Harmony 47 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_48_needs_research",
+      "kind": "word",
+      "value": "Harmony 48 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_49_needs_research",
+      "kind": "word",
+      "value": "Harmony 49 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_50_needs_research",
+      "kind": "word",
+      "value": "Harmony 50 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_51_needs_research",
+      "kind": "word",
+      "value": "Harmony 51 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_52_needs_research",
+      "kind": "word",
+      "value": "Harmony 52 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_53_needs_research",
+      "kind": "word",
+      "value": "Harmony 53 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_54_needs_research",
+      "kind": "word",
+      "value": "Harmony 54 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_55_needs_research",
+      "kind": "word",
+      "value": "Harmony 55 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_56_needs_research",
+      "kind": "word",
+      "value": "Harmony 56 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_57_needs_research",
+      "kind": "word",
+      "value": "Harmony 57 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_58_needs_research",
+      "kind": "word",
+      "value": "Harmony 58 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_59_needs_research",
+      "kind": "word",
+      "value": "Harmony 59 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_60_needs_research",
+      "kind": "word",
+      "value": "Harmony 60 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_61_needs_research",
+      "kind": "word",
+      "value": "Harmony 61 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_62_needs_research",
+      "kind": "word",
+      "value": "Harmony 62 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_63_needs_research",
+      "kind": "word",
+      "value": "Harmony 63 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_64_needs_research",
+      "kind": "word",
+      "value": "Harmony 64 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_65_needs_research",
+      "kind": "word",
+      "value": "Harmony 65 Needs Research"
+    },
+    {
+      "id": "char_word_harmony_66_needs_research",
+      "kind": "word",
+      "value": "Harmony 66 Needs Research"
+    },
+    {
+      "id": "char_hex_ffd700",
+      "kind": "hex",
+      "value": "#FFD700"
+    }
+  ],
+  "coordinates": [
+    {
+      "id": "coord_1_1",
+      "point_ref": "point_1_1",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_2_1",
+      "point_ref": "point_2_1",
+      "x": -1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_2_2",
+      "point_ref": "point_2_2",
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_3_1",
+      "point_ref": "point_3_1",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_3_2",
+      "point_ref": "point_3_2",
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_3_3",
+      "point_ref": "point_3_3",
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_4_1",
+      "point_ref": "point_4_1",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_4_2",
+      "point_ref": "point_4_2",
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_4_3",
+      "point_ref": "point_4_3",
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_4_4",
+      "point_ref": "point_4_4",
+      "x": -1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_5_1",
+      "point_ref": "point_5_1",
+      "x": -0.75,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_5_2",
+      "point_ref": "point_5_2",
+      "x": 1.0,
+      "y": -0.75,
+      "z": 0.0
+    },
+    {
+      "id": "coord_5_3",
+      "point_ref": "point_5_3",
+      "x": 0.0,
+      "y": 0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_5_4",
+      "point_ref": "point_5_4",
+      "x": 0.0,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_5_5",
+      "point_ref": "point_5_5",
+      "x": 1.0,
+      "y": 0.75,
+      "z": 0.0
+    },
+    {
+      "id": "coord_6_1",
+      "point_ref": "point_6_1",
+      "x": -0.866,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_6_2",
+      "point_ref": "point_6_2",
+      "x": 0.866,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_6_3",
+      "point_ref": "point_6_3",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_6_4",
+      "point_ref": "point_6_4",
+      "x": -0.866,
+      "y": 0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_6_5",
+      "point_ref": "point_6_5",
+      "x": 0.866,
+      "y": 0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_6_6",
+      "point_ref": "point_6_6",
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_1",
+      "point_ref": "point_7_1",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_2",
+      "point_ref": "point_7_2",
+      "x": -0.433884,
+      "y": -0.900969,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_3",
+      "point_ref": "point_7_3",
+      "x": 0.97437,
+      "y": -0.222521,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_4",
+      "point_ref": "point_7_4",
+      "x": 0.781831,
+      "y": 0.623489,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_5",
+      "point_ref": "point_7_5",
+      "x": 0.433884,
+      "y": -0.900969,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_6",
+      "point_ref": "point_7_6",
+      "x": -0.97437,
+      "y": -0.222521,
+      "z": 0.0
+    },
+    {
+      "id": "coord_7_7",
+      "point_ref": "point_7_7",
+      "x": -0.781831,
+      "y": 0.623489,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_1",
+      "point_ref": "point_8_1",
+      "x": -0.7071067811865476,
+      "y": 0.7071067811865476,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_2",
+      "point_ref": "point_8_2",
+      "x": 0.7071067811865476,
+      "y": -0.7071067811865476,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_3",
+      "point_ref": "point_8_3",
+      "x": 0.7071067811865476,
+      "y": 0.7071067811865476,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_4",
+      "point_ref": "point_8_4",
+      "x": -0.7071067811865476,
+      "y": -0.7071067811865476,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_5",
+      "point_ref": "point_8_5",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_6",
+      "point_ref": "point_8_6",
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_7",
+      "point_ref": "point_8_7",
+      "x": -1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_8_8",
+      "point_ref": "point_8_8",
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_1",
+      "point_ref": "point_9_1",
+      "x": -0.64278760968,
+      "y": 0.76604444311,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_2",
+      "point_ref": "point_9_2",
+      "x": 0.86602540378,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_3",
+      "point_ref": "point_9_3",
+      "x": 0.64278760968,
+      "y": 0.76604444311,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_4",
+      "point_ref": "point_9_4",
+      "x": -0.34202014333,
+      "y": -0.93969262079,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_5",
+      "point_ref": "point_9_5",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_6",
+      "point_ref": "point_9_6",
+      "x": 0.98480775301,
+      "y": 0.17364817767,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_7",
+      "point_ref": "point_9_7",
+      "x": -0.98480775301,
+      "y": 0.17364817767,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_8",
+      "point_ref": "point_9_8",
+      "x": 0.34202014333,
+      "y": -0.93969262079,
+      "z": 0.0
+    },
+    {
+      "id": "coord_9_9",
+      "point_ref": "point_9_9",
+      "x": -0.86602540378,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_1",
+      "point_ref": "point_10_1",
+      "x": -0.80901699437,
+      "y": 0.58778525229,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_2",
+      "point_ref": "point_10_2",
+      "x": 0.80901699437,
+      "y": -0.58778525229,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_3",
+      "point_ref": "point_10_3",
+      "x": 0.30901699437,
+      "y": 0.9510565163,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_4",
+      "point_ref": "point_10_4",
+      "x": -0.30901699437,
+      "y": -0.9510565163,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_5",
+      "point_ref": "point_10_5",
+      "x": -0.30901699437,
+      "y": 0.9510565163,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_6",
+      "point_ref": "point_10_6",
+      "x": 0.80901699437,
+      "y": 0.58778525229,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_7",
+      "point_ref": "point_10_7",
+      "x": -1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_8",
+      "point_ref": "point_10_8",
+      "x": 0.30901699437,
+      "y": -0.9510565163,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_9",
+      "point_ref": "point_10_9",
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_10_10",
+      "point_ref": "point_10_10",
+      "x": -0.80901699437,
+      "y": -0.58778525229,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_1",
+      "point_ref": "point_11_1",
+      "x": -0.909632,
+      "y": 0.415415,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_2",
+      "point_ref": "point_11_2",
+      "x": 0.75575,
+      "y": -0.654861,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_3",
+      "point_ref": "point_11_3",
+      "x": 0.54064081745,
+      "y": 0.84125353283,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_4",
+      "point_ref": "point_11_4",
+      "x": -0.281733,
+      "y": -0.959493,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_5",
+      "point_ref": "point_11_5",
+      "x": -0.54064081745,
+      "y": 0.84125353283,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_6",
+      "point_ref": "point_11_6",
+      "x": 0.909632,
+      "y": 0.415415,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_7",
+      "point_ref": "point_11_7",
+      "x": -0.989821,
+      "y": -0.142315,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_8",
+      "point_ref": "point_11_8",
+      "x": 0.281733,
+      "y": -0.959493,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_9",
+      "point_ref": "point_11_9",
+      "x": 0.989821,
+      "y": -0.142315,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_10",
+      "point_ref": "point_11_10",
+      "x": -0.75575,
+      "y": -0.654861,
+      "z": 0.0
+    },
+    {
+      "id": "coord_11_11",
+      "point_ref": "point_11_11",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_1",
+      "point_ref": "point_12_1",
+      "x": -0.5,
+      "y": 0.86602540378,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_2",
+      "point_ref": "point_12_2",
+      "x": 0.86602540378,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_3",
+      "point_ref": "point_12_3",
+      "x": 0.86602540378,
+      "y": 0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_4",
+      "point_ref": "point_12_4",
+      "x": -0.86602540378,
+      "y": -0.5,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_5",
+      "point_ref": "point_12_5",
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_6",
+      "point_ref": "point_12_6",
+      "x": 0.5,
+      "y": 0.86602540378,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_7",
+      "point_ref": "point_12_7",
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_8",
+      "point_ref": "point_12_8",
+      "x": -0.5,
+      "y": -0.86602540378,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_9",
+      "point_ref": "point_12_9",
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_10",
+      "point_ref": "point_12_10",
+      "x": 0.5,
+      "y": -0.86602540378,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_11",
+      "point_ref": "point_12_11",
+      "x": -1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    {
+      "id": "coord_12_12",
+      "point_ref": "point_12_12",
+      "x": -0.86602540378,
+      "y": 0.5,
+      "z": 0.0
+    }
+  ],
+  "semanticVocabs": [
+    {
+      "id": "semvocab_canonical_monad_1",
+      "name": "Canonical Monad",
+      "order": 1,
+      "terms": [
+        "char_word_unity"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_colours_monad_1",
+      "name": "Canonical Colours Monad",
+      "order": 1,
+      "terms": [
+        "char_hex_ff0000"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_dyad_2",
+      "name": "Canonical Dyad",
+      "order": 2,
+      "terms": [
+        "char_word_essence",
+        "char_word_existence"
+      ],
+      "connectives": [
+        "char_word_force_1_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_dyad_2",
+      "name": "Canonical Colours Dyad",
+      "order": 2,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_triad_3",
+      "name": "Canonical Triad",
+      "order": 3,
+      "terms": [
+        "char_word_will",
+        "char_word_function",
+        "char_word_being"
+      ],
+      "connectives": [
+        "char_word_generation",
+        "char_word_decision",
+        "char_word_consent"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_triad_3",
+      "name": "Canonical Colours Triad",
+      "order": 3,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_tetrad_4",
+      "name": "Canonical Tetrad",
+      "order": 4,
+      "terms": [
+        "char_word_ideal",
+        "char_word_ground",
+        "char_word_directive",
+        "char_word_instrumental"
+      ],
+      "connectives": [
+        "char_word_motivational_imperative",
+        "char_word_receptive_regard",
+        "char_word_effectual_compatibility",
+        "char_word_material_mastery",
+        "char_word_technical_power",
+        "char_word_demonstrable_activity"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_tetrad_4",
+      "name": "Canonical Colours Tetrad",
+      "order": 4,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_pentad_5",
+      "name": "Canonical Pentad",
+      "order": 5,
+      "terms": [
+        "char_word_quintessence",
+        "char_word_source",
+        "char_word_higher_potential",
+        "char_word_lower_potential",
+        "char_word_purpose"
+      ],
+      "connectives": [
+        "char_word_quantitative_match",
+        "char_word_aspiration",
+        "char_word_operation",
+        "char_word_qualitative_match",
+        "char_word_function",
+        "char_word_input",
+        "char_word_range_of_significance",
+        "char_word_range_of_potential",
+        "char_word_output",
+        "char_word_form"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_pentad_5",
+      "name": "Canonical Colours Pentad",
+      "order": 5,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_hexad_6",
+      "name": "Canonical Hexad",
+      "order": 6,
+      "terms": [
+        "char_word_priorities",
+        "char_word_criteria",
+        "char_word_values",
+        "char_word_resources",
+        "char_word_options",
+        "char_word_facts"
+      ],
+      "connectives": [
+        "char_word_step_1_needs_research",
+        "char_word_step_2_needs_research",
+        "char_word_step_3_needs_research",
+        "char_word_step_4_needs_research",
+        "char_word_step_5_needs_research",
+        "char_word_step_6_needs_research",
+        "char_word_step_7_needs_research",
+        "char_word_step_8_needs_research",
+        "char_word_step_9_needs_research",
+        "char_word_step_10_needs_research",
+        "char_word_step_11_needs_research",
+        "char_word_step_12_needs_research",
+        "char_word_step_13_needs_research",
+        "char_word_step_14_needs_research",
+        "char_word_step_15_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_hexad_6",
+      "name": "Canonical Colours Hexad",
+      "order": 6,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_heptad_7",
+      "name": "Canonical Heptad",
+      "order": 7,
+      "terms": [
+        "char_word_insight",
+        "char_word_application",
+        "char_word_design",
+        "char_word_research",
+        "char_word_synthesis",
+        "char_word_delivery",
+        "char_word_value"
+      ],
+      "connectives": [
+        "char_word_interval_1_needs_research",
+        "char_word_interval_2_needs_research",
+        "char_word_interval_3_needs_research",
+        "char_word_interval_4_needs_research",
+        "char_word_interval_5_needs_research",
+        "char_word_interval_6_needs_research",
+        "char_word_interval_7_needs_research",
+        "char_word_interval_8_needs_research",
+        "char_word_interval_9_needs_research",
+        "char_word_interval_10_needs_research",
+        "char_word_interval_11_needs_research",
+        "char_word_interval_12_needs_research",
+        "char_word_interval_13_needs_research",
+        "char_word_interval_14_needs_research",
+        "char_word_interval_15_needs_research",
+        "char_word_interval_16_needs_research",
+        "char_word_interval_17_needs_research",
+        "char_word_interval_18_needs_research",
+        "char_word_interval_19_needs_research",
+        "char_word_interval_20_needs_research",
+        "char_word_interval_21_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_heptad_7",
+      "name": "Canonical Colours Heptad",
+      "order": 7,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500",
+        "char_hex_00ffff"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_octad_8",
+      "name": "Canonical Octad",
+      "order": 8,
+      "terms": [
+        "char_word_inherent_values",
+        "char_word_critical_functions",
+        "char_word_organisational_modes",
+        "char_word_necessary_resourcing",
+        "char_word_intrinsic_nature",
+        "char_word_smallest_significant_holon",
+        "char_word_integrative_totality",
+        "char_word_supportive_platform"
+      ],
+      "connectives": [
+        "char_word_component_1_needs_research",
+        "char_word_component_2_needs_research",
+        "char_word_component_3_needs_research",
+        "char_word_component_4_needs_research",
+        "char_word_component_5_needs_research",
+        "char_word_component_6_needs_research",
+        "char_word_component_7_needs_research",
+        "char_word_component_8_needs_research",
+        "char_word_component_9_needs_research",
+        "char_word_component_10_needs_research",
+        "char_word_component_11_needs_research",
+        "char_word_component_12_needs_research",
+        "char_word_component_13_needs_research",
+        "char_word_component_14_needs_research",
+        "char_word_component_15_needs_research",
+        "char_word_component_16_needs_research",
+        "char_word_component_17_needs_research",
+        "char_word_component_18_needs_research",
+        "char_word_component_19_needs_research",
+        "char_word_component_20_needs_research",
+        "char_word_component_21_needs_research",
+        "char_word_component_22_needs_research",
+        "char_word_component_23_needs_research",
+        "char_word_component_24_needs_research",
+        "char_word_component_25_needs_research",
+        "char_word_component_26_needs_research",
+        "char_word_component_27_needs_research",
+        "char_word_component_28_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_octad_8",
+      "name": "Canonical Colours Octad",
+      "order": 8,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500",
+        "char_hex_00ffff",
+        "char_hex_8b4513"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_ennead_9",
+      "name": "Canonical Ennead",
+      "order": 9,
+      "terms": [
+        "char_word_term_1",
+        "char_word_term_2",
+        "char_word_term_3",
+        "char_word_term_4",
+        "char_word_term_5",
+        "char_word_term_6",
+        "char_word_term_7",
+        "char_word_term_8",
+        "char_word_term_9"
+      ],
+      "connectives": [
+        "char_word_transmutation_1_needs_research",
+        "char_word_transmutation_2_needs_research",
+        "char_word_transmutation_3_needs_research",
+        "char_word_transmutation_4_needs_research",
+        "char_word_transmutation_5_needs_research",
+        "char_word_transmutation_6_needs_research",
+        "char_word_transmutation_7_needs_research",
+        "char_word_transmutation_8_needs_research",
+        "char_word_transmutation_9_needs_research",
+        "char_word_transmutation_10_needs_research",
+        "char_word_transmutation_11_needs_research",
+        "char_word_transmutation_12_needs_research",
+        "char_word_transmutation_13_needs_research",
+        "char_word_transmutation_14_needs_research",
+        "char_word_transmutation_15_needs_research",
+        "char_word_transmutation_16_needs_research",
+        "char_word_transmutation_17_needs_research",
+        "char_word_transmutation_18_needs_research",
+        "char_word_transmutation_19_needs_research",
+        "char_word_transmutation_20_needs_research",
+        "char_word_transmutation_21_needs_research",
+        "char_word_transmutation_22_needs_research",
+        "char_word_transmutation_23_needs_research",
+        "char_word_transmutation_24_needs_research",
+        "char_word_transmutation_25_needs_research",
+        "char_word_transmutation_26_needs_research",
+        "char_word_transmutation_27_needs_research",
+        "char_word_transmutation_28_needs_research",
+        "char_word_transmutation_29_needs_research",
+        "char_word_transmutation_30_needs_research",
+        "char_word_transmutation_31_needs_research",
+        "char_word_transmutation_32_needs_research",
+        "char_word_transmutation_33_needs_research",
+        "char_word_transmutation_34_needs_research",
+        "char_word_transmutation_35_needs_research",
+        "char_word_transmutation_36_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_ennead_9",
+      "name": "Canonical Colours Ennead",
+      "order": 9,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500",
+        "char_hex_00ffff",
+        "char_hex_8b4513",
+        "char_hex_ff00ff"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_decad_10",
+      "name": "Canonical Decad",
+      "order": 10,
+      "terms": [
+        "char_word_term_1",
+        "char_word_term_2",
+        "char_word_term_3",
+        "char_word_term_4",
+        "char_word_term_5",
+        "char_word_term_6",
+        "char_word_term_7",
+        "char_word_term_8",
+        "char_word_term_9",
+        "char_word_term_10"
+      ],
+      "connectives": [
+        "char_word_progression_1_needs_research",
+        "char_word_progression_2_needs_research",
+        "char_word_progression_3_needs_research",
+        "char_word_progression_4_needs_research",
+        "char_word_progression_5_needs_research",
+        "char_word_progression_6_needs_research",
+        "char_word_progression_7_needs_research",
+        "char_word_progression_8_needs_research",
+        "char_word_progression_9_needs_research",
+        "char_word_progression_10_needs_research",
+        "char_word_progression_11_needs_research",
+        "char_word_progression_12_needs_research",
+        "char_word_progression_13_needs_research",
+        "char_word_progression_14_needs_research",
+        "char_word_progression_15_needs_research",
+        "char_word_progression_16_needs_research",
+        "char_word_progression_17_needs_research",
+        "char_word_progression_18_needs_research",
+        "char_word_progression_19_needs_research",
+        "char_word_progression_20_needs_research",
+        "char_word_progression_21_needs_research",
+        "char_word_progression_22_needs_research",
+        "char_word_progression_23_needs_research",
+        "char_word_progression_24_needs_research",
+        "char_word_progression_25_needs_research",
+        "char_word_progression_26_needs_research",
+        "char_word_progression_27_needs_research",
+        "char_word_progression_28_needs_research",
+        "char_word_progression_29_needs_research",
+        "char_word_progression_30_needs_research",
+        "char_word_progression_31_needs_research",
+        "char_word_progression_32_needs_research",
+        "char_word_progression_33_needs_research",
+        "char_word_progression_34_needs_research",
+        "char_word_progression_35_needs_research",
+        "char_word_progression_36_needs_research",
+        "char_word_progression_37_needs_research",
+        "char_word_progression_38_needs_research",
+        "char_word_progression_39_needs_research",
+        "char_word_progression_40_needs_research",
+        "char_word_progression_41_needs_research",
+        "char_word_progression_42_needs_research",
+        "char_word_progression_43_needs_research",
+        "char_word_progression_44_needs_research",
+        "char_word_progression_45_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_decad_10",
+      "name": "Canonical Colours Decad",
+      "order": 10,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500",
+        "char_hex_00ffff",
+        "char_hex_8b4513",
+        "char_hex_ff00ff",
+        "char_hex_ffffff"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_undecad_11",
+      "name": "Canonical Undecad",
+      "order": 11,
+      "terms": [
+        "char_word_term_1",
+        "char_word_term_2",
+        "char_word_term_3",
+        "char_word_term_4",
+        "char_word_term_5",
+        "char_word_term_6",
+        "char_word_term_7",
+        "char_word_term_8",
+        "char_word_term_9",
+        "char_word_term_10",
+        "char_word_term_11"
+      ],
+      "connectives": [
+        "char_word_correlation_1_needs_research",
+        "char_word_correlation_2_needs_research",
+        "char_word_correlation_3_needs_research",
+        "char_word_correlation_4_needs_research",
+        "char_word_correlation_5_needs_research",
+        "char_word_correlation_6_needs_research",
+        "char_word_correlation_7_needs_research",
+        "char_word_correlation_8_needs_research",
+        "char_word_correlation_9_needs_research",
+        "char_word_correlation_10_needs_research",
+        "char_word_correlation_11_needs_research",
+        "char_word_correlation_12_needs_research",
+        "char_word_correlation_13_needs_research",
+        "char_word_correlation_14_needs_research",
+        "char_word_correlation_15_needs_research",
+        "char_word_correlation_16_needs_research",
+        "char_word_correlation_17_needs_research",
+        "char_word_correlation_18_needs_research",
+        "char_word_correlation_19_needs_research",
+        "char_word_correlation_20_needs_research",
+        "char_word_correlation_21_needs_research",
+        "char_word_correlation_22_needs_research",
+        "char_word_correlation_23_needs_research",
+        "char_word_correlation_24_needs_research",
+        "char_word_correlation_25_needs_research",
+        "char_word_correlation_26_needs_research",
+        "char_word_correlation_27_needs_research",
+        "char_word_correlation_28_needs_research",
+        "char_word_correlation_29_needs_research",
+        "char_word_correlation_30_needs_research",
+        "char_word_correlation_31_needs_research",
+        "char_word_correlation_32_needs_research",
+        "char_word_correlation_33_needs_research",
+        "char_word_correlation_34_needs_research",
+        "char_word_correlation_35_needs_research",
+        "char_word_correlation_36_needs_research",
+        "char_word_correlation_37_needs_research",
+        "char_word_correlation_38_needs_research",
+        "char_word_correlation_39_needs_research",
+        "char_word_correlation_40_needs_research",
+        "char_word_correlation_41_needs_research",
+        "char_word_correlation_42_needs_research",
+        "char_word_correlation_43_needs_research",
+        "char_word_correlation_44_needs_research",
+        "char_word_correlation_45_needs_research",
+        "char_word_correlation_46_needs_research",
+        "char_word_correlation_47_needs_research",
+        "char_word_correlation_48_needs_research",
+        "char_word_correlation_49_needs_research",
+        "char_word_correlation_50_needs_research",
+        "char_word_correlation_51_needs_research",
+        "char_word_correlation_52_needs_research",
+        "char_word_correlation_53_needs_research",
+        "char_word_correlation_54_needs_research",
+        "char_word_correlation_55_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_undecad_11",
+      "name": "Canonical Colours Undecad",
+      "order": 11,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500",
+        "char_hex_00ffff",
+        "char_hex_8b4513",
+        "char_hex_ff00ff",
+        "char_hex_ffffff",
+        "char_hex_c0c0c0"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "semvocab_canonical_dodecad_12",
+      "name": "Canonical Dodecad",
+      "order": 12,
+      "terms": [
+        "char_word_term_1",
+        "char_word_term_2",
+        "char_word_term_3",
+        "char_word_term_4",
+        "char_word_term_5",
+        "char_word_term_6",
+        "char_word_term_7",
+        "char_word_term_8",
+        "char_word_term_9",
+        "char_word_term_10",
+        "char_word_term_11",
+        "char_word_term_12"
+      ],
+      "connectives": [
+        "char_word_harmony_1_needs_research",
+        "char_word_harmony_2_needs_research",
+        "char_word_harmony_3_needs_research",
+        "char_word_harmony_4_needs_research",
+        "char_word_harmony_5_needs_research",
+        "char_word_harmony_6_needs_research",
+        "char_word_harmony_7_needs_research",
+        "char_word_harmony_8_needs_research",
+        "char_word_harmony_9_needs_research",
+        "char_word_harmony_10_needs_research",
+        "char_word_harmony_11_needs_research",
+        "char_word_harmony_12_needs_research",
+        "char_word_harmony_13_needs_research",
+        "char_word_harmony_14_needs_research",
+        "char_word_harmony_15_needs_research",
+        "char_word_harmony_16_needs_research",
+        "char_word_harmony_17_needs_research",
+        "char_word_harmony_18_needs_research",
+        "char_word_harmony_19_needs_research",
+        "char_word_harmony_20_needs_research",
+        "char_word_harmony_21_needs_research",
+        "char_word_harmony_22_needs_research",
+        "char_word_harmony_23_needs_research",
+        "char_word_harmony_24_needs_research",
+        "char_word_harmony_25_needs_research",
+        "char_word_harmony_26_needs_research",
+        "char_word_harmony_27_needs_research",
+        "char_word_harmony_28_needs_research",
+        "char_word_harmony_29_needs_research",
+        "char_word_harmony_30_needs_research",
+        "char_word_harmony_31_needs_research",
+        "char_word_harmony_32_needs_research",
+        "char_word_harmony_33_needs_research",
+        "char_word_harmony_34_needs_research",
+        "char_word_harmony_35_needs_research",
+        "char_word_harmony_36_needs_research",
+        "char_word_harmony_37_needs_research",
+        "char_word_harmony_38_needs_research",
+        "char_word_harmony_39_needs_research",
+        "char_word_harmony_40_needs_research",
+        "char_word_harmony_41_needs_research",
+        "char_word_harmony_42_needs_research",
+        "char_word_harmony_43_needs_research",
+        "char_word_harmony_44_needs_research",
+        "char_word_harmony_45_needs_research",
+        "char_word_harmony_46_needs_research",
+        "char_word_harmony_47_needs_research",
+        "char_word_harmony_48_needs_research",
+        "char_word_harmony_49_needs_research",
+        "char_word_harmony_50_needs_research",
+        "char_word_harmony_51_needs_research",
+        "char_word_harmony_52_needs_research",
+        "char_word_harmony_53_needs_research",
+        "char_word_harmony_54_needs_research",
+        "char_word_harmony_55_needs_research",
+        "char_word_harmony_56_needs_research",
+        "char_word_harmony_57_needs_research",
+        "char_word_harmony_58_needs_research",
+        "char_word_harmony_59_needs_research",
+        "char_word_harmony_60_needs_research",
+        "char_word_harmony_61_needs_research",
+        "char_word_harmony_62_needs_research",
+        "char_word_harmony_63_needs_research",
+        "char_word_harmony_64_needs_research",
+        "char_word_harmony_65_needs_research",
+        "char_word_harmony_66_needs_research"
+      ]
+    },
+    {
+      "id": "semvocab_canonical_colours_dodecad_12",
+      "name": "Canonical Colours Dodecad",
+      "order": 12,
+      "terms": [
+        "char_hex_ff0000",
+        "char_hex_0000ff",
+        "char_hex_ffff00",
+        "char_hex_099902",
+        "char_hex_9900ff",
+        "char_hex_ffa500",
+        "char_hex_00ffff",
+        "char_hex_8b4513",
+        "char_hex_ff00ff",
+        "char_hex_ffffff",
+        "char_hex_c0c0c0",
+        "char_hex_ffd700"
+      ],
+      "connectives": []
+    }
+  ],
+  "grammars": [
+    {
+      "id": "grammar_canonical_monad_1",
+      "name": "Canonical Monad",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "topological_vocab_ref": "topvocab_1",
+      "geometric_vocab_ref": "geovocab_1",
+      "semantic_vocab_ref": "semvocab_canonical_monad_1"
+    },
+    {
+      "id": "grammar_canonical_dyad_2",
+      "name": "Canonical Dyad",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "topological_vocab_ref": "topvocab_2",
+      "geometric_vocab_ref": "geovocab_2",
+      "semantic_vocab_ref": "semvocab_canonical_dyad_2"
+    },
+    {
+      "id": "grammar_canonical_triad_3",
+      "name": "Canonical Triad",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "topological_vocab_ref": "topvocab_3",
+      "geometric_vocab_ref": "geovocab_3",
+      "semantic_vocab_ref": "semvocab_canonical_triad_3"
+    },
+    {
+      "id": "grammar_canonical_tetrad_4",
+      "name": "Canonical Tetrad",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "topological_vocab_ref": "topvocab_4",
+      "geometric_vocab_ref": "geovocab_4",
+      "semantic_vocab_ref": "semvocab_canonical_tetrad_4"
+    },
+    {
+      "id": "grammar_canonical_pentad_5",
+      "name": "Canonical Pentad",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "topological_vocab_ref": "topvocab_5",
+      "geometric_vocab_ref": "geovocab_5",
+      "semantic_vocab_ref": "semvocab_canonical_pentad_5"
+    },
+    {
+      "id": "grammar_canonical_hexad_6",
+      "name": "Canonical Hexad",
+      "order": 6,
+      "coherence": "Coalescence",
+      "term_designation": "Laws",
+      "connective_designation": "Steps",
+      "topological_vocab_ref": "topvocab_6",
+      "geometric_vocab_ref": "geovocab_6",
+      "semantic_vocab_ref": "semvocab_canonical_hexad_6"
+    },
+    {
+      "id": "grammar_canonical_heptad_7",
+      "name": "Canonical Heptad",
+      "order": 7,
+      "coherence": "Generation",
+      "term_designation": "States",
+      "connective_designation": "Intervals",
+      "topological_vocab_ref": "topvocab_7",
+      "geometric_vocab_ref": "geovocab_7",
+      "semantic_vocab_ref": "semvocab_canonical_heptad_7"
+    },
+    {
+      "id": "grammar_canonical_octad_8",
+      "name": "Canonical Octad",
+      "order": 8,
+      "coherence": "Self-Sufficiency",
+      "term_designation": "Elements",
+      "connective_designation": "Components",
+      "topological_vocab_ref": "topvocab_8",
+      "geometric_vocab_ref": "geovocab_8",
+      "semantic_vocab_ref": "semvocab_canonical_octad_8"
+    },
+    {
+      "id": "grammar_canonical_ennead_9",
+      "name": "Canonical Ennead",
+      "order": 9,
+      "coherence": "Transformation",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "topological_vocab_ref": "topvocab_9",
+      "geometric_vocab_ref": "geovocab_9",
+      "semantic_vocab_ref": "semvocab_canonical_ennead_9"
+    },
+    {
+      "id": "grammar_canonical_decad_10",
+      "name": "Canonical Decad",
+      "order": 10,
+      "coherence": "Intrinsic Harmony",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "topological_vocab_ref": "topvocab_10",
+      "geometric_vocab_ref": "geovocab_10",
+      "semantic_vocab_ref": "semvocab_canonical_decad_10"
+    },
+    {
+      "id": "grammar_canonical_undecad_11",
+      "name": "Canonical Undecad",
+      "order": 11,
+      "coherence": "Articulate Symmetry",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "topological_vocab_ref": "topvocab_11",
+      "geometric_vocab_ref": "geovocab_11",
+      "semantic_vocab_ref": "semvocab_canonical_undecad_11"
+    },
+    {
+      "id": "grammar_canonical_dodecad_12",
+      "name": "Canonical Dodecad",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "topological_vocab_ref": "topvocab_12",
+      "geometric_vocab_ref": "geovocab_12",
+      "semantic_vocab_ref": "semvocab_canonical_dodecad_12"
+    }
+  ]
+}
