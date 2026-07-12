@@ -1,39 +1,39 @@
-//! Grammar: the rules of a K_n system.
+//! Perspective: the rules of a K_n system.
 //!
-//! A `Grammar` is not a container of content — it's the *validator + inline
+//! A `Perspective` is not a container of content — it's the *validator + inline
 //! metadata* for a system. It references the three parallel vocabularies
 //! (`TopologicalVocabulary`, `GeometricVocabulary`, `SemanticVocabulary`) and
 //! provides the human-readable metadata (name, coherence, term/connective
 //! designations).
 //!
-//! Creating a Grammar with valid references *is* the join — there's no
+//! Creating a Perspective with valid references *is* the join — there's no
 //! separate `apply` step. Queries walk the references to reconstruct
-//! populated views (see `Graph::grammar_view`).
+//! populated views (see `Graph::perspective_view`).
 
 use serde::{Deserialize, Serialize};
 
 use super::vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
 
-/// A Grammar over one Order.
+/// A Perspective over one Order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Grammar {
+pub struct Perspective {
     pub id: String,
     /// Same as SystemName in the old model — "Triad", "Tetrad", ...
     pub name: String,
-    /// The K_n size this Grammar dictates.
+    /// The K_n size this Perspective dictates.
     pub order: u8,
     /// Inline metadata (formerly separate SystemName / CoherenceAttribute /
     /// TermDesignation / ConnectiveDesignation entries).
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
-    /// References to the three vocabularies this Grammar reconciles.
+    /// References to the three vocabularies this Perspective reconciles.
     pub topological_vocab_ref: String,
     pub geometric_vocab_ref: String,
     pub semantic_vocab_ref: String,
 }
 
-impl Grammar {
+impl Perspective {
     pub fn new(
         id: impl Into<String>,
         name: impl Into<String>,
@@ -72,7 +72,7 @@ impl Grammar {
         let name = name.into();
         let slug = name.to_lowercase().replace(' ', "_");
         Self::new(
-            format!("grammar_{}_{}", slug, order),
+            format!("perspective_{}_{}", slug, order),
             name,
             order,
             coherence,
@@ -97,19 +97,19 @@ impl Grammar {
         // Check refs match the passed vocabularies by ID.
         if topology.id != self.topological_vocab_ref {
             errs.push(format!(
-                "Grammar {}: topological_vocab_ref '{}' doesn't match passed topology '{}'",
+                "Perspective {}: topological_vocab_ref '{}' doesn't match passed topology '{}'",
                 self.id, self.topological_vocab_ref, topology.id
             ));
         }
         if geometry.id != self.geometric_vocab_ref {
             errs.push(format!(
-                "Grammar {}: geometric_vocab_ref '{}' doesn't match passed geometry '{}'",
+                "Perspective {}: geometric_vocab_ref '{}' doesn't match passed geometry '{}'",
                 self.id, self.geometric_vocab_ref, geometry.id
             ));
         }
         if semantics.id != self.semantic_vocab_ref {
             errs.push(format!(
-                "Grammar {}: semantic_vocab_ref '{}' doesn't match passed semantics '{}'",
+                "Perspective {}: semantic_vocab_ref '{}' doesn't match passed semantics '{}'",
                 self.id, self.semantic_vocab_ref, semantics.id
             ));
         }
@@ -117,19 +117,19 @@ impl Grammar {
         // Order alignment.
         if topology.order != self.order {
             errs.push(format!(
-                "Grammar {}: order {} doesn't match topology order {}",
+                "Perspective {}: order {} doesn't match topology order {}",
                 self.id, self.order, topology.order
             ));
         }
         if geometry.order != self.order {
             errs.push(format!(
-                "Grammar {}: order {} doesn't match geometry order {}",
+                "Perspective {}: order {} doesn't match geometry order {}",
                 self.id, self.order, geometry.order
             ));
         }
         if semantics.order != self.order {
             errs.push(format!(
-                "Grammar {}: order {} doesn't match semantics order {}",
+                "Perspective {}: order {} doesn't match semantics order {}",
                 self.id, self.order, semantics.order
             ));
         }
@@ -178,9 +178,9 @@ mod tests {
     }
 
     #[test]
-    fn test_grammar_creation_with_auto_id() {
+    fn test_perspective_creation_with_auto_id() {
         let (t, g, s) = triad_vocabs();
-        let gram = Grammar::with_auto_id(
+        let gram = Perspective::with_auto_id(
             "Triad",
             3,
             "Dynamism",
@@ -190,15 +190,15 @@ mod tests {
             &g.id,
             &s.id,
         );
-        assert_eq!(gram.id, "grammar_triad_3");
+        assert_eq!(gram.id, "perspective_triad_3");
         assert_eq!(gram.name, "Triad");
         assert_eq!(gram.coherence, "Dynamism");
     }
 
     #[test]
-    fn test_grammar_validate_ok() {
+    fn test_perspective_validate_ok() {
         let (t, g, s) = triad_vocabs();
-        let gram = Grammar::with_auto_id(
+        let gram = Perspective::with_auto_id(
             "Triad",
             3,
             "Dynamism",
@@ -212,7 +212,7 @@ mod tests {
     }
 
     #[test]
-    fn test_grammar_validate_catches_order_mismatch() {
+    fn test_perspective_validate_catches_order_mismatch() {
         let (t, g, _) = triad_vocabs();
         let tetrad_sem = SemanticVocabulary::with_auto_id(
             "Bad Sem",
@@ -220,7 +220,7 @@ mod tests {
             vec!["a".into(), "b".into(), "c".into(), "d".into()],
             vec!["e".into(), "f".into(), "g".into(), "h".into(), "i".into(), "j".into()],
         );
-        let gram = Grammar::with_auto_id(
+        let gram = Perspective::with_auto_id(
             "Confused",
             3,
             "?",
@@ -235,10 +235,10 @@ mod tests {
     }
 
     #[test]
-    fn test_grammar_validate_catches_wrong_ref() {
+    fn test_perspective_validate_catches_wrong_ref() {
         let (t, g, s) = triad_vocabs();
         let other_topology = TopologicalVocabulary::canonical_for(4);
-        let gram = Grammar::with_auto_id(
+        let gram = Perspective::with_auto_id(
             "Triad",
             3,
             "Dynamism",

@@ -1,4 +1,4 @@
-//! End-to-end smoke test for the Grammar / Vocabulary / Character surface.
+//! End-to-end smoke test for the Perspective / Vocabulary / Character surface.
 //!
 //! Verifies that a user can build a full Theology Triad from scratch and
 //! query it back through the schema.
@@ -64,10 +64,10 @@ async fn create_theology_triad_end_to_end() {
         .unwrap()
         .is_empty());
 
-    // Create the Grammar.
-    let create_grammar = r#"
+    // Create the Perspective.
+    let create_perspective = r#"
         mutation Create($sv: String!) {
-            createGrammar(input: {
+            createPerspective(input: {
                 name: "Theology Triad",
                 order: 3,
                 coherence: "Trinity",
@@ -79,23 +79,23 @@ async fn create_theology_triad_end_to_end() {
             }) { id name coherence topologicalVocabRef }
         }
     "#;
-    let req = async_graphql::Request::new(create_grammar)
+    let req = async_graphql::Request::new(create_perspective)
         .variables(async_graphql::Variables::from_json(json!({ "sv": sv_id })));
     let resp = schema.execute(req).await;
-    assert!(resp.errors.is_empty(), "create grammar errors: {:?}", resp.errors);
+    assert!(resp.errors.is_empty(), "create perspective errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
-    let grammar_id = data["createGrammar"]["id"].as_str().unwrap().to_string();
-    assert_eq!(data["createGrammar"]["name"], "Theology Triad");
-    assert_eq!(data["createGrammar"]["coherence"], "Trinity");
+    let perspective_id = data["createPerspective"]["id"].as_str().unwrap().to_string();
+    assert_eq!(data["createPerspective"]["name"], "Theology Triad");
+    assert_eq!(data["createPerspective"]["coherence"], "Trinity");
 
     // Validate returns no errors.
-    let validate = r#"query Validate($id: String!) { validateGrammar(id: $id) }"#;
+    let validate = r#"query Validate($id: String!) { validatePerspective(id: $id) }"#;
     let req = async_graphql::Request::new(validate)
-        .variables(async_graphql::Variables::from_json(json!({ "id": grammar_id })));
+        .variables(async_graphql::Variables::from_json(json!({ "id": perspective_id })));
     let resp = schema.execute(req).await;
     assert!(resp.errors.is_empty(), "validate errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
-    let errs = data["validateGrammar"].as_array().unwrap();
+    let errs = data["validatePerspective"].as_array().unwrap();
     assert!(errs.is_empty(), "validation returned: {:?}", errs);
 
     // Character-at-point join uses the new vocabulary.
@@ -112,13 +112,13 @@ async fn create_theology_triad_end_to_end() {
 
     // Clean up.
     let cleanup = r#"
-        mutation Cleanup($grammar: String!, $sv: String!) {
-            g: deleteGrammar(id: $grammar)
+        mutation Cleanup($perspective: String!, $sv: String!) {
+            g: deletePerspective(id: $perspective)
             s: deleteSemanticVocab(id: $sv)
         }
     "#;
     let req = async_graphql::Request::new(cleanup).variables(
-        async_graphql::Variables::from_json(json!({ "grammar": grammar_id, "sv": sv_id })),
+        async_graphql::Variables::from_json(json!({ "perspective": perspective_id, "sv": sv_id })),
     );
     let resp = schema.execute(req).await;
     let data = resp.data.into_json().unwrap();
@@ -142,8 +142,8 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
         .map(|f| f["name"].as_str().unwrap().to_string())
         .collect();
 
-    // Only Character / SemanticVocab / Grammar mutations exist.
-    let allowed = ["Character", "SemanticVocab", "Grammar"];
+    // Only Character / SemanticVocab / Perspective mutations exist.
+    let allowed = ["Character", "SemanticVocab", "Perspective"];
     for f in &fields {
         assert!(
             allowed.iter().any(|a| f.contains(a)),
@@ -158,9 +158,9 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
         "createSemanticVocab",
         "updateSemanticVocab",
         "deleteSemanticVocab",
-        "createGrammar",
-        "updateGrammar",
-        "deleteGrammar",
+        "createPerspective",
+        "updatePerspective",
+        "deletePerspective",
     ] {
         assert!(
             fields.iter().any(|f| f == expected),
