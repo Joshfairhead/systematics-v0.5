@@ -2921,9 +2921,9 @@
       "connectives": []
     }
   ],
-  "grammars": [
+  "perspectives": [
     {
-      "id": "grammar_canonical_monad_1",
+      "id": "perspective_canonical_monad_1",
       "name": "Canonical Monad",
       "order": 1,
       "coherence": "Universality",
@@ -2934,7 +2934,7 @@
       "semantic_vocab_ref": "semvocab_canonical_monad_1"
     },
     {
-      "id": "grammar_canonical_dyad_2",
+      "id": "perspective_canonical_dyad_2",
       "name": "Canonical Dyad",
       "order": 2,
       "coherence": "Complementarity",
@@ -2945,7 +2945,7 @@
       "semantic_vocab_ref": "semvocab_canonical_dyad_2"
     },
     {
-      "id": "grammar_canonical_triad_3",
+      "id": "perspective_canonical_triad_3",
       "name": "Canonical Triad",
       "order": 3,
       "coherence": "Dynamism",
@@ -2956,7 +2956,7 @@
       "semantic_vocab_ref": "semvocab_canonical_triad_3"
     },
     {
-      "id": "grammar_canonical_tetrad_4",
+      "id": "perspective_canonical_tetrad_4",
       "name": "Canonical Tetrad",
       "order": 4,
       "coherence": "Activity Field",
@@ -2967,7 +2967,7 @@
       "semantic_vocab_ref": "semvocab_canonical_tetrad_4"
     },
     {
-      "id": "grammar_canonical_pentad_5",
+      "id": "perspective_canonical_pentad_5",
       "name": "Canonical Pentad",
       "order": 5,
       "coherence": "Significance and Potential",
@@ -2978,7 +2978,7 @@
       "semantic_vocab_ref": "semvocab_canonical_pentad_5"
     },
     {
-      "id": "grammar_canonical_hexad_6",
+      "id": "perspective_canonical_hexad_6",
       "name": "Canonical Hexad",
       "order": 6,
       "coherence": "Coalescence",
@@ -2989,7 +2989,7 @@
       "semantic_vocab_ref": "semvocab_canonical_hexad_6"
     },
     {
-      "id": "grammar_canonical_heptad_7",
+      "id": "perspective_canonical_heptad_7",
       "name": "Canonical Heptad",
       "order": 7,
       "coherence": "Generation",
@@ -3000,7 +3000,7 @@
       "semantic_vocab_ref": "semvocab_canonical_heptad_7"
     },
     {
-      "id": "grammar_canonical_octad_8",
+      "id": "perspective_canonical_octad_8",
       "name": "Canonical Octad",
       "order": 8,
       "coherence": "Self-Sufficiency",
@@ -3011,7 +3011,7 @@
       "semantic_vocab_ref": "semvocab_canonical_octad_8"
     },
     {
-      "id": "grammar_canonical_ennead_9",
+      "id": "perspective_canonical_ennead_9",
       "name": "Canonical Ennead",
       "order": 9,
       "coherence": "Transformation",
@@ -3022,7 +3022,7 @@
       "semantic_vocab_ref": "semvocab_canonical_ennead_9"
     },
     {
-      "id": "grammar_canonical_decad_10",
+      "id": "perspective_canonical_decad_10",
       "name": "Canonical Decad",
       "order": 10,
       "coherence": "Intrinsic Harmony",
@@ -3033,7 +3033,7 @@
       "semantic_vocab_ref": "semvocab_canonical_decad_10"
     },
     {
-      "id": "grammar_canonical_undecad_11",
+      "id": "perspective_canonical_undecad_11",
       "name": "Canonical Undecad",
       "order": 11,
       "coherence": "Articulate Symmetry",
@@ -3044,7 +3044,7 @@
       "semantic_vocab_ref": "semvocab_canonical_undecad_11"
     },
     {
-      "id": "grammar_canonical_dodecad_12",
+      "id": "perspective_canonical_dodecad_12",
       "name": "Canonical Dodecad",
       "order": 12,
       "coherence": "Perfection",

@@ -1,7 +1,7 @@
 //! Persistence for the writable user store.
 //!
 //! Canonical content ships bundled (see `data::canonical_content`); this module
-//! handles the *user* slice — grammars, semantic vocabularies, characters, and
+//! handles the *user* slice — perspectives, semantic vocabularies, characters, and
 //! coordinates a user creates at runtime. It serialises to a JSON file (default
 //! `./data/store.json`, overridable via `SYSTEMATICS_STORE`) using the same
 //! `GraphContent` shape as the canonical seed.
@@ -56,7 +56,7 @@ pub fn save(graph: &Graph, path: &Path) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{Character, Grammar, SemanticVocabulary};
+    use crate::core::{Character, Perspective, SemanticVocabulary};
     use crate::data;
 
     fn temp_path(name: &str) -> PathBuf {
@@ -69,7 +69,7 @@ mod tests {
         let path = temp_path("roundtrip");
         let _ = std::fs::remove_file(&path);
 
-        // Build canonical graph, add a user grammar + its deps.
+        // Build canonical graph, add a user perspective + its deps.
         let mut graph = data::build_graph();
         graph.upsert_character(Character::new("char_word_immanent", "word", "Immanent"));
         graph.upsert_character(Character::new("char_word_omniscient", "word", "Omniscient"));
@@ -93,8 +93,8 @@ mod tests {
                 "char_word_consent".into(),
             ],
         ));
-        graph.add_grammar(Grammar::new(
-            "grammar_theology_triad_3",
+        graph.add_perspective(Perspective::new(
+            "perspective_theology_triad_3",
             "Theology Triad",
             3,
             "Trinity",
@@ -107,7 +107,7 @@ mod tests {
 
         // The user slice excludes canonical (Will/Function/Being stay canonical).
         let user = graph.user_content();
-        assert!(user.grammars.iter().any(|g| g.id == "grammar_theology_triad_3"));
+        assert!(user.perspectives.iter().any(|g| g.id == "perspective_theology_triad_3"));
         assert!(user.characters.iter().any(|c| c.id == "char_word_immanent"));
         assert!(
             !user.characters.iter().any(|c| c.id == "char_word_will"),
@@ -116,13 +116,13 @@ mod tests {
 
         save(&graph, &path).unwrap();
 
-        // Fresh canonical graph + load store → theology grammar reappears.
+        // Fresh canonical graph + load store → theology perspective reappears.
         let mut reloaded = data::build_graph();
-        assert!(reloaded.grammar("grammar_theology_triad_3").is_none());
+        assert!(reloaded.perspective("perspective_theology_triad_3").is_none());
         let n = load_into(&mut reloaded, &path).unwrap();
-        assert!(n >= 5); // 3 chars + 1 semvocab + 1 grammar
-        assert!(reloaded.grammar("grammar_theology_triad_3").is_some());
-        assert!(reloaded.validate_grammar("grammar_theology_triad_3").is_ok());
+        assert!(n >= 5); // 3 chars + 1 semvocab + 1 perspective
+        assert!(reloaded.perspective("perspective_theology_triad_3").is_some());
+        assert!(reloaded.validate_perspective("perspective_theology_triad_3").is_ok());
         assert_eq!(
             reloaded
                 .character_at_point("semvocab_theology_triad_3", "point_3_2")

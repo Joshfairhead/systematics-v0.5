@@ -1,4 +1,4 @@
-//! Grammar wire type.
+//! Perspective wire type.
 
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +9,7 @@ use async_graphql::SimpleObject;
 /// plus references to the three vocabularies it reconciles.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Grammar {
+pub struct Perspective {
     pub id: String,
     pub name: String,
     pub order: i32,

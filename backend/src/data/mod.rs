@@ -2,7 +2,7 @@
 //!
 //! Emits substrate entries (Order, Position, Point, Line, Coordinate, Segment,
 //! Character) followed by the canonical Topological / Geometric / Semantic
-//! Vocabularies and one Canonical Grammar per Order.
+//! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
     Entry, GeometricVocabulary, GraphContent, Graph, Line, Link, Order, Point, Position, Segment,
@@ -10,7 +10,7 @@ use crate::core::{
 };
 
 /// The canonical seed content (coordinates, characters, semantic vocabularies,
-/// grammars), bundled as JSON. Source of truth for canonical data; the Rust
+/// perspectives), bundled as JSON. Source of truth for canonical data; the Rust
 /// tables that generated it live under `#[cfg(test)] mod regen`.
 const CANONICAL_JSON: &str = include_str!("../../../data/canonical.json");
 
@@ -23,7 +23,7 @@ pub fn canonical_content() -> GraphContent {
 ///
 /// The combinatoric substrate (Order, Position, Point, Line, Segment, and the
 /// topological/geometric vocabulary ref-lists) is computed here; the data layer
-/// (coordinates, characters, semantic vocabularies, grammars) is applied from
+/// (coordinates, characters, semantic vocabularies, perspectives) is applied from
 /// the canonical seed and then marked canonical so later user additions can be
 /// told apart for persistence.
 pub fn build_graph() -> Graph {
@@ -104,7 +104,7 @@ fn add_rendering_line_links(graph: &mut Graph) {
 
 #[cfg(test)]
 mod regen {
-    use crate::core::{Character, Coordinate, GraphContent, Grammar, Point3d, SemanticVocabulary};
+    use crate::core::{Character, Coordinate, GraphContent, Perspective, Point3d, SemanticVocabulary};
 
 /// Build the canonical data layer from the Rust tables. This is the generator
 /// behind `data/canonical.json`; at runtime the JSON is loaded instead.
@@ -128,7 +128,7 @@ pub fn build_canonical_from_tables() -> GraphContent {
                 .push(Coordinate::from_point3d(order, position, *coord));
         }
 
-        // Word characters + the canonical word SemanticVocabulary + Grammar.
+        // Word characters + the canonical word SemanticVocabulary + Perspective.
         let term_slugs = get_term_character_slugs(order);
         let connective_slugs = get_canonical_connective_slugs(order);
         for slug in term_slugs.iter().chain(connective_slugs.iter()) {
@@ -153,7 +153,7 @@ pub fn build_canonical_from_tables() -> GraphContent {
         );
         let semvocab_id = semvocab.id.clone();
         content.semantic_vocabs.push(semvocab);
-        content.grammars.push(Grammar::with_auto_id(
+        content.perspectives.push(Perspective::with_auto_id(
             format!("Canonical {}", canonical_system_name(order)),
             order,
             canonical_coherence(order),
@@ -570,7 +570,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_graph_canonical_grammars() {
+    fn test_build_graph_canonical_perspectives() {
         let g = build_graph();
         for order in 1..=12u8 {
             assert!(g.topological_vocab_for_order(order).is_some());
@@ -582,17 +582,17 @@ mod tests {
                 order
             );
             assert!(g.semantic_vocab(&semvocab_id).is_some());
-            let grammar_id = format!(
-                "grammar_{}_{}",
+            let perspective_id = format!(
+                "perspective_{}_{}",
                 name.to_lowercase().replace(' ', "_"),
                 order
             );
-            assert!(g.grammar(&grammar_id).is_some());
+            assert!(g.perspective(&perspective_id).is_some());
             assert!(
-                g.validate_grammar(&grammar_id).is_ok(),
-                "Grammar {} failed validation: {:?}",
-                grammar_id,
-                g.validate_grammar(&grammar_id)
+                g.validate_perspective(&perspective_id).is_ok(),
+                "Perspective {} failed validation: {:?}",
+                perspective_id,
+                g.validate_perspective(&perspective_id)
             );
         }
     }
@@ -636,12 +636,12 @@ mod tests {
         std::fs::create_dir_all(concat!(env!("CARGO_MANIFEST_DIR"), "/../data")).unwrap();
         std::fs::write(path, json).unwrap();
         eprintln!(
-            "wrote {} ({} chars, {} coords, {} semvocabs, {} grammars)",
+            "wrote {} ({} chars, {} coords, {} semvocabs, {} perspectives)",
             path,
             content.characters.len(),
             content.coordinates.len(),
             content.semantic_vocabs.len(),
-            content.grammars.len()
+            content.perspectives.len()
         );
     }
 }

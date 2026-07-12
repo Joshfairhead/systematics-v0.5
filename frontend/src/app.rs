@@ -1,7 +1,7 @@
 use crate::api::client::GraphQLClient;
 use crate::components::graph_view::ApiGraphView;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
-use systematics_middleware::SystemView;
+use systematics_middleware::Grammar;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
@@ -34,8 +34,8 @@ pub struct Breadcrumb {
 
 pub enum ApiAppMsg {
     SelectSystem(String),
-    SystemsLoaded(Vec<SystemView>),
-    SystemLoaded(Box<SystemView>),
+    SystemsLoaded(Vec<Grammar>),
+    SystemLoaded(Box<Grammar>),
     LoadError(String),
     NavigateToSystem(String),
     NavigateBack,
@@ -43,8 +43,8 @@ pub enum ApiAppMsg {
 }
 
 pub struct ApiApp {
-    systems: Vec<SystemView>,
-    selected_system: Option<SystemView>,
+    systems: Vec<Grammar>,
+    selected_system: Option<Grammar>,
     loading: bool,
     error: Option<String>,
     graphql_client: GraphQLClient,
@@ -215,7 +215,7 @@ impl Component for ApiApp {
                             if self.loading && self.systems.is_empty() {
                                 html! { <div class="loading">{"Loading systems..."}</div> }
                             } else {
-                                // Convert SystemView to SystemDisplay for SystemSelector
+                                // Convert Grammar to SystemDisplay for SystemSelector
                                 let display_systems: Vec<SystemDisplay> = self.systems.iter().map(|sys| {
                                     SystemDisplay {
                                         name: sys.name.to_lowercase(),
