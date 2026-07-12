@@ -1,5 +1,6 @@
 //! GraphQL types and schema for the Systematics property graph API.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use async_graphql::*;
@@ -13,6 +14,10 @@ use crate::core::{
 /// Shared, mutable graph passed to the GraphQL schema as context data.
 pub type SharedGraph = Arc<RwLock<Graph>>;
 
+/// Writable-store path in context. `None` disables persistence (used by tests).
+#[derive(Clone, Default)]
+pub struct StorePath(pub Option<PathBuf>);
+
 /// Take a cheap snapshot of the shared graph for read-only resolvers.
 async fn graph_snapshot(ctx: &Context<'_>) -> Graph {
     ctx.data_unchecked::<SharedGraph>().read().await.clone()
@@ -21,6 +26,16 @@ async fn graph_snapshot(ctx: &Context<'_>) -> Graph {
 /// Access the shared graph for mutation resolvers.
 fn shared_graph<'a>(ctx: &'a Context<'_>) -> &'a SharedGraph {
     ctx.data_unchecked::<SharedGraph>()
+}
+
+/// Persist the graph's user slice, if a store path is configured. Called at the
+/// end of each mutation while the write lock is still held.
+fn persist(ctx: &Context<'_>, graph: &Graph) {
+    if let Some(path) = ctx.data_unchecked::<StorePath>().0.as_ref() {
+        if let Err(e) = crate::persistence::save(graph, path) {
+            tracing::error!("failed to persist user store: {}", e);
+        }
+    }
 }
 
 // ============================================================================
@@ -568,6 +583,7 @@ impl MutationRoot {
             )));
         }
         graph.add_entry(Entry::Character(character.clone()));
+        persist(ctx, &graph);
         Ok(GqlCharacter::new(character))
     }
 
@@ -578,7 +594,11 @@ impl MutationRoot {
         graph
             .entries
             .retain(|e| !matches!(e, Entry::Character(c) if c.id == id));
-        graph.entries.len() != before
+        let changed = graph.entries.len() != before;
+        if changed {
+            persist(ctx, &graph);
+        }
+        changed
     }
 
     async fn create_semantic_vocab(
@@ -596,6 +616,7 @@ impl MutationRoot {
             )));
         }
         graph.add_semantic_vocab(sv.clone());
+        persist(ctx, &graph);
         Ok(GqlSemanticVocabulary::new(sv))
     }
 
@@ -612,13 +633,18 @@ impl MutationRoot {
         if graph.update_semantic_vocab(sv.clone()).is_none() {
             return Err(Error::new(format!("SemanticVocabulary '{}' not found", id)));
         }
+        persist(ctx, &graph);
         Ok(GqlSemanticVocabulary::new(sv))
     }
 
     async fn delete_semantic_vocab(&self, ctx: &Context<'_>, id: String) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        graph.delete_semantic_vocab(&id).is_some()
+        let removed = graph.delete_semantic_vocab(&id).is_some();
+        if removed {
+            persist(ctx, &graph);
+        }
+        removed
     }
 
     async fn create_grammar(
@@ -633,6 +659,7 @@ impl MutationRoot {
             return Err(Error::new(format!("Grammar '{}' already exists", gr.id)));
         }
         graph.add_grammar(gr.clone());
+        persist(ctx, &graph);
         Ok(GqlGrammar::new(gr))
     }
 
@@ -649,13 +676,18 @@ impl MutationRoot {
         if graph.update_grammar(gr.clone()).is_none() {
             return Err(Error::new(format!("Grammar '{}' not found", id)));
         }
+        persist(ctx, &graph);
         Ok(GqlGrammar::new(gr))
     }
 
     async fn delete_grammar(&self, ctx: &Context<'_>, id: String) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        graph.delete_grammar(&id).is_some()
+        let removed = graph.delete_grammar(&id).is_some();
+        if removed {
+            persist(ctx, &graph);
+        }
+        removed
     }
 }
 
@@ -1051,8 +1083,16 @@ impl GrammarInput {
 pub type SystematicsSchema =
     async_graphql::Schema<QueryRoot, MutationRoot, async_graphql::EmptySubscription>;
 
+/// Build the schema with a shared graph and no persistence (tests, ephemeral).
 pub fn create_schema(graph: SharedGraph) -> SystematicsSchema {
+    create_schema_with_store(graph, None)
+}
+
+/// Build the schema with a shared graph and an optional writable store path.
+/// When `store` is `Some`, mutations persist the user slice after each change.
+pub fn create_schema_with_store(graph: SharedGraph, store: Option<PathBuf>) -> SystematicsSchema {
     async_graphql::Schema::build(QueryRoot, MutationRoot, async_graphql::EmptySubscription)
         .data(graph)
+        .data(StorePath(store))
         .finish()
 }
