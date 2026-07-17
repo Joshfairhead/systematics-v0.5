@@ -382,7 +382,10 @@ fn canonical_perspective_id(order: u8) -> String {
 fn resolve_perspective(graph: &Graph, perspective_id: &str) -> Option<GrammarData> {
     let perspective = graph.perspective(perspective_id)?;
     let order = perspective.order;
-    let name = perspective.name.clone();
+    // Display label is the order's system name (e.g. "Triad"), not the
+    // perspective's name ("Canonical Triad"). The frontend navigates by this
+    // (systemByName expects "triad", not "canonical triad").
+    let name = canonical_system_name(order).to_string();
     let topology = graph.topological_vocab(&perspective.topological_vocab_ref)?;
     let semantic = graph.semantic_vocab(&perspective.semantic_vocab_ref)?;
     let colour_vocab = graph.canonical_colour_vocab_for_order(order);
