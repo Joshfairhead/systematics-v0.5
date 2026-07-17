@@ -1,4 +1,4 @@
-use systematics_middleware::SystemView;
+use systematics_middleware::Grammar;
 use yew::prelude::*;
 
 /// Default colors for rendering
@@ -9,7 +9,7 @@ const SELECTED_EDGE_COLOR: &str = "#FF6B6B";
 
 #[derive(Properties, PartialEq)]
 pub struct ApiGraphViewProps {
-    pub system: SystemView,
+    pub system: Grammar,
     #[prop_or_default]
     pub on_navigate: Option<Callback<String>>,
     #[prop_or_default]
@@ -87,7 +87,7 @@ impl Component for ApiGraphView {
 
 impl ApiGraphView {
     /// Render edges (lines) from the system
-    fn render_edges(&self, system: &SystemView) -> Html {
+    fn render_edges(&self, system: &Grammar) -> Html {
         web_sys::console::log_1(
             &format!("render_edges: {} lines to render", system.lines.len()).into(),
         );
@@ -169,7 +169,7 @@ impl ApiGraphView {
     /// Render edge labels for connectives
     /// Instead of iterating connectives independently, we iterate through lines
     /// and find matching connectives to ensure labels align with the correct edges
-    fn render_edge_labels(&self, system: &SystemView) -> Html {
+    fn render_edge_labels(&self, system: &Grammar) -> Html {
         web_sys::console::log_1(
             &format!(
                 "render_edge_labels: {} lines, {} connectives",
@@ -279,7 +279,7 @@ impl ApiGraphView {
     }
 
     /// Render nodes from coordinates and terms
-    fn render_nodes(&self, ctx: &Context<Self>, system: &SystemView) -> Html {
+    fn render_nodes(&self, ctx: &Context<Self>, system: &Grammar) -> Html {
         system.coordinates.iter().map(|coord| {
             let position = coord.position;
             let idx = (position - 1) as usize;  // Convert 1-based position to 0-based index

@@ -2,87 +2,42 @@
 //!
 //! Emits substrate entries (Order, Position, Point, Line, Coordinate, Segment,
 //! Character) followed by the canonical Topological / Geometric / Semantic
-//! Vocabularies and one Canonical Grammar per Order.
+//! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
-    Character, Coordinate, Entry, GeometricVocabulary, Grammar, Graph, Line, Link, Order, Point,
-    Point3d, Position, SemanticVocabulary, Segment, TopologicalVocabulary,
+    Entry, GeometricVocabulary, GraphContent, Graph, Line, Link, Order, Point, Position, Segment,
+    TopologicalVocabulary,
 };
 
+/// The canonical seed content (coordinates, characters, semantic vocabularies,
+/// perspectives), bundled as JSON. Source of truth for canonical data; the Rust
+/// tables that generated it live under `#[cfg(test)] mod regen`.
+const CANONICAL_JSON: &str = include_str!("../../../data/canonical.json");
+
+/// Parse the embedded canonical seed content.
+pub fn canonical_content() -> GraphContent {
+    serde_json::from_str(CANONICAL_JSON).expect("data/canonical.json is valid GraphContent")
+}
+
 /// Build the complete graph with all systems (1-12).
+///
+/// The combinatoric substrate (Order, Position, Point, Line, Segment, and the
+/// topological/geometric vocabulary ref-lists) is computed here; the data layer
+/// (coordinates, characters, semantic vocabularies, perspectives) is applied from
+/// the canonical seed and then marked canonical so later user additions can be
+/// told apart for persistence.
 pub fn build_graph() -> Graph {
     let mut graph = Graph::new();
 
     add_orders(&mut graph);
     add_positions(&mut graph);
-    add_substrate(&mut graph);
-    add_canonical_vocabularies_and_grammars(&mut graph);
-    add_canonical_colour_vocabularies(&mut graph);
+    add_substrate_combinatorics(&mut graph);
     add_rendering_line_links(&mut graph);
 
+    graph.apply_content(&canonical_content());
+    graph.mark_canonical();
+
     graph
-}
-
-/// Seed one canonical hex-colour Character per unique colour + one Canonical
-/// Colour SemanticVocabulary per Order (terms only, no connectives).
-fn add_canonical_colour_vocabularies(graph: &mut Graph) {
-    for order in 1..=12u8 {
-        let hex_codes = get_colours(order);
-        // Ensure each hex code has a Character entry (content-addressed).
-        for hex in &hex_codes {
-            let id = format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase());
-            if graph.character(&id).is_none() {
-                graph.add_entry(Entry::Character(Character::new(&id, "hex", *hex)));
-            }
-        }
-        let terms: Vec<String> = hex_codes
-            .iter()
-            .map(|hex| format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase()))
-            .collect();
-        let name = format!("Canonical Colours {}", canonical_system_name(order));
-        graph.add_semantic_vocab(SemanticVocabulary::with_auto_id(
-            name,
-            order,
-            terms,
-            vec![], // colours have no connectives; validate() is not called on this vocab.
-        ));
-    }
-}
-
-fn get_colours(order: u8) -> Vec<&'static str> {
-    const RED: &str = "#FF0000";
-    const BLUE: &str = "#0000FF";
-    const YELLOW: &str = "#FFFF00";
-    const GREEN: &str = "#099902";
-    const PURPLE: &str = "#9900FF";
-    const ORANGE: &str = "#FFA500";
-    const LIGHT_BLUE: &str = "#00FFFF";
-    const BROWN: &str = "#8B4513";
-    const MAGENTA: &str = "#FF00FF";
-    const WHITE: &str = "#FFFFFF";
-    const SILVER: &str = "#C0C0C0";
-    const GOLD: &str = "#FFD700";
-
-    match order {
-        1 => vec![RED],
-        2 => vec![RED, BLUE],
-        3 => vec![RED, BLUE, YELLOW],
-        4 => vec![RED, BLUE, YELLOW, GREEN],
-        5 => vec![RED, BLUE, YELLOW, GREEN, PURPLE],
-        6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
-        7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
-        8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
-        9 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA],
-        10 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE],
-        11 => vec![
-            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
-        ],
-        12 => vec![
-            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
-            GOLD,
-        ],
-        _ => vec![],
-    }
 }
 
 // =============================================================================
@@ -101,85 +56,27 @@ fn add_positions(graph: &mut Graph) {
     }
 }
 
-fn add_substrate(graph: &mut Graph) {
+/// Emit the combinatoric substrate: Points, Lines, Segments, and the
+/// topological/geometric vocabulary ref-lists. All derivable from the Order,
+/// so this stays in code. Coordinates (the geometric *values*) are data and
+/// come from the canonical seed.
+fn add_substrate_combinatorics(graph: &mut Graph) {
     for order in 1..=12u8 {
-        // Points at every position.
         for position in 1..=order {
             graph.add_entry(Entry::Point(Point::new(order, position)));
         }
-        // Lines at every canonical pair (p1 < p2).
         for p1 in 1..=order {
             for p2 in (p1 + 1)..=order {
                 graph.add_entry(Entry::Line(Line::new(order, p1, p2)));
             }
         }
-        // Coordinates at every Point.
-        let coords = get_coordinates(order);
-        for (idx, coord) in coords.iter().enumerate() {
-            let position = (idx + 1) as u8;
-            graph.add_entry(Entry::Coordinate(Coordinate::from_point3d(
-                order, position, *coord,
-            )));
-        }
-        // Segments at every Line.
         for p1 in 1..=order {
             for p2 in (p1 + 1)..=order {
                 graph.add_entry(Entry::Segment(Segment::new(order, p1, p2)));
             }
         }
-        // Per-order topological and geometric vocabularies.
         graph.add_topological_vocab(TopologicalVocabulary::canonical_for(order));
         graph.add_geometric_vocab(GeometricVocabulary::canonical_for(order));
-    }
-}
-
-fn add_canonical_vocabularies_and_grammars(graph: &mut Graph) {
-    for order in 1..=12u8 {
-        let term_slugs = get_term_character_slugs(order);
-        let connective_slugs = get_canonical_connective_slugs(order);
-
-        // Emit Character entries for every referenced slug (word Characters
-        // are content-addressed by `char_word_{slug}`).
-        for slug in term_slugs.iter().chain(connective_slugs.iter()) {
-            let id = format!("char_word_{}", slug);
-            if graph.character(&id).is_none() {
-                let value = word_from_slug(slug);
-                graph.add_entry(Entry::Character(Character::new(&id, "word", value)));
-            }
-        }
-
-        let term_char_ids: Vec<String> = term_slugs
-            .iter()
-            .map(|s| format!("char_word_{}", s))
-            .collect();
-        let connective_char_ids: Vec<String> = connective_slugs
-            .iter()
-            .map(|s| format!("char_word_{}", s))
-            .collect();
-
-        let semvocab = SemanticVocabulary::with_auto_id(
-            format!("Canonical {}", canonical_system_name(order)),
-            order,
-            term_char_ids,
-            connective_char_ids,
-        );
-        let semvocab_id = semvocab.id.clone();
-        graph.add_semantic_vocab(semvocab);
-
-        let topvocab_id = format!("topvocab_{}", order);
-        let geovocab_id = format!("geovocab_{}", order);
-
-        let gram = Grammar::with_auto_id(
-            format!("Canonical {}", canonical_system_name(order)),
-            order,
-            canonical_coherence(order),
-            canonical_term_designation(order),
-            canonical_connective_designation(order),
-            &topvocab_id,
-            &geovocab_id,
-            &semvocab_id,
-        );
-        graph.add_grammar(gram);
     }
 }
 
@@ -196,6 +93,100 @@ fn add_rendering_line_links(graph: &mut Graph) {
             }
         }
     }
+}
+
+// =============================================================================
+// Canonical content generator + data tables (test-only).
+//
+// These build `data/canonical.json`. At runtime the JSON is loaded via
+// `canonical_content()`; the tables compile only under `#[cfg(test)]`.
+// =============================================================================
+
+#[cfg(test)]
+mod regen {
+    use crate::core::{Character, Coordinate, GraphContent, Perspective, Point3d, SemanticVocabulary};
+
+/// Build the canonical data layer from the Rust tables. This is the generator
+/// behind `data/canonical.json`; at runtime the JSON is loaded instead.
+pub fn build_canonical_from_tables() -> GraphContent {
+    let mut content = GraphContent::default();
+    let mut have_char = std::collections::HashSet::new();
+
+    let mut push_char = |content: &mut GraphContent, id: String, kind: &str, value: String| {
+        if have_char.insert(id.clone()) {
+            content.characters.push(Character::new(id, kind, value));
+        }
+    };
+
+    for order in 1..=12u8 {
+        // Coordinates (the geometric values).
+        let coords = get_coordinates(order);
+        for (idx, coord) in coords.iter().enumerate() {
+            let position = (idx + 1) as u8;
+            content
+                .coordinates
+                .push(Coordinate::from_point3d(order, position, *coord));
+        }
+
+        // Word characters + the canonical word SemanticVocabulary + Perspective.
+        let term_slugs = get_term_character_slugs(order);
+        let connective_slugs = get_canonical_connective_slugs(order);
+        for slug in term_slugs.iter().chain(connective_slugs.iter()) {
+            push_char(
+                &mut content,
+                format!("char_word_{}", slug),
+                "word",
+                word_from_slug(slug),
+            );
+        }
+        let term_char_ids: Vec<String> =
+            term_slugs.iter().map(|s| format!("char_word_{}", s)).collect();
+        let connective_char_ids: Vec<String> = connective_slugs
+            .iter()
+            .map(|s| format!("char_word_{}", s))
+            .collect();
+        let semvocab = SemanticVocabulary::with_auto_id(
+            format!("Canonical {}", canonical_system_name(order)),
+            order,
+            term_char_ids,
+            connective_char_ids,
+        );
+        let semvocab_id = semvocab.id.clone();
+        content.semantic_vocabs.push(semvocab);
+        content.perspectives.push(Perspective::with_auto_id(
+            format!("Canonical {}", canonical_system_name(order)),
+            order,
+            canonical_coherence(order),
+            canonical_term_designation(order),
+            canonical_connective_designation(order),
+            format!("topvocab_{}", order),
+            format!("geovocab_{}", order),
+            &semvocab_id,
+        ));
+
+        // Hex colour characters + the canonical colour SemanticVocabulary.
+        let hex_codes = get_colours(order);
+        for hex in &hex_codes {
+            push_char(
+                &mut content,
+                format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase()),
+                "hex",
+                hex.to_string(),
+            );
+        }
+        let colour_ids: Vec<String> = hex_codes
+            .iter()
+            .map(|hex| format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase()))
+            .collect();
+        content.semantic_vocabs.push(SemanticVocabulary::with_auto_id(
+            format!("Canonical Colours {}", canonical_system_name(order)),
+            order,
+            colour_ids,
+            vec![],
+        ));
+    }
+
+    content
 }
 
 // =============================================================================
@@ -334,7 +325,7 @@ fn word_from_slug(slug: &str) -> String {
         .join(" ")
 }
 
-fn canonical_system_name(order: u8) -> &'static str {
+pub fn canonical_system_name(order: u8) -> &'static str {
     match order {
         1 => "Monad",
         2 => "Dyad",
@@ -524,9 +515,47 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
     }
 }
 
+fn get_colours(order: u8) -> Vec<&'static str> {
+    const RED: &str = "#FF0000";
+    const BLUE: &str = "#0000FF";
+    const YELLOW: &str = "#FFFF00";
+    const GREEN: &str = "#099902";
+    const PURPLE: &str = "#9900FF";
+    const ORANGE: &str = "#FFA500";
+    const LIGHT_BLUE: &str = "#00FFFF";
+    const BROWN: &str = "#8B4513";
+    const MAGENTA: &str = "#FF00FF";
+    const WHITE: &str = "#FFFFFF";
+    const SILVER: &str = "#C0C0C0";
+    const GOLD: &str = "#FFD700";
+
+    match order {
+        1 => vec![RED],
+        2 => vec![RED, BLUE],
+        3 => vec![RED, BLUE, YELLOW],
+        4 => vec![RED, BLUE, YELLOW, GREEN],
+        5 => vec![RED, BLUE, YELLOW, GREEN, PURPLE],
+        6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
+        7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
+        8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
+        9 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA],
+        10 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE],
+        11 => vec![
+            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
+        ],
+        12 => vec![
+            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
+            GOLD,
+        ],
+        _ => vec![],
+    }
+}
+} // mod regen
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::regen::{build_canonical_from_tables, canonical_system_name};
 
     #[test]
     fn test_build_graph_substrate() {
@@ -541,7 +570,7 @@ mod tests {
     }
 
     #[test]
-    fn test_build_graph_canonical_grammars() {
+    fn test_build_graph_canonical_perspectives() {
         let g = build_graph();
         for order in 1..=12u8 {
             assert!(g.topological_vocab_for_order(order).is_some());
@@ -553,17 +582,17 @@ mod tests {
                 order
             );
             assert!(g.semantic_vocab(&semvocab_id).is_some());
-            let grammar_id = format!(
-                "grammar_{}_{}",
+            let perspective_id = format!(
+                "perspective_{}_{}",
                 name.to_lowercase().replace(' ', "_"),
                 order
             );
-            assert!(g.grammar(&grammar_id).is_some());
+            assert!(g.perspective(&perspective_id).is_some());
             assert!(
-                g.validate_grammar(&grammar_id).is_ok(),
-                "Grammar {} failed validation: {:?}",
-                grammar_id,
-                g.validate_grammar(&grammar_id)
+                g.validate_perspective(&perspective_id).is_ok(),
+                "Perspective {} failed validation: {:?}",
+                perspective_id,
+                g.validate_perspective(&perspective_id)
             );
         }
     }
@@ -592,5 +621,27 @@ mod tests {
         assert_eq!(g.lines(3).len(), 3);
         // Dodecad has C(12,2) = 66.
         assert_eq!(g.lines(12).len(), 66);
+    }
+
+    /// Regenerate `data/canonical.json` from the Rust tables. Ignored by
+    /// default — run explicitly after changing canonical data:
+    /// `cargo test -p systematics-backend regenerate_canonical_seed -- --ignored`
+    #[test]
+    #[ignore]
+    fn regenerate_canonical_seed() {
+        let content = build_canonical_from_tables();
+        let json = serde_json::to_string_pretty(&content).unwrap();
+        // CARGO_MANIFEST_DIR is backend/, so the workspace-root data dir is ../data.
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../data/canonical.json");
+        std::fs::create_dir_all(concat!(env!("CARGO_MANIFEST_DIR"), "/../data")).unwrap();
+        std::fs::write(path, json).unwrap();
+        eprintln!(
+            "wrote {} ({} chars, {} coords, {} semvocabs, {} perspectives)",
+            path,
+            content.characters.len(),
+            content.coordinates.len(),
+            content.semantic_vocabs.len(),
+            content.perspectives.len()
+        );
     }
 }

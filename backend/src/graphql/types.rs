@@ -1,17 +1,22 @@
 //! GraphQL types and schema for the Systematics property graph API.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use async_graphql::*;
 use tokio::sync::RwLock;
 
 use crate::core::{
-    Character, Coordinate, Entry, GeometricVocabulary, Grammar, Graph, Line, Order, Point,
+    Character, Coordinate, Entry, GeometricVocabulary, Perspective, Graph, Line, Order, Point,
     Position, SemanticVocabulary, Segment, TopologicalVocabulary,
 };
 
 /// Shared, mutable graph passed to the GraphQL schema as context data.
 pub type SharedGraph = Arc<RwLock<Graph>>;
+
+/// Writable-store path in context. `None` disables persistence (used by tests).
+#[derive(Clone, Default)]
+pub struct StorePath(pub Option<PathBuf>);
 
 /// Take a cheap snapshot of the shared graph for read-only resolvers.
 async fn graph_snapshot(ctx: &Context<'_>) -> Graph {
@@ -21,6 +26,16 @@ async fn graph_snapshot(ctx: &Context<'_>) -> Graph {
 /// Access the shared graph for mutation resolvers.
 fn shared_graph<'a>(ctx: &'a Context<'_>) -> &'a SharedGraph {
     ctx.data_unchecked::<SharedGraph>()
+}
+
+/// Persist the graph's user slice, if a store path is configured. Called at the
+/// end of each mutation while the write lock is still held.
+fn persist(ctx: &Context<'_>, graph: &Graph) {
+    if let Some(path) = ctx.data_unchecked::<StorePath>().0.as_ref() {
+        if let Err(e) = crate::persistence::save(graph, path) {
+            tracing::error!("failed to persist user store: {}", e);
+        }
+    }
 }
 
 // ============================================================================
@@ -141,7 +156,7 @@ impl QueryRoot {
             .collect()
     }
 
-    // -------- vocabularies and grammar --------
+    // -------- vocabularies and perspective --------
 
     async fn topological_vocab(
         &self,
@@ -205,16 +220,16 @@ impl QueryRoot {
             .collect()
     }
 
-    async fn grammar(&self, ctx: &Context<'_>, id: String) -> Option<GqlGrammar> {
+    async fn perspective(&self, ctx: &Context<'_>, id: String) -> Option<GqlPerspective> {
         let g = graph_snapshot(ctx).await;
-        g.grammar(&id).map(|gr| GqlGrammar::new(gr.clone()))
+        g.perspective(&id).map(|gr| GqlPerspective::new(gr.clone()))
     }
 
-    async fn grammars_for_order(&self, ctx: &Context<'_>, order: i32) -> Vec<GqlGrammar> {
+    async fn perspectives_for_order(&self, ctx: &Context<'_>, order: i32) -> Vec<GqlPerspective> {
         let g = graph_snapshot(ctx).await;
-        g.grammars_for_order(order as u8)
+        g.perspectives_for_order(order as u8)
             .into_iter()
-            .map(|gr| GqlGrammar::new(gr.clone()))
+            .map(|gr| GqlPerspective::new(gr.clone()))
             .collect()
     }
 
@@ -242,19 +257,30 @@ impl QueryRoot {
             .map(|c| GqlCharacter::new(c.clone()))
     }
 
-    async fn validate_grammar(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
+    async fn validate_perspective(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
         let g = graph_snapshot(ctx).await;
-        g.validate_grammar(&id).err().unwrap_or_default()
+        g.validate_perspective(&id).err().unwrap_or_default()
     }
 
-    // -------- compat: SystemView query used by the current SVG frontend --------
+    // -------- resolved Grammar (a Perspective resolved into a bound K-graph) --------
 
-    async fn system(&self, ctx: &Context<'_>, order: i32) -> Option<GqlSystemView> {
+    /// Resolve any Perspective (canonical or user) into its complete Grammar.
+    async fn grammar(&self, ctx: &Context<'_>, perspective_id: String) -> Option<GqlGrammar> {
         let g = graph_snapshot(ctx).await;
-        build_system_view(&g, order as u8).map(GqlSystemView::new)
+        resolve_perspective(&g, &perspective_id).map(GqlGrammar::new)
     }
 
-    async fn system_by_name(&self, ctx: &Context<'_>, name: String) -> Option<GqlSystemView> {
+    /// Convenience: the canonical Grammar for an order (resolves the seed's
+    /// `Canonical <Name>` perspective).
+    async fn system(&self, ctx: &Context<'_>, order: i32) -> Option<GqlGrammar> {
+        if !(1..=12).contains(&order) {
+            return None;
+        }
+        let g = graph_snapshot(ctx).await;
+        resolve_perspective(&g, &canonical_perspective_id(order as u8)).map(GqlGrammar::new)
+    }
+
+    async fn system_by_name(&self, ctx: &Context<'_>, name: String) -> Option<GqlGrammar> {
         let order = match name.to_lowercase().as_str() {
             "monad" => 1,
             "dyad" => 2,
@@ -271,19 +297,19 @@ impl QueryRoot {
             _ => return None,
         };
         let g = graph_snapshot(ctx).await;
-        build_system_view(&g, order).map(GqlSystemView::new)
+        resolve_perspective(&g, &canonical_perspective_id(order)).map(GqlGrammar::new)
     }
 
-    async fn all_systems(&self, ctx: &Context<'_>) -> Vec<GqlSystemView> {
+    async fn all_systems(&self, ctx: &Context<'_>) -> Vec<GqlGrammar> {
         let g = graph_snapshot(ctx).await;
         (1..=12u8)
-            .filter_map(|o| build_system_view(&g, o).map(GqlSystemView::new))
+            .filter_map(|o| resolve_perspective(&g, &canonical_perspective_id(o)).map(GqlGrammar::new))
             .collect()
     }
 }
 
 // ============================================================================
-// Compat: computed SystemView for the current SVG frontend renderer.
+// Compat: computed Grammar for the current SVG frontend renderer.
 // ============================================================================
 
 fn canonical_system_name(order: u8) -> &'static str {
@@ -304,56 +330,64 @@ fn canonical_system_name(order: u8) -> &'static str {
     }
 }
 
-pub struct SystemViewData {
+pub struct GrammarData {
     pub order: u8,
     pub name: String,
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
-    pub terms: Vec<SystemTermData>,
+    pub terms: Vec<GrammarTermData>,
     pub coordinates: Vec<Coordinate>,
-    pub colours: Vec<SystemColourData>,
-    pub lines: Vec<SystemLineData>,
-    pub connectives: Vec<SystemConnectiveData>,
+    pub colours: Vec<GrammarColourData>,
+    pub lines: Vec<GrammarLineData>,
+    pub connectives: Vec<GrammarConnectiveData>,
 }
 
-pub struct SystemTermData {
+pub struct GrammarTermData {
     pub position: i32,
     pub character_id: String,
     pub value: String,
 }
 
-pub struct SystemColourData {
+pub struct GrammarColourData {
     pub position: i32,
     pub value: String,
 }
 
-pub struct SystemLineData {
+pub struct GrammarLineData {
     pub id: String,
     pub base_position: i32,
     pub target_position: i32,
 }
 
-pub struct SystemConnectiveData {
+pub struct GrammarConnectiveData {
     pub id: String,
     pub base_position: i32,
     pub target_position: i32,
     pub character_value: String,
 }
 
-fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
-    if !(1..=12).contains(&order) {
-        return None;
-    }
-    let name = format!("Canonical {}", canonical_system_name(order));
-    let grammar_id = format!(
-        "grammar_canonical_{}_{}",
+/// Canonical perspective id for an order (the seed's `Canonical <Name>`).
+fn canonical_perspective_id(order: u8) -> String {
+    format!(
+        "perspective_canonical_{}_{}",
         canonical_system_name(order).to_lowercase(),
         order
-    );
-    let grammar = graph.grammar(&grammar_id)?;
-    let topology = graph.topological_vocab(&grammar.topological_vocab_ref)?;
-    let semantic = graph.semantic_vocab(&grammar.semantic_vocab_ref)?;
+    )
+}
+
+/// Resolve a Perspective (by id) into a complete bound Grammar — terms bound to
+/// points, connectives to lines, coordinates + colours per position, metadata
+/// applied. This is "resolve the wiring into a renderable K-graph".
+fn resolve_perspective(graph: &Graph, perspective_id: &str) -> Option<GrammarData> {
+    let perspective = graph.perspective(perspective_id)?;
+    let order = perspective.order;
+    // Display label is the order's system name (e.g. "Triad"), not the
+    // perspective's name ("Canonical Triad"). The frontend navigates by this
+    // (systemByName expects "triad", not "canonical triad").
+    let name = canonical_system_name(order).to_string();
+    let topology = graph.topological_vocab(&perspective.topological_vocab_ref)?;
+    let semantic = graph.semantic_vocab(&perspective.semantic_vocab_ref)?;
     let colour_vocab = graph.canonical_colour_vocab_for_order(order);
 
     // Terms (word Characters at each Point in position order).
@@ -361,7 +395,7 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
     for (idx, char_id) in semantic.terms.iter().enumerate() {
         let position = (idx + 1) as i32;
         if let Some(c) = graph.character(char_id) {
-            terms.push(SystemTermData {
+            terms.push(GrammarTermData {
                 position,
                 character_id: c.id.clone(),
                 value: c.value.clone(),
@@ -382,7 +416,7 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
     if let Some(cvocab) = colour_vocab {
         for (idx, char_id) in cvocab.terms.iter().enumerate() {
             if let Some(c) = graph.character(char_id) {
-                colours.push(SystemColourData {
+                colours.push(GrammarColourData {
                     position: (idx + 1) as i32,
                     value: c.value.clone(),
                 });
@@ -394,7 +428,7 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
     let mut lines = Vec::new();
     for p1 in 1..=order {
         for p2 in (p1 + 1)..=order {
-            lines.push(SystemLineData {
+            lines.push(GrammarLineData {
                 id: format!("line_{}_{}_{}", order, p1, p2),
                 base_position: p1 as i32,
                 target_position: p2 as i32,
@@ -402,7 +436,7 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
         }
     }
 
-    // Connectives: pair Grammar's topology.lines[i] with semantic.connectives[i].
+    // Connectives: pair Perspective's topology.lines[i] with semantic.connectives[i].
     let mut connectives = Vec::new();
     for (idx, line_id) in topology.lines.iter().enumerate() {
         if let Some(line) = graph.get_entry(line_id).and_then(|e| match e {
@@ -416,7 +450,7 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
                 .character(&char_id)
                 .map(|c| c.value.clone())
                 .unwrap_or_default();
-            connectives.push(SystemConnectiveData {
+            connectives.push(GrammarConnectiveData {
                 id: line.id.clone(),
                 base_position: base,
                 target_position: target,
@@ -425,12 +459,12 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
         }
     }
 
-    Some(SystemViewData {
+    Some(GrammarData {
         order,
         name,
-        coherence: grammar.coherence.clone(),
-        term_designation: grammar.term_designation.clone(),
-        connective_designation: grammar.connective_designation.clone(),
+        coherence: perspective.coherence.clone(),
+        term_designation: perspective.term_designation.clone(),
+        connective_designation: perspective.connective_designation.clone(),
         terms,
         coordinates,
         colours,
@@ -439,18 +473,18 @@ fn build_system_view(graph: &Graph, order: u8) -> Option<SystemViewData> {
     })
 }
 
-pub struct GqlSystemView {
-    inner: SystemViewData,
+pub struct GqlGrammar {
+    inner: GrammarData,
 }
 
-impl GqlSystemView {
-    pub fn new(inner: SystemViewData) -> Self {
+impl GqlGrammar {
+    pub fn new(inner: GrammarData) -> Self {
         Self { inner }
     }
 }
 
 #[Object]
-impl GqlSystemView {
+impl GqlGrammar {
     async fn order(&self) -> i32 {
         self.inner.order as i32
     }
@@ -466,11 +500,11 @@ impl GqlSystemView {
     async fn connective_designation(&self) -> &str {
         &self.inner.connective_designation
     }
-    async fn terms(&self) -> Vec<GqlSystemTerm> {
+    async fn terms(&self) -> Vec<GqlGrammarTerm> {
         self.inner
             .terms
             .iter()
-            .map(|t| GqlSystemTerm {
+            .map(|t| GqlGrammarTerm {
                 position: t.position,
                 character_id: t.character_id.clone(),
                 value: t.value.clone(),
@@ -485,32 +519,32 @@ impl GqlSystemView {
             .map(GqlCoordinate::new)
             .collect()
     }
-    async fn colours(&self) -> Vec<GqlSystemColour> {
+    async fn colours(&self) -> Vec<GqlGrammarColour> {
         self.inner
             .colours
             .iter()
-            .map(|c| GqlSystemColour {
+            .map(|c| GqlGrammarColour {
                 position: c.position,
                 value: c.value.clone(),
             })
             .collect()
     }
-    async fn lines(&self) -> Vec<GqlSystemLine> {
+    async fn lines(&self) -> Vec<GqlGrammarLine> {
         self.inner
             .lines
             .iter()
-            .map(|l| GqlSystemLine {
+            .map(|l| GqlGrammarLine {
                 id: l.id.clone(),
                 base_position: l.base_position,
                 target_position: l.target_position,
             })
             .collect()
     }
-    async fn connectives(&self) -> Vec<GqlSystemConnective> {
+    async fn connectives(&self) -> Vec<GqlGrammarConnective> {
         self.inner
             .connectives
             .iter()
-            .map(|c| GqlSystemConnective {
+            .map(|c| GqlGrammarConnective {
                 id: c.id.clone(),
                 base_position: c.base_position,
                 target_position: c.target_position,
@@ -521,27 +555,27 @@ impl GqlSystemView {
 }
 
 #[derive(SimpleObject)]
-pub struct GqlSystemTerm {
+pub struct GqlGrammarTerm {
     pub position: i32,
     pub character_id: String,
     pub value: String,
 }
 
 #[derive(SimpleObject)]
-pub struct GqlSystemColour {
+pub struct GqlGrammarColour {
     pub position: i32,
     pub value: String,
 }
 
 #[derive(SimpleObject)]
-pub struct GqlSystemLine {
+pub struct GqlGrammarLine {
     pub id: String,
     pub base_position: i32,
     pub target_position: i32,
 }
 
 #[derive(SimpleObject)]
-pub struct GqlSystemConnective {
+pub struct GqlGrammarConnective {
     pub id: String,
     pub base_position: i32,
     pub target_position: i32,
@@ -568,6 +602,7 @@ impl MutationRoot {
             )));
         }
         graph.add_entry(Entry::Character(character.clone()));
+        persist(ctx, &graph);
         Ok(GqlCharacter::new(character))
     }
 
@@ -578,7 +613,11 @@ impl MutationRoot {
         graph
             .entries
             .retain(|e| !matches!(e, Entry::Character(c) if c.id == id));
-        graph.entries.len() != before
+        let changed = graph.entries.len() != before;
+        if changed {
+            persist(ctx, &graph);
+        }
+        changed
     }
 
     async fn create_semantic_vocab(
@@ -596,6 +635,7 @@ impl MutationRoot {
             )));
         }
         graph.add_semantic_vocab(sv.clone());
+        persist(ctx, &graph);
         Ok(GqlSemanticVocabulary::new(sv))
     }
 
@@ -612,50 +652,61 @@ impl MutationRoot {
         if graph.update_semantic_vocab(sv.clone()).is_none() {
             return Err(Error::new(format!("SemanticVocabulary '{}' not found", id)));
         }
+        persist(ctx, &graph);
         Ok(GqlSemanticVocabulary::new(sv))
     }
 
     async fn delete_semantic_vocab(&self, ctx: &Context<'_>, id: String) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        graph.delete_semantic_vocab(&id).is_some()
+        let removed = graph.delete_semantic_vocab(&id).is_some();
+        if removed {
+            persist(ctx, &graph);
+        }
+        removed
     }
 
-    async fn create_grammar(
+    async fn create_perspective(
         &self,
         ctx: &Context<'_>,
-        input: GrammarInput,
-    ) -> async_graphql::Result<GqlGrammar> {
-        let gr = input.into_grammar();
+        input: PerspectiveInput,
+    ) -> async_graphql::Result<GqlPerspective> {
+        let gr = input.into_perspective();
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        if graph.grammar(&gr.id).is_some() {
-            return Err(Error::new(format!("Grammar '{}' already exists", gr.id)));
+        if graph.perspective(&gr.id).is_some() {
+            return Err(Error::new(format!("Perspective '{}' already exists", gr.id)));
         }
-        graph.add_grammar(gr.clone());
-        Ok(GqlGrammar::new(gr))
+        graph.add_perspective(gr.clone());
+        persist(ctx, &graph);
+        Ok(GqlPerspective::new(gr))
     }
 
-    async fn update_grammar(
+    async fn update_perspective(
         &self,
         ctx: &Context<'_>,
         id: String,
-        input: GrammarInput,
-    ) -> async_graphql::Result<GqlGrammar> {
-        let mut gr = input.into_grammar();
+        input: PerspectiveInput,
+    ) -> async_graphql::Result<GqlPerspective> {
+        let mut gr = input.into_perspective();
         gr.id = id.clone();
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        if graph.update_grammar(gr.clone()).is_none() {
-            return Err(Error::new(format!("Grammar '{}' not found", id)));
+        if graph.update_perspective(gr.clone()).is_none() {
+            return Err(Error::new(format!("Perspective '{}' not found", id)));
         }
-        Ok(GqlGrammar::new(gr))
+        persist(ctx, &graph);
+        Ok(GqlPerspective::new(gr))
     }
 
-    async fn delete_grammar(&self, ctx: &Context<'_>, id: String) -> bool {
+    async fn delete_perspective(&self, ctx: &Context<'_>, id: String) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        graph.delete_grammar(&id).is_some()
+        let removed = graph.delete_perspective(&id).is_some();
+        if removed {
+            persist(ctx, &graph);
+        }
+        removed
     }
 }
 
@@ -915,16 +966,16 @@ impl GqlSemanticVocabulary {
     }
 }
 
-pub struct GqlGrammar {
-    inner: Grammar,
+pub struct GqlPerspective {
+    inner: Perspective,
 }
-impl GqlGrammar {
-    pub fn new(inner: Grammar) -> Self {
+impl GqlPerspective {
+    pub fn new(inner: Perspective) -> Self {
         Self { inner }
     }
 }
 #[Object]
-impl GqlGrammar {
+impl GqlPerspective {
     async fn id(&self) -> &str {
         &self.inner.id
     }
@@ -1004,7 +1055,7 @@ impl SemanticVocabInput {
 }
 
 #[derive(InputObject)]
-pub struct GrammarInput {
+pub struct PerspectiveInput {
     pub id: Option<String>,
     pub name: String,
     pub order: i32,
@@ -1016,10 +1067,10 @@ pub struct GrammarInput {
     pub semantic_vocab_ref: String,
 }
 
-impl GrammarInput {
-    fn into_grammar(self) -> Grammar {
+impl PerspectiveInput {
+    fn into_perspective(self) -> Perspective {
         match self.id {
-            Some(id) => Grammar::new(
+            Some(id) => Perspective::new(
                 id,
                 self.name,
                 self.order as u8,
@@ -1030,7 +1081,7 @@ impl GrammarInput {
                 self.geometric_vocab_ref,
                 self.semantic_vocab_ref,
             ),
-            None => Grammar::with_auto_id(
+            None => Perspective::with_auto_id(
                 self.name,
                 self.order as u8,
                 self.coherence,
@@ -1051,8 +1102,16 @@ impl GrammarInput {
 pub type SystematicsSchema =
     async_graphql::Schema<QueryRoot, MutationRoot, async_graphql::EmptySubscription>;
 
+/// Build the schema with a shared graph and no persistence (tests, ephemeral).
 pub fn create_schema(graph: SharedGraph) -> SystematicsSchema {
+    create_schema_with_store(graph, None)
+}
+
+/// Build the schema with a shared graph and an optional writable store path.
+/// When `store` is `Some`, mutations persist the user slice after each change.
+pub fn create_schema_with_store(graph: SharedGraph, store: Option<PathBuf>) -> SystematicsSchema {
     async_graphql::Schema::build(QueryRoot, MutationRoot, async_graphql::EmptySubscription)
         .data(graph)
+        .data(StorePath(store))
         .finish()
 }

@@ -8,7 +8,7 @@
 //! - `GeometricVocabulary` — ordered `coordinates` and `segments`.
 //! - `SemanticVocabulary` — ordered `terms` and `connectives` (Character refs).
 //!
-//! The recursive framing: Systematics is a *language*, Grammar is the *rules*,
+//! The recursive framing: Systematics is a *language*, Perspective is the *rules*,
 //! and every content layer — topology, geometry, semantics — is a Vocabulary.
 
 use serde::{Deserialize, Serialize};

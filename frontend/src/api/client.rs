@@ -1,6 +1,6 @@
 use gloo_net::http::Request;
 use serde::{Deserialize, Serialize};
-use systematics_middleware::{ApiError, Coordinate, SystemView};
+use systematics_middleware::{ApiError, Coordinate, Grammar};
 
 #[derive(Serialize)]
 struct GraphQLRequest {
@@ -23,19 +23,19 @@ struct GraphQLError {
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct SystemQueryResponse {
-    system: Option<SystemView>,
+    system: Option<Grammar>,
 }
 
 #[derive(Deserialize, Debug)]
 struct SystemByNameQueryResponse {
     #[serde(rename = "systemByName")]
-    system_by_name: Option<SystemView>,
+    system_by_name: Option<Grammar>,
 }
 
 #[derive(Deserialize, Debug)]
 struct AllSystemsQueryResponse {
     #[serde(rename = "allSystems")]
-    all_systems: Vec<SystemView>,
+    all_systems: Vec<Grammar>,
 }
 
 #[derive(Clone)]
@@ -86,7 +86,7 @@ impl GraphQLClient {
     "#;
 
     #[allow(dead_code)]
-    pub async fn fetch_system_by_order(&self, order: i32) -> Result<SystemView, ApiError> {
+    pub async fn fetch_system_by_order(&self, order: i32) -> Result<Grammar, ApiError> {
         let query = format!(
             r#"
             query GetSystem($order: Int!) {{
@@ -121,7 +121,7 @@ impl GraphQLClient {
         Ok(self.transform_coordinates(system))
     }
 
-    pub async fn fetch_system(&self, system_name: &str) -> Result<SystemView, ApiError> {
+    pub async fn fetch_system(&self, system_name: &str) -> Result<Grammar, ApiError> {
         let query = format!(
             r#"
             query GetSystemByName($name: String!) {{
@@ -156,7 +156,7 @@ impl GraphQLClient {
         Ok(self.transform_coordinates(system))
     }
 
-    pub async fn fetch_all_systems(&self) -> Result<Vec<SystemView>, ApiError> {
+    pub async fn fetch_all_systems(&self) -> Result<Vec<Grammar>, ApiError> {
         let query = format!(
             r#"
             query GetAllSystems {{
@@ -193,7 +193,7 @@ impl GraphQLClient {
             .into(),
         );
 
-        let systems: Vec<SystemView> = data
+        let systems: Vec<Grammar> = data
             .all_systems
             .into_iter()
             .map(|sys| self.transform_coordinates(sys))
@@ -233,7 +233,7 @@ impl GraphQLClient {
             .map_err(|e| ApiError::ParseError(e.to_string()))
     }
 
-    fn transform_coordinates(&self, mut system: SystemView) -> SystemView {
+    fn transform_coordinates(&self, mut system: Grammar) -> Grammar {
         let viewport_width = 800.0;
         let viewport_height = 800.0;
         let margin = 100.0;

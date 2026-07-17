@@ -1,7 +1,7 @@
-//! Populated system view — a compat shape produced by the backend by joining
-//! a Canonical Grammar with its topological / geometric / semantic /
-//! colour vocabularies. Kept as a wire type so the current frontend
-//! renderer can consume it without knowing about Grammars directly.
+//! Grammar — a Perspective resolved into a complete bound K-graph. The backend
+//! joins a Perspective with its topological / geometric / semantic / colour
+//! vocabularies to produce this. Kept as a wire type so the frontend renderer
+//! can consume a resolved system without walking the Perspective itself.
 
 use serde::{Deserialize, Serialize};
 
@@ -13,8 +13,9 @@ use async_graphql::SimpleObject;
 /// A rendered term at a specific position within a system.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct SystemTerm {
+pub struct GrammarTerm {
     pub position: i32,
+    #[serde(rename = "characterId")]
     pub character_id: String,
     pub value: String,
 }
@@ -22,7 +23,7 @@ pub struct SystemTerm {
 /// A colour at a specific position within a system (hex form).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct SystemColour {
+pub struct GrammarColour {
     pub position: i32,
     pub value: String,
 }
@@ -30,7 +31,7 @@ pub struct SystemColour {
 /// A rendering edge between two coordinates.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct SystemLine {
+pub struct GrammarLine {
     pub id: String,
     #[serde(rename = "basePosition")]
     pub base_position: i32,
@@ -41,7 +42,7 @@ pub struct SystemLine {
 /// A connective within a system, with its character label and endpoints.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct SystemConnective {
+pub struct GrammarConnective {
     pub id: String,
     #[serde(rename = "basePosition")]
     pub base_position: i32,
@@ -54,7 +55,7 @@ pub struct SystemConnective {
 /// A complete rendered view of a system at a given order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct SystemView {
+pub struct Grammar {
     pub order: i32,
     pub name: String,
     pub coherence: String,
@@ -62,14 +63,14 @@ pub struct SystemView {
     pub term_designation: String,
     #[serde(rename = "connectiveDesignation")]
     pub connective_designation: String,
-    pub terms: Vec<SystemTerm>,
+    pub terms: Vec<GrammarTerm>,
     pub coordinates: Vec<Coordinate>,
-    pub colours: Vec<SystemColour>,
-    pub lines: Vec<SystemLine>,
-    pub connectives: Vec<SystemConnective>,
+    pub colours: Vec<GrammarColour>,
+    pub lines: Vec<GrammarLine>,
+    pub connectives: Vec<GrammarConnective>,
 }
 
-impl SystemView {
+impl Grammar {
     pub fn display_name(&self) -> String {
         self.name.clone()
     }

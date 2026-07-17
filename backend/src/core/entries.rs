@@ -13,7 +13,7 @@
 //! enabling unified iteration and queries across all entry kinds.
 //!
 //! Vocabulary layer (`TopologicalVocabulary`, `GeometricVocabulary`,
-//! `SemanticVocabulary`) and Grammar live in their own modules and hold
+//! `SemanticVocabulary`) and Perspective live in their own modules and hold
 //! *references* into this substrate.
 
 use serde::{Deserialize, Serialize};

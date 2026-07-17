@@ -3,15 +3,15 @@
 mod entries;
 mod enums;
 mod error;
-mod grammars;
+mod grammar;
 mod links;
-mod system;
+mod perspectives;
 mod vocabularies;
 
 pub use entries::*;
 pub use enums::*;
 pub use error::*;
-pub use grammars::*;
+pub use grammar::*;
 pub use links::*;
-pub use system::*;
+pub use perspectives::*;
 pub use vocabularies::*;

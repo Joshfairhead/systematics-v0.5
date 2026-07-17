@@ -6,5 +6,6 @@
 pub mod core;
 pub mod data;
 pub mod graphql;
+pub mod persistence;
 
-pub use graphql::{create_schema, SharedGraph, SystematicsSchema};
+pub use graphql::{create_schema, create_schema_with_store, SharedGraph, SystematicsSchema};

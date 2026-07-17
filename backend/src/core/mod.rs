@@ -7,12 +7,13 @@
 //!   rendering; `Connective` shim retained during frontend migration).
 //! - `vocabularies` — `TopologicalVocabulary`, `GeometricVocabulary`,
 //!   `SemanticVocabulary` — ordered per-Order references into the substrate.
-//! - `grammars` — `Grammar`: validation rules + inline metadata that
+//! - `perspectives` — `Perspective`: validation rules + inline metadata that
 //!   reconcile the three vocabularies.
 //! - `graph` — the container plus queries and mutations.
 
+pub mod content;
 pub mod entries;
-pub mod grammars;
+pub mod perspectives;
 pub mod graph;
 pub mod links;
 pub mod vocabularies;
@@ -25,6 +26,8 @@ pub use links::{Link, LinkType};
 
 pub use vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
 
-pub use grammars::Grammar;
+pub use perspectives::Perspective;
+
+pub use content::GraphContent;
 
 pub use graph::Graph;
