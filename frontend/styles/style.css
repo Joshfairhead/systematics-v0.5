@@ -6,13 +6,15 @@ body {
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #e3e9f0 0%, #f0f4f8 50%, #e8ecf1 100%);
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .app {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
     background: linear-gradient(135deg, #e3e9f0 0%, #f0f4f8 50%, #e8ecf1 100%);
     color: #2c3e50;
 }
@@ -50,10 +52,9 @@ body {
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center; /* centre buttons, and centre them on wrap */
     flex: 1;
     padding: 0.75rem 1.5rem;
-    padding-right: 180px; /* Make room for the toggle switch */
 }
 
 .nav-controls {
@@ -217,14 +218,15 @@ body {
 .main-view {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 2rem;
-    overflow: hidden;
+    padding: 1rem 2rem;
+    overflow-y: auto;
     min-height: 0;
 }
 
 .graph-view {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -311,10 +313,13 @@ body {
         0 16px 48px rgba(163, 177, 198, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.9),
         inset 0 -1px 0 rgba(163, 177, 198, 0.1);
-    width: min(calc(100vw - 4rem), 90vw);
+    /* Width is also bounded by the viewport height (so the 16:9 box never grows
+       taller than the space under the nav) — keeps the whole page in view. */
+    width: min(calc(100vw - 4rem), 90vw, calc((100vh - 7rem) * 16 / 9));
     max-width: 1400px;
     height: auto;
     aspect-ratio: 16 / 9;
+    flex-shrink: 0;
 }
 
 .edge {
@@ -356,6 +361,130 @@ body {
     }
 
     .graph-svg {
-        width: min(calc(100vw - 2rem), 95vw);
+        width: min(calc(100vw - 2rem), 95vw, calc((100vh - 6rem) * 16 / 9));
     }
+}
+
+/* Read-only citations panel (references for a selected term) */
+.references-panel {
+    margin: 1rem auto 0;
+    max-width: 640px;
+    width: min(calc(100vw - 2rem), 640px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+.references-panel h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.references-empty {
+    margin: 0;
+    opacity: 0.6;
+    font-size: 0.85rem;
+}
+
+.references-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.reference-item {
+    padding: 0.35rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.85rem;
+}
+
+.reference-source {
+    font-weight: 600;
+}
+
+.reference-lookup {
+    opacity: 0.8;
+}
+
+.reference-note {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* Graph header: overlay pinned inside the canvas (top-left) so it never
+   pushes the graph off-screen. One compact inline line — name + designations. */
+.graph-header {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.25;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+}
+
+.graph-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.designation {
+    opacity: 0.8;
+}
+
+.designation-term {
+    color: #4A90E2;
+}
+
+.designation-connective {
+    color: #E2A24A;
+}
+
+.designation-coherence {
+    font-style: italic;
+    opacity: 0.65;
+}
+
+/* A metadata item that carries a citation: re-enable hover (the header is
+   pointer-events:none) and mark it with a dotted amber underline. */
+.graph-header .designation.cited {
+    pointer-events: auto;
+    cursor: help;
+    text-decoration: underline dotted;
+    text-decoration-color: #E2A24A;
+    text-underline-offset: 3px;
+}
+
+/* Edge-labels toggle — overlay pinned inside the canvas, top-right */
+.edge-toggle-overlay {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Cited nodes get a subtle amber dashed ring; hover reveals the citation. */
+.node.cited .cited-ring {
+    opacity: 0.8;
 }

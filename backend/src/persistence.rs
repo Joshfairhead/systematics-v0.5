@@ -56,7 +56,7 @@ pub fn save(graph: &Graph, path: &Path) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{Character, Perspective, SemanticVocabulary};
+    use crate::core::{Character, Vocabulary, System};
     use crate::data;
 
     fn temp_path(name: &str) -> PathBuf {
@@ -78,8 +78,8 @@ mod tests {
             "word",
             "Transcendental",
         ));
-        graph.add_semantic_vocab(SemanticVocabulary::new(
-            "semvocab_theology_triad_3",
+        graph.add_vocabulary(Vocabulary::new(
+            "vocab_theology_triad_3",
             "Theology Triad",
             3,
             vec![
@@ -93,21 +93,20 @@ mod tests {
                 "char_word_consent".into(),
             ],
         ));
-        graph.add_perspective(Perspective::new(
-            "perspective_theology_triad_3",
+        graph.add_system(System::new(
+            "system_theology_triad_3",
             "Theology Triad",
             3,
             "Trinity",
             "Persons",
             "Perichoresis",
-            "topvocab_3",
-            "geovocab_3",
-            "semvocab_theology_triad_3",
+            "grammar_3",
+            "vocab_theology_triad_3",
         ));
 
         // The user slice excludes canonical (Will/Function/Being stay canonical).
         let user = graph.user_content();
-        assert!(user.perspectives.iter().any(|g| g.id == "perspective_theology_triad_3"));
+        assert!(user.systems.iter().any(|s| s.id == "system_theology_triad_3"));
         assert!(user.characters.iter().any(|c| c.id == "char_word_immanent"));
         assert!(
             !user.characters.iter().any(|c| c.id == "char_word_will"),
@@ -116,16 +115,16 @@ mod tests {
 
         save(&graph, &path).unwrap();
 
-        // Fresh canonical graph + load store → theology perspective reappears.
+        // Fresh canonical graph + load store → theology system reappears.
         let mut reloaded = data::build_graph();
-        assert!(reloaded.perspective("perspective_theology_triad_3").is_none());
+        assert!(reloaded.system("system_theology_triad_3").is_none());
         let n = load_into(&mut reloaded, &path).unwrap();
-        assert!(n >= 5); // 3 chars + 1 semvocab + 1 perspective
-        assert!(reloaded.perspective("perspective_theology_triad_3").is_some());
-        assert!(reloaded.validate_perspective("perspective_theology_triad_3").is_ok());
+        assert!(n >= 5); // 3 chars + 1 vocab + 1 system
+        assert!(reloaded.system("system_theology_triad_3").is_some());
+        assert!(reloaded.validate_system("system_theology_triad_3").is_ok());
         assert_eq!(
             reloaded
-                .character_at_point("semvocab_theology_triad_3", "point_3_2")
+                .character_at_point("vocab_theology_triad_3", "point_3_2")
                 .unwrap()
                 .value,
             "Omniscient"

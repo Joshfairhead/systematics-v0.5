@@ -1,7 +1,7 @@
-//! Grammar — a Perspective resolved into a complete bound K-graph. The backend
-//! joins a Perspective with its topological / geometric / semantic / colour
-//! vocabularies to produce this. Kept as a wire type so the frontend renderer
-//! can consume a resolved system without walking the Perspective itself.
+//! RenderedSystem — a System resolved into a complete bound K-graph. The backend
+//! joins a System's Grammar (structure) with its Vocabulary (terms) and the
+//! canonical colour vocabulary to produce this. Kept as a wire type so the
+//! frontend renderer can consume a resolved system without walking the System.
 
 use serde::{Deserialize, Serialize};
 
@@ -55,8 +55,10 @@ pub struct GrammarConnective {
 /// A complete rendered view of a system at a given order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Grammar {
+pub struct RenderedSystem {
     pub order: i32,
+    #[serde(rename = "systemId")]
+    pub system_id: String,
     pub name: String,
     pub coherence: String,
     #[serde(rename = "termDesignation")]
@@ -70,7 +72,7 @@ pub struct Grammar {
     pub connectives: Vec<GrammarConnective>,
 }
 
-impl Grammar {
+impl RenderedSystem {
     pub fn display_name(&self) -> String {
         self.name.clone()
     }

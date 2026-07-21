@@ -5,8 +5,8 @@
 //! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
-    Entry, GeometricVocabulary, GraphContent, Graph, Line, Link, Order, Point, Position, Segment,
-    TopologicalVocabulary,
+    Entry, GeometricVocabulary, Grammar, GraphContent, Graph, Line, Link, Order, Point, Position,
+    Segment, TopologicalVocabulary,
 };
 
 /// The canonical seed content (coordinates, characters, semantic vocabularies,
@@ -17,6 +17,16 @@ const CANONICAL_JSON: &str = include_str!("../../../data/canonical.json");
 /// Parse the embedded canonical seed content.
 pub fn canonical_content() -> GraphContent {
     serde_json::from_str(CANONICAL_JSON).expect("data/canonical.json is valid GraphContent")
+}
+
+/// The Citation triad seed — a separate bundled module (Source / Artefact /
+/// Lookup as a K3). Non-canonical in spirit (not one of the 12 archetypes) but
+/// ships bundled. Regenerate with the ignored `regenerate_citation_seed` test.
+const CITATION_JSON: &str = include_str!("../../../data/citation.json");
+
+/// Parse the embedded Citation triad seed content.
+pub fn citation_content() -> GraphContent {
+    serde_json::from_str(CITATION_JSON).expect("data/citation.json is valid GraphContent")
 }
 
 /// Build the complete graph with all systems (1-12).
@@ -35,6 +45,9 @@ pub fn build_graph() -> Graph {
     add_rendering_line_links(&mut graph);
 
     graph.apply_content(&canonical_content());
+    // The Citation triad ships as its own bundle, applied before marking
+    // canonical so it counts as bundled (not user) content.
+    graph.apply_content(&citation_content());
     graph.mark_canonical();
 
     graph
@@ -77,6 +90,8 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
         }
         graph.add_topological_vocab(TopologicalVocabulary::canonical_for(order));
         graph.add_geometric_vocab(GeometricVocabulary::canonical_for(order));
+        // The complete-graph structure for this Order (deterministic).
+        graph.add_grammar(Grammar::for_order(order));
     }
 }
 
@@ -104,7 +119,7 @@ fn add_rendering_line_links(graph: &mut Graph) {
 
 #[cfg(test)]
 mod regen {
-    use crate::core::{Character, Coordinate, GraphContent, Perspective, Point3d, SemanticVocabulary};
+    use crate::core::{Character, Coordinate, GraphContent, Point3d, Vocabulary, System};
 
 /// Build the canonical data layer from the Rust tables. This is the generator
 /// behind `data/canonical.json`; at runtime the JSON is loaded instead.
@@ -112,73 +127,37 @@ pub fn build_canonical_from_tables() -> GraphContent {
     let mut content = GraphContent::default();
     let mut have_char = std::collections::HashSet::new();
 
-    let mut push_char = |content: &mut GraphContent, id: String, kind: &str, value: String| {
-        if have_char.insert(id.clone()) {
-            content.characters.push(Character::new(id, kind, value));
-        }
-    };
-
     for order in 1..=12u8 {
         // Coordinates (the geometric values).
-        let coords = get_coordinates(order);
-        for (idx, coord) in coords.iter().enumerate() {
-            let position = (idx + 1) as u8;
+        for (idx, coord) in get_coordinates(order).iter().enumerate() {
             content
                 .coordinates
-                .push(Coordinate::from_point3d(order, position, *coord));
+                .push(Coordinate::from_point3d(order, (idx + 1) as u8, *coord));
         }
 
-        // Word characters + the canonical word SemanticVocabulary + Perspective.
-        let term_slugs = get_term_character_slugs(order);
-        let connective_slugs = get_canonical_connective_slugs(order);
-        for slug in term_slugs.iter().chain(connective_slugs.iter()) {
-            push_char(
-                &mut content,
-                format!("char_word_{}", slug),
-                "word",
-                word_from_slug(slug),
-            );
-        }
-        let term_char_ids: Vec<String> =
-            term_slugs.iter().map(|s| format!("char_word_{}", s)).collect();
-        let connective_char_ids: Vec<String> = connective_slugs
-            .iter()
-            .map(|s| format!("char_word_{}", s))
-            .collect();
-        let semvocab = SemanticVocabulary::with_auto_id(
-            format!("Canonical {}", canonical_system_name(order)),
+        // Word triad: term/connective Characters + Vocabulary + System.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            &format!("Canonical {}", canonical_system_name(order)),
             order,
-            term_char_ids,
-            connective_char_ids,
+            &get_term_character_slugs(order),
+            &get_canonical_connective_slugs(order),
         );
-        let semvocab_id = semvocab.id.clone();
-        content.semantic_vocabs.push(semvocab);
-        content.perspectives.push(Perspective::with_auto_id(
-            format!("Canonical {}", canonical_system_name(order)),
-            order,
-            canonical_coherence(order),
-            canonical_term_designation(order),
-            canonical_connective_designation(order),
-            format!("topvocab_{}", order),
-            format!("geovocab_{}", order),
-            &semvocab_id,
-        ));
 
-        // Hex colour characters + the canonical colour SemanticVocabulary.
+        // Hex colour characters + the canonical colour Vocabulary.
         let hex_codes = get_colours(order);
+        let mut colour_ids = Vec::new();
         for hex in &hex_codes {
-            push_char(
-                &mut content,
-                format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase()),
-                "hex",
-                hex.to_string(),
-            );
+            let id = format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase());
+            if have_char.insert(id.clone()) {
+                content
+                    .characters
+                    .push(Character::new(id.clone(), "hex", hex.to_string()));
+            }
+            colour_ids.push(id);
         }
-        let colour_ids: Vec<String> = hex_codes
-            .iter()
-            .map(|hex| format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase()))
-            .collect();
-        content.semantic_vocabs.push(SemanticVocabulary::with_auto_id(
+        content.vocabularies.push(Vocabulary::with_auto_id(
             format!("Canonical Colours {}", canonical_system_name(order)),
             order,
             colour_ids,
@@ -186,6 +165,67 @@ pub fn build_canonical_from_tables() -> GraphContent {
         ));
     }
 
+    content
+}
+
+/// Shared construction primitive: push term/connective word Characters, then a
+/// `Vocabulary` and a `System` over `grammar_{order}`, with metadata inherited
+/// from the order. Reused for every canonical order AND the Citation triad — the
+/// homoiconic bootstrap: the same builder that makes any system makes the system
+/// that *describes* citation.
+fn push_triadic_system(
+    content: &mut GraphContent,
+    have_char: &mut std::collections::HashSet<String>,
+    name: &str,
+    order: u8,
+    term_slugs: &[String],
+    connective_slugs: &[String],
+) {
+    for slug in term_slugs.iter().chain(connective_slugs.iter()) {
+        let id = format!("char_word_{}", slug);
+        if have_char.insert(id.clone()) {
+            content
+                .characters
+                .push(Character::new(id, "word", word_from_slug(slug)));
+        }
+    }
+    let term_char_ids: Vec<String> = term_slugs.iter().map(|s| format!("char_word_{}", s)).collect();
+    let connective_char_ids: Vec<String> = connective_slugs
+        .iter()
+        .map(|s| format!("char_word_{}", s))
+        .collect();
+    let vocab = Vocabulary::with_auto_id(name, order, term_char_ids, connective_char_ids);
+    let vocab_id = vocab.id.clone();
+    content.vocabularies.push(vocab);
+    content.systems.push(System::with_auto_id(
+        name,
+        order,
+        canonical_coherence(order),
+        canonical_term_designation(order),
+        canonical_connective_designation(order),
+        format!("grammar_{}", order),
+        &vocab_id,
+    ));
+}
+
+/// Build the Citation triad as its own content bundle (`data/citation.json`):
+/// Source / Artefact / Lookup as the three impulses of a K3, with placeholder
+/// acts (names TBD). Metadata inherits order 3 (Dynamism / Impulses / Acts).
+pub fn build_citation_from_tables() -> GraphContent {
+    let mut content = GraphContent::default();
+    let mut have_char = std::collections::HashSet::new();
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Citation",
+        3,
+        &["source".to_string(), "artefact".to_string(), "lookup".to_string()],
+        &[
+            "citation_act_1_needs_research".to_string(),
+            "citation_act_2_needs_research".to_string(),
+            "citation_act_3_needs_research".to_string(),
+        ],
+    );
     content
 }
 
@@ -555,7 +595,7 @@ fn get_colours(order: u8) -> Vec<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::regen::{build_canonical_from_tables, canonical_system_name};
+    use super::regen::{build_canonical_from_tables, build_citation_from_tables, canonical_system_name};
 
     #[test]
     fn test_build_graph_substrate() {
@@ -570,29 +610,30 @@ mod tests {
     }
 
     #[test]
-    fn test_build_graph_canonical_perspectives() {
+    fn test_build_graph_canonical_systems() {
         let g = build_graph();
         for order in 1..=12u8 {
             assert!(g.topological_vocab_for_order(order).is_some());
             assert!(g.geometric_vocab_for_order(order).is_some());
+            assert!(g.grammar_for_order(order).is_some());
             let name = format!("Canonical {}", canonical_system_name(order));
-            let semvocab_id = format!(
-                "semvocab_{}_{}",
+            let vocab_id = format!(
+                "vocab_{}_{}",
                 name.to_lowercase().replace(' ', "_"),
                 order
             );
-            assert!(g.semantic_vocab(&semvocab_id).is_some());
-            let perspective_id = format!(
-                "perspective_{}_{}",
+            assert!(g.vocabulary(&vocab_id).is_some());
+            let system_id = format!(
+                "system_{}_{}",
                 name.to_lowercase().replace(' ', "_"),
                 order
             );
-            assert!(g.perspective(&perspective_id).is_some());
+            assert!(g.system(&system_id).is_some());
             assert!(
-                g.validate_perspective(&perspective_id).is_ok(),
-                "Perspective {} failed validation: {:?}",
-                perspective_id,
-                g.validate_perspective(&perspective_id)
+                g.validate_system(&system_id).is_ok(),
+                "System {} failed validation: {:?}",
+                system_id,
+                g.validate_system(&system_id)
             );
         }
     }
@@ -601,13 +642,13 @@ mod tests {
     fn test_character_at_point_canonical_triad() {
         let g = build_graph();
         assert_eq!(
-            g.character_at_point("semvocab_canonical_triad_3", "point_3_1")
+            g.character_at_point("vocab_canonical_triad_3", "point_3_1")
                 .unwrap()
                 .value,
             "Will"
         );
         assert_eq!(
-            g.character_at_line("semvocab_canonical_triad_3", "line_3_1_2")
+            g.character_at_line("vocab_canonical_triad_3", "line_3_1_2")
                 .unwrap()
                 .value,
             "Generation"
@@ -636,12 +677,43 @@ mod tests {
         std::fs::create_dir_all(concat!(env!("CARGO_MANIFEST_DIR"), "/../data")).unwrap();
         std::fs::write(path, json).unwrap();
         eprintln!(
-            "wrote {} ({} chars, {} coords, {} semvocabs, {} perspectives)",
+            "wrote {} ({} chars, {} coords, {} vocabularies, {} systems)",
             path,
             content.characters.len(),
             content.coordinates.len(),
-            content.semantic_vocabs.len(),
-            content.perspectives.len()
+            content.vocabularies.len(),
+            content.systems.len()
+        );
+    }
+
+    #[test]
+    fn test_citation_triad_seeded() {
+        let g = build_graph();
+        assert!(g.grammar_for_order(3).is_some());
+        assert!(g.vocabulary("vocab_citation_3").is_some());
+        assert!(g.system("system_citation_3").is_some());
+        assert!(
+            g.validate_system("system_citation_3").is_ok(),
+            "citation triad failed validation: {:?}",
+            g.validate_system("system_citation_3")
+        );
+    }
+
+    /// Regenerate `data/citation.json` from the Rust tables. Ignored by default:
+    /// `cargo test -p systematics-backend regenerate_citation_seed -- --ignored`
+    #[test]
+    #[ignore]
+    fn regenerate_citation_seed() {
+        let content = build_citation_from_tables();
+        let json = serde_json::to_string_pretty(&content).unwrap();
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../data/citation.json");
+        std::fs::write(path, json).unwrap();
+        eprintln!(
+            "wrote {} ({} chars, {} vocabularies, {} systems)",
+            path,
+            content.characters.len(),
+            content.vocabularies.len(),
+            content.systems.len()
         );
     }
 }

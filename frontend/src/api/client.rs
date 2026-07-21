@@ -1,6 +1,6 @@
 use gloo_net::http::Request;
 use serde::{Deserialize, Serialize};
-use systematics_middleware::{ApiError, Coordinate, Grammar};
+use systematics_middleware::{ApiError, Coordinate, RenderedSystem};
 
 #[derive(Serialize)]
 struct GraphQLRequest {
@@ -23,19 +23,62 @@ struct GraphQLError {
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct SystemQueryResponse {
-    system: Option<Grammar>,
+    system: Option<RenderedSystem>,
 }
 
 #[derive(Deserialize, Debug)]
 struct SystemByNameQueryResponse {
     #[serde(rename = "systemByName")]
-    system_by_name: Option<Grammar>,
+    system_by_name: Option<RenderedSystem>,
 }
 
 #[derive(Deserialize, Debug)]
 struct AllSystemsQueryResponse {
     #[serde(rename = "allSystems")]
-    all_systems: Vec<Grammar>,
+    all_systems: Vec<RenderedSystem>,
+}
+
+// -------- referencing layer (read-only) --------
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefSource {
+    pub name: String,
+    pub kind: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefArtefact {
+    pub title: String,
+    pub url: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefLookup {
+    pub locator: String,
+}
+
+/// A resolved citation for display: source → artefact → lookup.
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct ReferenceView {
+    pub id: String,
+    pub target: String,
+    pub note: Option<String>,
+    pub source: Option<RefSource>,
+    pub artefact: Option<RefArtefact>,
+    pub lookup: Option<RefLookup>,
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
+struct ReferencesForResponse {
+    #[serde(rename = "referencesFor")]
+    references_for: Vec<ReferenceView>,
+}
+
+#[derive(Deserialize, Debug)]
+struct ReferencesForSystemResponse {
+    #[serde(rename = "referencesForSystem")]
+    references_for_system: Vec<ReferenceView>,
 }
 
 #[derive(Clone)]
@@ -50,6 +93,7 @@ impl GraphQLClient {
 
     const SYSTEM_FIELDS: &'static str = r#"
         order
+        systemId
         name
         coherence
         termDesignation
@@ -86,7 +130,7 @@ impl GraphQLClient {
     "#;
 
     #[allow(dead_code)]
-    pub async fn fetch_system_by_order(&self, order: i32) -> Result<Grammar, ApiError> {
+    pub async fn fetch_system_by_order(&self, order: i32) -> Result<RenderedSystem, ApiError> {
         let query = format!(
             r#"
             query GetSystem($order: Int!) {{
@@ -121,7 +165,7 @@ impl GraphQLClient {
         Ok(self.transform_coordinates(system))
     }
 
-    pub async fn fetch_system(&self, system_name: &str) -> Result<Grammar, ApiError> {
+    pub async fn fetch_system(&self, system_name: &str) -> Result<RenderedSystem, ApiError> {
         let query = format!(
             r#"
             query GetSystemByName($name: String!) {{
@@ -156,7 +200,7 @@ impl GraphQLClient {
         Ok(self.transform_coordinates(system))
     }
 
-    pub async fn fetch_all_systems(&self) -> Result<Vec<Grammar>, ApiError> {
+    pub async fn fetch_all_systems(&self) -> Result<Vec<RenderedSystem>, ApiError> {
         let query = format!(
             r#"
             query GetAllSystems {{
@@ -193,13 +237,80 @@ impl GraphQLClient {
             .into(),
         );
 
-        let systems: Vec<Grammar> = data
+        let systems: Vec<RenderedSystem> = data
             .all_systems
             .into_iter()
             .map(|sys| self.transform_coordinates(sys))
             .collect();
 
         Ok(systems)
+    }
+
+    /// Fetch all citations for a single Expression address (retained for
+    /// direct lookups; the graph prefetches per-system for hover tooltips).
+    #[allow(dead_code)]
+    pub async fn fetch_references_for(
+        &self,
+        address: &str,
+    ) -> Result<Vec<ReferenceView>, ApiError> {
+        let query = r#"
+            query Refs($address: String!) {
+                referencesFor(address: $address) {
+                    id
+                    target
+                    note
+                    source { name kind }
+                    artefact { title url }
+                    lookup { locator }
+                }
+            }
+        "#;
+        let variables = serde_json::json!({ "address": address });
+        let response: GraphQLResponse<ReferencesForResponse> =
+            self.execute_query(query, Some(variables)).await?;
+
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            ));
+        }
+
+        Ok(response.data.map(|d| d.references_for).unwrap_or_default())
+    }
+
+    /// Fetch every citation within a System at once (for hover tooltips).
+    /// Each `ReferenceView.target` encodes the cited term/connective.
+    pub async fn fetch_references_for_system(
+        &self,
+        system_id: &str,
+    ) -> Result<Vec<ReferenceView>, ApiError> {
+        let query = r#"
+            query SysRefs($systemId: String!) {
+                referencesForSystem(systemId: $systemId) {
+                    id
+                    target
+                    note
+                    source { name kind }
+                    artefact { title url }
+                    lookup { locator }
+                }
+            }
+        "#;
+        let variables = serde_json::json!({ "systemId": system_id });
+        let response: GraphQLResponse<ReferencesForSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+
+        Ok(response.data.map(|d| d.references_for_system).unwrap_or_default())
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(
@@ -233,7 +344,7 @@ impl GraphQLClient {
             .map_err(|e| ApiError::ParseError(e.to_string()))
     }
 
-    fn transform_coordinates(&self, mut system: Grammar) -> Grammar {
+    fn transform_coordinates(&self, mut system: RenderedSystem) -> RenderedSystem {
         let viewport_width = 800.0;
         let viewport_height = 800.0;
         let margin = 100.0;

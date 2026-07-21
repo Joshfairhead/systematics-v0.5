@@ -2274,9 +2274,9 @@
       "z": 0.0
     }
   ],
-  "semanticVocabs": [
+  "vocabularies": [
     {
-      "id": "semvocab_canonical_monad_1",
+      "id": "vocab_canonical_monad_1",
       "name": "Canonical Monad",
       "order": 1,
       "terms": [
@@ -2285,7 +2285,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_colours_monad_1",
+      "id": "vocab_canonical_colours_monad_1",
       "name": "Canonical Colours Monad",
       "order": 1,
       "terms": [
@@ -2294,7 +2294,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_dyad_2",
+      "id": "vocab_canonical_dyad_2",
       "name": "Canonical Dyad",
       "order": 2,
       "terms": [
@@ -2306,7 +2306,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_dyad_2",
+      "id": "vocab_canonical_colours_dyad_2",
       "name": "Canonical Colours Dyad",
       "order": 2,
       "terms": [
@@ -2316,7 +2316,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_triad_3",
+      "id": "vocab_canonical_triad_3",
       "name": "Canonical Triad",
       "order": 3,
       "terms": [
@@ -2331,7 +2331,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_triad_3",
+      "id": "vocab_canonical_colours_triad_3",
       "name": "Canonical Colours Triad",
       "order": 3,
       "terms": [
@@ -2342,7 +2342,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_tetrad_4",
+      "id": "vocab_canonical_tetrad_4",
       "name": "Canonical Tetrad",
       "order": 4,
       "terms": [
@@ -2361,7 +2361,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_tetrad_4",
+      "id": "vocab_canonical_colours_tetrad_4",
       "name": "Canonical Colours Tetrad",
       "order": 4,
       "terms": [
@@ -2373,7 +2373,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_pentad_5",
+      "id": "vocab_canonical_pentad_5",
       "name": "Canonical Pentad",
       "order": 5,
       "terms": [
@@ -2397,7 +2397,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_pentad_5",
+      "id": "vocab_canonical_colours_pentad_5",
       "name": "Canonical Colours Pentad",
       "order": 5,
       "terms": [
@@ -2410,7 +2410,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_hexad_6",
+      "id": "vocab_canonical_hexad_6",
       "name": "Canonical Hexad",
       "order": 6,
       "terms": [
@@ -2440,7 +2440,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_hexad_6",
+      "id": "vocab_canonical_colours_hexad_6",
       "name": "Canonical Colours Hexad",
       "order": 6,
       "terms": [
@@ -2454,7 +2454,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_heptad_7",
+      "id": "vocab_canonical_heptad_7",
       "name": "Canonical Heptad",
       "order": 7,
       "terms": [
@@ -2491,7 +2491,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_heptad_7",
+      "id": "vocab_canonical_colours_heptad_7",
       "name": "Canonical Colours Heptad",
       "order": 7,
       "terms": [
@@ -2506,7 +2506,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_octad_8",
+      "id": "vocab_canonical_octad_8",
       "name": "Canonical Octad",
       "order": 8,
       "terms": [
@@ -2551,7 +2551,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_octad_8",
+      "id": "vocab_canonical_colours_octad_8",
       "name": "Canonical Colours Octad",
       "order": 8,
       "terms": [
@@ -2567,7 +2567,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_ennead_9",
+      "id": "vocab_canonical_ennead_9",
       "name": "Canonical Ennead",
       "order": 9,
       "terms": [
@@ -2621,7 +2621,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_ennead_9",
+      "id": "vocab_canonical_colours_ennead_9",
       "name": "Canonical Colours Ennead",
       "order": 9,
       "terms": [
@@ -2638,7 +2638,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_decad_10",
+      "id": "vocab_canonical_decad_10",
       "name": "Canonical Decad",
       "order": 10,
       "terms": [
@@ -2702,7 +2702,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_decad_10",
+      "id": "vocab_canonical_colours_decad_10",
       "name": "Canonical Colours Decad",
       "order": 10,
       "terms": [
@@ -2720,7 +2720,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_undecad_11",
+      "id": "vocab_canonical_undecad_11",
       "name": "Canonical Undecad",
       "order": 11,
       "terms": [
@@ -2795,7 +2795,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_undecad_11",
+      "id": "vocab_canonical_colours_undecad_11",
       "name": "Canonical Colours Undecad",
       "order": 11,
       "terms": [
@@ -2814,7 +2814,7 @@
       "connectives": []
     },
     {
-      "id": "semvocab_canonical_dodecad_12",
+      "id": "vocab_canonical_dodecad_12",
       "name": "Canonical Dodecad",
       "order": 12,
       "terms": [
@@ -2901,7 +2901,7 @@
       ]
     },
     {
-      "id": "semvocab_canonical_colours_dodecad_12",
+      "id": "vocab_canonical_colours_dodecad_12",
       "name": "Canonical Colours Dodecad",
       "order": 12,
       "terms": [
@@ -2921,138 +2921,131 @@
       "connectives": []
     }
   ],
-  "perspectives": [
+  "systems": [
     {
-      "id": "perspective_canonical_monad_1",
+      "id": "system_canonical_monad_1",
       "name": "Canonical Monad",
       "order": 1,
       "coherence": "Universality",
       "term_designation": "Totality",
       "connective_designation": "Unity",
-      "topological_vocab_ref": "topvocab_1",
-      "geometric_vocab_ref": "geovocab_1",
-      "semantic_vocab_ref": "semvocab_canonical_monad_1"
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_canonical_monad_1"
     },
     {
-      "id": "perspective_canonical_dyad_2",
+      "id": "system_canonical_dyad_2",
       "name": "Canonical Dyad",
       "order": 2,
       "coherence": "Complementarity",
       "term_designation": "Poles",
       "connective_designation": "Force",
-      "topological_vocab_ref": "topvocab_2",
-      "geometric_vocab_ref": "geovocab_2",
-      "semantic_vocab_ref": "semvocab_canonical_dyad_2"
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_canonical_dyad_2"
     },
     {
-      "id": "perspective_canonical_triad_3",
+      "id": "system_canonical_triad_3",
       "name": "Canonical Triad",
       "order": 3,
       "coherence": "Dynamism",
       "term_designation": "Impulses",
       "connective_designation": "Acts",
-      "topological_vocab_ref": "topvocab_3",
-      "geometric_vocab_ref": "geovocab_3",
-      "semantic_vocab_ref": "semvocab_canonical_triad_3"
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_canonical_triad_3"
     },
     {
-      "id": "perspective_canonical_tetrad_4",
+      "id": "system_canonical_tetrad_4",
       "name": "Canonical Tetrad",
       "order": 4,
       "coherence": "Activity Field",
       "term_designation": "Sources",
       "connective_designation": "Interplays",
-      "topological_vocab_ref": "topvocab_4",
-      "geometric_vocab_ref": "geovocab_4",
-      "semantic_vocab_ref": "semvocab_canonical_tetrad_4"
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_canonical_tetrad_4"
     },
     {
-      "id": "perspective_canonical_pentad_5",
+      "id": "system_canonical_pentad_5",
       "name": "Canonical Pentad",
       "order": 5,
       "coherence": "Significance and Potential",
       "term_designation": "Limits",
       "connective_designation": "Mutualities",
-      "topological_vocab_ref": "topvocab_5",
-      "geometric_vocab_ref": "geovocab_5",
-      "semantic_vocab_ref": "semvocab_canonical_pentad_5"
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_canonical_pentad_5"
     },
     {
-      "id": "perspective_canonical_hexad_6",
+      "id": "system_canonical_hexad_6",
       "name": "Canonical Hexad",
       "order": 6,
       "coherence": "Coalescence",
       "term_designation": "Laws",
       "connective_designation": "Steps",
-      "topological_vocab_ref": "topvocab_6",
-      "geometric_vocab_ref": "geovocab_6",
-      "semantic_vocab_ref": "semvocab_canonical_hexad_6"
+      "grammar_ref": "grammar_6",
+      "vocabulary_ref": "vocab_canonical_hexad_6"
     },
     {
-      "id": "perspective_canonical_heptad_7",
+      "id": "system_canonical_heptad_7",
       "name": "Canonical Heptad",
       "order": 7,
       "coherence": "Generation",
       "term_designation": "States",
       "connective_designation": "Intervals",
-      "topological_vocab_ref": "topvocab_7",
-      "geometric_vocab_ref": "geovocab_7",
-      "semantic_vocab_ref": "semvocab_canonical_heptad_7"
+      "grammar_ref": "grammar_7",
+      "vocabulary_ref": "vocab_canonical_heptad_7"
     },
     {
-      "id": "perspective_canonical_octad_8",
+      "id": "system_canonical_octad_8",
       "name": "Canonical Octad",
       "order": 8,
       "coherence": "Self-Sufficiency",
       "term_designation": "Elements",
       "connective_designation": "Components",
-      "topological_vocab_ref": "topvocab_8",
-      "geometric_vocab_ref": "geovocab_8",
-      "semantic_vocab_ref": "semvocab_canonical_octad_8"
+      "grammar_ref": "grammar_8",
+      "vocabulary_ref": "vocab_canonical_octad_8"
     },
     {
-      "id": "perspective_canonical_ennead_9",
+      "id": "system_canonical_ennead_9",
       "name": "Canonical Ennead",
       "order": 9,
       "coherence": "Transformation",
       "term_designation": "Needs Research",
       "connective_designation": "Needs Research",
-      "topological_vocab_ref": "topvocab_9",
-      "geometric_vocab_ref": "geovocab_9",
-      "semantic_vocab_ref": "semvocab_canonical_ennead_9"
+      "grammar_ref": "grammar_9",
+      "vocabulary_ref": "vocab_canonical_ennead_9"
     },
     {
-      "id": "perspective_canonical_decad_10",
+      "id": "system_canonical_decad_10",
       "name": "Canonical Decad",
       "order": 10,
       "coherence": "Intrinsic Harmony",
       "term_designation": "Needs Research",
       "connective_designation": "Needs Research",
-      "topological_vocab_ref": "topvocab_10",
-      "geometric_vocab_ref": "geovocab_10",
-      "semantic_vocab_ref": "semvocab_canonical_decad_10"
+      "grammar_ref": "grammar_10",
+      "vocabulary_ref": "vocab_canonical_decad_10"
     },
     {
-      "id": "perspective_canonical_undecad_11",
+      "id": "system_canonical_undecad_11",
       "name": "Canonical Undecad",
       "order": 11,
       "coherence": "Articulate Symmetry",
       "term_designation": "Needs Research",
       "connective_designation": "Needs Research",
-      "topological_vocab_ref": "topvocab_11",
-      "geometric_vocab_ref": "geovocab_11",
-      "semantic_vocab_ref": "semvocab_canonical_undecad_11"
+      "grammar_ref": "grammar_11",
+      "vocabulary_ref": "vocab_canonical_undecad_11"
     },
     {
-      "id": "perspective_canonical_dodecad_12",
+      "id": "system_canonical_dodecad_12",
       "name": "Canonical Dodecad",
       "order": 12,
       "coherence": "Perfection",
       "term_designation": "Needs Research",
       "connective_designation": "Needs Research",
-      "topological_vocab_ref": "topvocab_12",
-      "geometric_vocab_ref": "geovocab_12",
-      "semantic_vocab_ref": "semvocab_canonical_dodecad_12"
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_canonical_dodecad_12"
     }
-  ]
+  ],
+  "perspectives": [],
+  "sources": [],
+  "artefacts": [],
+  "lookups": [],
+  "references": []
 }

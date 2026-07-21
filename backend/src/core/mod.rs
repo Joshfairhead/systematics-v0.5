@@ -6,16 +6,21 @@
 //! - `links` — Link entries (currently `Line` for coordinate-to-coordinate
 //!   rendering; `Connective` shim retained during frontend migration).
 //! - `vocabularies` — `TopologicalVocabulary`, `GeometricVocabulary`,
-//!   `SemanticVocabulary` — ordered per-Order references into the substrate.
-//! - `perspectives` — `Perspective`: validation rules + inline metadata that
-//!   reconcile the three vocabularies.
+//!   `Vocabulary` — ordered per-Order references into the substrate.
+//! - `grammar` — `Grammar`: the K_n structure + arity validation rules.
+//! - `systems` — `System`: metadata reconciling a Grammar with a Vocabulary.
+//! - `perspectives` — `Perspective`/`Link`: AD4M-style directed webs.
+//! - `citations` — `Source`/`Artefact`/`Lookup`/`Reference`: the citation triad.
 //! - `graph` — the container plus queries and mutations.
 
+pub mod citations;
 pub mod content;
 pub mod entries;
-pub mod perspectives;
+pub mod grammar;
 pub mod graph;
 pub mod links;
+pub mod perspectives;
+pub mod systems;
 pub mod vocabularies;
 
 pub use entries::{
@@ -24,9 +29,15 @@ pub use entries::{
 
 pub use links::{Link, LinkType};
 
-pub use vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
+pub use vocabularies::{GeometricVocabulary, Vocabulary, TopologicalVocabulary};
 
-pub use perspectives::Perspective;
+pub use grammar::Grammar;
+
+pub use systems::System;
+
+pub use perspectives::{Link as PerspectiveLink, Perspective};
+
+pub use citations::{Artefact, Lookup, Reference, Source};
 
 pub use content::GraphContent;
 

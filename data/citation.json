@@ -1,0 +1,69 @@
+{
+  "characters": [
+    {
+      "id": "char_word_source",
+      "kind": "word",
+      "value": "Source"
+    },
+    {
+      "id": "char_word_artefact",
+      "kind": "word",
+      "value": "Artefact"
+    },
+    {
+      "id": "char_word_lookup",
+      "kind": "word",
+      "value": "Lookup"
+    },
+    {
+      "id": "char_word_citation_act_1_needs_research",
+      "kind": "word",
+      "value": "Citation Act 1 Needs Research"
+    },
+    {
+      "id": "char_word_citation_act_2_needs_research",
+      "kind": "word",
+      "value": "Citation Act 2 Needs Research"
+    },
+    {
+      "id": "char_word_citation_act_3_needs_research",
+      "kind": "word",
+      "value": "Citation Act 3 Needs Research"
+    }
+  ],
+  "coordinates": [],
+  "vocabularies": [
+    {
+      "id": "vocab_citation_3",
+      "name": "Citation",
+      "order": 3,
+      "terms": [
+        "char_word_source",
+        "char_word_artefact",
+        "char_word_lookup"
+      ],
+      "connectives": [
+        "char_word_citation_act_1_needs_research",
+        "char_word_citation_act_2_needs_research",
+        "char_word_citation_act_3_needs_research"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_citation_3",
+      "name": "Citation",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_citation_3"
+    }
+  ],
+  "perspectives": [],
+  "sources": [],
+  "artefacts": [],
+  "lookups": [],
+  "references": []
+}

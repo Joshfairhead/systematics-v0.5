@@ -28,7 +28,7 @@ pub struct GeometricVocabulary {
 /// Ordered Character references for terms + connectives at one Order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct SemanticVocabulary {
+pub struct Vocabulary {
     pub id: String,
     pub name: String,
     pub order: i32,

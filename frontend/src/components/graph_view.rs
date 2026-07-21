@@ -1,5 +1,7 @@
-use systematics_middleware::Grammar;
+use systematics_middleware::RenderedSystem;
 use yew::prelude::*;
+
+use crate::api::client::ReferenceView;
 
 /// Default colors for rendering
 const DEFAULT_NODE_COLOR: &str = "#4A90E2";
@@ -9,11 +11,17 @@ const SELECTED_EDGE_COLOR: &str = "#FF6B6B";
 
 #[derive(Properties, PartialEq)]
 pub struct ApiGraphViewProps {
-    pub system: Grammar,
+    pub system: RenderedSystem,
     #[prop_or_default]
     pub on_navigate: Option<Callback<String>>,
     #[prop_or_default]
     pub show_edge_labels: bool,
+    /// Toggles the edge-label switch (rendered as an in-canvas overlay).
+    #[prop_or_default]
+    pub on_toggle_edge_labels: Option<Callback<()>>,
+    /// All citations within this system; shown as hover tooltips on nodes.
+    #[prop_or_default]
+    pub references: Vec<ReferenceView>,
 }
 
 pub enum ApiGraphMsg {
@@ -42,11 +50,12 @@ impl Component for ApiGraphView {
         match msg {
             ApiGraphMsg::NodeClicked(idx) => {
                 // Toggle selection
-                if self.selected_node == Some(idx) {
-                    self.selected_node = None;
-                } else {
+                let selecting = self.selected_node != Some(idx);
+                if selecting {
                     self.selected_node = Some(idx);
                     self.selected_edge = None;
+                } else {
+                    self.selected_node = None;
                 }
                 true
             }
@@ -67,16 +76,68 @@ impl Component for ApiGraphView {
         let system = &ctx.props().system;
         let show_edge_labels = ctx.props().show_edge_labels;
 
+        // The metadata elements (coherence + designations) are themselves
+        // citable: hovering a header item shows its own reference, if any.
+        let refs = &ctx.props().references;
+        let sid = &system.system_id;
+        let coherence_tip =
+            tooltip_for(refs, &format!("system:{}#coherence", sid)).map(AttrValue::from);
+        let term_tip =
+            tooltip_for(refs, &format!("system:{}#term-designation", sid)).map(AttrValue::from);
+        let conn_tip = tooltip_for(refs, &format!("system:{}#connective-designation", sid))
+            .map(AttrValue::from);
+
         html! {
             <div class="graph-view">
+                // Compact single-line header. On display a system's terms /
+                // connectives take their designations (Impulses/Acts for the
+                // triad, Sources/Interplays for the tetrad); the generic API
+                // field names stay `terms`/`connectives`. Each metadata item is
+                // itself referenceable — hover shows its citation.
+                <header class="graph-header">
+                    <span class="graph-title">
+                        { format!("{} · {}", system.name, system.k_notation()) }
+                    </span>
+                    <span
+                        class={ classes!("designation", "designation-coherence", coherence_tip.is_some().then_some("cited")) }
+                        title={ coherence_tip.clone() }
+                    >
+                        { &system.coherence }
+                    </span>
+                    <span
+                        class={ classes!("designation", "designation-term", term_tip.is_some().then_some("cited")) }
+                        title={ term_tip.clone() }
+                    >
+                        { format!("{} {}", system.order, system.term_designation) }
+                    </span>
+                    <span
+                        class={ classes!("designation", "designation-connective", conn_tip.is_some().then_some("cited")) }
+                        title={ conn_tip.clone() }
+                    >
+                        { format!("{} {}", system.connectives.len(), system.connective_designation) }
+                    </span>
+                </header>
+                if let Some(on_toggle) = ctx.props().on_toggle_edge_labels.clone() {
+                    <label class="edge-toggle-overlay">
+                        <span class="toggle-label">{ "Edge Labels" }</span>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={ show_edge_labels }
+                                onclick={ Callback::from(move |_| on_toggle.emit(())) }
+                            />
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                }
                 <svg
                     class="graph-svg"
                     viewBox="0 0 800 800"
                     preserveAspectRatio="xMidYMid meet"
                 >
-                    { self.render_edges(system) }
+                    { self.render_edges(ctx, system) }
                     if show_edge_labels {
-                        { self.render_edge_labels(system) }
+                        { self.render_edge_labels(ctx, system) }
                     }
                     { self.render_nodes(ctx, system) }
                 </svg>
@@ -87,7 +148,7 @@ impl Component for ApiGraphView {
 
 impl ApiGraphView {
     /// Render edges (lines) from the system
-    fn render_edges(&self, system: &Grammar) -> Html {
+    fn render_edges(&self, ctx: &Context<Self>, system: &RenderedSystem) -> Html {
         web_sys::console::log_1(
             &format!("render_edges: {} lines to render", system.lines.len()).into(),
         );
@@ -144,6 +205,19 @@ impl ApiGraphView {
                 };
 
                 let is_selected = self.selected_edge == Some(edge_tuple);
+
+                // Citations for this connective → native hover tooltip on the edge
+                // (the edge line itself stays neutral; the *label* carries the cue).
+                let (p1, p2) = (base_pos.min(target_pos), base_pos.max(target_pos));
+                let address = format!("system:{}#conn:{}-{}", system.system_id, p1, p2);
+                let edge_refs: Vec<&ReferenceView> = ctx
+                    .props()
+                    .references
+                    .iter()
+                    .filter(|r| r.target == address)
+                    .collect();
+                let tooltip = build_tooltip(&edge_refs);
+
                 let stroke = if is_selected {
                     SELECTED_EDGE_COLOR
                 } else {
@@ -152,15 +226,30 @@ impl ApiGraphView {
                 let stroke_width = if is_selected { 3.0 } else { 1.5 };
 
                 html! {
-                    <line
-                        x1={ from_x.to_string() }
-                        y1={ from_y.to_string() }
-                        x2={ to_x.to_string() }
-                        y2={ to_y.to_string() }
-                        stroke={ stroke }
-                        stroke-width={ stroke_width.to_string() }
-                        class="edge"
-                    />
+                    <g class="edge-group">
+                        if let Some(text) = tooltip {
+                            <title>{ text }</title>
+                        }
+                        <line
+                            x1={ from_x.to_string() }
+                            y1={ from_y.to_string() }
+                            x2={ to_x.to_string() }
+                            y2={ to_y.to_string() }
+                            stroke={ stroke }
+                            stroke-width={ stroke_width.to_string() }
+                            class="edge"
+                        />
+                        // Transparent, wider hit-area so the thin edge is easy to hover.
+                        <line
+                            x1={ from_x.to_string() }
+                            y1={ from_y.to_string() }
+                            x2={ to_x.to_string() }
+                            y2={ to_y.to_string() }
+                            stroke="transparent"
+                            stroke-width="12"
+                            style="cursor: pointer;"
+                        />
+                    </g>
                 }
             })
             .collect::<Html>()
@@ -169,7 +258,7 @@ impl ApiGraphView {
     /// Render edge labels for connectives
     /// Instead of iterating connectives independently, we iterate through lines
     /// and find matching connectives to ensure labels align with the correct edges
-    fn render_edge_labels(&self, system: &Grammar) -> Html {
+    fn render_edge_labels(&self, ctx: &Context<Self>, system: &RenderedSystem) -> Html {
         web_sys::console::log_1(
             &format!(
                 "render_edge_labels: {} lines, {} connectives",
@@ -201,6 +290,21 @@ impl ApiGraphView {
             if label.is_empty() {
                 return html! {};
             }
+
+            // Is this connective cited? Highlight the label (not the edge line).
+            let (cp1, cp2) = (line_base_pos.min(line_target_pos), line_base_pos.max(line_target_pos));
+            let conn_address = format!("system:{}#conn:{}-{}", system.system_id, cp1, cp2);
+            let conn_refs: Vec<&ReferenceView> = ctx
+                .props()
+                .references
+                .iter()
+                .filter(|r| r.target == conn_address)
+                .collect();
+            let cited = !conn_refs.is_empty();
+            let label_tooltip = build_tooltip(&conn_refs);
+            let label_fill = if cited { "#B4741A" } else { "#2563eb" };
+            let label_weight = if cited { "700" } else { "500" };
+            let rect_stroke = if cited { "rgba(226, 162, 74, 0.9)" } else { "rgba(37, 99, 235, 0.3)" };
 
             web_sys::console::log_1(&format!("Line {} ({}→{}) matched with connective {} (label='{}')",
                 line_idx, line_base_pos, line_target_pos, conn_idx, label).into());
@@ -240,46 +344,39 @@ impl ApiGraphView {
             let rect_height = 16.0;
 
             html! {
-                <>
-                    // Debug: Show actual midpoint with a red circle
-                    <circle
-                        cx={ mid_x.to_string() }
-                        cy={ mid_y.to_string() }
-                        r="3"
-                        fill="red"
-                        style="pointer-events: none;"
+                <g class="edge-label-group" transform={ format!("translate({} {}) rotate({})", mid_x, mid_y, rotation_angle) }>
+                    if let Some(text) = label_tooltip {
+                        <title>{ text }</title>
+                    }
+                    <rect
+                        x={ (-rect_width / 2.0).to_string() }
+                        y={ (-rect_height / 2.0).to_string() }
+                        width={ rect_width.to_string() }
+                        height={ rect_height.to_string() }
+                        fill="rgba(255, 255, 255, 0.9)"
+                        stroke={ rect_stroke }
+                        stroke-width={ if cited { "1.2" } else { "0.5" } }
+                        rx="4"
+                        style={ if cited { "cursor: pointer;" } else { "pointer-events: none;" } }
                     />
-                    <g class="edge-label-group" transform={ format!("translate({} {}) rotate({})", mid_x, mid_y, rotation_angle) }>
-                        <rect
-                            x={ (-rect_width / 2.0).to_string() }
-                            y={ (-rect_height / 2.0).to_string() }
-                            width={ rect_width.to_string() }
-                            height={ rect_height.to_string() }
-                            fill="rgba(255, 255, 255, 0.9)"
-                            stroke="rgba(37, 99, 235, 0.3)"
-                            stroke-width="0.5"
-                            rx="4"
-                            style="pointer-events: none;"
-                        />
-                        <text
-                            x="0"
-                            y="0"
-                            text-anchor="middle"
-                            dominant-baseline="middle"
-                            class="edge-label"
-                            fill="#2563eb"
-                            style="font-size: 10px; font-weight: 500; pointer-events: none; user-select: none;"
-                        >
-                            { label }
-                        </text>
-                    </g>
-                </>
+                    <text
+                        x="0"
+                        y="0"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                        class="edge-label"
+                        fill={ label_fill }
+                        style={ format!("font-size: 10px; font-weight: {}; user-select: none; {}", label_weight, if cited { "cursor: pointer;" } else { "pointer-events: none;" }) }
+                    >
+                        { label }
+                    </text>
+                </g>
             }
         }).collect::<Html>()
     }
 
     /// Render nodes from coordinates and terms
-    fn render_nodes(&self, ctx: &Context<Self>, system: &Grammar) -> Html {
+    fn render_nodes(&self, ctx: &Context<Self>, system: &RenderedSystem) -> Html {
         system.coordinates.iter().map(|coord| {
             let position = coord.position;
             let idx = (position - 1) as usize;  // Convert 1-based position to 0-based index
@@ -301,8 +398,35 @@ impl ApiGraphView {
             // Get term label for this position
             let term = system.term_at(position).unwrap_or("");
 
+            // Citations for this term → native hover tooltip on the node.
+            let address = format!("system:{}#term:{}", system.system_id, position);
+            let node_refs: Vec<&ReferenceView> = ctx
+                .props()
+                .references
+                .iter()
+                .filter(|r| r.target == address)
+                .collect();
+            let tooltip = build_tooltip(&node_refs);
+            let cited = tooltip.is_some();
+            let node_class = if cited { "node cited" } else { "node" };
+
             html! {
-                <g class="node" onclick={ onclick }>
+                <g class={ node_class } onclick={ onclick }>
+                    if let Some(text) = tooltip {
+                        <title>{ text }</title>
+                    }
+                    if cited {
+                        <circle
+                            cx={ coord.x.to_string() }
+                            cy={ coord.y.to_string() }
+                            r={ (radius + 4.0).to_string() }
+                            fill="none"
+                            stroke="#E2A24A"
+                            stroke-width="2"
+                            stroke-dasharray="3 3"
+                            class="cited-ring"
+                        />
+                    }
                     <circle
                         cx={ coord.x.to_string() }
                         cy={ coord.y.to_string() }
@@ -342,4 +466,45 @@ impl ApiGraphView {
             }
         }).collect::<Html>()
     }
+}
+
+/// A citation rendered as its own labelled triad (Source / Artefact / Lookup),
+/// one field per line — mirrors the Citation triad's three impulses.
+fn format_reference(r: &ReferenceView) -> String {
+    let mut lines = Vec::new();
+    lines.push(format!(
+        "Source: {}",
+        r.source.as_ref().map(|s| s.name.as_str()).unwrap_or("—")
+    ));
+    if let Some(a) = &r.artefact {
+        lines.push(format!("Artefact: {}", a.title));
+    }
+    if let Some(l) = &r.lookup {
+        lines.push(format!("Lookup: {}", l.locator));
+    }
+    if let Some(n) = &r.note {
+        lines.push(format!("Note: {}", n));
+    }
+    lines.join("\n")
+}
+
+/// Build a tooltip from the citations for an element: each as a labelled triad.
+/// Returns `None` when there are no citations.
+fn build_tooltip(refs: &[&ReferenceView]) -> Option<String> {
+    if refs.is_empty() {
+        return None;
+    }
+    Some(
+        refs.iter()
+            .map(|r| format_reference(r))
+            .collect::<Vec<_>>()
+            .join("\n\n"),
+    )
+}
+
+/// Citations targeting a specific Expression address (e.g. a metadata element
+/// like `system:<id>#coherence`), rendered as a tooltip. `None` if uncited.
+fn tooltip_for(references: &[ReferenceView], address: &str) -> Option<String> {
+    let matched: Vec<&ReferenceView> = references.iter().filter(|r| r.target == address).collect();
+    build_tooltip(&matched)
 }

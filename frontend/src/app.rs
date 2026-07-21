@@ -1,7 +1,7 @@
-use crate::api::client::GraphQLClient;
+use crate::api::client::{GraphQLClient, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
-use systematics_middleware::Grammar;
+use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
@@ -34,22 +34,26 @@ pub struct Breadcrumb {
 
 pub enum ApiAppMsg {
     SelectSystem(String),
-    SystemsLoaded(Vec<Grammar>),
-    SystemLoaded(Box<Grammar>),
+    SystemsLoaded(Vec<RenderedSystem>),
+    SystemLoaded(Box<RenderedSystem>),
     LoadError(String),
     NavigateToSystem(String),
     NavigateBack,
     ToggleEdgeLabels,
+    ReferencesLoaded(Vec<ReferenceView>),
 }
 
 pub struct ApiApp {
-    systems: Vec<Grammar>,
-    selected_system: Option<Grammar>,
+    systems: Vec<RenderedSystem>,
+    selected_system: Option<RenderedSystem>,
     loading: bool,
     error: Option<String>,
     graphql_client: GraphQLClient,
     breadcrumbs: Vec<Breadcrumb>,
     show_edge_labels: bool,
+    /// All citations within the current system, keyed by their target address —
+    /// prefetched so nodes can show references as a hover tooltip.
+    system_references: Vec<ReferenceView>,
 }
 
 impl Component for ApiApp {
@@ -84,6 +88,7 @@ impl Component for ApiApp {
             graphql_client,
             breadcrumbs: vec![],
             show_edge_labels: false,
+            system_references: vec![],
         }
     }
 
@@ -176,9 +181,19 @@ impl Component for ApiApp {
                     );
                 }
 
-                // Select the first system by default
+                // Select the first system by default + prefetch its citations.
                 if let Some(first_system) = systems.first() {
                     self.selected_system = Some(first_system.clone());
+                    let system_id = first_system.system_id.clone();
+                    let link = ctx.link().clone();
+                    let client = self.graphql_client.clone();
+                    spawn_local(async move {
+                        let refs = client
+                            .fetch_references_for_system(&system_id)
+                            .await
+                            .unwrap_or_default();
+                        link.send_message(ApiAppMsg::ReferencesLoaded(refs));
+                    });
                 }
 
                 self.systems = systems;
@@ -186,7 +201,19 @@ impl Component for ApiApp {
             }
             ApiAppMsg::SystemLoaded(system) => {
                 self.loading = false;
+                let system_id = system.system_id.clone();
                 self.selected_system = Some(*system);
+                // Prefetch citations for the new system (hover tooltips).
+                self.system_references = vec![];
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    let refs = client
+                        .fetch_references_for_system(&system_id)
+                        .await
+                        .unwrap_or_default();
+                    link.send_message(ApiAppMsg::ReferencesLoaded(refs));
+                });
                 true
             }
             ApiAppMsg::LoadError(error) => {
@@ -196,6 +223,10 @@ impl Component for ApiApp {
             }
             ApiAppMsg::ToggleEdgeLabels => {
                 self.show_edge_labels = !self.show_edge_labels;
+                true
+            }
+            ApiAppMsg::ReferencesLoaded(refs) => {
+                self.system_references = refs;
                 true
             }
         }
@@ -215,7 +246,7 @@ impl Component for ApiApp {
                             if self.loading && self.systems.is_empty() {
                                 html! { <div class="loading">{"Loading systems..."}</div> }
                             } else {
-                                // Convert Grammar to SystemDisplay for SystemSelector
+                                // Convert RenderedSystem to SystemDisplay for SystemSelector
                                 let display_systems: Vec<SystemDisplay> = self.systems.iter().map(|sys| {
                                     SystemDisplay {
                                         name: sys.name.to_lowercase(),
@@ -234,8 +265,6 @@ impl Component for ApiApp {
                                         systems={ display_systems }
                                         selected={ selected_name }
                                         on_select={ on_select }
-                                        show_edge_labels={ self.show_edge_labels }
-                                        on_toggle_edge_labels={ Some(on_toggle_edge_labels.clone()) }
                                     />
                                 }
                             }
@@ -281,6 +310,8 @@ impl Component for ApiApp {
                                         system={ system.clone() }
                                         on_navigate={ Some(on_navigate) }
                                         show_edge_labels={ self.show_edge_labels }
+                                        on_toggle_edge_labels={ Some(on_toggle_edge_labels.clone()) }
+                                        references={ self.system_references.clone() }
                                     />
                                 }
                             } else {
@@ -293,3 +324,4 @@ impl Component for ApiApp {
         }
     }
 }
+

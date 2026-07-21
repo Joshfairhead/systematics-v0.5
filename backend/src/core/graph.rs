@@ -7,11 +7,14 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
+use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
 use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
+use super::grammar::Grammar;
 use super::perspectives::Perspective;
+use super::systems::System;
 use super::links::{Link, LinkType};
-use super::vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
+use super::vocabularies::{GeometricVocabulary, Vocabulary, TopologicalVocabulary};
 
 /// The primary container. Holds substrate entries, edge Links, and the four
 /// higher-level tables.
@@ -24,9 +27,26 @@ pub struct Graph {
     #[serde(default)]
     pub geometric_vocabs: Vec<GeometricVocabulary>,
     #[serde(default)]
-    pub semantic_vocabs: Vec<SemanticVocabulary>,
+    pub vocabularies: Vec<Vocabulary>,
+    /// Complete-graph structures, one per Order. Seeded in code (deterministic),
+    /// never persisted as content.
+    #[serde(default)]
+    pub grammars: Vec<Grammar>,
+    /// Systems: metadata reconciling a Grammar with a Vocabulary.
+    #[serde(default)]
+    pub systems: Vec<System>,
+    /// Referencing layer: AD4M-style directed webs of Links.
     #[serde(default)]
     pub perspectives: Vec<Perspective>,
+    /// Citation triad entities + Reference edges.
+    #[serde(default)]
+    pub sources: Vec<Source>,
+    #[serde(default)]
+    pub artefacts: Vec<Artefact>,
+    #[serde(default)]
+    pub lookups: Vec<Lookup>,
+    #[serde(default)]
+    pub references: Vec<Reference>,
     /// IDs of content that came from the canonical seed. Runtime-only; used to
     /// separate user additions from canonical when persisting. Never serialised.
     #[serde(skip)]
@@ -202,12 +222,12 @@ impl Graph {
         self.geometric_vocabs.iter().find(|v| v.order == order)
     }
 
-    pub fn semantic_vocab(&self, id: &str) -> Option<&SemanticVocabulary> {
-        self.semantic_vocabs.iter().find(|v| v.id == id)
+    pub fn vocabulary(&self, id: &str) -> Option<&Vocabulary> {
+        self.vocabularies.iter().find(|v| v.id == id)
     }
 
-    pub fn semantic_vocabs_for_order(&self, order: u8) -> Vec<&SemanticVocabulary> {
-        self.semantic_vocabs
+    pub fn vocabularies_for_order(&self, order: u8) -> Vec<&Vocabulary> {
+        self.vocabularies
             .iter()
             .filter(|v| v.order == order)
             .collect()
@@ -221,29 +241,71 @@ impl Graph {
         self.geometric_vocabs.push(vocab);
     }
 
-    pub fn add_semantic_vocab(&mut self, vocab: SemanticVocabulary) {
-        self.semantic_vocabs.push(vocab);
+    pub fn add_vocabulary(&mut self, vocab: Vocabulary) {
+        self.vocabularies.push(vocab);
     }
 
-    pub fn update_semantic_vocab(
+    pub fn update_vocabulary(
         &mut self,
-        vocab: SemanticVocabulary,
-    ) -> Option<SemanticVocabulary> {
-        let idx = self.semantic_vocabs.iter().position(|v| v.id == vocab.id)?;
-        Some(std::mem::replace(&mut self.semantic_vocabs[idx], vocab))
+        vocab: Vocabulary,
+    ) -> Option<Vocabulary> {
+        let idx = self.vocabularies.iter().position(|v| v.id == vocab.id)?;
+        Some(std::mem::replace(&mut self.vocabularies[idx], vocab))
     }
 
-    pub fn delete_semantic_vocab(&mut self, id: &str) -> Option<SemanticVocabulary> {
-        let idx = self.semantic_vocabs.iter().position(|v| v.id == id)?;
-        Some(self.semantic_vocabs.remove(idx))
+    pub fn delete_vocabulary(&mut self, id: &str) -> Option<Vocabulary> {
+        let idx = self.vocabularies.iter().position(|v| v.id == id)?;
+        Some(self.vocabularies.remove(idx))
     }
+
+    // -------- Grammars (K_n structure; code-seeded, deterministic) --------
+
+    pub fn grammar(&self, id: &str) -> Option<&Grammar> {
+        self.grammars.iter().find(|g| g.id == id)
+    }
+
+    pub fn grammar_for_order(&self, order: u8) -> Option<&Grammar> {
+        self.grammars.iter().find(|g| g.order == order)
+    }
+
+    pub fn add_grammar(&mut self, grammar: Grammar) {
+        self.grammars.push(grammar);
+    }
+
+    // -------- Systems (metadata + Grammar/Vocabulary reconciliation) --------
+
+    pub fn system(&self, id: &str) -> Option<&System> {
+        self.systems.iter().find(|s| s.id == id)
+    }
+
+    pub fn systems_for_order(&self, order: u8) -> Vec<&System> {
+        self.systems.iter().filter(|s| s.order == order).collect()
+    }
+
+    pub fn add_system(&mut self, system: System) {
+        self.systems.push(system);
+    }
+
+    pub fn update_system(&mut self, system: System) -> Option<System> {
+        let idx = self.systems.iter().position(|s| s.id == system.id)?;
+        Some(std::mem::replace(&mut self.systems[idx], system))
+    }
+
+    pub fn delete_system(&mut self, id: &str) -> Option<System> {
+        let idx = self.systems.iter().position(|s| s.id == id)?;
+        Some(self.systems.remove(idx))
+    }
+
+    // ==========================================================================
+    // Referencing layer: Perspectives (webs) + citation triad
+    // ==========================================================================
 
     pub fn perspective(&self, id: &str) -> Option<&Perspective> {
-        self.perspectives.iter().find(|g| g.id == id)
+        self.perspectives.iter().find(|p| p.id == id)
     }
 
-    pub fn perspectives_for_order(&self, order: u8) -> Vec<&Perspective> {
-        self.perspectives.iter().filter(|g| g.order == order).collect()
+    pub fn perspectives(&self) -> &[Perspective] {
+        &self.perspectives
     }
 
     pub fn add_perspective(&mut self, perspective: Perspective) {
@@ -251,23 +313,106 @@ impl Graph {
     }
 
     pub fn update_perspective(&mut self, perspective: Perspective) -> Option<Perspective> {
-        let idx = self.perspectives.iter().position(|g| g.id == perspective.id)?;
+        let idx = self.perspectives.iter().position(|p| p.id == perspective.id)?;
         Some(std::mem::replace(&mut self.perspectives[idx], perspective))
     }
 
     pub fn delete_perspective(&mut self, id: &str) -> Option<Perspective> {
-        let idx = self.perspectives.iter().position(|g| g.id == id)?;
+        let idx = self.perspectives.iter().position(|p| p.id == id)?;
         Some(self.perspectives.remove(idx))
     }
 
+    /// Mutable access to a Perspective by id (for add/remove link).
+    pub fn perspective_mut(&mut self, id: &str) -> Option<&mut Perspective> {
+        self.perspectives.iter_mut().find(|p| p.id == id)
+    }
+
+    pub fn source(&self, id: &str) -> Option<&Source> {
+        self.sources.iter().find(|s| s.id == id)
+    }
+    pub fn upsert_source(&mut self, source: Source) {
+        let id = source.id.clone();
+        self.sources.retain(|s| s.id != id);
+        self.sources.push(source);
+    }
+
+    pub fn artefact(&self, id: &str) -> Option<&Artefact> {
+        self.artefacts.iter().find(|a| a.id == id)
+    }
+    pub fn upsert_artefact(&mut self, artefact: Artefact) {
+        let id = artefact.id.clone();
+        self.artefacts.retain(|a| a.id != id);
+        self.artefacts.push(artefact);
+    }
+
+    pub fn lookup(&self, id: &str) -> Option<&Lookup> {
+        self.lookups.iter().find(|l| l.id == id)
+    }
+    pub fn upsert_lookup(&mut self, lookup: Lookup) {
+        let id = lookup.id.clone();
+        self.lookups.retain(|l| l.id != id);
+        self.lookups.push(lookup);
+    }
+
+    pub fn reference(&self, id: &str) -> Option<&Reference> {
+        self.references.iter().find(|r| r.id == id)
+    }
+    pub fn upsert_reference(&mut self, reference: Reference) {
+        let id = reference.id.clone();
+        self.references.retain(|r| r.id != id);
+        self.references.push(reference);
+    }
+    pub fn delete_reference(&mut self, id: &str) -> Option<Reference> {
+        let idx = self.references.iter().position(|r| r.id == id)?;
+        Some(self.references.remove(idx))
+    }
+
+    /// All References whose cited target matches the given Expression address.
+    pub fn references_for(&self, address: &str) -> Vec<&Reference> {
+        self.references.iter().filter(|r| r.target == address).collect()
+    }
+
+    /// All References citing anything within a System (the whole system, or any
+    /// of its terms/connectives) — used to prefetch hover tooltips for a graph.
+    pub fn references_for_system(&self, system_id: &str) -> Vec<&Reference> {
+        let exact = format!("system:{}", system_id);
+        let prefix = format!("system:{}#", system_id);
+        self.references
+            .iter()
+            .filter(|r| r.target == exact || r.target.starts_with(&prefix))
+            .collect()
+    }
+
+    /// All References citing `address` *or anything nested under it* — a container
+    /// rolls up its parts. Descendants are addressed by appending `#…` to the
+    /// container address (e.g. `system:<id>` contains `system:<id>#term:1`), so a
+    /// leaf address (a node/edge) simply returns its own exact matches.
+    pub fn references_under(&self, address: &str) -> Vec<&Reference> {
+        let prefix = format!("{}#", address);
+        self.references
+            .iter()
+            .filter(|r| r.target == address || r.target.starts_with(&prefix))
+            .collect()
+    }
+
+    /// All Links (across every Perspective) touching the given address as
+    /// either source or target.
+    pub fn links_for(&self, address: &str) -> Vec<&super::perspectives::Link> {
+        self.perspectives
+            .iter()
+            .flat_map(|p| p.links.iter())
+            .filter(|l| l.source == address || l.target == address)
+            .collect()
+    }
+
     /// Look up which Character inhabits a given Point through a
-    /// SemanticVocabulary's paired TopologicalVocabulary.
+    /// Vocabulary's paired TopologicalVocabulary.
     pub fn character_at_point(
         &self,
-        semantic_vocab_id: &str,
+        vocabulary_id: &str,
         point_id: &str,
     ) -> Option<&Character> {
-        let sv = self.semantic_vocab(semantic_vocab_id)?;
+        let sv = self.vocabulary(vocabulary_id)?;
         let topology = self.topological_vocab_for_order(sv.order)?;
         let idx = topology.points.iter().position(|p| p == point_id)?;
         let char_id = sv.terms.get(idx)?;
@@ -275,55 +420,56 @@ impl Graph {
     }
 
     /// Look up which Character inhabits a given Line through a
-    /// SemanticVocabulary's paired TopologicalVocabulary.
+    /// Vocabulary's paired TopologicalVocabulary.
     pub fn character_at_line(
         &self,
-        semantic_vocab_id: &str,
+        vocabulary_id: &str,
         line_id: &str,
     ) -> Option<&Character> {
-        let sv = self.semantic_vocab(semantic_vocab_id)?;
+        let sv = self.vocabulary(vocabulary_id)?;
         let topology = self.topological_vocab_for_order(sv.order)?;
         let idx = topology.lines.iter().position(|l| l == line_id)?;
         let char_id = sv.connectives.get(idx)?;
         self.character(char_id)
     }
 
-    /// Validate a Perspective by resolving all three referenced vocabularies.
-    pub fn validate_perspective(&self, perspective_id: &str) -> Result<(), Vec<String>> {
-        let g = self
-            .perspective(perspective_id)
-            .ok_or_else(|| vec![format!("Perspective '{}' not found", perspective_id)])?;
+    /// Validate a System by resolving its Grammar + Vocabulary and the
+    /// Grammar's referenced substrate vocabularies.
+    pub fn validate_system(&self, system_id: &str) -> Result<(), Vec<String>> {
+        let sys = self
+            .system(system_id)
+            .ok_or_else(|| vec![format!("System '{}' not found", system_id)])?;
+        let grammar = self
+            .grammar(&sys.grammar_ref)
+            .ok_or_else(|| vec![format!("Grammar '{}' not found", sys.grammar_ref)])?;
         let t = self
-            .topological_vocab(&g.topological_vocab_ref)
+            .topological_vocab(&grammar.topological_vocab_ref)
             .ok_or_else(|| {
                 vec![format!(
                     "TopologicalVocabulary '{}' not found",
-                    g.topological_vocab_ref
+                    grammar.topological_vocab_ref
                 )]
             })?;
         let geo = self
-            .geometric_vocab(&g.geometric_vocab_ref)
+            .geometric_vocab(&grammar.geometric_vocab_ref)
             .ok_or_else(|| {
                 vec![format!(
                     "GeometricVocabulary '{}' not found",
-                    g.geometric_vocab_ref
+                    grammar.geometric_vocab_ref
                 )]
             })?;
         let s = self
-            .semantic_vocab(&g.semantic_vocab_ref)
+            .vocabulary(&sys.vocabulary_ref)
             .ok_or_else(|| {
-                vec![format!(
-                    "SemanticVocabulary '{}' not found",
-                    g.semantic_vocab_ref
-                )]
+                vec![format!("Vocabulary '{}' not found", sys.vocabulary_ref)]
             })?;
-        g.validate_with(t, geo, s)
+        grammar.validate_with(t, geo, s)
     }
 
-    /// Look up the Canonical SemanticVocabulary containing hex colours for
+    /// Look up the Canonical Vocabulary containing hex colours for
     /// the given order (created by seed as "Canonical Colours {name}").
-    pub fn canonical_colour_vocab_for_order(&self, order: u8) -> Option<&SemanticVocabulary> {
-        self.semantic_vocabs
+    pub fn canonical_colour_vocab_for_order(&self, order: u8) -> Option<&Vocabulary> {
+        self.vocabularies
             .iter()
             .find(|v| v.order == order && v.name.starts_with("Canonical Colours"))
     }
@@ -356,15 +502,32 @@ impl Graph {
         for c in &content.coordinates {
             self.upsert_coordinate(c.clone());
         }
-        for v in &content.semantic_vocabs {
-            if self.update_semantic_vocab(v.clone()).is_none() {
-                self.add_semantic_vocab(v.clone());
+        for v in &content.vocabularies {
+            if self.update_vocabulary(v.clone()).is_none() {
+                self.add_vocabulary(v.clone());
             }
         }
-        for g in &content.perspectives {
-            if self.update_perspective(g.clone()).is_none() {
-                self.add_perspective(g.clone());
+        for s in &content.systems {
+            if self.update_system(s.clone()).is_none() {
+                self.add_system(s.clone());
             }
+        }
+        for p in &content.perspectives {
+            if self.update_perspective(p.clone()).is_none() {
+                self.add_perspective(p.clone());
+            }
+        }
+        for s in &content.sources {
+            self.upsert_source(s.clone());
+        }
+        for a in &content.artefacts {
+            self.upsert_artefact(a.clone());
+        }
+        for l in &content.lookups {
+            self.upsert_lookup(l.clone());
+        }
+        for r in &content.references {
+            self.upsert_reference(r.clone());
         }
     }
 
@@ -373,8 +536,13 @@ impl Graph {
         GraphContent {
             characters: self.characters(None).into_iter().cloned().collect(),
             coordinates: self.coordinates(None).into_iter().cloned().collect(),
-            semantic_vocabs: self.semantic_vocabs.clone(),
+            vocabularies: self.vocabularies.clone(),
+            systems: self.systems.clone(),
             perspectives: self.perspectives.clone(),
+            sources: self.sources.clone(),
+            artefacts: self.artefacts.clone(),
+            lookups: self.lookups.clone(),
+            references: self.references.clone(),
         }
     }
 
@@ -401,16 +569,46 @@ impl Graph {
                 .filter(|c| is_user(&c.id))
                 .cloned()
                 .collect(),
-            semantic_vocabs: self
-                .semantic_vocabs
+            vocabularies: self
+                .vocabularies
                 .iter()
                 .filter(|v| is_user(&v.id))
+                .cloned()
+                .collect(),
+            systems: self
+                .systems
+                .iter()
+                .filter(|s| is_user(&s.id))
                 .cloned()
                 .collect(),
             perspectives: self
                 .perspectives
                 .iter()
-                .filter(|g| is_user(&g.id))
+                .filter(|p| is_user(&p.id))
+                .cloned()
+                .collect(),
+            sources: self
+                .sources
+                .iter()
+                .filter(|s| is_user(&s.id))
+                .cloned()
+                .collect(),
+            artefacts: self
+                .artefacts
+                .iter()
+                .filter(|a| is_user(&a.id))
+                .cloned()
+                .collect(),
+            lookups: self
+                .lookups
+                .iter()
+                .filter(|l| is_user(&l.id))
+                .cloned()
+                .collect(),
+            references: self
+                .references
+                .iter()
+                .filter(|r| is_user(&r.id))
                 .cloned()
                 .collect(),
         }
@@ -445,7 +643,7 @@ impl Graph {
 mod tests {
     use super::*;
     use crate::core::vocabularies::{
-        GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary,
+        GeometricVocabulary, Vocabulary, TopologicalVocabulary,
     };
 
     fn triad_test_graph() -> Graph {
@@ -467,7 +665,7 @@ mod tests {
         }
         g.add_topological_vocab(TopologicalVocabulary::canonical_for(3));
         g.add_geometric_vocab(GeometricVocabulary::canonical_for(3));
-        g.add_semantic_vocab(SemanticVocabulary::with_auto_id(
+        g.add_vocabulary(Vocabulary::with_auto_id(
             "Canonical Triad",
             3,
             vec![
@@ -481,15 +679,15 @@ mod tests {
                 "char_word_consent".into(),
             ],
         ));
-        g.add_perspective(Perspective::with_auto_id(
+        g.add_grammar(Grammar::for_order(3));
+        g.add_system(System::with_auto_id(
             "Canonical Triad",
             3,
             "Dynamism",
             "Impulses",
             "Acts",
-            "topvocab_3",
-            "geovocab_3",
-            "semvocab_canonical_triad_3",
+            "grammar_3",
+            "vocab_canonical_triad_3",
         ));
         g
     }
@@ -510,13 +708,13 @@ mod tests {
     fn test_character_at_point_and_line_via_join() {
         let g = triad_test_graph();
         assert_eq!(
-            g.character_at_point("semvocab_canonical_triad_3", "point_3_1")
+            g.character_at_point("vocab_canonical_triad_3", "point_3_1")
                 .unwrap()
                 .value,
             "Will"
         );
         assert_eq!(
-            g.character_at_line("semvocab_canonical_triad_3", "line_3_1_2")
+            g.character_at_line("vocab_canonical_triad_3", "line_3_1_2")
                 .unwrap()
                 .value,
             "Generation"
@@ -524,8 +722,8 @@ mod tests {
     }
 
     #[test]
-    fn test_perspective_validate_via_graph() {
+    fn test_system_validate_via_graph() {
         let g = triad_test_graph();
-        assert!(g.validate_perspective("perspective_canonical_triad_3").is_ok());
+        assert!(g.validate_system("system_canonical_triad_3").is_ok());
     }
 }

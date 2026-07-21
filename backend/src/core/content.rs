@@ -9,30 +9,49 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::citations::{Artefact, Lookup, Reference, Source};
 use super::entries::{Character, Coordinate};
 use super::perspectives::Perspective;
-use super::vocabularies::SemanticVocabulary;
+use super::systems::System;
+use super::vocabularies::Vocabulary;
 
 /// A portable slice of the data layer. Applied onto a substrate to populate it;
-/// snapshotted back out to persist.
+/// snapshotted back out to persist. (Grammars are deterministic per Order and
+/// seeded in code, so they are not part of persisted content.)
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct GraphContent {
     #[serde(default)]
     pub characters: Vec<Character>,
     #[serde(default)]
     pub coordinates: Vec<Coordinate>,
-    #[serde(default, rename = "semanticVocabs")]
-    pub semantic_vocabs: Vec<SemanticVocabulary>,
+    #[serde(default, rename = "vocabularies")]
+    pub vocabularies: Vec<Vocabulary>,
+    #[serde(default)]
+    pub systems: Vec<System>,
+    // -------- referencing layer (AD4M perspectives + citation triad) --------
     #[serde(default)]
     pub perspectives: Vec<Perspective>,
+    #[serde(default)]
+    pub sources: Vec<Source>,
+    #[serde(default)]
+    pub artefacts: Vec<Artefact>,
+    #[serde(default)]
+    pub lookups: Vec<Lookup>,
+    #[serde(default)]
+    pub references: Vec<Reference>,
 }
 
 impl GraphContent {
     pub fn is_empty(&self) -> bool {
         self.characters.is_empty()
             && self.coordinates.is_empty()
-            && self.semantic_vocabs.is_empty()
+            && self.vocabularies.is_empty()
+            && self.systems.is_empty()
             && self.perspectives.is_empty()
+            && self.sources.is_empty()
+            && self.artefacts.is_empty()
+            && self.lookups.is_empty()
+            && self.references.is_empty()
     }
 
     /// All entry IDs carried by this content (across every kind).
@@ -40,8 +59,13 @@ impl GraphContent {
         let mut ids = Vec::new();
         ids.extend(self.characters.iter().map(|c| c.id.clone()));
         ids.extend(self.coordinates.iter().map(|c| c.id.clone()));
-        ids.extend(self.semantic_vocabs.iter().map(|v| v.id.clone()));
-        ids.extend(self.perspectives.iter().map(|g| g.id.clone()));
+        ids.extend(self.vocabularies.iter().map(|v| v.id.clone()));
+        ids.extend(self.systems.iter().map(|s| s.id.clone()));
+        ids.extend(self.perspectives.iter().map(|p| p.id.clone()));
+        ids.extend(self.sources.iter().map(|s| s.id.clone()));
+        ids.extend(self.artefacts.iter().map(|a| a.id.clone()));
+        ids.extend(self.lookups.iter().map(|l| l.id.clone()));
+        ids.extend(self.references.iter().map(|r| r.id.clone()));
         ids
     }
 }

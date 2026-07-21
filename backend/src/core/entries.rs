@@ -13,7 +13,7 @@
 //! enabling unified iteration and queries across all entry kinds.
 //!
 //! Vocabulary layer (`TopologicalVocabulary`, `GeometricVocabulary`,
-//! `SemanticVocabulary`) and Perspective live in their own modules and hold
+//! `Vocabulary`) and Perspective live in their own modules and hold
 //! *references* into this substrate.
 
 use serde::{Deserialize, Serialize};
@@ -238,7 +238,7 @@ impl Segment {
 // =============================================================================
 
 /// A semantic value. Where a Character "lives" is determined by which
-/// SemanticVocabulary slot references its ID, not by any field on the
+/// Vocabulary slot references its ID, not by any field on the
 /// Character itself.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Character {
