@@ -1,0 +1,821 @@
+{
+  "characters": [],
+  "coordinates": [],
+  "vocabularies": [
+    {
+      "id": "vocab_dramatic_universe_i_monad_1",
+      "name": "Dramatic Universe I Monad",
+      "order": 1,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_dyad_2",
+      "name": "Dramatic Universe I Dyad",
+      "order": 2,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_triad_3",
+      "name": "Dramatic Universe I Triad",
+      "order": 3,
+      "terms": [
+        "char_word_function",
+        "char_word_being",
+        "char_word_will"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_tetrad_4",
+      "name": "Dramatic Universe I Tetrad",
+      "order": 4,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_pentad_5",
+      "name": "Dramatic Universe I Pentad",
+      "order": 5,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_hexad_6",
+      "name": "Dramatic Universe I Hexad",
+      "order": 6,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_heptad_7",
+      "name": "Dramatic Universe I Heptad",
+      "order": 7,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_octad_8",
+      "name": "Dramatic Universe I Octad",
+      "order": 8,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_ennead_9",
+      "name": "Dramatic Universe I Ennead",
+      "order": 9,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_decad_10",
+      "name": "Dramatic Universe I Decad",
+      "order": 10,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_undecad_11",
+      "name": "Dramatic Universe I Undecad",
+      "order": 11,
+      "terms": [],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dramatic_universe_i_dodecad_12",
+      "name": "Dramatic Universe I Dodecad",
+      "order": 12,
+      "terms": [],
+      "connectives": []
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_dramatic_universe_i_monad_1",
+      "name": "Dramatic Universe I Monad",
+      "order": 1,
+      "coherence": "Wholeness",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_dramatic_universe_i_monad_1"
+    },
+    {
+      "id": "system_dramatic_universe_i_dyad_2",
+      "name": "Dramatic Universe I Dyad",
+      "order": 2,
+      "coherence": "Polarity",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_dramatic_universe_i_dyad_2"
+    },
+    {
+      "id": "system_dramatic_universe_i_triad_3",
+      "name": "Dramatic Universe I Triad",
+      "order": 3,
+      "coherence": "Relatedness",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_dramatic_universe_i_triad_3"
+    },
+    {
+      "id": "system_dramatic_universe_i_tetrad_4",
+      "name": "Dramatic Universe I Tetrad",
+      "order": 4,
+      "coherence": "Subsistence",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_dramatic_universe_i_tetrad_4"
+    },
+    {
+      "id": "system_dramatic_universe_i_pentad_5",
+      "name": "Dramatic Universe I Pentad",
+      "order": 5,
+      "coherence": "Potentiality",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_dramatic_universe_i_pentad_5"
+    },
+    {
+      "id": "system_dramatic_universe_i_hexad_6",
+      "name": "Dramatic Universe I Hexad",
+      "order": 6,
+      "coherence": "Repetition",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_6",
+      "vocabulary_ref": "vocab_dramatic_universe_i_hexad_6"
+    },
+    {
+      "id": "system_dramatic_universe_i_heptad_7",
+      "name": "Dramatic Universe I Heptad",
+      "order": 7,
+      "coherence": "Structure",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_7",
+      "vocabulary_ref": "vocab_dramatic_universe_i_heptad_7"
+    },
+    {
+      "id": "system_dramatic_universe_i_octad_8",
+      "name": "Dramatic Universe I Octad",
+      "order": 8,
+      "coherence": "Individuality",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_8",
+      "vocabulary_ref": "vocab_dramatic_universe_i_octad_8"
+    },
+    {
+      "id": "system_dramatic_universe_i_ennead_9",
+      "name": "Dramatic Universe I Ennead",
+      "order": 9,
+      "coherence": "Pattern",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_9",
+      "vocabulary_ref": "vocab_dramatic_universe_i_ennead_9"
+    },
+    {
+      "id": "system_dramatic_universe_i_decad_10",
+      "name": "Dramatic Universe I Decad",
+      "order": 10,
+      "coherence": "Creativity",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_10",
+      "vocabulary_ref": "vocab_dramatic_universe_i_decad_10"
+    },
+    {
+      "id": "system_dramatic_universe_i_undecad_11",
+      "name": "Dramatic Universe I Undecad",
+      "order": 11,
+      "coherence": "Domination",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_11",
+      "vocabulary_ref": "vocab_dramatic_universe_i_undecad_11"
+    },
+    {
+      "id": "system_dramatic_universe_i_dodecad_12",
+      "name": "Dramatic Universe I Dodecad",
+      "order": 12,
+      "coherence": "Autocracy",
+      "term_designation": "",
+      "connective_designation": "",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_dramatic_universe_i_dodecad_12"
+    }
+  ],
+  "perspectives": [
+    {
+      "id": "perspective_dramatic_universe_vol_1",
+      "name": "Dramatic Universe Vol 1",
+      "links": [
+        {
+          "id": "link_4a11fb49e0ca44df",
+          "source": "system:system_dramatic_universe_i_monad_1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_7cd5f8f11a4998ad",
+          "source": "source:source_j_g__bennett",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy"
+        },
+        {
+          "id": "link_917f8650ed4904d2",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_3_wholeness__p_35"
+        },
+        {
+          "id": "link_a5290d0a1fbddd96",
+          "source": "system:system_dramatic_universe_i_monad_1#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_53eec748a7cbabb0",
+          "source": "system:system_dramatic_universe_i_dyad_2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_0f7ee2531e3518bd",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_4_polarity__p_37"
+        },
+        {
+          "id": "link_6abf7baeb8b9a572",
+          "source": "system:system_dramatic_universe_i_dyad_2#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_90483c39a00b1316",
+          "source": "system:system_dramatic_universe_i_triad_3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_2f44b948a3c9bfd4",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_5_relatedness__p_38"
+        },
+        {
+          "id": "link_c3d8903b24af0e60",
+          "source": "system:system_dramatic_universe_i_triad_3#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_0431cb272b90c4a6",
+          "source": "system:system_dramatic_universe_i_triad_3#term:1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_5c9e592595ada554",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56"
+        },
+        {
+          "id": "link_47feab24ce750ea7",
+          "source": "system:system_dramatic_universe_i_triad_3#term:2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_275be3b4032fe57f",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58"
+        },
+        {
+          "id": "link_1c99bb60e8b990eb",
+          "source": "system:system_dramatic_universe_i_triad_3#term:3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_e6ce80e5a49c33a2",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60"
+        },
+        {
+          "id": "link_dc5cf5cf6b3ca131",
+          "source": "system:system_dramatic_universe_i_tetrad_4",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_a52b27f1ab7dbb05",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_6_subsistence__p_40"
+        },
+        {
+          "id": "link_2b8a126ffce96805",
+          "source": "system:system_dramatic_universe_i_tetrad_4#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_a408fa4a3e793417",
+          "source": "system:system_dramatic_universe_i_pentad_5",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_e66ff37011d6ee01",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_7_potentiality__p_41"
+        },
+        {
+          "id": "link_727230a6c9638844",
+          "source": "system:system_dramatic_universe_i_pentad_5#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_cdf222026f78e9e5",
+          "source": "system:system_dramatic_universe_i_hexad_6",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_080be9915690374a",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_8_repetition__p_42"
+        },
+        {
+          "id": "link_21a284d64e6783b9",
+          "source": "system:system_dramatic_universe_i_hexad_6#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_1a05c4456c6725f2",
+          "source": "system:system_dramatic_universe_i_heptad_7",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_2d13c6f57d4dd411",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_9_structure__p_43"
+        },
+        {
+          "id": "link_0cf2d45852162547",
+          "source": "system:system_dramatic_universe_i_heptad_7#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_5fa908b3ecdd1a1d",
+          "source": "system:system_dramatic_universe_i_octad_8",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_13ec56cc400f05e9",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_10_individuality__p_45"
+        },
+        {
+          "id": "link_d821b23bc5979ad2",
+          "source": "system:system_dramatic_universe_i_octad_8#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_6c4df0489caede71",
+          "source": "system:system_dramatic_universe_i_ennead_9",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_d917f4e5b2d2b129",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_11_pattern__p_46"
+        },
+        {
+          "id": "link_0c843d3e1e9ae517",
+          "source": "system:system_dramatic_universe_i_ennead_9#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_6a61be1a19674dac",
+          "source": "system:system_dramatic_universe_i_decad_10",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_368ca834c0da2fce",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_12_creativity__p_47"
+        },
+        {
+          "id": "link_563baa23c93c5a22",
+          "source": "system:system_dramatic_universe_i_decad_10#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_7979eab5f2bc6b59",
+          "source": "system:system_dramatic_universe_i_undecad_11",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_bb957653fe68b939",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_13_domination__p_47"
+        },
+        {
+          "id": "link_dfed8eaba9d62a92",
+          "source": "system:system_dramatic_universe_i_undecad_11#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_b6f632c39d55bc2e",
+          "source": "system:system_dramatic_universe_i_dodecad_12",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_b026a1b53fee26fc",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_14_autocracy__p_48"
+        },
+        {
+          "id": "link_878c0599bd961bab",
+          "source": "system:system_dramatic_universe_i_dodecad_12#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source_j_g__bennett",
+      "name": "J.G. Bennett",
+      "kind": null,
+      "description": null
+    }
+  ],
+  "artefacts": [
+    {
+      "id": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "source_ref": "source_j_g__bennett",
+      "title": "The Dramatic Universe, Vol. 1: The Foundations of Natural Philosophy",
+      "kind": null,
+      "url": null
+    }
+  ],
+  "lookups": [
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_3_wholeness__p_35",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.3 Wholeness, p.35"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_4_polarity__p_37",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.4 Polarity, p.37"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_5_relatedness__p_38",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.5 Relatedness, p.38"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.3.3 Process and Function, p.56"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.3.4 Being as Togetherness, p.58"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.3.5 Will as the Active Element, p.60"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_6_subsistence__p_40",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.6 Subsistence, p.40"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_7_potentiality__p_41",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.7 Potentiality, p.41"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_8_repetition__p_42",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.8 Repetition, p.42"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_9_structure__p_43",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.9 Structure, p.43"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_10_individuality__p_45",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.10 Individuality, p.45"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_11_pattern__p_46",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.11 Pattern, p.46"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_12_creativity__p_47",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.12 Creativity, p.47"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_13_domination__p_47",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.13 Domination, p.47"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_14_autocracy__p_48",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.2.14 Autocracy, p.48"
+    }
+  ],
+  "references": [
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_monad_1_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_monad_1",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_3_wholeness__p_35",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_monad_1_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_monad_1#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_3_wholeness__p_35",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_dyad_2_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_dyad_2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_4_polarity__p_37",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_dyad_2_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_dyad_2#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_4_polarity__p_37",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_triad_3_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_triad_3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_5_relatedness__p_38",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_triad_3_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_triad_3#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_5_relatedness__p_38",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_triad_3_term_1_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_triad_3#term:1",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_triad_3_term_2_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_triad_3#term:2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_triad_3_term_3_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_triad_3#term:3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_tetrad_4_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_tetrad_4",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_6_subsistence__p_40",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_tetrad_4_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_tetrad_4#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_6_subsistence__p_40",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_pentad_5_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_pentad_5",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_7_potentiality__p_41",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_pentad_5_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_pentad_5#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_7_potentiality__p_41",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_hexad_6_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_hexad_6",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_8_repetition__p_42",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_hexad_6_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_hexad_6#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_8_repetition__p_42",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_heptad_7_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_heptad_7",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_9_structure__p_43",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_heptad_7_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_heptad_7#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_9_structure__p_43",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_octad_8_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_octad_8",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_10_individuality__p_45",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_octad_8_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_octad_8#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_10_individuality__p_45",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_ennead_9_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_ennead_9",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_11_pattern__p_46",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_ennead_9_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_ennead_9#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_11_pattern__p_46",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_decad_10_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_decad_10",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_12_creativity__p_47",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_decad_10_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_decad_10#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_12_creativity__p_47",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_undecad_11_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_undecad_11",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_13_domination__p_47",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_undecad_11_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_undecad_11#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_13_domination__p_47",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_dodecad_12_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_dodecad_12",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_14_autocracy__p_48",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_1_system_system_dramatic_universe_i_dodecad_12_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_1",
+      "target": "system:system_dramatic_universe_i_dodecad_12#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_2_14_autocracy__p_48",
+      "note": null
+    }
+  ]
+}

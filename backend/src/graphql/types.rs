@@ -354,8 +354,20 @@ impl QueryRoot {
         g.reference(&id).map(|r| GqlReference::new(r.clone()))
     }
 
-    /// All References citing the given Expression address (term / connective /
-    /// system / series).
+    /// Every reference in the graph — for the reference browser (sort/filter by
+    /// source · artefact · system · lookup client-side).
+    async fn all_references(&self, ctx: &Context<'_>) -> Vec<GqlReference> {
+        let g = graph_snapshot(ctx).await;
+        g.references.iter().map(|r| GqlReference::new(r.clone())).collect()
+    }
+
+    /// A Perspective exported as a self-contained, loadable JSON module
+    /// (`GraphContent` shape) — "turn a perspective into a file".
+    async fn export_perspective(&self, ctx: &Context<'_>, id: String) -> String {
+        let g = graph_snapshot(ctx).await;
+        serde_json::to_string_pretty(&g.export_perspective(&id)).unwrap_or_else(|_| "{}".into())
+    }
+
     /// References citing this exact address. Set `includeDescendants: true` to
     /// roll up everything nested under a container address (e.g. a whole system
     /// sums its node/edge citations).

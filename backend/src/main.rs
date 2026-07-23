@@ -81,8 +81,15 @@ fn init_tracing() {
 /// so mutations (Functor CRUD, applyFunctor) persist across requests within
 /// a single process. Restarting the process resets to seed state.
 fn build_api_router() -> Router {
-    // Build the canonical graph, then merge the writable user store over it.
+    // Build the canonical graph, load durable perspective modules, then merge
+    // the writable user store over it.
     let mut graph = data::build_graph();
+    let modules = data::load_perspective_modules(&mut graph);
+    if modules > 0 {
+        // Re-mark: bundled perspective modules are durable, not user-store data.
+        graph.mark_canonical();
+        tracing::info!("Loaded {} perspective module(s) from ./data/perspectives", modules);
+    }
     let store_path = persistence::resolve_store_path();
     if let Err(e) = persistence::load_into(&mut graph, &store_path) {
         tracing::error!("failed to load user store from {}: {}", store_path.display(), e);

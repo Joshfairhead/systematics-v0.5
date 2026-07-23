@@ -29,6 +29,37 @@ pub fn citation_content() -> GraphContent {
     serde_json::from_str(CITATION_JSON).expect("data/citation.json is valid GraphContent")
 }
 
+/// Load every `./data/perspectives/*.json` module (relative to the process cwd)
+/// onto the graph. Each file is an exported Perspective bundle — a durable,
+/// modular alternative to the single ephemeral user store; one source = one
+/// file, load a single file or the whole directory (a sequence). A missing
+/// directory is fine (returns 0). Call before `mark_canonical` to bundle them.
+pub fn load_perspective_modules(graph: &mut Graph) -> usize {
+    let dir = std::path::Path::new("./data/perspectives");
+    let mut paths: Vec<std::path::PathBuf> = match std::fs::read_dir(dir) {
+        Ok(rd) => rd
+            .filter_map(|e| e.ok().map(|e| e.path()))
+            .filter(|p| p.extension().and_then(|x| x.to_str()) == Some("json"))
+            .collect(),
+        Err(_) => return 0,
+    };
+    paths.sort();
+    let mut loaded = 0;
+    for p in paths {
+        match std::fs::read_to_string(&p)
+            .ok()
+            .and_then(|s| serde_json::from_str::<GraphContent>(&s).ok())
+        {
+            Some(content) => {
+                graph.apply_content(&content);
+                loaded += 1;
+            }
+            None => eprintln!("skipped invalid perspective module {}", p.display()),
+        }
+    }
+    loaded
+}
+
 /// Build the complete graph with all systems (1-12).
 ///
 /// The combinatoric substrate (Order, Position, Point, Line, Segment, and the

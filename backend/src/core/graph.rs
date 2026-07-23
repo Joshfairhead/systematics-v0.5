@@ -395,6 +395,53 @@ impl Graph {
             .collect()
     }
 
+    /// A self-contained `GraphContent` module for one Perspective: the
+    /// perspective itself, its references, and the (non-canonical) sources,
+    /// artefacts, lookups, systems, vocabularies and characters they reach.
+    /// Canonical entities (already bundled in `canonical.json`) are excluded, so
+    /// the module is a portable, loadable file — one source = one file.
+    pub fn export_perspective(&self, perspective_id: &str) -> GraphContent {
+        let mut out = GraphContent::default();
+        let Some(persp) = self.perspectives.iter().find(|p| p.id == perspective_id) else {
+            return out;
+        };
+        out.perspectives.push(persp.clone());
+
+        let is_user = |id: &str| !self.canonical_ids.contains(id);
+        let (mut src, mut art, mut lk, mut sys) =
+            (HashSet::new(), HashSet::new(), HashSet::new(), HashSet::new());
+        for r in self.references.iter().filter(|r| r.perspective_ref == perspective_id) {
+            out.references.push(r.clone());
+            src.insert(r.source_ref.clone());
+            if let Some(a) = &r.artefact_ref { art.insert(a.clone()); }
+            if let Some(l) = &r.lookup_ref { lk.insert(l.clone()); }
+            if let Some(rest) = r.target.strip_prefix("system:") {
+                sys.insert(rest.split('#').next().unwrap_or(rest).to_string());
+            }
+        }
+        out.sources = self.sources.iter().filter(|s| src.contains(&s.id)).cloned().collect();
+        out.artefacts = self.artefacts.iter().filter(|a| art.contains(&a.id)).cloned().collect();
+        out.lookups = self.lookups.iter().filter(|l| lk.contains(&l.id)).cloned().collect();
+
+        let mut vocab = HashSet::new();
+        for s in self.systems.iter().filter(|s| sys.contains(&s.id) && is_user(&s.id)) {
+            out.systems.push(s.clone());
+            vocab.insert(s.vocabulary_ref.clone());
+        }
+        let mut chars = HashSet::new();
+        for v in self.vocabularies.iter().filter(|v| vocab.contains(&v.id)) {
+            out.vocabularies.push(v.clone());
+            chars.extend(v.terms.iter().chain(v.connectives.iter()).cloned());
+        }
+        out.characters = self
+            .characters(None)
+            .into_iter()
+            .filter(|c| chars.contains(&c.id) && is_user(&c.id))
+            .cloned()
+            .collect();
+        out
+    }
+
     /// All Links (across every Perspective) touching the given address as
     /// either source or target.
     pub fn links_for(&self, address: &str) -> Vec<&super::perspectives::Link> {
