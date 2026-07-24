@@ -16,6 +16,7 @@
 pub mod citations;
 pub mod content;
 pub mod entries;
+pub mod functors;
 pub mod grammar;
 pub mod graph;
 pub mod links;
@@ -34,6 +35,8 @@ pub use vocabularies::{GeometricVocabulary, Vocabulary, TopologicalVocabulary};
 pub use grammar::Grammar;
 
 pub use systems::System;
+
+pub use functors::Functor;
 
 pub use perspectives::{Link as PerspectiveLink, Perspective};
 

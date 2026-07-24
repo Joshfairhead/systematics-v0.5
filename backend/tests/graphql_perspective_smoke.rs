@@ -149,6 +149,7 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
         "Character",
         "Vocabulary",
         "System",
+        "Functor",
         "Perspective",
         "Link",
         "Source",

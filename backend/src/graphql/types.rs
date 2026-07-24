@@ -7,8 +7,8 @@ use async_graphql::*;
 use tokio::sync::RwLock;
 
 use crate::core::{
-    Artefact, Character, Coordinate, Entry, GeometricVocabulary, Grammar, Graph, Line, Lookup,
-    Order, Perspective, PerspectiveLink, Point, Position, Reference, Vocabulary, Segment,
+    Artefact, Character, Coordinate, Entry, Functor, GeometricVocabulary, Grammar, Graph, Line,
+    Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Vocabulary, Segment,
     Source, System, TopologicalVocabulary,
 };
 
@@ -268,6 +268,27 @@ impl QueryRoot {
     async fn validate_system(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
         let g = graph_snapshot(ctx).await;
         g.validate_system(&id).err().unwrap_or_default()
+    }
+
+    // -------- Functors (same-grammar morphisms between Systems) --------
+
+    /// A single stored Functor by id.
+    async fn functor(&self, ctx: &Context<'_>, id: String) -> Option<GqlFunctor> {
+        let g = graph_snapshot(ctx).await;
+        g.functor(&id).cloned().map(GqlFunctor::new)
+    }
+
+    /// All stored Functors.
+    async fn functors(&self, ctx: &Context<'_>) -> Vec<GqlFunctor> {
+        let g = graph_snapshot(ctx).await;
+        g.functors().iter().cloned().map(GqlFunctor::new).collect()
+    }
+
+    /// Advisory validation of a Functor (permutation laws + resolved systems).
+    /// Empty vec = valid; otherwise the reasons it is not a functor.
+    async fn validate_functor(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
+        let g = graph_snapshot(ctx).await;
+        g.validate_functor(&id).err().unwrap_or_default()
     }
 
     // -------- resolved RenderedSystem (a System resolved into a bound K-graph) --------
@@ -825,6 +846,90 @@ impl MutationRoot {
         removed
     }
 
+    // -------- Functors (same-grammar morphisms between Systems) --------
+
+    async fn create_functor(
+        &self,
+        ctx: &Context<'_>,
+        input: FunctorInput,
+    ) -> async_graphql::Result<GqlFunctor> {
+        let functor = input.into_functor();
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.functor(&functor.id).is_some() {
+            return Err(Error::new(format!("Functor '{}' already exists", functor.id)));
+        }
+        graph.add_functor(functor.clone());
+        persist(ctx, &graph);
+        Ok(GqlFunctor::new(functor))
+    }
+
+    async fn update_functor(
+        &self,
+        ctx: &Context<'_>,
+        id: String,
+        input: FunctorInput,
+    ) -> async_graphql::Result<GqlFunctor> {
+        let mut functor = input.into_functor();
+        functor.id = id.clone();
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.update_functor(functor.clone()).is_none() {
+            return Err(Error::new(format!("Functor '{}' not found", id)));
+        }
+        persist(ctx, &graph);
+        Ok(GqlFunctor::new(functor))
+    }
+
+    async fn delete_functor(&self, ctx: &Context<'_>, id: String) -> bool {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        let removed = graph.delete_functor(&id).is_some();
+        if removed {
+            persist(ctx, &graph);
+        }
+        removed
+    }
+
+    /// Transform a Perspective by a Functor, materialising and storing a new
+    /// Perspective whose addresses over the functor's source system are remapped
+    /// to its target system. Returns the new Perspective.
+    async fn apply_functor(
+        &self,
+        ctx: &Context<'_>,
+        functor_ref: String,
+        perspective_ref: String,
+        new_id: Option<String>,
+        new_name: String,
+    ) -> async_graphql::Result<GqlPerspective> {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+
+        let new_id = new_id.unwrap_or_else(|| {
+            let slug: String = new_name
+                .to_lowercase()
+                .chars()
+                .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                .collect();
+            format!("perspective_{slug}")
+        });
+        if graph.perspective(&new_id).is_some() {
+            return Err(Error::new(format!("Perspective '{new_id}' already exists")));
+        }
+
+        let new_persp = graph
+            .apply_functor(&functor_ref, &perspective_ref, new_id, new_name)
+            .ok_or_else(|| {
+                Error::new(format!(
+                    "apply_functor: functor '{functor_ref}' or perspective '{perspective_ref}' not found"
+                ))
+            })?;
+
+        graph.add_perspective(new_persp.clone());
+        persist(ctx, &graph);
+        Ok(GqlPerspective::new(new_persp))
+    }
+
     // -------- referencing layer: perspectives (webs) + citations --------
 
     async fn create_perspective(
@@ -1333,6 +1438,38 @@ impl GqlSystem {
     }
 }
 
+pub struct GqlFunctor {
+    inner: Functor,
+}
+impl GqlFunctor {
+    pub fn new(inner: Functor) -> Self {
+        Self { inner }
+    }
+}
+#[Object]
+impl GqlFunctor {
+    async fn id(&self) -> &str {
+        &self.inner.id
+    }
+    async fn name(&self) -> &str {
+        &self.inner.name
+    }
+    async fn order(&self) -> i32 {
+        self.inner.order as i32
+    }
+    async fn source_ref(&self) -> &str {
+        &self.inner.source_ref
+    }
+    async fn target_ref(&self) -> &str {
+        &self.inner.target_ref
+    }
+    /// The object map: `permutation[i]` is the 1-based target position of source
+    /// position `i + 1`.
+    async fn permutation(&self) -> Vec<i32> {
+        self.inner.permutation.iter().map(|&p| p as i32).collect()
+    }
+}
+
 // ============================================================================
 // Input types
 // ============================================================================
@@ -1417,6 +1554,41 @@ impl SystemInput {
                 self.vocabulary_ref,
             ),
         }
+    }
+}
+
+#[derive(InputObject)]
+pub struct FunctorInput {
+    pub id: Option<String>,
+    pub name: String,
+    pub order: i32,
+    pub source_ref: String,
+    pub target_ref: String,
+    /// The object map: `permutation[i]` is the 1-based target position of source
+    /// position `i + 1`. Validate with `validateFunctor` after creating.
+    pub permutation: Vec<i32>,
+}
+
+impl FunctorInput {
+    fn into_functor(self) -> Functor {
+        let permutation: Vec<u8> = self.permutation.iter().map(|&p| p as u8).collect();
+        let id = self.id.unwrap_or_else(|| {
+            let slug: String = self
+                .name
+                .to_lowercase()
+                .chars()
+                .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                .collect();
+            format!("functor_{slug}")
+        });
+        Functor::new(
+            id,
+            self.name,
+            self.order as u8,
+            self.source_ref,
+            self.target_ref,
+            permutation,
+        )
     }
 }
 

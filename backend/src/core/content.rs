@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use super::citations::{Artefact, Lookup, Reference, Source};
 use super::entries::{Character, Coordinate};
+use super::functors::Functor;
 use super::perspectives::Perspective;
 use super::systems::System;
 use super::vocabularies::Vocabulary;
@@ -39,6 +40,10 @@ pub struct GraphContent {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
+    /// Same-grammar functors (position permutations between systems of one
+    /// Order). User-created transforms, persisted like systems/references.
+    #[serde(default)]
+    pub functors: Vec<Functor>,
     /// External addresses this content depends on but does not own (canonical
     /// systems, sibling perspectives, shared citation entities). Advisory:
     /// populated by `Graph::export_perspective` so a module records what must be
@@ -73,6 +78,7 @@ impl GraphContent {
         ids.extend(self.artefacts.iter().map(|a| a.id.clone()));
         ids.extend(self.lookups.iter().map(|l| l.id.clone()));
         ids.extend(self.references.iter().map(|r| r.id.clone()));
+        ids.extend(self.functors.iter().map(|f| f.id.clone()));
         ids
     }
 }

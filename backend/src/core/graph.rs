@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
 use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
+use super::functors::Functor;
 use super::grammar::Grammar;
 use super::perspectives::Perspective;
 use super::systems::System;
@@ -47,6 +48,9 @@ pub struct Graph {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
+    /// Same-grammar functors: position permutations between systems of one Order.
+    #[serde(default)]
+    pub functors: Vec<Functor>,
     /// IDs of the immutable canonical *archetypes* (the seed: the 12 per-order
     /// systems + the citation triad + their vocabularies/characters). Runtime
     /// only, never serialised. This is the "do not copy me into a module file"
@@ -304,6 +308,93 @@ impl Graph {
     pub fn delete_system(&mut self, id: &str) -> Option<System> {
         let idx = self.systems.iter().position(|s| s.id == id)?;
         Some(self.systems.remove(idx))
+    }
+
+    // -------- Functors (same-grammar morphisms between Systems) --------
+
+    pub fn functor(&self, id: &str) -> Option<&Functor> {
+        self.functors.iter().find(|f| f.id == id)
+    }
+
+    pub fn functors(&self) -> &[Functor] {
+        &self.functors
+    }
+
+    pub fn add_functor(&mut self, functor: Functor) {
+        self.functors.push(functor);
+    }
+
+    pub fn update_functor(&mut self, functor: Functor) -> Option<Functor> {
+        let idx = self.functors.iter().position(|f| f.id == functor.id)?;
+        Some(std::mem::replace(&mut self.functors[idx], functor))
+    }
+
+    pub fn delete_functor(&mut self, id: &str) -> Option<Functor> {
+        let idx = self.functors.iter().position(|f| f.id == id)?;
+        Some(self.functors.remove(idx))
+    }
+
+    /// Advisory validation of a stored Functor, resolved against the graph
+    /// (mirrors `validate_system`): the permutation laws hold, both referenced
+    /// systems exist, and all three orders agree. Returns the reasons on failure.
+    pub fn validate_functor(&self, id: &str) -> Result<(), Vec<String>> {
+        let Some(f) = self.functor(id) else {
+            return Err(vec![format!("Functor '{id}' not found")]);
+        };
+        let mut errs = match f.validate() {
+            Ok(()) => Vec::new(),
+            Err(e) => e,
+        };
+        for (role, sref) in [("source", &f.source_ref), ("target", &f.target_ref)] {
+            match self.system(sref) {
+                Some(s) if s.order != f.order => errs.push(format!(
+                    "Functor {}: {} system '{}' has order {}, expected {}",
+                    f.id, role, sref, s.order, f.order
+                )),
+                Some(_) => {}
+                None => errs.push(format!(
+                    "Functor {}: {} system '{}' not found",
+                    f.id, role, sref
+                )),
+            }
+        }
+        if errs.is_empty() {
+            Ok(())
+        } else {
+            Err(errs)
+        }
+    }
+
+    /// Apply a functor to a source Perspective, materialising a *new* Perspective
+    /// whose links are the source's with every address over the functor's source
+    /// system remapped to the target system (`Transform(perspective, functor)`).
+    /// Pure — computes but does not store the result; returns `None` if either
+    /// the functor or the perspective is missing.
+    pub fn apply_functor(
+        &self,
+        functor_id: &str,
+        perspective_id: &str,
+        new_id: impl Into<String>,
+        new_name: impl Into<String>,
+    ) -> Option<Perspective> {
+        let f = self.functor(functor_id)?;
+        let src = self.perspective(perspective_id)?;
+        let new_id = new_id.into();
+        let links = src
+            .links
+            .iter()
+            .map(|l| super::perspectives::Link {
+                id: format!("{}_{}", new_id, l.id),
+                source: f.map_address(&l.source),
+                predicate: l.predicate.clone(),
+                target: f.map_address(&l.target),
+            })
+            .collect();
+        Some(Perspective {
+            id: new_id,
+            name: new_name.into(),
+            links,
+        })
     }
 
     // ==========================================================================
@@ -665,6 +756,11 @@ impl Graph {
         for r in &content.references {
             self.upsert_reference(r.clone());
         }
+        for f in &content.functors {
+            if self.update_functor(f.clone()).is_none() {
+                self.add_functor(f.clone());
+            }
+        }
     }
 
     /// Snapshot the entire data layer as a content bundle.
@@ -679,6 +775,7 @@ impl Graph {
             artefacts: self.artefacts.clone(),
             lookups: self.lookups.clone(),
             references: self.references.clone(),
+            functors: self.functors.clone(),
             manifest: Vec::new(),
         }
     }
@@ -759,6 +856,12 @@ impl Graph {
                 .references
                 .iter()
                 .filter(|r| is_user(&r.id))
+                .cloned()
+                .collect(),
+            functors: self
+                .functors
+                .iter()
+                .filter(|f| is_user(&f.id))
                 .cloned()
                 .collect(),
             manifest: Vec::new(),
