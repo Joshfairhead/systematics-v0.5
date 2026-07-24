@@ -12,11 +12,10 @@
 //!
 //! Any drift here is a regression in module loading or referential composition.
 //!
-//! NB: `load_perspective_modules` reads `./data/perspectives` relative to the
-//! process cwd. Cargo runs a package's integration tests with cwd = the package
-//! root (`backend/`), so the path resolves to `backend/data/perspectives`. If a
-//! future change breaks that coupling this test fails loudly — which is the
-//! point (it is exactly the cwd fragility the plan calls out as defect #5).
+//! `load_perspective_modules` resolves modules from the source tree via the
+//! compile-time `CARGO_MANIFEST_DIR` (cwd-independent) in dev/CI, and from the
+//! copy embedded via `include_dir!` when deployed — so this test does not depend
+//! on the process working directory (defect #5, fixed in Step 4).
 
 use systematics_backend::core::Graph;
 use systematics_backend::data;

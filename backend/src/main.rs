@@ -90,7 +90,7 @@ fn build_api_router() -> Router {
         // canonical archetypes — mark them bundled so they can still be edited
         // and re-exported losslessly.
         graph.mark_bundled();
-        tracing::info!("Loaded {} perspective module(s) from ./data/perspectives", modules);
+        tracing::info!("Loaded {} perspective module(s)", modules);
     }
     let store_path = persistence::resolve_store_path();
     if let Err(e) = persistence::load_into(&mut graph, &store_path) {

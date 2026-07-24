@@ -29,34 +29,78 @@ pub fn citation_content() -> GraphContent {
     serde_json::from_str(CITATION_JSON).expect("data/citation.json is valid GraphContent")
 }
 
-/// Load every `./data/perspectives/*.json` module (relative to the process cwd)
-/// onto the graph. Each file is an exported Perspective bundle — a durable,
-/// modular alternative to the single ephemeral user store; one source = one
-/// file, load a single file or the whole directory (a sequence). A missing
-/// directory is fine (returns 0). Follow with `mark_bundled` so the modules are
-/// kept out of the user store yet stay editable / re-exportable (unlike the
-/// canonical seed, which is marked with `mark_canonical`).
+/// The perspective module files, embedded into the binary at build time (like
+/// the canonical/citation seed). This is what a deployed build serves — no
+/// runtime filesystem, volume or working-directory assumption required.
+static EMBEDDED_MODULES: include_dir::Dir<'static> =
+    include_dir::include_dir!("$CARGO_MANIFEST_DIR/data/perspectives");
+
+/// Load every perspective module (`*.json`) onto the graph. Each file is an
+/// exported Perspective bundle — a durable, modular alternative to the single
+/// ephemeral user store; one source = one file. Follow with `mark_bundled` so
+/// the modules are kept out of the user store yet stay editable / re-exportable
+/// (unlike the canonical seed, which is marked with `mark_canonical`).
+///
+/// Source resolution, in order:
+///   1. `$SYSTEMATICS_DATA/perspectives` if that env var is set,
+///   2. the source tree (`$CARGO_MANIFEST_DIR/data/perspectives`) — present when
+///      the binary runs on its build machine (local dev, `cargo test`, CI), so
+///      edits are picked up live without a rebuild,
+///   3. otherwise the copy embedded at build time — the deployed path.
+///
+/// Returns the number of modules applied.
 pub fn load_perspective_modules(graph: &mut Graph) -> usize {
-    let dir = std::path::Path::new("./data/perspectives");
-    let mut paths: Vec<std::path::PathBuf> = match std::fs::read_dir(dir) {
-        Ok(rd) => rd
-            .filter_map(|e| e.ok().map(|e| e.path()))
-            .filter(|p| p.extension().and_then(|x| x.to_str()) == Some("json"))
-            .collect(),
-        Err(_) => return 0,
-    };
-    paths.sort();
+    let fs_dir = std::env::var_os("SYSTEMATICS_DATA")
+        .map(|root| std::path::PathBuf::from(root).join("perspectives"))
+        .unwrap_or_else(|| {
+            std::path::PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/perspectives"))
+        });
+
+    match std::fs::read_dir(&fs_dir) {
+        Ok(rd) => {
+            let mut paths: Vec<std::path::PathBuf> = rd
+                .filter_map(|e| e.ok().map(|e| e.path()))
+                .filter(|p| p.extension().and_then(|x| x.to_str()) == Some("json"))
+                .collect();
+            paths.sort();
+            let mut loaded = 0;
+            for p in paths {
+                match std::fs::read_to_string(&p)
+                    .ok()
+                    .and_then(|s| serde_json::from_str::<GraphContent>(&s).ok())
+                {
+                    Some(content) => {
+                        graph.apply_content(&content);
+                        loaded += 1;
+                    }
+                    None => eprintln!("skipped invalid perspective module {}", p.display()),
+                }
+            }
+            loaded
+        }
+        // Deployed build: no source tree on disk — use the embedded copy.
+        Err(_) => load_embedded_modules(graph),
+    }
+}
+
+/// Apply the perspective modules embedded into the binary at build time.
+fn load_embedded_modules(graph: &mut Graph) -> usize {
+    let mut files: Vec<&include_dir::File> = EMBEDDED_MODULES
+        .files()
+        .filter(|f| f.path().extension().and_then(|x| x.to_str()) == Some("json"))
+        .collect();
+    files.sort_by(|a, b| a.path().cmp(b.path()));
     let mut loaded = 0;
-    for p in paths {
-        match std::fs::read_to_string(&p)
-            .ok()
-            .and_then(|s| serde_json::from_str::<GraphContent>(&s).ok())
+    for f in files {
+        match f
+            .contents_utf8()
+            .and_then(|s| serde_json::from_str::<GraphContent>(s).ok())
         {
             Some(content) => {
                 graph.apply_content(&content);
                 loaded += 1;
             }
-            None => eprintln!("skipped invalid perspective module {}", p.display()),
+            None => eprintln!("skipped invalid embedded perspective module {}", f.path().display()),
         }
     }
     loaded
