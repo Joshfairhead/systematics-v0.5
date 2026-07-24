@@ -86,8 +86,10 @@ fn build_api_router() -> Router {
     let mut graph = data::build_graph();
     let modules = data::load_perspective_modules(&mut graph);
     if modules > 0 {
-        // Re-mark: bundled perspective modules are durable, not user-store data.
-        graph.mark_canonical();
+        // Perspective modules are durable (kept out of the user store) but not
+        // canonical archetypes — mark them bundled so they can still be edited
+        // and re-exported losslessly.
+        graph.mark_bundled();
         tracing::info!("Loaded {} perspective module(s) from ./data/perspectives", modules);
     }
     let store_path = persistence::resolve_store_path();

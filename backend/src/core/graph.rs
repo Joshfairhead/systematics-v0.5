@@ -47,10 +47,20 @@ pub struct Graph {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
-    /// IDs of content that came from the canonical seed. Runtime-only; used to
-    /// separate user additions from canonical when persisting. Never serialised.
+    /// IDs of the immutable canonical *archetypes* (the seed: the 12 per-order
+    /// systems + the citation triad + their vocabularies/characters). Runtime
+    /// only, never serialised. This is the "do not copy me into a module file"
+    /// set used by `export_perspective` — it must NOT include module content, or
+    /// re-exporting a loaded module would drop the module's own systems.
     #[serde(skip)]
     canonical_ids: HashSet<String>,
+    /// IDs of everything sourced from a *file* (the canonical seed AND the loaded
+    /// perspective modules). Runtime only, never serialised. This is the "already
+    /// durable elsewhere, so don't write me to the user store" set used by
+    /// `user_content`. A superset of `canonical_ids`. Module content is bundled
+    /// (durable) but *not* canonical (still editable / re-exportable).
+    #[serde(skip)]
+    bundled_ids: HashSet<String>,
 }
 
 impl Graph {
@@ -593,16 +603,29 @@ impl Graph {
         }
     }
 
-    /// Mark everything currently in the data layer as canonical. Called once
-    /// after the canonical seed is applied, before any user store is loaded.
+    /// Mark everything currently in the data layer as canonical (an immutable
+    /// archetype) *and* bundled. Called once after the canonical seed is applied,
+    /// before modules or any user store are loaded.
     pub fn mark_canonical(&mut self) {
-        self.canonical_ids = self.content_snapshot().ids().into_iter().collect();
+        let ids: HashSet<String> = self.content_snapshot().ids().into_iter().collect();
+        self.bundled_ids.extend(ids.iter().cloned());
+        self.canonical_ids = ids;
     }
 
-    /// The user-added slice of the data layer (everything whose id is not
-    /// canonical). This is what gets persisted.
+    /// Mark everything currently in the data layer as *bundled* (durable, sourced
+    /// from a file) without marking it canonical. Called after perspective
+    /// modules are loaded: their content must be kept out of the writable user
+    /// store (like canonical content), but it is not an immutable archetype, so
+    /// `export_perspective` may still re-emit a module's own entities losslessly.
+    pub fn mark_bundled(&mut self) {
+        self.bundled_ids.extend(self.content_snapshot().ids());
+    }
+
+    /// The user-added slice of the data layer (everything not already durable in
+    /// a file — neither canonical seed nor a loaded module). This is what gets
+    /// persisted to the user store.
     pub fn user_content(&self) -> GraphContent {
-        let is_user = |id: &str| !self.canonical_ids.contains(id);
+        let is_user = |id: &str| !self.bundled_ids.contains(id);
         GraphContent {
             characters: self
                 .characters(None)

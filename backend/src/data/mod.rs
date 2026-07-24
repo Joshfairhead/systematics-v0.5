@@ -33,7 +33,9 @@ pub fn citation_content() -> GraphContent {
 /// onto the graph. Each file is an exported Perspective bundle — a durable,
 /// modular alternative to the single ephemeral user store; one source = one
 /// file, load a single file or the whole directory (a sequence). A missing
-/// directory is fine (returns 0). Call before `mark_canonical` to bundle them.
+/// directory is fine (returns 0). Follow with `mark_bundled` so the modules are
+/// kept out of the user store yet stay editable / re-exportable (unlike the
+/// canonical seed, which is marked with `mark_canonical`).
 pub fn load_perspective_modules(graph: &mut Graph) -> usize {
     let dir = std::path::Path::new("./data/perspectives");
     let mut paths: Vec<std::path::PathBuf> = match std::fs::read_dir(dir) {

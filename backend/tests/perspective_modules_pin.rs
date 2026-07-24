@@ -50,8 +50,9 @@ fn assembled_graph() -> (Graph, usize) {
     let mut graph = data::build_graph();
     let modules = data::load_perspective_modules(&mut graph);
     if modules > 0 {
-        // Bundled perspective modules are durable, not user-store data.
-        graph.mark_canonical();
+        // Modules are durable (kept out of the user store) but not canonical
+        // archetypes — mirrors main.rs::build_api_router.
+        graph.mark_bundled();
     }
     (graph, modules)
 }
