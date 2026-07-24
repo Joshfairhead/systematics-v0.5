@@ -930,6 +930,35 @@ impl MutationRoot {
         Ok(GqlPerspective::new(new_persp))
     }
 
+    /// Load (E/L/T's receptive impulse): merge an exported perspective module
+    /// bundle (the JSON `exportPerspective` returns) into the working graph.
+    /// The merged content becomes user content (persisted to the writable store,
+    /// so it survives a restart) — export it to a `data/perspectives/*.json` file
+    /// to make it a permanent, bundled module. Manifest dependencies that don't
+    /// resolve are returned as warnings, not errors (dangling is tolerated; load
+    /// their home modules to resolve them).
+    async fn load_perspective(
+        &self,
+        ctx: &Context<'_>,
+        bundle: String,
+    ) -> async_graphql::Result<GqlLoadReport> {
+        let content: crate::core::GraphContent = serde_json::from_str(&bundle)
+            .map_err(|e| Error::new(format!("invalid perspective bundle: {e}")))?;
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        graph.apply_content(&content);
+        persist(ctx, &graph);
+
+        let loaded = content.perspectives.iter().map(|p| p.id.clone()).collect();
+        let unresolved = content
+            .manifest
+            .iter()
+            .filter(|a| !graph.resolves(a))
+            .cloned()
+            .collect();
+        Ok(GqlLoadReport { loaded, unresolved })
+    }
+
     // -------- referencing layer: perspectives (webs) + citations --------
 
     async fn create_perspective(
@@ -1468,6 +1497,16 @@ impl GqlFunctor {
     async fn permutation(&self) -> Vec<i32> {
         self.inner.permutation.iter().map(|&p| p as i32).collect()
     }
+}
+
+/// Outcome of `loadPerspective`: what merged, and which manifest dependencies
+/// remain unresolved (dangling — tolerated, load their home modules to resolve).
+#[derive(SimpleObject)]
+pub struct GqlLoadReport {
+    /// Perspective ids merged into the graph.
+    pub loaded: Vec<String>,
+    /// Manifest addresses that don't resolve in the current graph.
+    pub unresolved: Vec<String>,
 }
 
 // ============================================================================

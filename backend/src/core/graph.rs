@@ -397,6 +397,29 @@ impl Graph {
         })
     }
 
+    /// Does an address resolve to an entity currently in the graph? Used by the
+    /// Load primitive to warn about dangling manifest dependencies (which are
+    /// tolerated, per the referential model, not errors).
+    pub fn resolves(&self, address: &str) -> bool {
+        let Some((kind, rest)) = address.split_once(':') else {
+            return false;
+        };
+        let id = rest.split('#').next().unwrap_or(rest);
+        match kind {
+            "system" => self.system(id).is_some(),
+            "perspective" => self.perspective(id).is_some(),
+            "vocab" => self.vocabulary(id).is_some(),
+            "source" => self.source(id).is_some(),
+            "artefact" => self.artefact(id).is_some(),
+            "lookup" => self.lookup(id).is_some(),
+            "grammar" => id
+                .parse::<u8>()
+                .ok()
+                .is_some_and(|o| self.grammar_for_order(o).is_some()),
+            _ => false,
+        }
+    }
+
     // ==========================================================================
     // Referencing layer: Perspectives (webs) + citation triad
     // ==========================================================================
