@@ -1,0 +1,151 @@
+//! Pin test — locks in the current perspective-module load behaviour BEFORE the
+//! composable-perspectives refactor (docs/plans/composable-perspectives.md,
+//! Step 1). Nothing in that plan moves until this is green, and it re-runs after
+//! every subsequent step.
+//!
+//! It reproduces `main.rs::build_api_router` exactly — `build_graph()` →
+//! `load_perspective_modules()` → second `mark_canonical()` — and asserts:
+//!   * the 14 committed module files load,
+//!   * all 68 references resolve to an existing System (the target's system id
+//!     is present in the graph), and
+//!   * the 16 module-owned systems are all present.
+//!
+//! Any drift here is a regression in module loading or referential composition.
+//!
+//! NB: `load_perspective_modules` reads `./data/perspectives` relative to the
+//! process cwd. Cargo runs a package's integration tests with cwd = the package
+//! root (`backend/`), so the path resolves to `backend/data/perspectives`. If a
+//! future change breaks that coupling this test fails loudly — which is the
+//! point (it is exactly the cwd fragility the plan calls out as defect #5).
+
+use systematics_backend::core::Graph;
+use systematics_backend::data;
+
+/// The 16 systems that live in (are owned by) the perspective module files:
+/// DU1's 12 systemic-attribute systems, DU2's 3 systems, and the Elementary
+/// Systematics triad. Canonical (12) and citation (1) systems are seeded
+/// separately and are *not* in this list.
+const MODULE_OWNED_SYSTEMS: &[&str] = &[
+    "system_dramatic_universe_i_monad_1",
+    "system_dramatic_universe_i_dyad_2",
+    "system_dramatic_universe_i_triad_3",
+    "system_dramatic_universe_i_tetrad_4",
+    "system_dramatic_universe_i_pentad_5",
+    "system_dramatic_universe_i_hexad_6",
+    "system_dramatic_universe_i_heptad_7",
+    "system_dramatic_universe_i_octad_8",
+    "system_dramatic_universe_i_ennead_9",
+    "system_dramatic_universe_i_decad_10",
+    "system_dramatic_universe_i_undecad_11",
+    "system_dramatic_universe_i_dodecad_12",
+    "system_dramatic_universe_ii_dyad_2",
+    "system_dramatic_universe_ii_triad_3",
+    "system_dramatic_universe_ii_tetrad_4",
+    "system_elementary_systematics_triad_3",
+];
+
+/// Reproduce the startup sequence from `main.rs::build_api_router`, minus the
+/// writable user store (absent in CI, and irrelevant to module loading).
+fn assembled_graph() -> (Graph, usize) {
+    let mut graph = data::build_graph();
+    let modules = data::load_perspective_modules(&mut graph);
+    if modules > 0 {
+        // Bundled perspective modules are durable, not user-store data.
+        graph.mark_canonical();
+    }
+    (graph, modules)
+}
+
+#[test]
+fn all_fourteen_modules_load() {
+    let (graph, modules) = assembled_graph();
+    assert_eq!(
+        modules, 14,
+        "expected 14 perspective module files to load from ./data/perspectives \
+         (cwd must be backend/); got {modules}"
+    );
+    assert_eq!(
+        graph.perspectives().len(),
+        14,
+        "the seed contributes 0 perspectives, so all 14 come from modules"
+    );
+}
+
+#[test]
+fn all_sixty_eight_references_present_and_resolve() {
+    let (graph, _) = assembled_graph();
+
+    assert_eq!(
+        graph.references.len(),
+        68,
+        "expected 68 references from the module files"
+    );
+
+    // Every reference targets `system:<id>[#...]`; each must resolve to a System
+    // that exists in the graph. A dangling target = broken referential composition.
+    let mut unresolved = Vec::new();
+    for r in &graph.references {
+        let Some(rest) = r.target.strip_prefix("system:") else {
+            panic!("reference {} has non-system target {}", r.id, r.target);
+        };
+        let sys_id = rest.split('#').next().unwrap_or(rest);
+        if graph.system(sys_id).is_none() {
+            unresolved.push((r.id.clone(), r.target.clone()));
+        }
+    }
+    assert!(
+        unresolved.is_empty(),
+        "these references point at a system that isn't loaded: {unresolved:?}"
+    );
+}
+
+#[test]
+fn sixteen_module_owned_systems_present() {
+    let (graph, _) = assembled_graph();
+
+    let missing: Vec<&str> = MODULE_OWNED_SYSTEMS
+        .iter()
+        .copied()
+        .filter(|id| graph.system(id).is_none())
+        .collect();
+    assert!(
+        missing.is_empty(),
+        "module-owned systems missing after load: {missing:?}"
+    );
+
+    // Total systems = 12 canonical + 1 citation + 16 module-owned.
+    assert_eq!(
+        graph.systems.len(),
+        29,
+        "expected 12 canonical + 1 citation + 16 module systems"
+    );
+}
+
+#[test]
+fn du3_composes_by_address_not_copy() {
+    // The plan's core-model claim, pinned: the DU3 module owns 0 systems yet its
+    // citations still resolve onto the canonical tetrad by address — composition
+    // is referential, not by copying the canonical system into DU3's file.
+    let (graph, _) = assembled_graph();
+
+    let du3 = graph
+        .perspective("perspective_dramatic_universe_vol_3")
+        .expect("DU3 perspective loaded");
+
+    let du3_tetrad_refs: Vec<_> = graph
+        .references
+        .iter()
+        .filter(|r| r.perspective_ref == du3.id)
+        .filter(|r| r.target.starts_with("system:system_canonical_tetrad_4"))
+        .collect();
+    assert!(
+        !du3_tetrad_refs.is_empty(),
+        "DU3 should cite the canonical tetrad by address"
+    );
+
+    // And the canonical tetrad itself is owned by the seed, not by DU3.
+    assert!(
+        graph.system("system_canonical_tetrad_4").is_some(),
+        "canonical tetrad present from the seed"
+    );
+}
