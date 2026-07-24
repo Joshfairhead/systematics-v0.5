@@ -39,6 +39,13 @@ pub struct GraphContent {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
+    /// External addresses this content depends on but does not own (canonical
+    /// systems, sibling perspectives, shared citation entities). Advisory:
+    /// populated by `Graph::export_perspective` so a module records what must be
+    /// loaded elsewhere for its address-links to resolve. Omitted when empty, so
+    /// full snapshots and pre-existing module files are unaffected.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub manifest: Vec<String>,
 }
 
 impl GraphContent {

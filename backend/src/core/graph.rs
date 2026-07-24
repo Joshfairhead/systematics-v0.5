@@ -405,11 +405,20 @@ impl Graph {
             .collect()
     }
 
-    /// A self-contained `GraphContent` module for one Perspective: the
-    /// perspective itself, its references, and the (non-canonical) sources,
-    /// artefacts, lookups, systems, vocabularies and characters they reach.
-    /// Canonical entities (already bundled in `canonical.json`) are excluded, so
-    /// the module is a portable, loadable file — one source = one file.
+    /// A self-contained `GraphContent` module for one Perspective, built by
+    /// *reference* rather than by copy:
+    ///  * the perspective itself (with its links),
+    ///  * the references whose `perspective_ref` is this perspective,
+    ///  * the non-canonical entities those references and links *own* — systems,
+    ///    vocabularies, characters, sources, artefacts, lookups, and
+    ///  * a `manifest` of the external addresses the module depends on but does
+    ///    not own (canonical systems, sibling perspectives, shared citation
+    ///    entities).
+    ///
+    /// Canonical archetypes (the seed) are never copied — one expression, one
+    /// home; they are recorded in the manifest instead, so composition resolves
+    /// by address once those homes are loaded. A manifest entry that never
+    /// resolves is a tolerated dangling citation, not an error.
     pub fn export_perspective(&self, perspective_id: &str) -> GraphContent {
         let mut out = GraphContent::default();
         let Some(persp) = self.perspectives.iter().find(|p| p.id == perspective_id) else {
@@ -417,7 +426,13 @@ impl Graph {
         };
         out.perspectives.push(persp.clone());
 
-        let is_user = |id: &str| !self.canonical_ids.contains(id);
+        // Own = not a canonical archetype. Applies to *every* entity kind, so a
+        // shared/canonical vocabulary, source, artefact or lookup is referenced
+        // by address, never duplicated into the file.
+        let is_own = |id: &str| !self.canonical_ids.contains(id);
+        let mut manifest: HashSet<String> = HashSet::new();
+
+        // 1) References this perspective owns, and the entities they reach.
         let (mut src, mut art, mut lk, mut sys) =
             (HashSet::new(), HashSet::new(), HashSet::new(), HashSet::new());
         for r in self.references.iter().filter(|r| r.perspective_ref == perspective_id) {
@@ -429,26 +444,90 @@ impl Graph {
                 sys.insert(rest.split('#').next().unwrap_or(rest).to_string());
             }
         }
-        out.sources = self.sources.iter().filter(|s| src.contains(&s.id)).cloned().collect();
-        out.artefacts = self.artefacts.iter().filter(|a| art.contains(&a.id)).cloned().collect();
-        out.lookups = self.lookups.iter().filter(|l| lk.contains(&l.id)).cloned().collect();
 
-        let mut vocab = HashSet::new();
-        for s in self.systems.iter().filter(|s| sys.contains(&s.id) && is_user(&s.id)) {
-            out.systems.push(s.clone());
-            vocab.insert(s.vocabulary_ref.clone());
+        // 2) Systems referenced by the perspective's links, too (a
+        //    perspective-of-perspectives / link-composed system is not reachable
+        //    through references alone).
+        for l in &persp.links {
+            for endpoint in [&l.source, &l.target] {
+                if let Some(rest) = endpoint.strip_prefix("system:") {
+                    sys.insert(rest.split('#').next().unwrap_or(rest).to_string());
+                }
+            }
         }
+
+        // 3) Systems: own the non-canonical ones; record the rest (canonical or
+        //    absent) as external dependencies.
+        let mut vocab = HashSet::new();
+        for sid in &sys {
+            match self.system(sid) {
+                Some(s) if is_own(sid) => {
+                    if !out.systems.iter().any(|x| x.id == *sid) {
+                        out.systems.push(s.clone());
+                        vocab.insert(s.vocabulary_ref.clone());
+                    }
+                }
+                _ => {
+                    manifest.insert(format!("system:{sid}"));
+                }
+            }
+        }
+
+        // 4) Vocabularies + characters owned via the owned systems.
         let mut chars = HashSet::new();
-        for v in self.vocabularies.iter().filter(|v| vocab.contains(&v.id)) {
+        for v in self.vocabularies.iter().filter(|v| vocab.contains(&v.id) && is_own(&v.id)) {
             out.vocabularies.push(v.clone());
             chars.extend(v.terms.iter().chain(v.connectives.iter()).cloned());
         }
         out.characters = self
             .characters(None)
             .into_iter()
-            .filter(|c| chars.contains(&c.id) && is_user(&c.id))
+            .filter(|c| chars.contains(&c.id) && is_own(&c.id))
             .cloned()
             .collect();
+
+        // 5) Citation entities: own the non-canonical ones; record canonical /
+        //    shared ones as external dependencies.
+        out.sources = self.sources.iter().filter(|s| src.contains(&s.id) && is_own(&s.id)).cloned().collect();
+        out.artefacts = self.artefacts.iter().filter(|a| art.contains(&a.id) && is_own(&a.id)).cloned().collect();
+        out.lookups = self.lookups.iter().filter(|l| lk.contains(&l.id) && is_own(&l.id)).cloned().collect();
+        for s in &src { if self.source(s).is_none_or(|e| !is_own(&e.id)) { manifest.insert(format!("source:{s}")); } }
+        for a in &art { if self.artefact(a).is_none_or(|e| !is_own(&e.id)) { manifest.insert(format!("artefact:{a}")); } }
+        for l in &lk  { if self.lookup(l).is_none_or(|e| !is_own(&e.id)) { manifest.insert(format!("lookup:{l}")); } }
+
+        // 6) Link endpoints that point outside this module (sibling perspectives,
+        //    shared citation entities) are external dependencies.
+        for l in &persp.links {
+            for endpoint in [&l.source, &l.target] {
+                let Some((kind, rest)) = endpoint.split_once(':') else { continue };
+                let id = rest.split('#').next().unwrap_or(rest);
+                let owned = match kind {
+                    "system" => out.systems.iter().any(|s| s.id == id),
+                    "perspective" => out.perspectives.iter().any(|p| p.id == id),
+                    "source" => out.sources.iter().any(|s| s.id == id),
+                    "artefact" => out.artefacts.iter().any(|a| a.id == id),
+                    "lookup" => out.lookups.iter().any(|l| l.id == id),
+                    // fragments of substrate/other kinds resolve from the seed.
+                    _ => true,
+                };
+                if !owned {
+                    manifest.insert(format!("{kind}:{id}"));
+                }
+            }
+        }
+
+        // Deterministic ordering: several sets above are harvested from
+        // `HashSet`s, so sort every collection by id to keep exports (and the
+        // module files they become) stable and diff-friendly.
+        out.systems.sort_by(|a, b| a.id.cmp(&b.id));
+        out.vocabularies.sort_by(|a, b| a.id.cmp(&b.id));
+        out.characters.sort_by(|a, b| a.id.cmp(&b.id));
+        out.sources.sort_by(|a, b| a.id.cmp(&b.id));
+        out.artefacts.sort_by(|a, b| a.id.cmp(&b.id));
+        out.lookups.sort_by(|a, b| a.id.cmp(&b.id));
+        out.references.sort_by(|a, b| a.id.cmp(&b.id));
+        out.manifest = manifest.into_iter().collect();
+        out.manifest.sort();
         out
     }
 
@@ -600,6 +679,7 @@ impl Graph {
             artefacts: self.artefacts.clone(),
             lookups: self.lookups.clone(),
             references: self.references.clone(),
+            manifest: Vec::new(),
         }
     }
 
@@ -681,6 +761,7 @@ impl Graph {
                 .filter(|r| is_user(&r.id))
                 .cloned()
                 .collect(),
+            manifest: Vec::new(),
         }
     }
 
