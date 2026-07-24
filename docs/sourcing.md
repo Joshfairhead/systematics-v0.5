@@ -1,28 +1,53 @@
 # Systematics Sourcing Plan & Source Registry
 
 How we attach authoritative references to the systems, organise them as
-**perspectives**, and decide what is canonical. Live citation data lives in the
-runtime store (`backend/data/store.json`, gitignored); this doc is the map.
+**perspectives**, and decide what is canonical. The scraped work is durable in
+git‑tracked module files (`backend/data/perspectives/*.json`), embedded into the
+binary at build; the writable user store (`backend/data/store.json`, gitignored)
+holds only genuinely new, unsaved user content. This doc is the map. See
+`docs/plans/composable-perspectives.md` for the full infrastructure design.
 
 ## Modular file infrastructure (built)
 
-Each perspective is a **loadable module file**, so the scraped work is durable
-and portable (not trapped in the one ephemeral `store.json`):
+Each perspective is a **module file** under `backend/data/perspectives/*.json`
+(git‑tracked; one source = one file) — the durable home for the scraped work,
+not the ephemeral user store.
 
-- **Export** — `exportPerspective(id)` GraphQL query returns a self‑contained
-  `GraphContent` bundle (the perspective + its references + the *non‑canonical*
-  systems/vocabularies/characters/sources/artefacts/lookups they reach; canonical
-  entities are excluded, since they're already bundled). `graph.export_perspective`.
-- **Store** — one file per perspective in `backend/data/perspectives/*.json`
-  (tracked in git; only `store.json` is ignored). One source = one file.
-- **Load** — `data::load_perspective_modules` reads that directory on startup
-  (before `mark_canonical`, so modules are durable/bundled, not user‑store data).
-  Load a single file or the whole directory (a sequence).
-- **Promote to canonical** — a module loaded before `mark_canonical` is bundled;
-  re‑declaring which supply the archetype vocabulary is the remaining step.
+- **Export** — `exportPerspective(id)` returns a self‑contained `GraphContent`
+  bundle built by *reference, not copy* (`graph.export_perspective`):
+  - the perspective (with its links) + its references;
+  - only the entities it **owns** — a canonical/shared vocabulary, system,
+    source, artefact or lookup is never copied in (the ownership filter applies
+    to *every* kind);
+  - a `manifest` of the **external addresses** it depends on but doesn't own
+    (canonical systems, sibling perspectives, shared citation entities), so
+    composition resolves by address once those homes load. An empty manifest is
+    omitted, so files stay diff‑stable.
+- **Load** — `data::load_perspective_modules` applies every module at startup,
+  then `mark_bundled` (not a second `mark_canonical`). Resolution order:
+  `$SYSTEMATICS_DATA/perspectives` → the source tree (fresh files in dev/CI,
+  cwd‑independent via `CARGO_MANIFEST_DIR`) → the copy embedded into the binary
+  via `include_dir!` (the deployed path — no filesystem, volume or
+  working‑directory assumption).
+- **Bundled vs. canonical** — two separate id sets:
+  - `canonical_ids` = the immutable seed archetypes (the 12 per‑order systems +
+    the citation triad + substrate). Export never copies these; they are the
+    "one home" for shared structure.
+  - `bundled_ids` = everything sourced from a file (seed **and** modules); a
+    superset. Kept out of the writable user store, but module content is
+    *editable and re‑exportable* — durable ≠ frozen.
+- **Durability** — a module's home is its file. In‑app edits to a loaded module
+  are session‑scoped until re‑exported back to the file; the user store is only
+  for genuinely new content.
 
-Verified: with `store.json` removed, the backend reloads all perspectives from
-the module files with data fully intact.
+Composition is by address: DU3 owns 0 systems yet cites the canonical tetrad by
+`system:…` address (recorded in its manifest); the Qualsystems course owns 0
+systems and composes its 8 modules purely via `hasModule` links (recorded as
+`perspective:…` manifest deps).
+
+Verified: launched from any working directory, the backend loads all 14 modules
+(68 references) — from the source tree in dev, or the embedded copy when
+deployed with no filesystem present.
 
 ## The model — schema vs. reference
 
@@ -104,10 +129,15 @@ module is populated as it is scraped.
 4. **Canonical re‑declaration**: Legacy perspective for the unsourced values; seed edit + regen; re‑declare.
 5. **Reference browser** (final): a "References" tab over `allReferences`, sort/filter by **source · artefact · system · lookup**; also use it to **merge the duplicate DU2 artefact** (short vs full title).
 
-## Corpus snapshot (at time of writing)
+## Corpus snapshot
 
-68 references across: DU1 (30), DU3 (14), DU2 (13 + 6 legacy demo), Elementary Systematics (5).
-Perspectives: *Dramatic Universe* (early canonical citations), *Dramatic Universe Vol 1/2/3*, *Elementary Systematics*.
+68 references across the 14 module files: *Dramatic Universe* (early, 9), DU1
+(27), DU2 (13), DU3 (14), Elementary Systematics (5); the 8 Qualsystems Course
+modules carry links only (references added as each is scraped). 14 perspectives:
+*Dramatic Universe* (early canonical citations), *Dramatic Universe Vol 1/2/3*,
+*Elementary Systematics*, the *Qualsystems Course* + its 8 module perspectives.
+16 module‑owned systems (DU1 ×12, DU2 ×3, ES ×1); the 12 canonical + citation
+systems are seeded, not module‑owned.
 
 ## Known discrepancies / cleanups
 
@@ -115,3 +145,9 @@ Perspectives: *Dramatic Universe* (early canonical citations), *Dramatic Univers
 - Pentad **terms** unsourced (not in DU1/DU3).
 - Duplicate DU2 artefact (`The Dramatic Universe, Vol. 2` vs full title) → merge in the browser.
 - Perspective naming: consolidate "Dramatic Universe" (early) into the Vol‑numbered perspectives.
+- Shared `source_j_g__bennett` is currently copied into all 5 Bennett module
+  files (and one artefact + 3 lookups sit in both the early *Dramatic Universe*
+  and DU1 files). Export now dedups shared entities going forward (ownership
+  filter + manifest), but the committed files were not regenerated — a one‑time
+  data cleanup, best done together with the early‑perspective consolidation
+  above.
