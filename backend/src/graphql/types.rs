@@ -1801,6 +1801,35 @@ impl GqlReference {
         let g = graph_snapshot(ctx).await;
         g.lookup(id).map(|l| GqlLookup::new(l.clone()))
     }
+
+    /// Human-readable name of the owning Perspective (the reference web this
+    /// citation belongs to) — for grouping/filtering the reference browser.
+    async fn perspective_name(&self, ctx: &Context<'_>) -> Option<String> {
+        let g = graph_snapshot(ctx).await;
+        g.perspective(&self.inner.perspective_ref)
+            .map(|p| p.name.clone())
+    }
+
+    /// The fragment of the target address after `#` — `coherence`, `term:2`,
+    /// `conn:1-2`, `term-designation`, … — or empty when the whole System is
+    /// cited. Lets the browser filter by what is being cited.
+    async fn target_fragment(&self) -> String {
+        self.inner
+            .target
+            .split_once('#')
+            .map(|(_, frag)| frag.to_string())
+            .unwrap_or_default()
+    }
+
+    /// Resolve the System behind the target address (`system:<id>[#…]`) — carries
+    /// the order, name and coherence/designation values, so the browser can
+    /// group references by order and show each perspective's value side by side.
+    async fn target_system(&self, ctx: &Context<'_>) -> Option<GqlSystem> {
+        let rest = self.inner.target.strip_prefix("system:")?;
+        let id = rest.split('#').next().unwrap_or(rest);
+        let g = graph_snapshot(ctx).await;
+        g.system(id).map(|s| GqlSystem::new(s.clone()))
+    }
 }
 
 #[derive(InputObject)]
