@@ -13,6 +13,11 @@ pub enum AppView {
     References,
 }
 
+/// Whether the (big-table) reference browser is reachable from the UI. Hidden
+/// while the perspective/system/sequence selector redesign is pending; the
+/// component and its wiring are retained as a detailed perspective browser.
+const SHOW_REFERENCES_VIEW: bool = false;
+
 /// Detect GraphQL endpoint based on current browser location
 /// - Development (localhost:8080): Points to http://localhost:8000/graphql
 /// - Production (any other domain): Uses relative /graphql (same origin)
@@ -308,19 +313,25 @@ impl Component for ApiApp {
                     </aside>
 
                     <main class="main-view">
-                        // Top-level view switch (Graph ⇄ References)
-                        <div class="view-switch">
-                            <button
-                                class={ if self.view == AppView::Graph { "view-switch-btn active" } else { "view-switch-btn" } }
-                                onclick={ show_graph }
-                            >{ "Graph" }</button>
-                            <button
-                                class={ if self.view == AppView::References { "view-switch-btn active" } else { "view-switch-btn" } }
-                                onclick={ show_refs }
-                            >{ "References" }</button>
-                        </div>
+                        // Top-level view switch (Graph ⇄ References). Hidden for
+                        // now: the big-table reference browser is kept as code (a
+                        // detailed perspective browser) but out of view, pending
+                        // the perspective/system/sequence selector redesign. Flip
+                        // SHOW_REFERENCES_VIEW to re-expose it.
+                        if SHOW_REFERENCES_VIEW {
+                            <div class="view-switch">
+                                <button
+                                    class={ if self.view == AppView::Graph { "view-switch-btn active" } else { "view-switch-btn" } }
+                                    onclick={ show_graph }
+                                >{ "Graph" }</button>
+                                <button
+                                    class={ if self.view == AppView::References { "view-switch-btn active" } else { "view-switch-btn" } }
+                                    onclick={ show_refs }
+                                >{ "References" }</button>
+                            </div>
+                        }
 
-                        if self.view == AppView::References {
+                        if SHOW_REFERENCES_VIEW && self.view == AppView::References {
                             <ReferenceBrowser references={ self.all_references.clone() } />
                         } else {
                         // Breadcrumb trail
