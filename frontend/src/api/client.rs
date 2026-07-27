@@ -57,7 +57,22 @@ pub struct RefLookup {
     pub locator: String,
 }
 
-/// A resolved citation for display: source → artefact → lookup.
+/// The System behind a reference's target address (resolved server-side): the
+/// grouping key (`order`) and the value each perspective gives it (`coherence`).
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefSystem {
+    pub id: String,
+    pub order: i32,
+    pub name: String,
+    pub coherence: String,
+    #[serde(rename = "termDesignation")]
+    pub term_designation: String,
+    #[serde(rename = "connectiveDesignation")]
+    pub connective_designation: String,
+}
+
+/// A resolved citation for display: source → artefact → lookup, plus the owning
+/// perspective and the resolved target system (for the reference browser).
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct ReferenceView {
     pub id: String,
@@ -66,6 +81,18 @@ pub struct ReferenceView {
     pub source: Option<RefSource>,
     pub artefact: Option<RefArtefact>,
     pub lookup: Option<RefLookup>,
+    /// Owning perspective name (the reference web). `None` on the older
+    /// per-system tooltip query, which doesn't select it.
+    #[serde(rename = "perspectiveName", default)]
+    pub perspective_name: Option<String>,
+    /// Fragment of the target after `#` (`coherence`, `term:2`, …; empty = whole
+    /// system). `None` unless selected.
+    #[serde(rename = "targetFragment", default)]
+    pub target_fragment: Option<String>,
+    /// Resolved target System (order/name/coherence/designations). `None` unless
+    /// selected or when the target system isn't loaded.
+    #[serde(rename = "targetSystem", default)]
+    pub target_system: Option<RefSystem>,
 }
 
 #[allow(dead_code)]
@@ -79,6 +106,12 @@ struct ReferencesForResponse {
 struct ReferencesForSystemResponse {
     #[serde(rename = "referencesForSystem")]
     references_for_system: Vec<ReferenceView>,
+}
+
+#[derive(Deserialize, Debug)]
+struct AllReferencesResponse {
+    #[serde(rename = "allReferences")]
+    all_references: Vec<ReferenceView>,
 }
 
 #[derive(Clone)]
@@ -311,6 +344,39 @@ impl GraphQLClient {
         }
 
         Ok(response.data.map(|d| d.references_for_system).unwrap_or_default())
+    }
+
+    /// Every citation in the graph, enriched with owning perspective + resolved
+    /// target system — the single query that powers the reference browser
+    /// (both the table and the compare-by-order matrix).
+    pub async fn fetch_all_references(&self) -> Result<Vec<ReferenceView>, ApiError> {
+        let query = r#"
+            query AllRefs {
+                allReferences {
+                    id
+                    target
+                    note
+                    perspectiveName
+                    targetFragment
+                    source { name kind }
+                    artefact { title url }
+                    lookup { locator }
+                    targetSystem {
+                        id order name coherence termDesignation connectiveDesignation
+                    }
+                }
+            }
+        "#;
+        let response: GraphQLResponse<AllReferencesResponse> =
+            self.execute_query(query, None).await?;
+
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+
+        Ok(response.data.map(|d| d.all_references).unwrap_or_default())
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(

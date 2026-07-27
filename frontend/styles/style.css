@@ -488,3 +488,143 @@ body {
 .node.cited .cited-ring {
     opacity: 0.8;
 }
+
+/* ============================================================
+   Reference browser (References view)
+   ============================================================ */
+.main-view {
+    /* anchor the absolutely-positioned view switch */
+    position: relative;
+}
+
+.view-switch {
+    position: absolute;
+    top: 0.75rem;
+    right: 1.25rem;
+    z-index: 20;
+    display: flex;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(163, 177, 198, 0.3);
+}
+.view-switch-btn {
+    border: none;
+    background: transparent;
+    color: #4a5568;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.view-switch-btn.active {
+    background: rgba(37, 99, 235, 0.15);
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.reference-browser {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 0;
+    padding-top: 2.5rem; /* clear the absolute view switch */
+}
+.ref-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.ref-tab {
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    color: #4a5568;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.ref-tab.active {
+    background: rgba(37, 99, 235, 0.15);
+    color: #2563eb;
+    font-weight: 600;
+}
+.ref-count {
+    color: #718096;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+.ref-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+.ref-filter,
+.ref-search {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 8px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    color: #2c3e50;
+}
+.ref-search {
+    flex: 1;
+    min-width: 160px;
+}
+
+.ref-table-wrap {
+    overflow: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    max-height: calc(100vh - 13rem);
+}
+.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+.ref-table th,
+.ref-table td {
+    text-align: left;
+    padding: 0.45rem 0.7rem;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+    vertical-align: top;
+}
+.ref-table thead th {
+    position: sticky;
+    top: 0;
+    background: rgba(240, 244, 248, 0.95);
+    backdrop-filter: blur(8px);
+    color: #4a5568;
+    font-weight: 600;
+    z-index: 1;
+}
+.ref-th {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.ref-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.35);
+}
+.ref-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.compare-matrix .compare-order {
+    font-weight: 600;
+    white-space: nowrap;
+}
+.compare-cell.empty {
+    color: #cbd5e0;
+    text-align: center;
+}

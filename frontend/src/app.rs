@@ -1,9 +1,17 @@
 use crate::api::client::{GraphQLClient, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
+use crate::components::reference_browser::ReferenceBrowser;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
+
+/// Which top-level view the main pane shows.
+#[derive(Clone, Copy, PartialEq)]
+pub enum AppView {
+    Graph,
+    References,
+}
 
 /// Detect GraphQL endpoint based on current browser location
 /// - Development (localhost:8080): Points to http://localhost:8000/graphql
@@ -41,6 +49,8 @@ pub enum ApiAppMsg {
     NavigateBack,
     ToggleEdgeLabels,
     ReferencesLoaded(Vec<ReferenceView>),
+    SetView(AppView),
+    AllReferencesLoaded(Vec<ReferenceView>),
 }
 
 pub struct ApiApp {
@@ -54,6 +64,11 @@ pub struct ApiApp {
     /// All citations within the current system, keyed by their target address —
     /// prefetched so nodes can show references as a hover tooltip.
     system_references: Vec<ReferenceView>,
+    /// Which top-level view the main pane shows (graph canvas vs reference browser).
+    view: AppView,
+    /// Every citation in the graph (enriched), loaded lazily on first entry to
+    /// the References view — powers the browser's table + compare matrix.
+    all_references: Vec<ReferenceView>,
 }
 
 impl Component for ApiApp {
@@ -89,6 +104,8 @@ impl Component for ApiApp {
             breadcrumbs: vec![],
             show_edge_labels: false,
             system_references: vec![],
+            view: AppView::Graph,
+            all_references: vec![],
         }
     }
 
@@ -229,6 +246,23 @@ impl Component for ApiApp {
                 self.system_references = refs;
                 true
             }
+            ApiAppMsg::SetView(view) => {
+                self.view = view;
+                // Lazily load all references the first time the browser opens.
+                if view == AppView::References && self.all_references.is_empty() {
+                    let link = ctx.link().clone();
+                    let client = self.graphql_client.clone();
+                    spawn_local(async move {
+                        let refs = client.fetch_all_references().await.unwrap_or_default();
+                        link.send_message(ApiAppMsg::AllReferencesLoaded(refs));
+                    });
+                }
+                true
+            }
+            ApiAppMsg::AllReferencesLoaded(refs) => {
+                self.all_references = refs;
+                true
+            }
         }
     }
 
@@ -237,6 +271,8 @@ impl Component for ApiApp {
         let on_navigate = ctx.link().callback(ApiAppMsg::NavigateToSystem);
         let on_back = ctx.link().callback(|_| ApiAppMsg::NavigateBack);
         let on_toggle_edge_labels = ctx.link().callback(|_| ApiAppMsg::ToggleEdgeLabels);
+        let show_graph = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Graph));
+        let show_refs = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::References));
 
         html! {
             <div class="app">
@@ -272,6 +308,21 @@ impl Component for ApiApp {
                     </aside>
 
                     <main class="main-view">
+                        // Top-level view switch (Graph ⇄ References)
+                        <div class="view-switch">
+                            <button
+                                class={ if self.view == AppView::Graph { "view-switch-btn active" } else { "view-switch-btn" } }
+                                onclick={ show_graph }
+                            >{ "Graph" }</button>
+                            <button
+                                class={ if self.view == AppView::References { "view-switch-btn active" } else { "view-switch-btn" } }
+                                onclick={ show_refs }
+                            >{ "References" }</button>
+                        </div>
+
+                        if self.view == AppView::References {
+                            <ReferenceBrowser references={ self.all_references.clone() } />
+                        } else {
                         // Breadcrumb trail
                         if !self.breadcrumbs.is_empty() {
                             <nav class="breadcrumbs">
@@ -318,6 +369,7 @@ impl Component for ApiApp {
                                 html! { <div class="loading">{"Select a system"}</div> }
                             }
                         }
+                        } // end Graph view
                     </main>
                 </div>
             </div>
