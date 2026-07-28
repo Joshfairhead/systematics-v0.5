@@ -33,22 +33,28 @@ potential / essence), reconciled by **Grammar** at the Quintessence.
 ## The ten Mutualities (edges)
 
 The canonical pentad's connectives (designation: *Mutualities*), in lexicographic
-line order (`data/mod.rs:378`), map edge-for-edge onto the architecture. ✓ marks
-the two you anchored directly; both matched the lexicographic order, confirming
-the rest.
+line order (`data/mod.rs:378`). Each edge is not just a *reading* but a concrete
+**instance** — the tool's actual layers ARE the Mutualities. `[U]` = anchored by
+the user; `[P]` = proposed (to be tested with the pentad itself). The remaining
+links are still being worked out — likely via category theory (connective
+characters expressed as functors/morphisms with the right name).
 
-| Edge (Limit–Limit) | Mutuality | Reading |
-|---|---|---|
-| Grammar – Sign | **quantitative-match** | grammar matches the *count* of signs — **this is the existing arity `Grammar`** |
-| Grammar – Semantics | **aspiration** | grammar reaches toward meaning |
-| Grammar – Syntax | **operation** | grammar operates through form |
-| Grammar – Symbol | **qualitative-match** | grammar matches the assembled *quality* of the symbol |
-| Sign – Semantics | **function** ✓ | a sign's function *is* its meaning |
-| Sign – Syntax | **input** | signs are input to the syntactic compile |
-| Sign – Symbol | **range-of-significance** | the span from atomic sign to realized symbol |
-| Semantics – Syntax | **range-of-potential** | form↔meaning — Hodgson's "internal and external potentiality" |
-| Semantics – Symbol | **output** | the symbol outputs its meaning |
-| Syntax – Symbol | **form** ✓ | form compiles signs into the symbol — **this is `resolve_system`** |
+| Edge (Limit–Limit) | Mutuality | Instance in the tool | |
+|---|---|---|---|
+| Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position) | [U] |
+| Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering) | [U] |
+| Grammar – Syntax | **operation** | **Functor / morphism** — the category-theoretic operation driving the compile | [P] |
+| Grammar – Semantics | **aspiration** | **Coherence** — the systemic attribute the grammar aims at | [P] |
+| Sign – Semantics | **function** ✓ | the functional meaning of each sign | [U] |
+| Sign – Syntax | **input** | **Coordinates / points** — positional (2D) input to the compile | [P] |
+| Sign – Symbol | **range-of-significance** | **3D upcast geometry** — dodecahedron etc. (external potential) | [U] |
+| Semantics – Syntax | **range-of-potential** | **the rendered systems 1–12 as a whole** (internal potential) | [U] |
+| Semantics – Symbol | **output** | **Designations / labels** — the symbol outputs its meaning | [P] |
+| Syntax – Symbol | **form** ✓ | **`resolve_system`** — compiles signs into the symbol | [U] |
+
+The payoff: the pentad's edges are the codebase's existing layers (number,
+colour, geometry/3D, functors, rendered systems, designations, the compiler) —
+the architecture organizes itself into its own order-5 system.
 
 ## AD4M resolution (subject · predicate · object)
 
@@ -65,6 +71,26 @@ character *generation* has a form (its word), a function (its meaning), possible
 inputs/outputs, and its own semantics/syntax/signs/symbols within the system. The
 Pentad is therefore the **grammar for any element** — applied homoiconographically,
 it describes even its own edge-labels.
+
+## The architecture as a progression of systems (monad → hexad)
+
+The architecture isn't only the pentad — it's a **Sequence of Systems, one per
+order**, each describing the tool at a level (itself homoiconic: the tool's
+architecture told in the tool's own systems). Working sketch (tentative above the
+pentad; `?` = unsettled):
+
+- **Monad** — the sign-ground: unity-in-diversity; *everything is a sign*.
+- **Dyad** — ? personas & profiles.
+- **Triad** — **agents · languages · perspectives** (to be checked against the
+  triad's affirming/receptive/reconciling connectives; stays abstract).
+- **Tetrad** — ? never settled; user's rough guess *interfaces · representations ·
+  interpretations · expressions*; the canonical tetrad designations
+  *Ideal/Ground/Directive/Instrumental* may anchor it better.
+- **Pentad** — **Sign · Symbol · Syntax · Semantics · Grammar** (this doc).
+- **Hexad** — **coalescence + cyclicity**: "the beginning of homoiconicity." The
+  cyclic/coalescent structure is where the description **closes on itself** —
+  isomorphic, the map equal to the territory. This is where the tool becomes
+  genuinely self-describing (homoiconographic).
 
 ## Where Perspective sits
 
@@ -83,7 +109,7 @@ Conventions to migrate the code toward (a real, staged refactor — not this pas
 | address | **Sign** | key, value, any field |
 | `RenderedSystem` | **Symbol** | the assembled graph |
 | `resolve_system` | **form** (a grammar operation) | compiles Syntax over Signs → Symbol |
-| `Grammar` (K_n arity) | **quantitative-match** Mutuality | an aspect of the Grammar node (Grammar–Sign) |
+| `Grammar` (K_n arity + structure) | **Grammar** node (Quintessence) | the generative centre; its arity shows up on the quantitative-match edge (= Number) |
 | `Functor` / morphism | an **operation** grammar | a Mutuality; symbol→symbol |
 | `Vocabulary` | Signs (node characters) + **connective characters** (edge labels) | — |
 | `Perspective` | **Perspective** | unchanged — the container of grammars |
