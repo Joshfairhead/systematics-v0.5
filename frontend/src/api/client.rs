@@ -114,6 +114,26 @@ struct AllReferencesResponse {
     all_references: Vec<ReferenceView>,
 }
 
+/// A non-canonical System the Load control can browse (id, display name, order).
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct InstanceSystem {
+    pub id: String,
+    pub name: String,
+    pub order: i32,
+}
+
+#[derive(Deserialize, Debug)]
+struct InstanceSystemsResponse {
+    #[serde(rename = "instanceSystems")]
+    instance_systems: Vec<InstanceSystem>,
+}
+
+#[derive(Deserialize, Debug)]
+struct RenderSystemResponse {
+    #[serde(rename = "renderSystem")]
+    render_system: Option<RenderedSystem>,
+}
+
 #[derive(Clone)]
 pub struct GraphQLClient {
     endpoint: String,
@@ -277,6 +297,49 @@ impl GraphQLClient {
             .collect();
 
         Ok(systems)
+    }
+
+    /// The non-canonical instance systems the Load control browses.
+    pub async fn fetch_instance_systems(&self) -> Result<Vec<InstanceSystem>, ApiError> {
+        let query = r#"query { instanceSystems { id name order } }"#;
+        let response: GraphQLResponse<InstanceSystemsResponse> =
+            self.execute_query(query, None).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.instance_systems).unwrap_or_default())
+    }
+
+    /// Render any System by id (used to load instance systems into the canvas).
+    /// Also pulls the `canonicalClass` (the class this instance fills) so the
+    /// Canonical-override toggle can flip labels.
+    pub async fn fetch_rendered_by_id(&self, id: &str) -> Result<RenderedSystem, ApiError> {
+        let query = format!(
+            r#"
+            query Render($id: String!) {{
+                renderSystem(systemId: $id) {{
+                    {fields}
+                    canonicalClass {{ {fields} }}
+                }}
+            }}
+        "#,
+            fields = Self::SYSTEM_FIELDS
+        );
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<RenderSystemResponse> =
+            self.execute_query(&query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        let system = response
+            .data
+            .and_then(|d| d.render_system)
+            .ok_or_else(|| ApiError::NotFound(format!("System '{}' not found", id)))?;
+        Ok(self.transform_coordinates(system))
     }
 
     /// Fetch all citations for a single Expression address (retained for

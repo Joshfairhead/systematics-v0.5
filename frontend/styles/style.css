@@ -628,3 +628,70 @@ body {
     color: #cbd5e0;
     text-align: center;
 }
+
+/* ---- Load control + Canonical-override toggle (in-canvas, top-right) ---- */
+.load-overlay {
+    position: absolute;
+    top: 2.7rem;
+    right: 0.75rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+}
+.load-button {
+    border: none;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    color: #2c3e50;
+    cursor: pointer;
+}
+.load-menu {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    padding: 0.25rem;
+    min-width: 190px;
+    max-height: 60vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(163, 177, 198, 0.4);
+}
+.load-item {
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+    color: #2c3e50;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.load-item:hover {
+    background: rgba(37, 99, 235, 0.1);
+}
+.canonical-toggle-overlay {
+    position: absolute;
+    top: 4.9rem;
+    right: 0.75rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    cursor: pointer;
+}

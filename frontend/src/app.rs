@@ -1,4 +1,4 @@
-use crate::api::client::{GraphQLClient, ReferenceView};
+use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::ReferenceBrowser;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
@@ -56,6 +56,9 @@ pub enum ApiAppMsg {
     ReferencesLoaded(Vec<ReferenceView>),
     SetView(AppView),
     AllReferencesLoaded(Vec<ReferenceView>),
+    InstanceSystemsLoaded(Vec<InstanceSystem>),
+    LoadInstance(String),
+    ToggleCanonical,
 }
 
 pub struct ApiApp {
@@ -74,6 +77,12 @@ pub struct ApiApp {
     /// Every citation in the graph (enriched), loaded lazily on first entry to
     /// the References view — powers the browser's table + compare matrix.
     all_references: Vec<ReferenceView>,
+    /// Non-canonical instance systems the Load control browses (e.g. the
+    /// Architecture Pentad).
+    instance_systems: Vec<InstanceSystem>,
+    /// When true, node/edge labels show the canonical *class* (from the loaded
+    /// system's `canonicalClass`) instead of its instance values.
+    show_canonical: bool,
 }
 
 impl Component for ApiApp {
@@ -100,6 +109,15 @@ impl Component for ApiApp {
             }
         });
 
+        // Instance systems for the Load control (best-effort).
+        let link2 = ctx.link().clone();
+        let client2 = graphql_client.clone();
+        spawn_local(async move {
+            if let Ok(instances) = client2.fetch_instance_systems().await {
+                link2.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+            }
+        });
+
         Self {
             systems: vec![],
             selected_system: None,
@@ -111,6 +129,8 @@ impl Component for ApiApp {
             system_references: vec![],
             view: AppView::Graph,
             all_references: vec![],
+            instance_systems: vec![],
+            show_canonical: false,
         }
     }
 
@@ -268,6 +288,29 @@ impl Component for ApiApp {
                 self.all_references = refs;
                 true
             }
+            ApiAppMsg::InstanceSystemsLoaded(instances) => {
+                self.instance_systems = instances;
+                true
+            }
+            ApiAppMsg::LoadInstance(id) => {
+                // Replace the canvas with the loaded instance system (single canvas).
+                self.breadcrumbs.clear();
+                self.loading = true;
+                self.error = None;
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    match client.fetch_rendered_by_id(&id).await {
+                        Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                        Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                    }
+                });
+                true
+            }
+            ApiAppMsg::ToggleCanonical => {
+                self.show_canonical = !self.show_canonical;
+                true
+            }
         }
     }
 
@@ -278,6 +321,8 @@ impl Component for ApiApp {
         let on_toggle_edge_labels = ctx.link().callback(|_| ApiAppMsg::ToggleEdgeLabels);
         let show_graph = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Graph));
         let show_refs = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::References));
+        let on_load = ctx.link().callback(ApiAppMsg::LoadInstance);
+        let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
 
         html! {
             <div class="app">
@@ -374,6 +419,10 @@ impl Component for ApiApp {
                                         show_edge_labels={ self.show_edge_labels }
                                         on_toggle_edge_labels={ Some(on_toggle_edge_labels.clone()) }
                                         references={ self.system_references.clone() }
+                                        instance_systems={ self.instance_systems.clone() }
+                                        on_load={ Some(on_load.clone()) }
+                                        show_canonical={ self.show_canonical }
+                                        on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
                                     />
                                 }
                             } else {

@@ -241,6 +241,19 @@ impl QueryRoot {
             .collect()
     }
 
+    /// Instance systems: every System that is *not* the canonical archetype for
+    /// its order (DU1/DU2/ES systems, the Citation triad, the Architecture
+    /// Pentad, …). These are what the Load control browses — the canonical
+    /// categories are reached by the normal order navigation.
+    async fn instance_systems(&self, ctx: &Context<'_>) -> Vec<GqlSystem> {
+        let g = graph_snapshot(ctx).await;
+        g.systems
+            .iter()
+            .filter(|s| s.id != canonical_system_id(s.order))
+            .map(|s| GqlSystem::new(s.clone()))
+            .collect()
+    }
+
     // -------- joins --------
 
     async fn character_at_point(

@@ -1,7 +1,7 @@
 use systematics_middleware::RenderedSystem;
 use yew::prelude::*;
 
-use crate::api::client::ReferenceView;
+use crate::api::client::{InstanceSystem, ReferenceView};
 
 /// Default colors for rendering
 const DEFAULT_NODE_COLOR: &str = "#4A90E2";
@@ -22,17 +22,31 @@ pub struct ApiGraphViewProps {
     /// All citations within this system; shown as hover tooltips on nodes.
     #[prop_or_default]
     pub references: Vec<ReferenceView>,
+    /// Non-canonical instance systems, listed by the in-canvas Load control.
+    #[prop_or_default]
+    pub instance_systems: Vec<InstanceSystem>,
+    /// Load an instance system (by id) into the canvas.
+    #[prop_or_default]
+    pub on_load: Option<Callback<String>>,
+    /// When true, labels show the canonical *class* (`system.canonical_class`).
+    #[prop_or_default]
+    pub show_canonical: bool,
+    /// Toggle the Canonical-override switch.
+    #[prop_or_default]
+    pub on_toggle_canonical: Option<Callback<()>>,
 }
 
 pub enum ApiGraphMsg {
     NodeClicked(usize),
     #[allow(dead_code)]
     EdgeClicked(usize, usize),
+    ToggleLoadMenu,
 }
 
 pub struct ApiGraphView {
     selected_node: Option<usize>,
     selected_edge: Option<(usize, usize)>,
+    load_menu_open: bool,
 }
 
 impl Component for ApiGraphView {
@@ -43,11 +57,16 @@ impl Component for ApiGraphView {
         Self {
             selected_node: None,
             selected_edge: None,
+            load_menu_open: false,
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            ApiGraphMsg::ToggleLoadMenu => {
+                self.load_menu_open = !self.load_menu_open;
+                true
+            }
             ApiGraphMsg::NodeClicked(idx) => {
                 // Toggle selection
                 let selecting = self.selected_node != Some(idx);
@@ -129,6 +148,52 @@ impl Component for ApiGraphView {
                             <span class="slider"></span>
                         </div>
                     </label>
+                }
+
+                // Canonical-override toggle — only when the system has a class
+                // (i.e. it's an instance). Flips node/edge labels to the class.
+                if system.canonical_class.is_some() {
+                    if let Some(on_toggle) = ctx.props().on_toggle_canonical.clone() {
+                        <label class="canonical-toggle-overlay">
+                            <span class="toggle-label">{ "Canonical" }</span>
+                            <div class="toggle-switch">
+                                <input
+                                    type="checkbox"
+                                    checked={ ctx.props().show_canonical }
+                                    onclick={ Callback::from(move |_| on_toggle.emit(())) }
+                                />
+                                <span class="slider"></span>
+                            </div>
+                        </label>
+                    }
+                }
+
+                // Load control (top-right): browse + load instance systems.
+                if let Some(on_load) = ctx.props().on_load.clone() {
+                    <div class="load-overlay">
+                        <button
+                            class="load-button"
+                            onclick={ ctx.link().callback(|_| ApiGraphMsg::ToggleLoadMenu) }
+                        >{ if self.load_menu_open { "Load ▴" } else { "Load ▾" } }</button>
+                        if self.load_menu_open {
+                            <div class="load-menu">
+                                { for ctx.props().instance_systems.iter().map(|inst| {
+                                    let id = inst.id.clone();
+                                    let on_load = on_load.clone();
+                                    let toggle = ctx.link().callback(|_| ApiGraphMsg::ToggleLoadMenu);
+                                    let onclick = Callback::from(move |_| {
+                                        on_load.emit(id.clone());
+                                        toggle.emit(());
+                                    });
+                                    html! {
+                                        <button class="load-item" onclick={ onclick }>
+                                            { format!("{} · {}", inst.order, inst.name) }
+                                        </button>
+                                    }
+                                }) }
+                            </div>
+                        }
+                    </div>
                 }
                 <svg
                     class="graph-svg"
@@ -285,7 +350,24 @@ impl ApiGraphView {
                 return html! {};
             };
 
-            let label = connective.character_value.as_str();
+            // Canonical override: show the class connective at this edge instead.
+            let (ep1, ep2) = (line_base_pos.min(line_target_pos), line_base_pos.max(line_target_pos));
+            let class_label = if ctx.props().show_canonical {
+                system.canonical_class.as_deref().and_then(|c| {
+                    c.connectives
+                        .iter()
+                        .find(|k| {
+                            (k.base_position.min(k.target_position), k.base_position.max(k.target_position))
+                                == (ep1, ep2)
+                        })
+                        .map(|k| k.character_value.clone())
+                })
+            } else {
+                None
+            };
+            let label: &str = class_label
+                .as_deref()
+                .unwrap_or(connective.character_value.as_str());
 
             if label.is_empty() {
                 return html! {};
@@ -395,8 +477,19 @@ impl ApiGraphView {
             let radius = if is_selected { 18.0 } else { 12.0 };
             let onclick = ctx.link().callback(move |_| ApiGraphMsg::NodeClicked(idx));
 
-            // Get term label for this position
-            let term = system.term_at(position).unwrap_or("");
+            // Get term label for this position (canonical class when overridden).
+            let class_term = if ctx.props().show_canonical {
+                system
+                    .canonical_class
+                    .as_deref()
+                    .and_then(|c| c.term_at(position))
+                    .map(|s| s.to_string())
+            } else {
+                None
+            };
+            let term: &str = class_term
+                .as_deref()
+                .unwrap_or_else(|| system.term_at(position).unwrap_or(""));
 
             // Citations for this term → native hover tooltip on the node.
             let address = format!("system:{}#term:{}", system.system_id, position);
