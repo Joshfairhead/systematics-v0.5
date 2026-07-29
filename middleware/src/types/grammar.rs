@@ -70,6 +70,11 @@ pub struct RenderedSystem {
     pub colours: Vec<GrammarColour>,
     pub lines: Vec<GrammarLine>,
     pub connectives: Vec<GrammarConnective>,
+    /// The canonical *class* this system instantiates (same order); `None` when
+    /// this system is itself canonical. Drives the "Canonical override" toggle —
+    /// terms/connectives pair with the instance's by position.
+    #[serde(default, rename = "canonicalClass")]
+    pub canonical_class: Option<Box<RenderedSystem>>,
 }
 
 impl RenderedSystem {

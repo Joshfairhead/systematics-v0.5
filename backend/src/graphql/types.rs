@@ -689,6 +689,19 @@ impl GqlRenderedSystem {
             })
             .collect()
     }
+
+    /// The canonical *class* this system instantiates — the canonical system of
+    /// the same order. `None` when this system already *is* that canonical one.
+    /// Both share the K_n structure, so terms/connectives pair by position — the
+    /// frontend's "Canonical override" toggle flips instance labels to these.
+    async fn canonical_class(&self, ctx: &Context<'_>) -> Option<GqlRenderedSystem> {
+        let canonical_id = canonical_system_id(self.inner.order);
+        if self.inner.system_id == canonical_id {
+            return None;
+        }
+        let g = graph_snapshot(ctx).await;
+        resolve_system(&g, &canonical_id).map(GqlRenderedSystem::new)
+    }
 }
 
 #[derive(SimpleObject)]
