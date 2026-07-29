@@ -37,7 +37,7 @@ async fn all_references_exposes_resolved_browser_fields() {
     assert!(resp.errors.is_empty(), "query errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
     let refs = data["allReferences"].as_array().unwrap();
-    assert_eq!(refs.len(), 68, "all 68 references present");
+    assert_eq!(refs.len(), 75, "all 75 references present");
 
     // DU1's heptad coherence citation: system:system_dramatic_universe_i_heptad_7#coherence.
     let du1_heptad = refs

@@ -20,10 +20,10 @@
 use systematics_backend::core::Graph;
 use systematics_backend::data;
 
-/// The 16 systems that live in (are owned by) the perspective module files:
-/// DU1's 12 systemic-attribute systems, DU2's 3 systems, and the Elementary
-/// Systematics triad. Canonical (12) and citation (1) systems are seeded
-/// separately and are *not* in this list.
+/// The 17 systems that live in (are owned by) the perspective module files:
+/// DU1's 12 systemic-attribute systems, DU2's 3 systems, the Elementary
+/// Systematics triad, and the self-describing Architecture Pentad. Canonical
+/// (12) and citation (1) systems are seeded separately and are *not* here.
 const MODULE_OWNED_SYSTEMS: &[&str] = &[
     "system_dramatic_universe_i_monad_1",
     "system_dramatic_universe_i_dyad_2",
@@ -41,6 +41,7 @@ const MODULE_OWNED_SYSTEMS: &[&str] = &[
     "system_dramatic_universe_ii_triad_3",
     "system_dramatic_universe_ii_tetrad_4",
     "system_elementary_systematics_triad_3",
+    "system_architecture_pentad_5",
 ];
 
 /// Reproduce the startup sequence from `main.rs::build_api_router`, minus the
@@ -57,28 +58,28 @@ fn assembled_graph() -> (Graph, usize) {
 }
 
 #[test]
-fn all_fourteen_modules_load() {
+fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 14,
-        "expected 14 perspective module files to load from ./data/perspectives \
-         (cwd must be backend/); got {modules}"
+        modules, 15,
+        "expected 15 perspective module files to load (14 sources + the \
+         self-describing Architecture Pentad); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
-        14,
-        "the seed contributes 0 perspectives, so all 14 come from modules"
+        15,
+        "the seed contributes 0 perspectives, so all 15 come from modules"
     );
 }
 
 #[test]
-fn all_sixty_eight_references_present_and_resolve() {
+fn all_references_present_and_resolve() {
     let (graph, _) = assembled_graph();
 
     assert_eq!(
         graph.references.len(),
-        68,
-        "expected 68 references from the module files"
+        75,
+        "expected 75 references (68 sources + 7 on the Architecture Pentad)"
     );
 
     // Every reference targets `system:<id>[#...]`; each must resolve to a System
@@ -100,7 +101,7 @@ fn all_sixty_eight_references_present_and_resolve() {
 }
 
 #[test]
-fn sixteen_module_owned_systems_present() {
+fn module_owned_systems_present() {
     let (graph, _) = assembled_graph();
 
     let missing: Vec<&str> = MODULE_OWNED_SYSTEMS
@@ -113,11 +114,11 @@ fn sixteen_module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 16 module-owned.
+    // Total systems = 12 canonical + 1 citation + 17 module-owned.
     assert_eq!(
         graph.systems.len(),
-        29,
-        "expected 12 canonical + 1 citation + 16 module systems"
+        30,
+        "expected 12 canonical + 1 citation + 17 module systems"
     );
 }
 

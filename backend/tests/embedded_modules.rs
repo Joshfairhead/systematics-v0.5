@@ -3,7 +3,7 @@
 //! A deployed binary has no source tree on disk, so `load_perspective_modules`
 //! must fall back to the copy of the modules embedded via `include_dir!`. This
 //! test forces that path by pointing `SYSTEMATICS_DATA` at a directory that does
-//! not exist, then asserts the full corpus (14 modules, 68 references, the 16
+//! not exist, then asserts the full corpus (15 modules, 75 references, the 17
 //! module-owned systems) is present from the binary alone — no filesystem, no
 //! working-directory assumption, no volume.
 //!
@@ -24,18 +24,18 @@ fn embedded_modules_are_complete_without_a_filesystem() {
     }
 
     assert_eq!(
-        modules, 14,
-        "the deployed binary must serve all 14 modules from the embedded copy"
+        modules, 15,
+        "the deployed binary must serve all 15 modules from the embedded copy"
     );
     assert_eq!(
         graph.references.len(),
-        68,
-        "all 68 references must be embedded in the binary"
+        75,
+        "all 75 references must be embedded in the binary"
     );
     assert_eq!(
         graph.perspectives().len(),
-        14,
-        "all 14 perspectives must be embedded in the binary"
+        15,
+        "all 15 perspectives must be embedded in the binary"
     );
     assert!(
         graph.system("system_dramatic_universe_i_triad_3").is_some(),
