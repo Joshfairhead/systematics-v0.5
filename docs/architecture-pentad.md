@@ -33,8 +33,10 @@ potential / essence), reconciled by **Grammar** at the Quintessence.
 ## The ten Mutualities (edges)
 
 The canonical pentad's connectives (designation: *Mutualities*), in lexicographic
-line order (`data/mod.rs:378`). Each edge is not just a *reading* but a concrete
-**instance** — the tool's actual layers ARE the Mutualities. `[U]` = anchored by
+line order (`data/mod.rs:378`). Each edge is a concrete **embodiment** — a real
+thing in the system, whether it exists in the codebase today or is yet to be
+built (an input, say, may be a *module* or data stream; an output, a generated
+codebase). Naming what's there is the start, not the ceiling. `[U]` = anchored by
 the user; `[P]` = proposed (to be tested with the pentad itself). The remaining
 links are still being worked out — likely via category theory (connective
 characters expressed as functors/morphisms with the right name).
@@ -43,18 +45,19 @@ characters expressed as functors/morphisms with the right name).
 |---|---|---|---|
 | Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position) | [U] |
 | Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering) | [U] |
-| Grammar – Syntax | **operation** | **Functor / morphism** — the category-theoretic operation driving the compile | [P] |
-| Grammar – Semantics | **aspiration** | **Coherence** — the systemic attribute the grammar aims at | [P] |
+| Grammar – Syntax | **operation** | **Functor / morphism** — category theory (itself a triad: identity · association · composition) | [U] |
+| Grammar – Semantics | **aspiration** | **holographic coherence** — a *digital embodiment* of coherence (each part reflecting the whole), not a label-field; coherence-as-potential, actualized at the hexad | [P?] |
 | Sign – Semantics | **function** ✓ | the functional meaning of each sign | [U] |
-| Sign – Syntax | **input** | **Coordinates / points** — positional (2D) input to the compile | [P] |
+| Sign – Syntax | **input** | **assembly pieces** — points, coordinates, terms; and, in scope, **modules / data streams** | [U] |
 | Sign – Symbol | **range-of-significance** | **3D upcast geometry** — dodecahedron etc. (external potential) | [U] |
 | Semantics – Syntax | **range-of-potential** | **the rendered systems 1–12 as a whole** (internal potential) | [U] |
-| Semantics – Symbol | **output** | **Designations / labels** — the symbol outputs its meaning | [P] |
+| Semantics – Symbol | **output** | **generative** — labelled complete graphs → small language models / codebase automation (not designations) | [P] |
 | Syntax – Symbol | **form** ✓ | **`resolve_system`** — compiles signs into the symbol | [U] |
 
-The payoff: the pentad's edges are the codebase's existing layers (number,
-colour, geometry/3D, functors, rendered systems, designations, the compiler) —
-the architecture organizes itself into its own order-5 system.
+The payoff: the pentad's edges are already-present layers of the codebase
+(number, colour, geometry/3D, functors, rendered systems, the compiler) — and
+where they aren't yet, they name what to build (module inputs, generative
+outputs). The architecture organizes itself into its own order-5 system.
 
 ## AD4M resolution (subject · predicate · object)
 
@@ -99,6 +102,12 @@ being one of its five Limits. It is the generic container/web (AD4M) that holds
 many sign→symbol assemblies and decorates them (references, excerpts). Its exact
 placement relative to the pentad (the monadic container that *is also a sign*; the
 "will" that reconciles) is the one piece still being set — see open questions.
+
+**System vs Perspective:** a **System is a *scoped* perspective** — a lens
+constrained by its grammar (bounded, one K_n). The current `Perspective` is the
+**open graph** — a useful catch-all with no such bound. AD4M's Agent/Language/
+Perspective triad is kept in mind to blend: take the good parts, reinterpret them
+through systematics, leave the mess.
 
 ## Rename map (code → convention)
 
