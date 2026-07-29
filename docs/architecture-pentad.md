@@ -45,13 +45,13 @@ characters expressed as functors/morphisms with the right name).
 |---|---|---|---|
 | Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position) | [U] |
 | Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering) | [U] |
-| Grammar – Syntax | **operation** | **Functor / morphism** — category theory (itself a triad: identity · association · composition) | [U] |
-| Grammar – Semantics | **aspiration** | **holographic coherence** — a *digital embodiment* of coherence (each part reflecting the whole), not a label-field; coherence-as-potential, actualized at the hexad | [P?] |
+| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (itself a triad: identity · association · composition) | [U] |
+| Grammar – Semantics | **aspiration** | the **set of coherence attributes** (monad→dodecad) as *demands* on each system — coherence-as-potential (a digital embodiment, not a label-field), actualized at the hexad | [P?] |
 | Sign – Semantics | **function** ✓ | the functional meaning of each sign | [U] |
 | Sign – Syntax | **input** | **assembly pieces** — points, coordinates, terms; and, in scope, **modules / data streams** | [U] |
 | Sign – Symbol | **range-of-significance** | **3D upcast geometry** — dodecahedron etc. (external potential) | [U] |
 | Semantics – Syntax | **range-of-potential** | **the rendered systems 1–12 as a whole** (internal potential) | [U] |
-| Semantics – Symbol | **output** | **generative** — labelled complete graphs → small language models / codebase automation (not designations) | [P] |
+| Semantics – Symbol | **output** | **self-describing protocols** — the symbol as a system that describes itself; generative (labelled graphs → small language models / codebase automation) | [P] |
 | Syntax – Symbol | **form** ✓ | **`resolve_system`** — compiles signs into the symbol | [U] |
 
 The payoff: the pentad's edges are already-present layers of the codebase
@@ -92,8 +92,13 @@ pentad; `?` = unsettled):
 - **Pentad** — **Sign · Symbol · Syntax · Semantics · Grammar** (this doc).
 - **Hexad** — **coalescence + cyclicity**: "the beginning of homoiconicity." The
   cyclic/coalescent structure is where the description **closes on itself** —
-  isomorphic, the map equal to the territory. This is where the tool becomes
-  genuinely self-describing (homoiconographic).
+  isomorphic, the map equal to the territory. Likely a coalescence of two triads
+  (Bennett: nearer *facts / values* than operational/experiential); the
+  **range-of-significance** edge (Sign–Symbol) is what focuses it. **CT and
+  Systematics** appear as two instances of signs↔symbols — CT on the input side
+  (sign→syntax), Systematics on the output side (semantics→symbol). The
+  export↔load round-trip (`export∘load = id`) is one seed of it, but the system is
+  not yet fully holographic (instrument ≠ object); the hexad is where it becomes so.
 
 ## Where Perspective sits
 
