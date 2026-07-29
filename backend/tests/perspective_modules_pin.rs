@@ -5,10 +5,10 @@
 //!
 //! It reproduces `main.rs::build_api_router` exactly — `build_graph()` →
 //! `load_perspective_modules()` → second `mark_canonical()` — and asserts:
-//!   * the 14 committed module files load,
-//!   * all 68 references resolve to an existing System (the target's system id
+//!   * the 15 committed module files load,
+//!   * all 75 references resolve to an existing System (the target's system id
 //!     is present in the graph), and
-//!   * the 16 module-owned systems are all present.
+//!   * the 17 module-owned systems are all present.
 //!
 //! Any drift here is a regression in module loading or referential composition.
 //!

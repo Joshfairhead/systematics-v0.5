@@ -1,9 +1,54 @@
 {
   "characters": [
     {
+      "id": "char_word_category_theory",
+      "kind": "word",
+      "value": "Category Theory"
+    },
+    {
+      "id": "char_word_coherence",
+      "kind": "word",
+      "value": "Coherence"
+    },
+    {
+      "id": "char_word_colour",
+      "kind": "word",
+      "value": "Colour"
+    },
+    {
+      "id": "char_word_functor",
+      "kind": "word",
+      "value": "Functor"
+    },
+    {
+      "id": "char_word_geometry",
+      "kind": "word",
+      "value": "Geometry"
+    },
+    {
       "id": "char_word_grammar",
       "kind": "word",
       "value": "Grammar"
+    },
+    {
+      "id": "char_word_meaning",
+      "kind": "word",
+      "value": "Meaning"
+    },
+    {
+      "id": "char_word_number",
+      "kind": "word",
+      "value": "Number"
+    },
+    {
+      "id": "char_word_progression",
+      "kind": "word",
+      "value": "Progression"
+    },
+    {
+      "id": "char_word_render",
+      "kind": "word",
+      "value": "Render"
     },
     {
       "id": "char_word_semantics",
@@ -24,6 +69,11 @@
       "id": "char_word_syntax",
       "kind": "word",
       "value": "Syntax"
+    },
+    {
+      "id": "char_word_systematics",
+      "kind": "word",
+      "value": "Systematics"
     }
   ],
   "coordinates": [],
@@ -40,16 +90,16 @@
         "char_word_symbol"
       ],
       "connectives": [
-        "char_word_quantitative_match",
-        "char_word_aspiration",
-        "char_word_operation",
-        "char_word_qualitative_match",
-        "char_word_function",
-        "char_word_input",
-        "char_word_range_of_significance",
-        "char_word_range_of_potential",
-        "char_word_output",
-        "char_word_form"
+        "char_word_number",
+        "char_word_coherence",
+        "char_word_functor",
+        "char_word_colour",
+        "char_word_meaning",
+        "char_word_category_theory",
+        "char_word_geometry",
+        "char_word_progression",
+        "char_word_systematics",
+        "char_word_render"
       ]
     }
   ],
