@@ -28,6 +28,9 @@ body {
 
 .sidebar {
     flex-shrink: 0;
+    /* Stack above .main-view so the Load dropdown isn't painted behind the canvas. */
+    position: relative;
+    z-index: 100;
 }
 
 /* Top Navigation Bar */
