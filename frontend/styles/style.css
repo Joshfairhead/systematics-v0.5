@@ -629,16 +629,13 @@ body {
     text-align: center;
 }
 
-/* ---- Load control + Canonical-override toggle (in-canvas, top-right) ---- */
-.load-overlay {
-    position: absolute;
-    top: 2.7rem;
-    right: 0.75rem;
-    z-index: 10;
+/* ---- Load control (in the menu bar) + Canonical-override toggle ---- */
+.nav-load {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.35rem;
+    align-items: center;
+    padding: 0 1rem;
+    flex-shrink: 0;
 }
 .load-button {
     border: none;
@@ -652,16 +649,20 @@ body {
     cursor: pointer;
 }
 .load-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0.5rem;
+    z-index: 20;
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(163, 177, 198, 0.4);
     border-radius: 10px;
     padding: 0.25rem;
-    min-width: 190px;
-    max-height: 60vh;
+    min-width: 210px;
+    max-height: 70vh;
     overflow-y: auto;
     box-shadow: 0 8px 24px rgba(163, 177, 198, 0.4);
 }
@@ -681,7 +682,7 @@ body {
 }
 .canonical-toggle-overlay {
     position: absolute;
-    top: 4.9rem;
+    top: 2.7rem;
     right: 0.75rem;
     z-index: 3;
     display: flex;

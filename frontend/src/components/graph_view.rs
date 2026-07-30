@@ -1,7 +1,7 @@
 use systematics_middleware::RenderedSystem;
 use yew::prelude::*;
 
-use crate::api::client::{InstanceSystem, ReferenceView};
+use crate::api::client::ReferenceView;
 
 /// Default colors for rendering
 const DEFAULT_NODE_COLOR: &str = "#4A90E2";
@@ -22,12 +22,6 @@ pub struct ApiGraphViewProps {
     /// All citations within this system; shown as hover tooltips on nodes.
     #[prop_or_default]
     pub references: Vec<ReferenceView>,
-    /// Non-canonical instance systems, listed by the in-canvas Load control.
-    #[prop_or_default]
-    pub instance_systems: Vec<InstanceSystem>,
-    /// Load an instance system (by id) into the canvas.
-    #[prop_or_default]
-    pub on_load: Option<Callback<String>>,
     /// When true, labels show the canonical *class* (`system.canonical_class`).
     #[prop_or_default]
     pub show_canonical: bool,
@@ -40,13 +34,11 @@ pub enum ApiGraphMsg {
     NodeClicked(usize),
     #[allow(dead_code)]
     EdgeClicked(usize, usize),
-    ToggleLoadMenu,
 }
 
 pub struct ApiGraphView {
     selected_node: Option<usize>,
     selected_edge: Option<(usize, usize)>,
-    load_menu_open: bool,
 }
 
 impl Component for ApiGraphView {
@@ -57,16 +49,11 @@ impl Component for ApiGraphView {
         Self {
             selected_node: None,
             selected_edge: None,
-            load_menu_open: false,
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            ApiGraphMsg::ToggleLoadMenu => {
-                self.load_menu_open = !self.load_menu_open;
-                true
-            }
             ApiGraphMsg::NodeClicked(idx) => {
                 // Toggle selection
                 let selecting = self.selected_node != Some(idx);
@@ -168,33 +155,6 @@ impl Component for ApiGraphView {
                     }
                 }
 
-                // Load control (top-right): browse + load instance systems.
-                if let Some(on_load) = ctx.props().on_load.clone() {
-                    <div class="load-overlay">
-                        <button
-                            class="load-button"
-                            onclick={ ctx.link().callback(|_| ApiGraphMsg::ToggleLoadMenu) }
-                        >{ if self.load_menu_open { "Load ▴" } else { "Load ▾" } }</button>
-                        if self.load_menu_open {
-                            <div class="load-menu">
-                                { for ctx.props().instance_systems.iter().map(|inst| {
-                                    let id = inst.id.clone();
-                                    let on_load = on_load.clone();
-                                    let toggle = ctx.link().callback(|_| ApiGraphMsg::ToggleLoadMenu);
-                                    let onclick = Callback::from(move |_| {
-                                        on_load.emit(id.clone());
-                                        toggle.emit(());
-                                    });
-                                    html! {
-                                        <button class="load-item" onclick={ onclick }>
-                                            { format!("{} · {}", inst.order, inst.name) }
-                                        </button>
-                                    }
-                                }) }
-                            </div>
-                        }
-                    </div>
-                }
                 <svg
                     class="graph-svg"
                     viewBox="0 0 800 800"

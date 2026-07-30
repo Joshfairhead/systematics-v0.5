@@ -351,6 +351,8 @@ impl Component for ApiApp {
                                         systems={ display_systems }
                                         selected={ selected_name }
                                         on_select={ on_select }
+                                        instance_systems={ self.instance_systems.clone() }
+                                        on_load={ Some(on_load.clone()) }
                                     />
                                 }
                             }
@@ -419,8 +421,6 @@ impl Component for ApiApp {
                                         show_edge_labels={ self.show_edge_labels }
                                         on_toggle_edge_labels={ Some(on_toggle_edge_labels.clone()) }
                                         references={ self.system_references.clone() }
-                                        instance_systems={ self.instance_systems.clone() }
-                                        on_load={ Some(on_load.clone()) }
                                         show_canonical={ self.show_canonical }
                                         on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
                                     />
