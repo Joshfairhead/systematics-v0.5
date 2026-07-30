@@ -19,6 +19,13 @@ So **being and doing are not two separate runs**; they are the two sides of one
 coin, brought together in the will (the system we are building). A *Perspective*
 (a graph) is therefore will-shaped: nouns + verbs in relationship.
 
+**Validation rule [proposed — the Dyad's force]:** a **term (vertex) must be a
+noun**; a **connective (edge) must be a verb**. This noun↔verb polarity, and the
+*force* binding them, is the **Dyad** (Poles / Force). Mis-typed content is a
+validation error — e.g. "sort · tag · filter · search" are **verbs**, so they are
+**connectives**, not terms. (Enforcing this needs a part-of-speech on characters;
+capture the rule now, implement later.)
+
 Correction to an earlier framing: the "being vs doing" polarity was mis-worded.
 **Doing = activity = the Tetrad** (Activity Field) — verb-like, and it *represents*
 being; what was loosely called "being" is more functional / dyadic. Terminology
@@ -72,10 +79,12 @@ We need enough system to use it to design itself. The way through:
    the Monad, represented as a perspective graph**; the fuller vector/RAG form is
    later.
 2. **Tetrad — Organise.** Distil the Monad into a **graph**: create all the
-   **node/edge relations** — nodes = **term characters**, edges = **connective
-   characters**. Sort · Tag · Filter · Search are its operations; the **edge
-   mappings are still to be defined**. (This is where "what is part of the system
-   vs not" gets discriminated — two overlapping monads.)
+   **node/edge relations** — nodes = **term characters** (nouns), edges =
+   **connective characters** (verbs). **Sort · Tag · Filter · Search are verbs →
+   they are the Tetrad's *connectives*, NOT its terms** (per the validation rule
+   above). The Tetrad's noun-terms (the four *sources* the operations act between)
+   are **still to be defined** — this is the "edge mappings still needed" gap.
+   (This is where "what is part of the system vs not" gets discriminated.)
 3. **Assemble — structure into systems (sequential order).** Group graph elements
    into term/connective characters, forming a mass of **loose low-order systems —
    mostly dyadic pairs and triadic faces — as raw material**, most of which are
@@ -84,7 +93,11 @@ We need enough system to use it to design itself. The way through:
    not-needed, looking toward the outcome at 8.
 4. **Represent** — the architecture run as a **first-class, editable Sequence in
    the app** (the Sequence type designed but not yet built), with back-and-forth
-   updates happening *there*.
+   updates happening *there*. The **Load control should address a Sequence**, not
+   just a single system: loading the *Architecture Run* sequence shows it as a
+   **collection of systems** — the Pentad displays with its terms, orders not yet
+   defined show blank/placeholder. "See the architectural plan represented as a
+   collection of systems."
 5. Then **use the system to tune its own design** (dynamic homoiconicity).
 
 ## Bennett's DU2 creation-myth pattern [generative automation, downstream]
