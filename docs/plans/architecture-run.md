@@ -65,19 +65,27 @@ the point: the operational will (the enneagram) contains the structural being
 
 We need enough system to use it to design itself. The way through:
 
-1. **Ingest** — load an unsorted hodgepodge of stored systems/fragments. This is
-   about **unstructured data** — RAG-like (chuck everything into a vector store /
-   latent space). *Not everything in storage is part of this system — it's just a
-   collection of everything.* **For now, treat ingest as the Monad, represented
-   as a perspective graph** (the fuller vector/RAG form is later).
-2. **Organise (Tetrad = Sort · Tag · Filter · Search)** over the ingested graph.
-   **Relate (Triad, point 3)** to work out what is needed vs not-needed, looking
-   toward the outcome at 8. (Discrimination — what is part of the system vs not:
-   two overlapping monads.)
-3. **Represent** — the architecture run as a **first-class, editable Sequence in
+1. **Monad — Ingest.** An unsorted hodgepodge of stored systems/fragments —
+   **unstructured data; RAG is the Monad of the system** (chuck everything into a
+   vector store / latent space). *Not everything in storage is part of this system
+   — it's just a collection of everything.* **Stay simple for now: treat ingest as
+   the Monad, represented as a perspective graph**; the fuller vector/RAG form is
+   later.
+2. **Tetrad — Organise.** Distil the Monad into a **graph**: create all the
+   **node/edge relations** — nodes = **term characters**, edges = **connective
+   characters**. Sort · Tag · Filter · Search are its operations; the **edge
+   mappings are still to be defined**. (This is where "what is part of the system
+   vs not" gets discriminated — two overlapping monads.)
+3. **Assemble — structure into systems (sequential order).** Group graph elements
+   into term/connective characters, forming a mass of **loose low-order systems —
+   mostly dyadic pairs and triadic faces — as raw material**, most of which are
+   **discarded**, the rest **assembled into higher-order complete graphs** (faces
+   gluing into higher systems). **Relate (Triad, point 3)** sifts needed vs
+   not-needed, looking toward the outcome at 8.
+4. **Represent** — the architecture run as a **first-class, editable Sequence in
    the app** (the Sequence type designed but not yet built), with back-and-forth
    updates happening *there*.
-4. Then **use the system to tune its own design** (dynamic homoiconicity).
+5. Then **use the system to tune its own design** (dynamic homoiconicity).
 
 ## Bennett's DU2 creation-myth pattern [generative automation, downstream]
 
