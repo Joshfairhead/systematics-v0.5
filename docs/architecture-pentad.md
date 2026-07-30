@@ -45,7 +45,7 @@ characters expressed as functors/morphisms with the right name).
 |---|---|---|---|
 | Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position) | [U] |
 | Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering) | [U] |
-| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (itself a triad: identity · association · composition) | [U] |
+| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (core notions: identity, composition, associativity) | [U] |
 | Grammar – Semantics | **aspiration** | the **set of coherence attributes** (monad→dodecad) as *demands* on each system — coherence-as-potential (a digital embodiment, not a label-field), actualized at the hexad | [P?] |
 | Sign – Semantics | **function** ✓ | the functional meaning of each sign | [U] |
 | Sign – Syntax | **input** | **assembly pieces** — points, coordinates, terms; and, in scope, **modules / data streams** | [U] |
@@ -144,4 +144,13 @@ in its own terms.
 2. **`resolve_system` = form specifically**, or the whole Grammar node? It compiles
    (→ form) but also validates (→ quantitative/qualitative match).
 3. **Rename staging** — the code refactor is broad (core + GraphQL + frontend);
-   do it once the model is frozen and the self-describing pentad is seeded.
+   do it once the model is frozen and the self-describing pentad is seeded. The
+   direction (per the user) is **dynamic homoiconicity**: as the description is
+   corrected by progressive approximation, the codebase is refactored to match it,
+   until the code reads as if articulated from the systems.
+4. **Does a pentad edge contain a triad?** (e.g. the `operation` edge and CT's
+   identity/composition/associativity, or Extract/Load/Transform.) A *possibility,
+   not settled* — do not assert it.
+5. **Vertices and links as systems.** A vertex may represent another system
+   (plausible); a link may represent a collection of links or systems (uncertain).
+   Open — not decided.
