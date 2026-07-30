@@ -36,34 +36,44 @@ part.
 
 These are reconciled *in the will* (the running system), not held apart.
 
-## The process circulates on the enneagram [proposed]
+## The process and the enneagram [proposed — mappings UNRESOLVED]
 
-The operational process is **not a flat 1→12**; it follows the enneagram's
-hexagram circulation **1 → 4 → 2 → 8 → 5 → 7 → (1)**, with the triangle **3 · 6 · 9**
-as the reconciling shock-points (to be worked out):
+The operational process is **not a flat 1→12**; it seems to circulate on the
+enneagram (hexagram flow **1 → 4 → 2 → 8 → 5 → 7 → (1)**; triangle **3 · 6 · 9**).
+But *which* enneagram mapping is not settled — there are (at least) two, and they
+conflict on where the monad/ingest sits. Both are recorded; neither is asserted.
 
-| point | operation (proposed) | note |
-|---|---|---|
-| **1** | **Ingest** = *assimilation* — bring the unsorted collection in | monad = the collection itself; ingest realises it |
-| **4** | **Sort · Tag · Search · Filter** — the activity/tetrad (Activity Field) | 1→4 inner line |
-| **2** | **Discrimination** — what we are *doing*; weigh related & valuable options toward the end result | 4→2 inner line; dyad = in/out complementarity |
-| **8** | **Agent / emitter** (thermostat, LLM — a will) | 2→8; agent @ octad [user-anchored] |
-| **5** | **the Pentad** (Sign/Symbol/Syntax/Semantics/Grammar) | 8→5; the structural core sits on the flow [settled] |
-| **7** | **Generation** — emitting new systems/symbols/code | 5→7 |
-| 3 · 6 · 9 | reconciling shocks (triangle) | open |
+**Candidate A — operations on points** (an earlier process reading):
+1 = Ingest/assimilation · 4 = Sort·Tag·Search·Filter · 2 = Discrimination ·
+8 = Agent/outcome · 5 = Pentad · 7 = Generation.
 
-The flow passing *through* the Pentad (point 5) is the point: the operational
-will (the enneagram) contains the structural being (the pentad) as a station.
+**Candidate B — Hodgson's expression** (systems on points): 9 = Monad · 1 = Dyad ·
+2 = Triad · 4 = Tetrad · 5 = Pentad · 7 = Hexad · 8 = Heptad. ("A bit weird, but
+possibly on point.") Note B puts the **Monad at 9**, which conflicts with A's
+ingest-at-1 once we say *ingest = monad*.
+
+**The 3·6·9 triangle** is open: possibly **Extract · Load · Transform**, or
+possibly the triangle *represents* the Triad (3), Hexad (6) and Ennead/Nonad (9)
+themselves within the structure.
+
+Anchors that survive across readings: **8** (agent / the outcome looked toward),
+**5** (the Pentad [settled]). The flow passing *through* the Pentad (point 5) is
+the point: the operational will (the enneagram) contains the structural being
+(the pentad) as a station.
 
 ## The bootstrap (the chicken-and-egg)
 
 We need enough system to use it to design itself. The way through:
 
-1. **Ingest** — load an unsorted hodgepodge of stored systems/fragments (extend
-   `loadPerspective` to bulk / arbitrary input). *Not everything in storage is
-   part of this system — it's just a collection of everything.*
-2. **Discern + organise** — sort / filter / search / tag; discriminate what is
-   part of the system from what is not (two overlapping monads).
+1. **Ingest** — load an unsorted hodgepodge of stored systems/fragments. This is
+   about **unstructured data** — RAG-like (chuck everything into a vector store /
+   latent space). *Not everything in storage is part of this system — it's just a
+   collection of everything.* **For now, treat ingest as the Monad, represented
+   as a perspective graph** (the fuller vector/RAG form is later).
+2. **Organise (Tetrad = Sort · Tag · Filter · Search)** over the ingested graph.
+   **Relate (Triad, point 3)** to work out what is needed vs not-needed, looking
+   toward the outcome at 8. (Discrimination — what is part of the system vs not:
+   two overlapping monads.)
 3. **Represent** — the architecture run as a **first-class, editable Sequence in
    the app** (the Sequence type designed but not yet built), with back-and-forth
    updates happening *there*.
@@ -87,11 +97,13 @@ such operations.
 - **[settled]** Pentad (5) = Sign/Symbol/Syntax/Semantics/Grammar; nouns=nodes,
   verbs=edges, graph=will.
 - **[anchored]** Agent @ Octad (8).
-- **[proposed]** enneagram process flow 1→4→2→8→5→7; 1=ingest/assimilation;
-  4=sort/filter/search/tag; 2=discrimination; 7=generation.
-- **[open]** the Triad; the triangle 3·6·9; orders 9–12; how structural and
-  operational aspects precisely reconcile; the exact terminology of the
-  being/doing/activity mapping.
+- **[proposed]** Ingest = Monad = a perspective graph (unstructured / RAG ideal);
+  Tetrad = sort/tag/filter/search; enneagram process flow 1→4→2→8→5→7; generation
+  at 7.
+- **[open / unresolved]** *which* enneagram mapping (operations-on-points vs
+  Hodgson's systems-on-points — they conflict on the monad's point); the triangle
+  3·6·9 (ELT? or triad/hexad/ennead?); the Triad; orders 9–12; how structural and
+  operational aspects precisely reconcile; the exact being/doing/activity wording.
 - **[discarded]** the earlier abstract 1→12 run (weak past the pentad).
 
 ## Near-term build (recommended)
