@@ -7,16 +7,14 @@ use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
 /// Which top-level view the main pane shows.
+/// - **Nullad**: the raw registry — everything, as a data view (the reference
+///   browser) with search / sort / filter.
+/// - **Monad**: the scoped graph view (a system on the canvas).
 #[derive(Clone, Copy, PartialEq)]
 pub enum AppView {
-    Graph,
-    References,
+    Nullad,
+    Monad,
 }
-
-/// Whether the (big-table) reference browser is reachable from the UI. Hidden
-/// while the perspective/system/sequence selector redesign is pending; the
-/// component and its wiring are retained as a detailed perspective browser.
-const SHOW_REFERENCES_VIEW: bool = false;
 
 /// Detect GraphQL endpoint based on current browser location
 /// - Development (localhost:8080): Points to http://localhost:8000/graphql
@@ -127,7 +125,7 @@ impl Component for ApiApp {
             breadcrumbs: vec![],
             show_edge_labels: false,
             system_references: vec![],
-            view: AppView::Graph,
+            view: AppView::Monad,
             all_references: vec![],
             instance_systems: vec![],
             show_canonical: false,
@@ -274,7 +272,7 @@ impl Component for ApiApp {
             ApiAppMsg::SetView(view) => {
                 self.view = view;
                 // Lazily load all references the first time the browser opens.
-                if view == AppView::References && self.all_references.is_empty() {
+                if view == AppView::Nullad && self.all_references.is_empty() {
                     let link = ctx.link().clone();
                     let client = self.graphql_client.clone();
                     spawn_local(async move {
@@ -319,8 +317,8 @@ impl Component for ApiApp {
         let on_navigate = ctx.link().callback(ApiAppMsg::NavigateToSystem);
         let on_back = ctx.link().callback(|_| ApiAppMsg::NavigateBack);
         let on_toggle_edge_labels = ctx.link().callback(|_| ApiAppMsg::ToggleEdgeLabels);
-        let show_graph = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Graph));
-        let show_refs = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::References));
+        let show_monad = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Monad));
+        let show_nullad = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Nullad));
         let on_load = ctx.link().callback(ApiAppMsg::LoadInstance);
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
 
@@ -360,25 +358,20 @@ impl Component for ApiApp {
                     </aside>
 
                     <main class="main-view">
-                        // Top-level view switch (Graph ⇄ References). Hidden for
-                        // now: the big-table reference browser is kept as code (a
-                        // detailed perspective browser) but out of view, pending
-                        // the perspective/system/sequence selector redesign. Flip
-                        // SHOW_REFERENCES_VIEW to re-expose it.
-                        if SHOW_REFERENCES_VIEW {
-                            <div class="view-switch">
-                                <button
-                                    class={ if self.view == AppView::Graph { "view-switch-btn active" } else { "view-switch-btn" } }
-                                    onclick={ show_graph }
-                                >{ "Graph" }</button>
-                                <button
-                                    class={ if self.view == AppView::References { "view-switch-btn active" } else { "view-switch-btn" } }
-                                    onclick={ show_refs }
-                                >{ "References" }</button>
-                            </div>
-                        }
+                        // Top-level view switch — Nullad (the raw registry, a data
+                        // view over everything) before Monad (the scoped graph view).
+                        <div class="view-switch">
+                            <button
+                                class={ if self.view == AppView::Nullad { "view-switch-btn active" } else { "view-switch-btn" } }
+                                onclick={ show_nullad }
+                            >{ "Nullad" }</button>
+                            <button
+                                class={ if self.view == AppView::Monad { "view-switch-btn active" } else { "view-switch-btn" } }
+                                onclick={ show_monad }
+                            >{ "Monad" }</button>
+                        </div>
 
-                        if SHOW_REFERENCES_VIEW && self.view == AppView::References {
+                        if self.view == AppView::Nullad {
                             <ReferenceBrowser references={ self.all_references.clone() } />
                         } else {
                         // Breadcrumb trail
