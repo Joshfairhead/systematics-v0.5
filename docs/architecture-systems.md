@@ -48,15 +48,32 @@ the graph · `proposed` = named but not built/settled.
 | Canonical run | the 12 canonical systems (monad→dodecad) — the systematic backbone | `data/canonical.json` | seeded |
 | Functor | same-grammar morphism (an `S_n` permutation); the CT operations identity · composition · associativity sit behind it | `core/functors.rs` | impl |
 
-## The live registry — the Architectural Monad
+## Nullad, Monad, and the core sequence
 
-The in-app, live form of *this document* is the **Architectural Monad**
-(`sequence_architectural_monad`, seeded in
-`backend/data/perspectives/architecture_monad.json`) — a `Sequence` holding the
-**declared architecture systems**. It is the bounded universe of inquiry: it
-contains everything of relevance (structured and unstructured, floating dyads and
-triads that later resolve into higher systems), as a list of members. Currently:
-the Architecture Pentad. Undeclared orders are simply absent (blank in the view).
+Three distinct things — do not conflate them:
+
+- **Nullad (0) — the unbounded registry.** *Everything* in the tool (all systems,
+  sequences, perspectives; structured and unstructured). No scope. Best expressed
+  as a **view/query** over the graph, not a curated list.
+- **Monad (1) — a scoped registry.** A bounded universe of inquiry with a
+  **central point naming its unity** (e.g. "system architecture"), linking every
+  graph of relevance to it: the class/instance dyad, the ALP and ELT triads, the
+  pegged Pentad, other potential pentads/tetrads, and *implicit* knowledge-graph
+  material not yet assembled. It is **raw material** for sorting and assembly, not
+  the core sequence. It is **fractal/holonic** — five tetrads here might each be a
+  single *node* in the core Pentad; much of it is only partially relevant (or
+  irrelevant) to the sequential representation, yet still within the monad's
+  possibility space.
+- **Core sequence (1→12).** The systems of interest that *articulate a selection*
+  of the monad. It is not the monad.
+
+The live form of the **Monad** is `sequence_architectural_monad` (seeded in
+`backend/data/perspectives/architecture_monad.json`) — a `Sequence` whose name is
+its unity ("Architectural Monad") and whose members link the relevant graphs.
+Members may be **explicit** (a resolvable `system:` address, e.g. the Pentad) or
+**implicit** (a dangling address = material still to be assembled — tolerated).
+Currently one explicit member: the Architecture Pentad; it grows as relevant
+graphs are declared.
 
 ## Practice
 

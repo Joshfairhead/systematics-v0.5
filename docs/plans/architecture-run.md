@@ -72,12 +72,19 @@ the point: the operational will (the enneagram) contains the structural being
 
 We need enough system to use it to design itself. The way through:
 
-1. **Monad — Ingest.** An unsorted hodgepodge of stored systems/fragments —
-   **unstructured data; RAG is the Monad of the system** (chuck everything into a
-   vector store / latent space). *Not everything in storage is part of this system
-   — it's just a collection of everything.* **Stay simple for now: treat ingest as
-   the Monad, represented as a perspective graph**; the fuller vector/RAG form is
-   later.
+1. **Nullad — Ingest (everything).** An unsorted hodgepodge of stored
+   systems/fragments — **unstructured data** (chuck everything into a vector
+   store / latent space). *Not everything in storage is part of any one inquiry —
+   it's just a collection of everything.* This unbounded registry is the
+   **Nullad** (order 0). Stay simple for now: a perspective graph; the fuller
+   vector/RAG form is later.
+1b. **Monad — Scope.** A **scoped** sub-universe drawn from the Nullad, with a
+   **central point naming its unity of inquiry** (e.g. "system architecture"),
+   linking every graph of relevance (class/instance dyad, ALP/ELT triads, the
+   Pentad, other potential pentads/tetrads, and *implicit* material still to be
+   assembled). This is **raw material** for sorting/assembly — **fractal/holonic**
+   (five tetrads here may be one node in the core Pentad); most of it is only
+   partially relevant to the sequence. Live form: `sequence_architectural_monad`.
 2. **Tetrad — Organise.** Distil the Monad into a **graph**: create all the
    **node/edge relations** — nodes = **term characters** (nouns), edges =
    **connective characters** (verbs). **Sort · Tag · Filter · Search are verbs →
@@ -91,13 +98,14 @@ We need enough system to use it to design itself. The way through:
    **discarded**, the rest **assembled into higher-order complete graphs** (faces
    gluing into higher systems). **Relate (Triad, point 3)** sifts needed vs
    not-needed, looking toward the outcome at 8.
-4. **Represent** — the architecture run as a **first-class, editable Sequence in
-   the app** (the Sequence type designed but not yet built), with back-and-forth
-   updates happening *there*. The **Load control should address a Sequence**, not
-   just a single system: loading the *Architecture Run* sequence shows it as a
-   **collection of systems** — the Pentad displays with its terms, orders not yet
-   defined show blank/placeholder. "See the architectural plan represented as a
-   collection of systems."
+4. **Represent** — via **Sequences** (now built) the **Load control should
+   address a Sequence**, not just a single system. Two distinct views:
+   - the **Monad** (`sequence_architectural_monad`) — the scoped registry / raw
+     material of everything relevant to the inquiry;
+   - the **core Sequence (1→12)** — the *articulated selection* the run makes
+     from the monad (the Pentad displays with its terms; undeclared orders blank).
+   The core sequence **is not** the monad — it is a selection drawn from it.
+   "See the architectural plan represented as a collection of systems."
 5. Then **use the system to tune its own design** (dynamic homoiconicity).
 
 ## Bennett's DU2 creation-myth pattern [generative automation, downstream]
@@ -118,9 +126,12 @@ such operations.
 - **[settled]** Pentad (5) = Sign/Symbol/Syntax/Semantics/Grammar; nouns=nodes,
   verbs=edges, graph=will.
 - **[anchored]** Agent @ Octad (8).
-- **[proposed]** Ingest = Monad = a perspective graph (unstructured / RAG ideal);
-  Tetrad = sort/tag/filter/search; enneagram process flow 1→4→2→8→5→7; generation
-  at 7.
+- **[settled shape]** **Nullad** = the unbounded registry (everything in the
+  tool); **Monad** = a *scoped* sub-universe with a central unity of inquiry, raw
+  material, fractal/holonic; the **core sequence** articulates a *selection* of
+  the monad (it is not the monad).
+- **[proposed]** Ingest → Nullad (unstructured / RAG ideal); Tetrad =
+  sort/tag/filter/search; enneagram process flow 1→4→2→8→5→7; generation at 7.
 - **[open / unresolved]** *which* enneagram mapping (operations-on-points vs
   Hodgson's systems-on-points — they conflict on the monad's point); the triangle
   3·6·9 (ELT? or triad/hexad/ennead?); the Triad; orders 9–12; how structural and
