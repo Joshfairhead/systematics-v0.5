@@ -52,28 +52,33 @@ the graph · `proposed` = named but not built/settled.
 
 Three distinct things — do not conflate them:
 
-- **Nullad (0) — the unbounded registry.** *Everything* in the tool (all systems,
-  sequences, perspectives; structured and unstructured). No scope. Best expressed
-  as a **view/query** over the graph, not a curated list.
+- **Nullad (0) — the unbounded registry.** *Everything* in the tool. No scope.
+  Best expressed as a **data view over an `all` query** — the raw registry.
+  **UI: the (repurposed) reference browser** — a "Nullad" page (before Monad)
+  with search / sort / tag / filter. Not a curated list.
 - **Monad (1) — a scoped registry.** A bounded universe of inquiry with a
   **central point naming its unity** (e.g. "system architecture"), linking every
-  graph of relevance to it: the class/instance dyad, the ALP and ELT triads, the
-  pegged Pentad, other potential pentads/tetrads, and *implicit* knowledge-graph
-  material not yet assembled. It is **raw material** for sorting and assembly, not
-  the core sequence. It is **fractal/holonic** — five tetrads here might each be a
-  single *node* in the core Pentad; much of it is only partially relevant (or
-  irrelevant) to the sequential representation, yet still within the monad's
-  possibility space.
-- **Core sequence (1→12).** The systems of interest that *articulate a selection*
-  of the monad. It is not the monad.
+  graph of relevance: the class/instance dyad, the ALP and ELT triads, the pegged
+  Pentad, other potential pentads/tetrads, and *implicit* knowledge-graph material
+  not yet assembled. Raw material for sorting/assembly, **not** the core sequence.
+  **UI: one entry on the current graph view**, its members linked on the backend
+  (not necessarily shown as core-sequence pages).
+- **Core sequence (1→12).** The systems of interest, produced **by performing
+  operations on the monad** (sort → assemble → …). It *articulates* the monad; it
+  is not the monad.
 
-The live form of the **Monad** is `sequence_architectural_monad` (seeded in
-`backend/data/perspectives/architecture_monad.json`) — a `Sequence` whose name is
-its unity ("Architectural Monad") and whose members link the relevant graphs.
-Members may be **explicit** (a resolvable `system:` address, e.g. the Pentad) or
-**implicit** (a dangling address = material still to be assembled — tolerated).
-Currently one explicit member: the Architecture Pentad; it grows as relevant
-graphs are declared.
+**Systems are lenses on the monad.** Each order is the *same* monad **reformulated
+at a resolution**: the Pentad expresses its significance in 5 Limits + 10
+Mutualities; a triad reformulates its core dynamics in 3 terms + 3 connectives;
+and so on. Moreover a **node inside one reformulation can itself unfold into a
+system** — e.g. `Sign` (a Pentad node) may unfold into a *dyad of number and
+strings*. Everything is **fractal / holonic**: five tetrads in the monad may be a
+single node in the core Pentad.
+
+The live **Monad** is `sequence_architectural_monad` (seeded in
+`backend/data/perspectives/architecture_monad.json`) — members may be **explicit**
+(a resolvable `system:` address, e.g. the Pentad) or **implicit** (a dangling
+address = material still to be assembled). One explicit member now (the Pentad).
 
 ## Practice
 

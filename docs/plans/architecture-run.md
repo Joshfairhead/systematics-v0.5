@@ -98,14 +98,15 @@ We need enough system to use it to design itself. The way through:
    **discarded**, the rest **assembled into higher-order complete graphs** (faces
    gluing into higher systems). **Relate (Triad, point 3)** sifts needed vs
    not-needed, looking toward the outcome at 8.
-4. **Represent** — via **Sequences** (now built) the **Load control should
-   address a Sequence**, not just a single system. Two distinct views:
-   - the **Monad** (`sequence_architectural_monad`) — the scoped registry / raw
-     material of everything relevant to the inquiry;
-   - the **core Sequence (1→12)** — the *articulated selection* the run makes
-     from the monad (the Pentad displays with its terms; undeclared orders blank).
-   The core sequence **is not** the monad — it is a selection drawn from it.
-   "See the architectural plan represented as a collection of systems."
+4. **Represent** — three views, distinct:
+   - **Nullad page** (the raw registry) — the **repurposed reference browser**, a
+     data view over an `all` query with search / sort / tag / filter. A "Nullad"
+     button *before* Monad. **← this is slice 3.**
+   - **Monad view** — the scoped registry as **one entry on the current graph
+     view**; its members linked on the backend, not necessarily core-sequence pages.
+   - **Core Sequence (1→12)** — produced **by performing operations on the monad**;
+     the Pentad displays with its terms, undeclared orders blank. A selection
+     *articulated from* the monad, not the monad itself.
 5. Then **use the system to tune its own design** (dynamic homoiconicity).
 
 ## Bennett's DU2 creation-myth pattern [generative automation, downstream]
