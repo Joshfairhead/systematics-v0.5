@@ -21,6 +21,7 @@ pub mod grammar;
 pub mod graph;
 pub mod links;
 pub mod perspectives;
+pub mod sequences;
 pub mod systems;
 pub mod vocabularies;
 
@@ -37,6 +38,8 @@ pub use grammar::Grammar;
 pub use systems::System;
 
 pub use functors::Functor;
+
+pub use sequences::Sequence;
 
 pub use perspectives::{Link as PerspectiveLink, Perspective};
 

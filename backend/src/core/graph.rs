@@ -12,6 +12,7 @@ use super::content::GraphContent;
 use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
 use super::functors::Functor;
 use super::grammar::Grammar;
+use super::sequences::Sequence;
 use super::perspectives::Perspective;
 use super::systems::System;
 use super::links::{Link, LinkType};
@@ -51,6 +52,9 @@ pub struct Graph {
     /// Same-grammar functors: position permutations between systems of one Order.
     #[serde(default)]
     pub functors: Vec<Functor>,
+    /// Sequences: ordered series of member addresses (container triad `+` pole).
+    #[serde(default)]
+    pub sequences: Vec<Sequence>,
     /// IDs of the immutable canonical *archetypes* (the seed: the 12 per-order
     /// systems + the citation triad + their vocabularies/characters). Runtime
     /// only, never serialised. This is the "do not copy me into a module file"
@@ -397,6 +401,30 @@ impl Graph {
         })
     }
 
+    // -------- Sequences (ordered series of member addresses) --------
+
+    pub fn sequence(&self, id: &str) -> Option<&Sequence> {
+        self.sequences.iter().find(|s| s.id == id)
+    }
+
+    pub fn sequences(&self) -> &[Sequence] {
+        &self.sequences
+    }
+
+    pub fn add_sequence(&mut self, sequence: Sequence) {
+        self.sequences.push(sequence);
+    }
+
+    pub fn update_sequence(&mut self, sequence: Sequence) -> Option<Sequence> {
+        let idx = self.sequences.iter().position(|s| s.id == sequence.id)?;
+        Some(std::mem::replace(&mut self.sequences[idx], sequence))
+    }
+
+    pub fn delete_sequence(&mut self, id: &str) -> Option<Sequence> {
+        let idx = self.sequences.iter().position(|s| s.id == id)?;
+        Some(self.sequences.remove(idx))
+    }
+
     /// Does an address resolve to an entity currently in the graph? Used by the
     /// Load primitive to warn about dangling manifest dependencies (which are
     /// tolerated, per the referential model, not errors).
@@ -408,6 +436,7 @@ impl Graph {
         match kind {
             "system" => self.system(id).is_some(),
             "perspective" => self.perspective(id).is_some(),
+            "sequence" => self.sequence(id).is_some(),
             "vocab" => self.vocabulary(id).is_some(),
             "source" => self.source(id).is_some(),
             "artefact" => self.artefact(id).is_some(),
@@ -784,6 +813,11 @@ impl Graph {
                 self.add_functor(f.clone());
             }
         }
+        for s in &content.sequences {
+            if self.update_sequence(s.clone()).is_none() {
+                self.add_sequence(s.clone());
+            }
+        }
     }
 
     /// Snapshot the entire data layer as a content bundle.
@@ -799,6 +833,7 @@ impl Graph {
             lookups: self.lookups.clone(),
             references: self.references.clone(),
             functors: self.functors.clone(),
+            sequences: self.sequences.clone(),
             manifest: Vec::new(),
         }
     }
@@ -885,6 +920,12 @@ impl Graph {
                 .functors
                 .iter()
                 .filter(|f| is_user(&f.id))
+                .cloned()
+                .collect(),
+            sequences: self
+                .sequences
+                .iter()
+                .filter(|s| is_user(&s.id))
                 .cloned()
                 .collect(),
             manifest: Vec::new(),

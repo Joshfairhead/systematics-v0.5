@@ -8,8 +8,8 @@ use tokio::sync::RwLock;
 
 use crate::core::{
     Artefact, Character, Coordinate, Entry, Functor, GeometricVocabulary, Grammar, Graph, Line,
-    Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Vocabulary, Segment,
-    Source, System, TopologicalVocabulary,
+    Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Sequence, Vocabulary,
+    Segment, Source, System, TopologicalVocabulary,
 };
 
 /// Shared, mutable graph passed to the GraphQL schema as context data.
@@ -302,6 +302,18 @@ impl QueryRoot {
     async fn validate_functor(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
         let g = graph_snapshot(ctx).await;
         g.validate_functor(&id).err().unwrap_or_default()
+    }
+
+    // -------- Sequences (ordered series of member addresses) --------
+
+    async fn sequence(&self, ctx: &Context<'_>, id: String) -> Option<GqlSequence> {
+        let g = graph_snapshot(ctx).await;
+        g.sequence(&id).cloned().map(GqlSequence::new)
+    }
+
+    async fn sequences(&self, ctx: &Context<'_>) -> Vec<GqlSequence> {
+        let g = graph_snapshot(ctx).await;
+        g.sequences().iter().cloned().map(GqlSequence::new).collect()
     }
 
     // -------- resolved RenderedSystem (a System resolved into a bound K-graph) --------
@@ -917,6 +929,51 @@ impl MutationRoot {
         removed
     }
 
+    // -------- Sequences (ordered series of member addresses) --------
+
+    async fn create_sequence(
+        &self,
+        ctx: &Context<'_>,
+        input: SequenceInput,
+    ) -> async_graphql::Result<GqlSequence> {
+        let sequence = input.into_sequence();
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.sequence(&sequence.id).is_some() {
+            return Err(Error::new(format!("Sequence '{}' already exists", sequence.id)));
+        }
+        graph.add_sequence(sequence.clone());
+        persist(ctx, &graph);
+        Ok(GqlSequence::new(sequence))
+    }
+
+    async fn update_sequence(
+        &self,
+        ctx: &Context<'_>,
+        id: String,
+        input: SequenceInput,
+    ) -> async_graphql::Result<GqlSequence> {
+        let mut sequence = input.into_sequence();
+        sequence.id = id.clone();
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.update_sequence(sequence.clone()).is_none() {
+            return Err(Error::new(format!("Sequence '{}' not found", id)));
+        }
+        persist(ctx, &graph);
+        Ok(GqlSequence::new(sequence))
+    }
+
+    async fn delete_sequence(&self, ctx: &Context<'_>, id: String) -> bool {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        let removed = graph.delete_sequence(&id).is_some();
+        if removed {
+            persist(ctx, &graph);
+        }
+        removed
+    }
+
     /// Transform a Perspective by a Functor, materialising and storing a new
     /// Perspective whose addresses over the functor's source system are remapped
     /// to its target system. Returns the new Perspective.
@@ -1493,6 +1550,28 @@ impl GqlSystem {
     }
 }
 
+pub struct GqlSequence {
+    inner: Sequence,
+}
+impl GqlSequence {
+    pub fn new(inner: Sequence) -> Self {
+        Self { inner }
+    }
+}
+#[Object]
+impl GqlSequence {
+    async fn id(&self) -> &str {
+        &self.inner.id
+    }
+    async fn name(&self) -> &str {
+        &self.inner.name
+    }
+    /// Ordered member addresses.
+    async fn members(&self) -> Vec<String> {
+        self.inner.members.clone()
+    }
+}
+
 pub struct GqlFunctor {
     inner: Functor,
 }
@@ -1618,6 +1697,23 @@ impl SystemInput {
                 self.grammar_ref,
                 self.vocabulary_ref,
             ),
+        }
+    }
+}
+
+#[derive(InputObject)]
+pub struct SequenceInput {
+    pub id: Option<String>,
+    pub name: String,
+    /// Ordered member addresses (`system:<id>`, `perspective:<id>`, `sequence:<id>`).
+    pub members: Vec<String>,
+}
+
+impl SequenceInput {
+    fn into_sequence(self) -> Sequence {
+        match self.id {
+            Some(id) => Sequence::new(id, self.name, self.members),
+            None => Sequence::with_auto_id(self.name, self.members),
         }
     }
 }

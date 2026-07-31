@@ -26,7 +26,7 @@ the graph · `proposed` = named but not built/settled.
 |---|---|---|---|---|
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
 | **Operations (ELT)** | Extract · Load · Transform (verbs) → `exportPerspective` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs` | impl (not seeded) |
-| **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,perspectives}.rs`, `sequences.rs` (TBD) | proposed (Sequence unbuilt; triad-ness unsettled) |
+| **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three types built; the *triad-ness* itself still unsettled) |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 
 ## Tetrad (order 4 — Sources / Interplays)
