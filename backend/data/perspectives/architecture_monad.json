@@ -1,0 +1,11 @@
+{
+  "sequences": [
+    {
+      "id": "sequence_architectural_monad",
+      "name": "Architectural Monad",
+      "members": [
+        "system:system_architecture_pentad_5"
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 //!
 //! It reproduces `main.rs::build_api_router` exactly — `build_graph()` →
 //! `load_perspective_modules()` → second `mark_canonical()` — and asserts:
-//!   * the 15 committed module files load,
+//!   * the 16 committed module files load,
 //!   * all 75 references resolve to an existing System (the target's system id
 //!     is present in the graph), and
 //!   * the 17 module-owned systems are all present.
@@ -61,14 +61,15 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 15,
-        "expected 15 perspective module files to load (14 sources + the \
-         self-describing Architecture Pentad); got {modules}"
+        modules, 16,
+        "expected 16 module files to load (14 sources + the Architecture Pentad \
+         + the Architectural Monad registry); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
         15,
-        "the seed contributes 0 perspectives, so all 15 come from modules"
+        "15 perspectives from 16 modules — the Architectural Monad module carries \
+         only a Sequence, no perspective"
     );
 }
 
@@ -148,5 +149,22 @@ fn du3_composes_by_address_not_copy() {
     assert!(
         graph.system("system_canonical_tetrad_4").is_some(),
         "canonical tetrad present from the seed"
+    );
+}
+
+#[test]
+fn architectural_monad_registry_loads() {
+    // The Architectural Monad is a Sequence registry of the declared architecture
+    // systems — currently just the seeded Pentad. Undeclared orders are simply
+    // absent (blank in the view). Its one member must resolve.
+    let (graph, _) = assembled_graph();
+
+    let monad = graph
+        .sequence("sequence_architectural_monad")
+        .expect("Architectural Monad registry loaded from its module");
+    assert_eq!(monad.members, vec!["system:system_architecture_pentad_5"]);
+    assert!(
+        graph.resolves(&monad.members[0]),
+        "the registry's member (the Architecture Pentad) resolves"
     );
 }

@@ -48,6 +48,16 @@ the graph · `proposed` = named but not built/settled.
 | Canonical run | the 12 canonical systems (monad→dodecad) — the systematic backbone | `data/canonical.json` | seeded |
 | Functor | same-grammar morphism (an `S_n` permutation); the CT operations identity · composition · associativity sit behind it | `core/functors.rs` | impl |
 
+## The live registry — the Architectural Monad
+
+The in-app, live form of *this document* is the **Architectural Monad**
+(`sequence_architectural_monad`, seeded in
+`backend/data/perspectives/architecture_monad.json`) — a `Sequence` holding the
+**declared architecture systems**. It is the bounded universe of inquiry: it
+contains everything of relevance (structured and unstructured, floating dyads and
+triads that later resolve into higher systems), as a list of members. Currently:
+the Architecture Pentad. Undeclared orders are simply absent (blank in the view).
+
 ## Practice
 
 Whenever we implement a systematic grouping (dyad / triad / tetrad / …), **add it
