@@ -13,12 +13,53 @@ tagged accordingly.
 **Status legend:** `impl` = in code · `seeded` = also a real System instance in
 the graph · `proposed` = named but not built/settled.
 
+## Self-documentation rule [settled]
+
+**The system must document its own construction.** Every dyad / triad / … we build
+is registered here *and*, as far as possible, **represented in the graph itself** —
+so that filtering the tool by *architecture / project* surfaces these systems and
+their relationships **without recourse to any out-of-system document**. This
+markdown registry is the interim; the north star is that the app *is* its own
+documentation (**dynamic homoiconicity**). As the model changes in conversation,
+this updates in step.
+
+## Everything is a tag [proposed — working principle]
+
+In a view, **every attribute of every element is a tag** — a `key : value` pair
+(perspective, source, locator, artefact, order, coherence, designation, …). This is
+why the query controls are one triad rather than separate features: **Tag (=)
+reconciles Sort (+) and Filter (−)**. Sort prioritises the list by a tag; Filter
+adds/removes tags from the query. Because a tag is `key : value`, each of Sort and
+Filter splits along the **by-key ↔ by-value** dyad. The control is therefore a small
+tree — **Tag → {Sort, Filter} → {key, value}** — and it is **fractal**: the same
+shape recurs at every level.
+
+## The generative process — symmetric doubling [proposed]
+
+The move that *builds* the architecture (distinct from the canonical 1→12 run) is a
+**symmetric doubling**: take a whole and split it, keeping symmetry, so **1 → 2 → 4
+→ 8**:
+
+- **Monad → Dyad** — the whole splits into two poles (Tag → Sort/Filter; or by-key
+  ↔ by-value).
+- **Dyad → Tetrad** — each pole splits again (Sort → {by-key, by-value}; Filter →
+  {by-key, by-value}) — four leaves, still symmetric.
+- **Tetrad → Octad** — each leaf splits once more, retaining symmetry.
+
+By the time the unfolding reaches a **System**, its own description is such a tree:
+**order · coherence · designation · characters**, where **designation** splits into
+*term-designation · connective-designation* and **characters** split into *terms ·
+connectives* — the same left/right symmetry all the way down. This is the in-app
+counterpart of the canonical run: the run *enumerates* orders 1→12; the doubling
+*constructs* a system by successive symmetric division.
+
 ## Dyads (order 2 — Poles / Force)
 
 | system | poles (nouns) | force (verb) | code | status |
 |---|---|---|---|---|
 | Language | **Grammar ↔ Vocabulary** | *reconciled by* System | `core/{grammar,vocabularies,systems}.rs` | impl |
 | Class/Instance | **canonical ↔ instance** | *instantiates / overrides* | `renderSystem.canonicalClass` (`graphql/types.rs`) | impl |
+| Query axis | **by key ↔ by value** | *sorts / selects* | `components/reference_browser.rs` (within the Query triad) | impl v1 — a tag has a *key* (its type) and a *value*; Sort and Filter each act on one axis |
 
 ## Triads (order 3 — Impulses / Acts)
 
@@ -27,13 +68,14 @@ the graph · `proposed` = named but not built/settled.
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
 | **Operations (ELT)** | Extract · Load · Transform (verbs) → `createSequence` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three types built; the *triad-ness* itself still unsettled) |
+| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**. *Everything in a view is a tag*; Sort prioritises the list by a tag, Filter adds/removes tags from the query. Each of Sort and Filter splits by the **by-key ↔ by-value** dyad (act on the tag's *key* = its type, or its *value*). | reconciler-typed (Tag is the whole; Sort +, Filter − its poles) | UI: `components/reference_browser.rs` (the Tag reconciler tree) | impl v1 — Sort-by-key + Filter-by-value live; Sort-by-value / Filter-by-key forthcoming |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 
 ## Tetrad (order 4 — Sources / Interplays)
 
 | system | terms / edges | typing | status |
 |---|---|---|---|
-| **Organise** | four *sources* (nouns) — **TBD**; operations *sort · tag · filter · search* (verbs) | verbs are edges; noun-terms are the gap | proposed (see `docs/plans/architecture-run.md`) |
+| **Organise** | four *sources* (nouns) — **TBD**; operations *sort · tag · filter · search* | **superseded** — the operations are now read as the **Sort · Tag · Filter triad** (above), with *search* a separate free-text mechanism, not a fourth term | proposed → recast as a triad |
 
 ## Pentad (order 5 — Limits / Mutualities) — settled
 

@@ -163,6 +163,10 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let f_artefact = use_state(|| Option::<String>::None);
     let search = use_state(String::new);
     let load_open = use_state(|| false);
+    // The Tag reconciler popover. Tag (=) reconciles Sort (+) and Filter (−):
+    // everything in the view is a tag, so both operations act on tags. Tags
+    // themselves are always shown (the reconciler is the whole).
+    let tags_open = use_state(|| false);
 
     let refs = &props.references;
     // The order filter comes from the header (Nullad = None = all).
@@ -254,6 +258,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                         perspectives: &perspectives,
                         sources: &sources,
                         artefacts: &artefacts,
+                        tags_open: &tags_open,
                     }),
                     Tab::Compare => compare_view(refs, filter_order),
                 }
@@ -376,6 +381,8 @@ struct TableCtx<'a> {
     perspectives: &'a BTreeSet<String>,
     sources: &'a BTreeSet<String>,
     artefacts: &'a BTreeSet<String>,
+    /// The Tag reconciler popover (holds the Sort/Filter × key/value tree).
+    tags_open: &'a UseStateHandle<bool>,
 }
 
 /// A toggle chip for a `String`-valued filter facet. Clicking a chip sets the
@@ -432,6 +439,7 @@ fn table_view(ctx: TableCtx) -> Html {
         perspectives,
         sources,
         artefacts,
+        tags_open,
     } = ctx;
 
     // Filter — same predicate Extract uses (header order + facets + search).
@@ -497,45 +505,80 @@ fn table_view(ctx: TableCtx) -> Html {
         })
     };
 
+    let toggle_tags = {
+        let s = tags_open.clone();
+        Callback::from(move |_: MouseEvent| s.set(!*s))
+    };
+    let filters_active = f_perspective.is_some() || f_source.is_some() || f_artefact.is_some();
+    let sort_summary = format!("{} {}", (**sort_col).label(), if **sort_asc { "▲" } else { "▼" });
+
     html! {
         <>
-            <div class="ref-controls">
-                <div class="ref-search-row">
-                    <input
-                        class="ref-search"
-                        type="text"
-                        placeholder="Search…"
-                        value={ (**search).clone() }
-                        oninput={ on_search }
-                    />
-                    <span class="ref-count">{ format!("{} shown", rows.len()) }</span>
+            // Control bar: the Tag reconciler (holding the Sort/Filter tree) to the
+            // left of the search. Tag (=) reconciles Sort (+) and Filter (−).
+            <div class="ref-controlbar">
+                <div class="control-pop">
+                    <button
+                        class={ classes!("control-btn", (filters_active || **tags_open).then_some("active")) }
+                        onclick={ toggle_tags }
+                        title="Tag (=) reconciles Sort (+) and Filter (−) — everything here is a tag"
+                    >{ "Tags ▾" }</button>
+                    if **tags_open {
+                        <div class="control-menu tag-tree">
+                            <div class="tag-root">{ "Tag (=)" }</div>
+                            <div class="tag-branches">
+                                // Sort (+): prioritise the list by a tag.
+                                <div class="tag-branch">
+                                    <div class="tag-branch-head">{ format!("Sort (+) · {sort_summary}") }</div>
+                                    <div class="tag-leaf">
+                                        <span class="tag-leaf-label">{ "by key" }</span>
+                                        { sort_button(SortCol::Order) }
+                                        { sort_button(SortCol::Perspective) }
+                                        { sort_button(SortCol::Source) }
+                                        { sort_button(SortCol::Artefact) }
+                                        { sort_button(SortCol::Fragment) }
+                                    </div>
+                                    <div class="tag-leaf">
+                                        <span class="tag-leaf-label">{ "by value" }</span>
+                                        <span class="tag-leaf-todo">{ "forthcoming" }</span>
+                                    </div>
+                                </div>
+                                // Filter (−): add/remove tags from the query.
+                                <div class="tag-branch">
+                                    <div class="tag-branch-head">{ "Filter (−)" }</div>
+                                    <div class="tag-leaf">
+                                        <span class="tag-leaf-label">{ "by key" }</span>
+                                        <span class="tag-leaf-todo">{ "forthcoming" }</span>
+                                    </div>
+                                    <div class="tag-leaf tag-leaf-col">
+                                        <span class="tag-leaf-label">{ "by value" }</span>
+                                        { string_facet("Perspective", perspectives, f_perspective) }
+                                        { string_facet("Source", sources, f_source) }
+                                        { string_facet("Artefact", artefacts, f_artefact) }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
 
-                // Sort — buttons.
-                <div class="facet">
-                    <span class="facet-label">{ "Sort" }</span>
-                    { sort_button(SortCol::Perspective) }
-                    { sort_button(SortCol::Source) }
-                    { sort_button(SortCol::Artefact) }
-                    { sort_button(SortCol::Order) }
-                    { sort_button(SortCol::Fragment) }
-                </div>
-
-                // Filter — buttons. Order is driven by the header's system
-                // buttons; these facets refine within it (perspective/source/artefact).
-                { string_facet("Perspective", perspectives, f_perspective) }
-                { string_facet("Source", sources, f_source) }
-                { string_facet("Artefact", artefacts, f_artefact) }
+                <input
+                    class="ref-search"
+                    type="text"
+                    placeholder="Search…"
+                    value={ (**search).clone() }
+                    oninput={ on_search }
+                />
+                <span class="ref-count">{ format!("{} shown", rows.len()) }</span>
             </div>
 
             <div class="ref-table-wrap">
                 <table class="ref-table">
                     <thead>
                         <tr>
-                            <th class="ref-th">{ "Perspective" }</th>
-                            <th class="ref-th">{ "Tags (source · locator · artefact)" }</th>
                             <th class="ref-th">{ "Order" }</th>
                             <th class="ref-th">{ "Cites" }</th>
+                            <th class="ref-th">{ "Tags" }</th>
                             <th class="ref-th">{ "Note" }</th>
                         </tr>
                     </thead>
@@ -550,10 +593,9 @@ fn table_view(ctx: TableCtx) -> Html {
                                 .unwrap_or_else(|| r.target.clone());
                             html! {
                                 <tr>
-                                    <td>{ persp(r) }</td>
-                                    <td>{ citation_tags(r, f_source, f_artefact) }</td>
                                     <td>{ order_of(r).map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() }</td>
                                     <td title={ target_label }>{ cites }</td>
+                                    <td>{ citation_tags(r, f_perspective, f_source, f_artefact) }</td>
                                     <td>{ r.note.clone().unwrap_or_default() }</td>
                                 </tr>
                             }
@@ -565,20 +607,27 @@ fn table_view(ctx: TableCtx) -> Html {
     }
 }
 
-/// Render a reference's **citation triad** (source · locator · artefact) as
-/// tags. Source and artefact tags are clickable — they set the matching filter,
-/// so tagging and filtering are the same button surface. The citation format is
-/// the fixed triad for now, but the row is extendable to other systematic
-/// formats.
+/// Render a reference's tags — its **perspective** plus the **citation triad**
+/// (source · locator · artefact). Perspective / source / artefact are clickable
+/// (they set the matching filter), so tagging and filtering share one surface.
+/// Folded here (shown only when the Tags column is on) to declutter the table.
 fn citation_tags(
     r: &ReferenceView,
+    f_perspective: &UseStateHandle<Option<String>>,
     f_source: &UseStateHandle<Option<String>>,
     f_artefact: &UseStateHandle<Option<String>>,
 ) -> Html {
+    let perspective = persp(r);
     let source = src(r);
     let locator = loc(r);
     let artefact = art(r);
 
+    let perspective_tag = (!perspective.is_empty()).then(|| {
+        let f = f_perspective.clone();
+        let v = perspective.clone();
+        let onclick = Callback::from(move |_: MouseEvent| f.set(Some(v.clone())));
+        html! { <button class="tag tag-perspective" onclick={ onclick } title="Perspective (filter)">{ perspective.clone() }</button> }
+    });
     let source_tag = (!source.is_empty()).then(|| {
         let f = f_source.clone();
         let v = source.clone();
@@ -597,6 +646,7 @@ fn citation_tags(
 
     html! {
         <span class="tags">
+            { perspective_tag.unwrap_or_default() }
             { source_tag.unwrap_or_default() }
             { locator_tag.unwrap_or_default() }
             { artefact_tag.unwrap_or_default() }

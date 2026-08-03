@@ -522,21 +522,19 @@ impl ApiGraphView {
 }
 
 /// A citation rendered as its own labelled triad (Source / Artefact / Lookup),
-/// one field per line — mirrors the Citation triad's three impulses.
+/// always all three lines — mirrors the Citation triad's three impulses, with a
+/// dash where a field is absent, so the triad is legible at a glance.
 fn format_reference(r: &ReferenceView) -> String {
-    let mut lines = Vec::new();
-    lines.push(format!(
-        "Source: {}",
-        r.source.as_ref().map(|s| s.name.as_str()).unwrap_or("—")
-    ));
-    if let Some(a) = &r.artefact {
-        lines.push(format!("Artefact: {}", a.title));
-    }
-    if let Some(l) = &r.lookup {
-        lines.push(format!("Lookup: {}", l.locator));
-    }
+    let source = r.source.as_ref().map(|s| s.name.as_str()).unwrap_or("—");
+    let artefact = r.artefact.as_ref().map(|a| a.title.as_str()).unwrap_or("—");
+    let locator = r.lookup.as_ref().map(|l| l.locator.as_str()).unwrap_or("—");
+    let mut lines = vec![
+        format!("Source: {source}"),
+        format!("Artefact: {artefact}"),
+        format!("Lookup: {locator}"),
+    ];
     if let Some(n) = &r.note {
-        lines.push(format!("Note: {}", n));
+        lines.push(format!("Note: {n}"));
     }
     lines.join("\n")
 }
