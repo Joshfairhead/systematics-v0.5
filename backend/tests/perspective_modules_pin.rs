@@ -162,9 +162,17 @@ fn architectural_monad_registry_loads() {
     let monad = graph
         .sequence("sequence_architectural_monad")
         .expect("Architectural Monad registry loaded from its module");
-    assert_eq!(monad.members, vec!["system:system_architecture_pentad_5"]);
-    assert!(
-        graph.resolves(&monad.members[0]),
-        "the registry's member (the Architecture Pentad) resolves"
+    assert_eq!(
+        monad.members,
+        vec![
+            "system:system_architecture_pentad_5",
+            "system:system_citation_3",
+            "perspective:elt_triad",
+        ]
     );
+    // Explicit members resolve; the ELT triad is an *implicit* (dangling) member
+    // — material documented but not yet seeded as a graph object.
+    assert!(graph.resolves("system:system_architecture_pentad_5"));
+    assert!(graph.resolves("system:system_citation_3"));
+    assert!(!graph.resolves("perspective:elt_triad"));
 }

@@ -77,8 +77,10 @@ single node in the core Pentad.
 
 The live **Monad** is `sequence_architectural_monad` (seeded in
 `backend/data/perspectives/architecture_monad.json`) — members may be **explicit**
-(a resolvable `system:` address, e.g. the Pentad) or **implicit** (a dangling
-address = material still to be assembled). One explicit member now (the Pentad).
+(a resolvable `system:` address) or **implicit** (a dangling address = material
+still to be assembled). Members now: the **Pentad** and the **Citation triad**
+(explicit) and the **ELT triad** (`perspective:elt_triad`, implicit — documented
+but not yet seeded as a graph object).
 
 ## Practice
 
