@@ -28,7 +28,10 @@ body {
 
 .sidebar {
     flex-shrink: 0;
-    /* Stack above .main-view so the Load dropdown isn't painted behind the canvas. */
+    /* Column so the view-switch sits above the system menu (top-left header). */
+    display: flex;
+    flex-direction: column;
+    /* Stack above .main-view so dropdowns aren't painted behind the canvas. */
     position: relative;
     z-index: 100;
 }
@@ -500,12 +503,11 @@ body {
     position: relative;
 }
 
+/* Top-left of the header (sidebar), above the system menu. */
 .view-switch {
-    position: absolute;
-    top: 0.75rem;
-    right: 1.25rem;
-    z-index: 20;
-    display: flex;
+    display: inline-flex;
+    align-self: flex-start;
+    margin: 0.6rem 0 0 0.75rem;
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -534,7 +536,39 @@ body {
     flex-direction: column;
     gap: 0.75rem;
     min-height: 0;
-    padding-top: 2.5rem; /* clear the absolute view switch */
+}
+
+/* ---- ELT triad (Extract · Load · Transform) — operation edge ---- */
+.elt-triad {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.elt-btn {
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    color: #2c3e50;
+    cursor: pointer;
+}
+.elt-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+.elt-load {
+    position: relative;
+}
+/* Anchor the Load menu to the left (it lives on the Nullad page now). */
+.elt-load .load-menu {
+    left: 0;
+    right: auto;
+}
+.load-empty {
+    color: #a0aec0;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
 }
 .ref-tabs {
     display: flex;
@@ -561,14 +595,20 @@ body {
     margin-left: 0.5rem;
 }
 
-.ref-filter-bar {
+/* ---- Controls: search row + sort/filter/tag button facets ---- */
+.ref-controls {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.ref-search-row {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
 }
-.ref-filter,
 .ref-search {
+    flex: 1;
+    min-width: 160px;
     background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(163, 177, 198, 0.4);
     border-radius: 8px;
@@ -576,9 +616,65 @@ body {
     font-size: 0.85rem;
     color: #2c3e50;
 }
-.ref-search {
-    flex: 1;
-    min-width: 160px;
+
+.facet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+}
+.facet-label {
+    color: #718096;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    min-width: 5.5rem;
+}
+.facet-chip,
+.sort-chip {
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.6);
+    color: #4a5568;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+.facet-chip.active,
+.sort-chip.active {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.4);
+    color: #2563eb;
+    font-weight: 600;
+}
+
+/* ---- Citation-triad tags (source · locator · artefact) ---- */
+.tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.tag {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+button.tag {
+    cursor: pointer;
+}
+.tag-source {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563eb;
+}
+.tag-artefact {
+    background: rgba(16, 185, 129, 0.14);
+    color: #059669;
+}
+.tag-locator {
+    background: rgba(163, 177, 198, 0.2);
+    color: #4a5568;
 }
 
 .ref-table-wrap {
@@ -632,25 +728,7 @@ body {
     text-align: center;
 }
 
-/* ---- Load control (in the menu bar) + Canonical-override toggle ---- */
-.nav-load {
-    position: relative;
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-    flex-shrink: 0;
-}
-.load-button {
-    border: none;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 10px;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.75rem;
-    color: #2c3e50;
-    cursor: pointer;
-}
+/* ---- Load menu (shared: the ELT triad's Load edge on the Nullad page) ---- */
 .load-menu {
     position: absolute;
     top: calc(100% + 0.25rem);

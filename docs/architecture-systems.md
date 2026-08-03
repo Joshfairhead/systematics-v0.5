@@ -25,7 +25,7 @@ the graph · `proposed` = named but not built/settled.
 | system | terms / role | node- or edge-typed | code | status |
 |---|---|---|---|---|
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
-| **Operations (ELT)** | Extract · Load · Transform (verbs) → `exportPerspective` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs` | impl (not seeded) |
+| **Operations (ELT)** | Extract · Load · Transform (verbs) → `exportPerspective` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Load** is wired (`loadPerspective` → `on_load`); **Extract** (select from Nullad → link into a Monad, an active filter; ideally auto-computes the members' integral to name the Monad) and **Transform** (apply a Functor) are surfaced as buttons but **not yet wired** |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three types built; the *triad-ness* itself still unsettled) |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 
@@ -54,8 +54,13 @@ Three distinct things — do not conflate them:
 
 - **Nullad (0) — the unbounded registry.** *Everything* in the tool. No scope.
   Best expressed as a **data view over an `all` query** — the raw registry.
-  **UI: the (repurposed) reference browser** — a "Nullad" page (before Monad)
-  with search / sort / tag / filter. Not a curated list.
+  **UI: the (repurposed) reference browser** — a "Nullad" page (the view switch
+  sits top-left of the header, before Monad). Search (free text) + **sort /
+  filter as button facets** (perspective · source · artefact · order); each
+  reference carries its **citation triad as tags** (source · locator · artefact),
+  and the source/artefact tags double as filter buttons. The page also hosts the
+  **ELT triad** (Load wired; Extract/Transform surfaced but unwired). Not a
+  curated list. *(Still fed by `allReferences`, not yet a true `all` query.)*
 - **Monad (1) — a scoped registry.** A bounded universe of inquiry with a
   **central point naming its unity** (e.g. "system architecture"), linking every
   graph of relevance: the class/instance dyad, the ALP and ELT triads, the pegged

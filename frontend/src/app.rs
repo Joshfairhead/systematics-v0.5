@@ -292,6 +292,9 @@ impl Component for ApiApp {
             }
             ApiAppMsg::LoadInstance(id) => {
                 // Replace the canvas with the loaded instance system (single canvas).
+                // Load is the ELT triad's edge on the Nullad page, so switch to the
+                // Monad (graph) view to reveal what was loaded.
+                self.view = AppView::Monad;
                 self.breadcrumbs.clear();
                 self.loading = true;
                 self.error = None;
@@ -326,6 +329,18 @@ impl Component for ApiApp {
             <div class="app">
                 <div class="app-content">
                     <aside class="sidebar">
+                        // Top-level view switch — Nullad (the raw registry) before
+                        // Monad (the scoped graph view). Top-left of the header.
+                        <div class="view-switch">
+                            <button
+                                class={ if self.view == AppView::Nullad { "view-switch-btn active" } else { "view-switch-btn" } }
+                                onclick={ show_nullad }
+                            >{ "Nullad" }</button>
+                            <button
+                                class={ if self.view == AppView::Monad { "view-switch-btn active" } else { "view-switch-btn" } }
+                                onclick={ show_monad }
+                            >{ "Monad" }</button>
+                        </div>
                         {
                             if self.loading && self.systems.is_empty() {
                                 html! { <div class="loading">{"Loading systems..."}</div> }
@@ -349,8 +364,6 @@ impl Component for ApiApp {
                                         systems={ display_systems }
                                         selected={ selected_name }
                                         on_select={ on_select }
-                                        instance_systems={ self.instance_systems.clone() }
-                                        on_load={ Some(on_load.clone()) }
                                     />
                                 }
                             }
@@ -358,21 +371,12 @@ impl Component for ApiApp {
                     </aside>
 
                     <main class="main-view">
-                        // Top-level view switch — Nullad (the raw registry, a data
-                        // view over everything) before Monad (the scoped graph view).
-                        <div class="view-switch">
-                            <button
-                                class={ if self.view == AppView::Nullad { "view-switch-btn active" } else { "view-switch-btn" } }
-                                onclick={ show_nullad }
-                            >{ "Nullad" }</button>
-                            <button
-                                class={ if self.view == AppView::Monad { "view-switch-btn active" } else { "view-switch-btn" } }
-                                onclick={ show_monad }
-                            >{ "Monad" }</button>
-                        </div>
-
                         if self.view == AppView::Nullad {
-                            <ReferenceBrowser references={ self.all_references.clone() } />
+                            <ReferenceBrowser
+                                references={ self.all_references.clone() }
+                                instance_systems={ self.instance_systems.clone() }
+                                on_load={ on_load.clone() }
+                            />
                         } else {
                         // Breadcrumb trail
                         if !self.breadcrumbs.is_empty() {
