@@ -25,7 +25,7 @@ the graph · `proposed` = named but not built/settled.
 | system | terms / role | node- or edge-typed | code | status |
 |---|---|---|---|---|
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
-| **Operations (ELT)** | Extract · Load · Transform (verbs) → `exportPerspective` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Load** is wired (`loadPerspective` → `on_load`); **Extract** (select from Nullad → link into a Monad, an active filter; ideally auto-computes the members' integral to name the Monad) and **Transform** (apply a Functor) are surfaced as buttons but **not yet wired** |
+| **Operations (ELT)** | Extract · Load · Transform (verbs) → `createSequence` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three types built; the *triad-ness* itself still unsettled) |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 
@@ -66,8 +66,11 @@ Three distinct things — do not conflate them:
   graph of relevance: the class/instance dyad, the ALP and ELT triads, the pegged
   Pentad, other potential pentads/tetrads, and *implicit* knowledge-graph material
   not yet assembled. Raw material for sorting/assembly, **not** the core sequence.
-  **UI: one entry on the current graph view**, its members linked on the backend
-  (not necessarily shown as core-sequence pages).
+  **Produced by Extract** (Nullad → Monad): a selection over the Nullad,
+  materialized as a persisted `Sequence` — so the scope is a **real graph object**
+  (id + members), not a transient client-side key. **UI: one entry on the current
+  graph view** (that node not yet built); for now Extract confirms the created
+  Monad by id.
 - **Core sequence (1→12).** The systems of interest, produced **by performing
   operations on the monad** (sort → assemble → …). It *articulates* the monad; it
   is not the monad.

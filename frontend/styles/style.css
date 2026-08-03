@@ -591,6 +591,12 @@ body {
     font-size: 0.8rem;
     padding: 0.35rem 0.6rem;
 }
+/* Extract feedback (Nullad → Monad result). */
+.elt-note {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: #059669;
+}
 .ref-tabs {
     display: flex;
     align-items: center;

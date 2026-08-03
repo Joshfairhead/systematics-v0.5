@@ -52,6 +52,19 @@ pub struct ReferenceBrowserProps {
     /// `None` = Nullad = the whole registry (no order filter).
     #[prop_or_default]
     pub filter_order: Option<i32>,
+    /// Extract (Nullad → Monad): materialize the current selection as a Monad.
+    pub on_extract: Callback<ExtractRequest>,
+    /// Feedback from the last Extract (e.g. "Extracted 'Monad …' (n members)").
+    #[prop_or_default]
+    pub extract_note: Option<String>,
+}
+
+/// A request to Extract the current selection into a Monad — a provisional name
+/// plus the selected member addresses (`system:<id>`, …).
+#[derive(Clone, PartialEq)]
+pub struct ExtractRequest {
+    pub name: String,
+    pub members: Vec<String>,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -100,6 +113,34 @@ fn order_of(r: &ReferenceView) -> Option<i32> {
 fn frag(r: &ReferenceView) -> String {
     r.target_fragment.clone().unwrap_or_default()
 }
+/// Whether a reference is in the current selection (header order + facets +
+/// search). Shared by the table (what to show) and Extract (what to materialize).
+fn passes_filters(
+    r: &ReferenceView,
+    filter_order: Option<i32>,
+    f_perspective: Option<&str>,
+    f_source: Option<&str>,
+    f_artefact: Option<&str>,
+    needle: &str,
+) -> bool {
+    filter_order.is_none_or(|o| order_of(r) == Some(o))
+        && f_perspective.is_none_or(|p| persp(r).as_str() == p)
+        && f_source.is_none_or(|s| src(r).as_str() == s)
+        && f_artefact.is_none_or(|a| art(r).as_str() == a)
+        && (needle.is_empty() || {
+            let hay = format!(
+                "{} {} {} {} {} {}",
+                persp(r),
+                src(r),
+                art(r),
+                loc(r),
+                r.target,
+                r.note.clone().unwrap_or_default()
+            )
+            .to_lowercase();
+            hay.contains(needle)
+        })
+}
 fn provenance(r: &ReferenceView) -> String {
     let s = src(r);
     let l = loc(r);
@@ -140,6 +181,32 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         None => "Nullad — all orders".to_string(),
     };
 
+    // The Extract selection: distinct target systems of the currently-filtered
+    // references, as `system:<id>` member addresses. This is what Extract
+    // materializes into a Monad.
+    let needle = search.to_lowercase();
+    let mut seen = BTreeSet::new();
+    let extract_members: Vec<String> = refs
+        .iter()
+        .filter(|r| {
+            passes_filters(
+                r,
+                filter_order,
+                f_perspective.as_deref(),
+                f_source.as_deref(),
+                f_artefact.as_deref(),
+                &needle,
+            )
+        })
+        .filter_map(|r| r.target_system.as_ref().map(|s| format!("system:{}", s.id)))
+        .filter(|m| seen.insert(m.clone()))
+        .collect();
+    // Provisional Monad name (the "integral" naming is a later refinement).
+    let extract_name = match filter_order {
+        Some(o) => format!("Monad — {} {}", o, order_name(o)),
+        None => format!("Monad — Nullad selection ({})", extract_members.len()),
+    };
+
     let switch_tab = {
         let tab = tab.clone();
         move |t: Tab| {
@@ -151,7 +218,15 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     html! {
         <div class="reference-browser">
             // ELT triad — the operation edge. Extract · Load · Transform.
-            { elt_triad(&props.instance_systems, &props.on_load, &load_open) }
+            { elt_triad(EltCtx {
+                instance_systems: &props.instance_systems,
+                on_load: &props.on_load,
+                load_open: &load_open,
+                extract_members: &extract_members,
+                extract_name: &extract_name,
+                on_extract: &props.on_extract,
+                extract_note: props.extract_note.as_deref(),
+            }) }
 
             <div class="ref-tabs">
                 <button
@@ -187,26 +262,65 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     }
 }
 
-/// The ELT triad control: Extract · Load · Transform. Load opens a menu of
-/// instance systems; Extract and Transform are the triad's other two edges,
-/// present but not yet wired to backend operations.
-fn elt_triad(
-    instance_systems: &[InstanceSystem],
-    on_load: &Callback<String>,
-    load_open: &UseStateHandle<bool>,
-) -> Html {
+/// Grouped arguments for the ELT triad control.
+struct EltCtx<'a> {
+    instance_systems: &'a [InstanceSystem],
+    on_load: &'a Callback<String>,
+    load_open: &'a UseStateHandle<bool>,
+    /// The current selection to Extract, as `system:<id>` member addresses.
+    extract_members: &'a [String],
+    /// Provisional name for the Monad Extract would create.
+    extract_name: &'a str,
+    on_extract: &'a Callback<ExtractRequest>,
+    /// Feedback from the last Extract, if any.
+    extract_note: Option<&'a str>,
+}
+
+/// The ELT triad control: Extract · Load · Transform.
+/// - **Extract** materializes the current selection into a Monad (Nullad → Monad).
+/// - **Load** opens a menu of instance systems.
+/// - **Transform** (apply a Functor) is the third edge, not yet wired.
+fn elt_triad(ctx: EltCtx) -> Html {
+    let EltCtx {
+        instance_systems,
+        on_load,
+        load_open,
+        extract_members,
+        extract_name,
+        on_extract,
+        extract_note,
+    } = ctx;
+
     let toggle = {
         let o = load_open.clone();
         Callback::from(move |_: MouseEvent| o.set(!*o))
     };
 
+    let can_extract = !extract_members.is_empty();
+    let on_extract_click = {
+        let on_extract = on_extract.clone();
+        let name = extract_name.to_string();
+        let members = extract_members.to_vec();
+        Callback::from(move |_: MouseEvent| {
+            on_extract.emit(ExtractRequest {
+                name: name.clone(),
+                members: members.clone(),
+            })
+        })
+    };
+    let extract_title = format!(
+        "Extract — materialize this selection ({} systems) into a Monad (Nullad → Monad)",
+        extract_members.len()
+    );
+
     html! {
         <div class="elt-triad" title="Operation edge (ELT): Extract · Load · Transform">
             <button
                 class="elt-btn"
-                disabled=true
-                title="Extract — select systems from the Nullad to link into a Monad (an active filter). Not yet wired."
-            >{ "Extract" }</button>
+                disabled={ !can_extract }
+                onclick={ on_extract_click }
+                title={ extract_title }
+            >{ format!("Extract ({})", extract_members.len()) }</button>
 
             <div class="elt-load">
                 <button class="elt-btn" onclick={ toggle }>
@@ -240,6 +354,10 @@ fn elt_triad(
                 disabled=true
                 title="Transform — apply a Functor to a loaded system. Not yet wired."
             >{ "Transform" }</button>
+
+            if let Some(note) = extract_note {
+                <span class="elt-note">{ note }</span>
+            }
         </div>
     }
 }
@@ -316,30 +434,19 @@ fn table_view(ctx: TableCtx) -> Html {
         artefacts,
     } = ctx;
 
-    // Filter. The header's order selection (`filter_order`) scopes the view;
-    // the in-page facets refine within it.
+    // Filter — same predicate Extract uses (header order + facets + search).
     let needle = search.to_lowercase();
     let mut rows: Vec<&ReferenceView> = refs
         .iter()
-        .filter(|r| filter_order.is_none_or(|o| order_of(r) == Some(o)))
-        .filter(|r| f_perspective.as_ref().is_none_or(|p| &persp(r) == p))
-        .filter(|r| f_source.as_ref().is_none_or(|s| &src(r) == s))
-        .filter(|r| f_artefact.as_ref().is_none_or(|a| &art(r) == a))
         .filter(|r| {
-            if needle.is_empty() {
-                return true;
-            }
-            let hay = format!(
-                "{} {} {} {} {} {}",
-                persp(r),
-                src(r),
-                art(r),
-                loc(r),
-                r.target,
-                r.note.clone().unwrap_or_default()
+            passes_filters(
+                r,
+                filter_order,
+                f_perspective.as_deref(),
+                f_source.as_deref(),
+                f_artefact.as_deref(),
+                &needle,
             )
-            .to_lowercase();
-            hay.contains(&needle)
         })
         .collect();
 

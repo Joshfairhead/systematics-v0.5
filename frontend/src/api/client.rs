@@ -128,6 +128,22 @@ struct InstanceSystemsResponse {
     instance_systems: Vec<InstanceSystem>,
 }
 
+/// A Sequence (e.g. a Monad extracted from the Nullad) as returned by
+/// `createSequence` — id, name, and member addresses.
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct SequenceView {
+    pub id: String,
+    pub name: String,
+    #[serde(default)]
+    pub members: Vec<String>,
+}
+
+#[derive(Deserialize, Debug)]
+struct CreateSequenceResponse {
+    #[serde(rename = "createSequence")]
+    create_sequence: Option<SequenceView>,
+}
+
 #[derive(Deserialize, Debug)]
 struct RenderSystemResponse {
     #[serde(rename = "renderSystem")]
@@ -440,6 +456,36 @@ impl GraphQLClient {
         }
 
         Ok(response.data.map(|d| d.all_references).unwrap_or_default())
+    }
+
+    /// Extract (Nullad → Monad): materialize a selection as a persisted
+    /// `Sequence` (a Monad) via `createSequence`. `members` are addresses
+    /// (`system:<id>`, …). The backend auto-ids from the name and persists to
+    /// the user store — so the scope becomes a real graph object.
+    pub async fn create_sequence(
+        &self,
+        name: &str,
+        members: Vec<String>,
+    ) -> Result<SequenceView, ApiError> {
+        let query = r#"
+            mutation Extract($input: SequenceInput!) {
+                createSequence(input: $input) { id name members }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "name": name, "members": members }
+        });
+        let response: GraphQLResponse<CreateSequenceResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.create_sequence)
+            .ok_or_else(|| ApiError::ParseError("createSequence returned no data".to_string()))
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(

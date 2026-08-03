@@ -1,6 +1,6 @@
 use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
-use crate::components::reference_browser::ReferenceBrowser;
+use crate::components::reference_browser::{ExtractRequest, ReferenceBrowser};
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
@@ -83,6 +83,10 @@ pub enum ApiAppMsg {
     InstanceSystemsLoaded(Vec<InstanceSystem>),
     LoadInstance(String),
     ToggleCanonical,
+    /// Extract the current data-view selection into a Monad (Nullad → Monad).
+    ExtractMonad(ExtractRequest),
+    /// Result feedback from the last Extract.
+    MonadExtracted(String),
 }
 
 pub struct ApiApp {
@@ -110,6 +114,8 @@ pub struct ApiApp {
     /// When true, node/edge labels show the canonical *class* (from the loaded
     /// system's `canonicalClass`) instead of its instance values.
     show_canonical: bool,
+    /// Feedback from the last Extract (Nullad → Monad), shown in the data view.
+    extract_note: Option<String>,
 }
 
 impl Component for ApiApp {
@@ -159,6 +165,7 @@ impl Component for ApiApp {
             all_references: vec![],
             instance_systems: vec![],
             show_canonical: false,
+            extract_note: None,
         }
     }
 
@@ -360,6 +367,34 @@ impl Component for ApiApp {
                 self.show_canonical = !self.show_canonical;
                 true
             }
+            ApiAppMsg::ExtractMonad(req) => {
+                // Extract (Nullad → Monad): materialize the current selection as a
+                // persisted Sequence via GraphQL. The scope becomes a real graph
+                // object rather than a transient client-side key.
+                if req.members.is_empty() {
+                    self.extract_note = Some("Nothing selected to extract.".to_string());
+                    return true;
+                }
+                self.extract_note = Some(format!("Extracting {}…", req.name));
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                let count = req.members.len();
+                spawn_local(async move {
+                    let note = match client.create_sequence(&req.name, req.members).await {
+                        Ok(seq) => format!(
+                            "Extracted Monad “{}” ({} systems) → {}",
+                            seq.name, count, seq.id
+                        ),
+                        Err(e) => format!("Extract failed: {e}"),
+                    };
+                    link.send_message(ApiAppMsg::MonadExtracted(note));
+                });
+                true
+            }
+            ApiAppMsg::MonadExtracted(note) => {
+                self.extract_note = Some(note);
+                true
+            }
         }
     }
 
@@ -370,6 +405,7 @@ impl Component for ApiApp {
         let on_toggle_edge_labels = ctx.link().callback(|_| ApiAppMsg::ToggleEdgeLabels);
         let on_load = ctx.link().callback(ApiAppMsg::LoadInstance);
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
+        let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
 
         // The Data toggle flips between the graph canvas and the reference browser.
         let data_mode = self.mode == ViewMode::Data;
@@ -417,6 +453,8 @@ impl Component for ApiApp {
                                 instance_systems={ self.instance_systems.clone() }
                                 on_load={ on_load.clone() }
                                 filter_order={ filter_order }
+                                on_extract={ on_extract }
+                                extract_note={ self.extract_note.clone() }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for
