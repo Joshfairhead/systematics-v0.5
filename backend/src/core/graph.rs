@@ -415,6 +415,23 @@ impl Graph {
         self.sequences.push(sequence);
     }
 
+    /// A sequence id free in the graph: `base` if unused, else `base_2`, `base_3`,
+    /// … So repeated Extracts of the same scope (which slug to the same base id
+    /// from their auto-name) each get a distinct Monad rather than colliding.
+    pub fn unique_sequence_id(&self, base: &str) -> String {
+        if self.sequence(base).is_none() {
+            return base.to_string();
+        }
+        let mut n = 2;
+        loop {
+            let candidate = format!("{base}_{n}");
+            if self.sequence(&candidate).is_none() {
+                return candidate;
+            }
+            n += 1;
+        }
+    }
+
     pub fn update_sequence(&mut self, sequence: Sequence) -> Option<Sequence> {
         let idx = self.sequences.iter().position(|s| s.id == sequence.id)?;
         Some(std::mem::replace(&mut self.sequences[idx], sequence))

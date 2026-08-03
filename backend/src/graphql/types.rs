@@ -936,11 +936,17 @@ impl MutationRoot {
         ctx: &Context<'_>,
         input: SequenceInput,
     ) -> async_graphql::Result<GqlSequence> {
-        let sequence = input.into_sequence();
+        // An explicit id must be respected (collision = error); an auto-generated
+        // id (no id supplied) is disambiguated so repeated Extracts don't collide.
+        let explicit_id = input.id.is_some();
+        let mut sequence = input.into_sequence();
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         if graph.sequence(&sequence.id).is_some() {
-            return Err(Error::new(format!("Sequence '{}' already exists", sequence.id)));
+            if explicit_id {
+                return Err(Error::new(format!("Sequence '{}' already exists", sequence.id)));
+            }
+            sequence.id = graph.unique_sequence_id(&sequence.id);
         }
         graph.add_sequence(sequence.clone());
         persist(ctx, &graph);
