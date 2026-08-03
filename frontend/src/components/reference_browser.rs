@@ -94,6 +94,39 @@ impl SortCol {
     }
 }
 
+/// A selectable column — one **tag key**. The view is composed by choosing which
+/// keys to show (the Tag reconciler's own by-key action). Everything is a tag, so
+/// a column is just a tag key surfaced.
+#[derive(Clone, Copy, PartialEq)]
+enum ColKey {
+    Order,
+    Perspective,
+    Citation,
+    Cites,
+    Note,
+}
+
+/// Canonical column order (independent of the order keys were toggled on).
+const ALL_COLS: [ColKey; 5] = [
+    ColKey::Order,
+    ColKey::Perspective,
+    ColKey::Citation,
+    ColKey::Cites,
+    ColKey::Note,
+];
+
+impl ColKey {
+    fn label(self) -> &'static str {
+        match self {
+            ColKey::Order => "Order",
+            ColKey::Perspective => "Perspective",
+            ColKey::Citation => "Citation",
+            ColKey::Cites => "Cites",
+            ColKey::Note => "Note",
+        }
+    }
+}
+
 // -- small field accessors (references carry Option-wrapped nested data) --
 fn persp(r: &ReferenceView) -> String {
     r.perspective_name.clone().unwrap_or_default()
@@ -164,9 +197,11 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let search = use_state(String::new);
     let load_open = use_state(|| false);
     // The Tag reconciler popover. Tag (=) reconciles Sort (+) and Filter (−):
-    // everything in the view is a tag, so both operations act on tags. Tags
-    // themselves are always shown (the reconciler is the whole).
+    // everything in the view is a tag, so both operations act on tags.
     let tags_open = use_state(|| false);
+    // Which tag keys are shown as columns — the view is composed by key. Minimal
+    // by default (seeing every key at once is rarely useful).
+    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Citation]);
 
     let refs = &props.references;
     // The order filter comes from the header (Nullad = None = all).
@@ -259,6 +294,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                         sources: &sources,
                         artefacts: &artefacts,
                         tags_open: &tags_open,
+                        visible_cols: &visible_cols,
                     }),
                     Tab::Compare => compare_view(refs, filter_order),
                 }
@@ -383,6 +419,8 @@ struct TableCtx<'a> {
     artefacts: &'a BTreeSet<String>,
     /// The Tag reconciler popover (holds the Sort/Filter × key/value tree).
     tags_open: &'a UseStateHandle<bool>,
+    /// Which tag keys are shown as columns (the view, composed by key).
+    visible_cols: &'a UseStateHandle<Vec<ColKey>>,
 }
 
 /// A toggle chip for a `String`-valued filter facet. Clicking a chip sets the
@@ -440,6 +478,7 @@ fn table_view(ctx: TableCtx) -> Html {
         sources,
         artefacts,
         tags_open,
+        visible_cols,
     } = ctx;
 
     // Filter — same predicate Extract uses (header order + facets + search).
@@ -497,6 +536,44 @@ fn table_view(ctx: TableCtx) -> Html {
         }
     };
 
+    // Column toggle — add/remove a tag key from the view (the Tag = by-key action).
+    let col_chip = |k: ColKey| -> Html {
+        let visible_cols = visible_cols.clone();
+        let on = visible_cols.contains(&k);
+        let onclick = Callback::from(move |_: MouseEvent| {
+            let mut next = (*visible_cols).clone();
+            if let Some(i) = next.iter().position(|c| *c == k) {
+                next.remove(i);
+            } else {
+                next.push(k);
+            }
+            visible_cols.set(next);
+        });
+        html! {
+            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
+                { k.label() }
+            </button>
+        }
+    };
+    // Visible columns in canonical order (independent of toggle order).
+    let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
+    let cell = |k: ColKey, r: &ReferenceView| -> Html {
+        match k {
+            ColKey::Order => html! { { order_of(r).map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } },
+            ColKey::Perspective => html! {
+                { persp_tag(r, f_perspective) }
+            },
+            ColKey::Citation => html! { { citation_tags(r, f_source, f_artefact) } },
+            ColKey::Cites => {
+                let f = frag(r);
+                let cites = if f.is_empty() { "whole system".to_string() } else { f };
+                let target_label = r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_else(|| r.target.clone());
+                html! { <span title={ target_label }>{ cites }</span> }
+            }
+            ColKey::Note => html! { { r.note.clone().unwrap_or_default() } },
+        }
+    };
+
     let on_search = {
         let search = search.clone();
         Callback::from(move |e: InputEvent| {
@@ -526,6 +603,11 @@ fn table_view(ctx: TableCtx) -> Html {
                     if **tags_open {
                         <div class="control-menu tag-tree">
                             <div class="tag-root">{ "Tag (=)" }</div>
+                            // Tag (=) — compose the view by choosing tag keys as columns.
+                            <div class="tag-leaf tag-columns">
+                                <span class="tag-leaf-label">{ "columns · by key" }</span>
+                                { for ALL_COLS.into_iter().map(col_chip) }
+                            </div>
                             <div class="tag-branches">
                                 // Sort (+): prioritise the list by a tag.
                                 <div class="tag-branch">
@@ -573,61 +655,54 @@ fn table_view(ctx: TableCtx) -> Html {
             </div>
 
             <div class="ref-table-wrap">
-                <table class="ref-table">
-                    <thead>
-                        <tr>
-                            <th class="ref-th">{ "Order" }</th>
-                            <th class="ref-th">{ "Cites" }</th>
-                            <th class="ref-th">{ "Tags" }</th>
-                            <th class="ref-th">{ "Note" }</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { for rows.iter().map(|r| {
-                            let cites = {
-                                let f = frag(r);
-                                if f.is_empty() { "whole system".to_string() } else { f }
-                            };
-                            let target_label = r.target_system.as_ref()
-                                .map(|s| s.name.clone())
-                                .unwrap_or_else(|| r.target.clone());
-                            html! {
+                if cols.is_empty() {
+                    <p class="ref-empty">{ "No columns — pick tag keys under Tags ▾ → columns." }</p>
+                } else {
+                    <table class="ref-table">
+                        <thead>
+                            <tr>
+                                { for cols.iter().map(|k| html!{ <th class="ref-th">{ k.label() }</th> }) }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            { for rows.iter().map(|r| html!{
                                 <tr>
-                                    <td>{ order_of(r).map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() }</td>
-                                    <td title={ target_label }>{ cites }</td>
-                                    <td>{ citation_tags(r, f_perspective, f_source, f_artefact) }</td>
-                                    <td>{ r.note.clone().unwrap_or_default() }</td>
+                                    { for cols.iter().map(|k| html!{ <td>{ cell(*k, r) }</td> }) }
                                 </tr>
-                            }
-                        }) }
-                    </tbody>
-                </table>
+                            }) }
+                        </tbody>
+                    </table>
+                }
             </div>
         </>
     }
 }
 
-/// Render a reference's tags — its **perspective** plus the **citation triad**
-/// (source · locator · artefact). Perspective / source / artefact are clickable
-/// (they set the matching filter), so tagging and filtering share one surface.
-/// Folded here (shown only when the Tags column is on) to declutter the table.
+/// The **Perspective** tag for a reference — its own column key; clickable to
+/// filter (tagging and filtering share one surface).
+fn persp_tag(r: &ReferenceView, f_perspective: &UseStateHandle<Option<String>>) -> Html {
+    let perspective = persp(r);
+    if perspective.is_empty() {
+        return html! {};
+    }
+    let f = f_perspective.clone();
+    let v = perspective.clone();
+    let onclick = Callback::from(move |_: MouseEvent| f.set(Some(v.clone())));
+    html! { <button class="tag tag-perspective" onclick={ onclick } title="Perspective (filter)">{ perspective }</button> }
+}
+
+/// Render a reference's **citation triad** (source · locator · artefact) as tags.
+/// Source and artefact are clickable (they set the matching filter), so tagging
+/// and filtering share one surface. The Citation column key surfaces this.
 fn citation_tags(
     r: &ReferenceView,
-    f_perspective: &UseStateHandle<Option<String>>,
     f_source: &UseStateHandle<Option<String>>,
     f_artefact: &UseStateHandle<Option<String>>,
 ) -> Html {
-    let perspective = persp(r);
     let source = src(r);
     let locator = loc(r);
     let artefact = art(r);
 
-    let perspective_tag = (!perspective.is_empty()).then(|| {
-        let f = f_perspective.clone();
-        let v = perspective.clone();
-        let onclick = Callback::from(move |_: MouseEvent| f.set(Some(v.clone())));
-        html! { <button class="tag tag-perspective" onclick={ onclick } title="Perspective (filter)">{ perspective.clone() }</button> }
-    });
     let source_tag = (!source.is_empty()).then(|| {
         let f = f_source.clone();
         let v = source.clone();
@@ -646,7 +721,6 @@ fn citation_tags(
 
     html! {
         <span class="tags">
-            { perspective_tag.unwrap_or_default() }
             { source_tag.unwrap_or_default() }
             { locator_tag.unwrap_or_default() }
             { artefact_tag.unwrap_or_default() }

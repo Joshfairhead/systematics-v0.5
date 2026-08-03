@@ -743,6 +743,18 @@ body {
     font-size: 0.75rem;
     font-style: italic;
 }
+/* Tag (=) column composer — spans the tree width, above the Sort/Filter branches. */
+.tag-columns {
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.1rem;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.3);
+}
+.ref-empty {
+    color: #a0aec0;
+    font-size: 0.85rem;
+    padding: 1rem;
+    text-align: center;
+}
 
 .facet {
     display: flex;
