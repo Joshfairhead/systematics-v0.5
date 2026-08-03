@@ -168,11 +168,16 @@ fn architectural_monad_registry_loads() {
             "system:system_architecture_pentad_5",
             "system:system_citation_3",
             "perspective:elt_triad",
+            "perspective:sort_tag_filter_triad",
+            "perspective:query_axis_dyad",
         ]
     );
-    // Explicit members resolve; the ELT triad is an *implicit* (dangling) member
-    // — material documented but not yet seeded as a graph object.
+    // The Monad tracks features as fragments: seeded members resolve; fragments
+    // still to be folded in are *implicit* (dangling) addresses — tracked but not
+    // yet assembled into a graph object.
     assert!(graph.resolves("system:system_architecture_pentad_5"));
     assert!(graph.resolves("system:system_citation_3"));
     assert!(!graph.resolves("perspective:elt_triad"));
+    assert!(!graph.resolves("perspective:sort_tag_filter_triad"));
+    assert!(!graph.resolves("perspective:query_axis_dyad"));
 }

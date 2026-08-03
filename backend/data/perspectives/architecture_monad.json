@@ -6,7 +6,9 @@
       "members": [
         "system:system_architecture_pentad_5",
         "system:system_citation_3",
-        "perspective:elt_triad"
+        "perspective:elt_triad",
+        "perspective:sort_tag_filter_triad",
+        "perspective:query_axis_dyad"
       ]
     }
   ]
