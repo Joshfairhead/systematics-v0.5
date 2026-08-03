@@ -28,9 +28,6 @@ body {
 
 .sidebar {
     flex-shrink: 0;
-    /* Column so the view-switch sits above the system menu (top-left header). */
-    display: flex;
-    flex-direction: column;
     /* Stack above .main-view so dropdowns aren't painted behind the canvas. */
     position: relative;
     z-index: 100;
@@ -499,35 +496,59 @@ body {
    Reference browser (References view)
    ============================================================ */
 .main-view {
-    /* anchor the absolutely-positioned view switch */
+    /* anchor absolutely-positioned overlays (e.g. the canonical toggle) */
     position: relative;
 }
 
-/* Top-left of the header (sidebar), above the system menu. */
-.view-switch {
-    display: inline-flex;
-    align-self: flex-start;
-    margin: 0.6rem 0 0 0.75rem;
+/* Data toggle — right of the system menu; flips to the reference view. */
+.data-toggle {
+    flex-shrink: 0;
+    margin: 0 1rem;
+    border: 1px solid rgba(163, 177, 198, 0.4);
     background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(163, 177, 198, 0.3);
-}
-.view-switch-btn {
-    border: none;
-    background: transparent;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: #4a5568;
+    border-radius: 10px;
     padding: 0.4rem 0.9rem;
     font-size: 0.85rem;
     cursor: pointer;
 }
-.view-switch-btn.active {
+.data-toggle.active {
     background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.4);
     color: #2563eb;
     font-weight: 600;
+}
+
+/* Nullad — the order-0 button leading the sequence. Subtle accent. */
+.nav-nullad {
+    font-style: italic;
+}
+
+/* Nullad graph mode: a blank canvas placeholder. Stretch to fill the pane
+   (the .main-view is a flex row with align-items:flex-start). */
+.nullad-blank {
+    flex: 1;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    color: #a0aec0;
+    text-align: center;
+    user-select: none;
+}
+.nullad-blank-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #718096;
+    margin: 0;
+}
+.nullad-blank-hint {
+    font-size: 0.85rem;
+    margin: 0;
 }
 
 .reference-browser {
@@ -593,6 +614,13 @@ body {
     color: #718096;
     font-size: 0.8rem;
     margin-left: 0.5rem;
+}
+/* Active header scope (which order the data view is filtered to). */
+.ref-scope {
+    margin-left: auto;
+    color: #2563eb;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 /* ---- Controls: search row + sort/filter/tag button facets ---- */

@@ -48,6 +48,10 @@ pub struct ReferenceBrowserProps {
     pub instance_systems: Vec<InstanceSystem>,
     /// Load an instance system (by id) into the graph.
     pub on_load: Callback<String>,
+    /// The order selected in the header — filters the view to that system.
+    /// `None` = Nullad = the whole registry (no order filter).
+    #[prop_or_default]
+    pub filter_order: Option<i32>,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -116,18 +120,25 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let f_perspective = use_state(|| Option::<String>::None);
     let f_source = use_state(|| Option::<String>::None);
     let f_artefact = use_state(|| Option::<String>::None);
-    let f_order = use_state(|| Option::<i32>::None);
     let search = use_state(String::new);
     let load_open = use_state(|| false);
 
     let refs = &props.references;
+    // The order filter comes from the header (Nullad = None = all).
+    let filter_order = props.filter_order;
 
-    // Distinct facet values.
+    // Distinct facet values (perspective/source/artefact refine within the
+    // header's order selection).
     let perspectives: BTreeSet<String> =
         refs.iter().map(persp).filter(|s| !s.is_empty()).collect();
     let sources: BTreeSet<String> = refs.iter().map(src).filter(|s| !s.is_empty()).collect();
     let artefacts: BTreeSet<String> = refs.iter().map(art).filter(|s| !s.is_empty()).collect();
-    let orders: BTreeSet<i32> = refs.iter().filter_map(order_of).collect();
+
+    // Caption for the active header scope.
+    let scope_label = match filter_order {
+        Some(o) => format!("{} {} only", o, order_name(o)),
+        None => "Nullad — all orders".to_string(),
+    };
 
     let switch_tab = {
         let tab = tab.clone();
@@ -151,25 +162,25 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                     class={ if *tab == Tab::Compare { "ref-tab active" } else { "ref-tab" } }
                     onclick={ switch_tab(Tab::Compare) }
                 >{ "Compare by order" }</button>
+                <span class="ref-scope">{ scope_label }</span>
                 <span class="ref-count">{ format!("{} references", refs.len()) }</span>
             </div>
             {
                 match *tab {
                     Tab::Table => table_view(TableCtx {
                         refs,
+                        filter_order,
                         sort_col: &sort_col,
                         sort_asc: &sort_asc,
                         f_perspective: &f_perspective,
                         f_source: &f_source,
                         f_artefact: &f_artefact,
-                        f_order: &f_order,
                         search: &search,
                         perspectives: &perspectives,
                         sources: &sources,
                         artefacts: &artefacts,
-                        orders: &orders,
                     }),
-                    Tab::Compare => compare_view(refs),
+                    Tab::Compare => compare_view(refs, filter_order),
                 }
             }
         </div>
@@ -236,17 +247,17 @@ fn elt_triad(
 /// Grouped arguments for the table view (keeps the signature under one struct).
 struct TableCtx<'a> {
     refs: &'a [ReferenceView],
+    /// Order filter from the header (`None` = Nullad = all).
+    filter_order: Option<i32>,
     sort_col: &'a UseStateHandle<SortCol>,
     sort_asc: &'a UseStateHandle<bool>,
     f_perspective: &'a UseStateHandle<Option<String>>,
     f_source: &'a UseStateHandle<Option<String>>,
     f_artefact: &'a UseStateHandle<Option<String>>,
-    f_order: &'a UseStateHandle<Option<i32>>,
     search: &'a UseStateHandle<String>,
     perspectives: &'a BTreeSet<String>,
     sources: &'a BTreeSet<String>,
     artefacts: &'a BTreeSet<String>,
-    orders: &'a BTreeSet<i32>,
 }
 
 /// A toggle chip for a `String`-valued filter facet. Clicking a chip sets the
@@ -293,27 +304,27 @@ fn string_facet(label: &str, values: &BTreeSet<String>, state: &UseStateHandle<O
 fn table_view(ctx: TableCtx) -> Html {
     let TableCtx {
         refs,
+        filter_order,
         sort_col,
         sort_asc,
         f_perspective,
         f_source,
         f_artefact,
-        f_order,
         search,
         perspectives,
         sources,
         artefacts,
-        orders,
     } = ctx;
 
-    // Filter.
+    // Filter. The header's order selection (`filter_order`) scopes the view;
+    // the in-page facets refine within it.
     let needle = search.to_lowercase();
     let mut rows: Vec<&ReferenceView> = refs
         .iter()
+        .filter(|r| filter_order.is_none_or(|o| order_of(r) == Some(o)))
         .filter(|r| f_perspective.as_ref().is_none_or(|p| &persp(r) == p))
         .filter(|r| f_source.as_ref().is_none_or(|s| &src(r) == s))
         .filter(|r| f_artefact.as_ref().is_none_or(|a| &art(r) == a))
-        .filter(|r| f_order.as_ref().is_none_or(|o| order_of(r) == Some(*o)))
         .filter(|r| {
             if needle.is_empty() {
                 return true;
@@ -403,33 +414,11 @@ fn table_view(ctx: TableCtx) -> Html {
                     { sort_button(SortCol::Fragment) }
                 </div>
 
-                // Filter — buttons. Facets are the citation/reference data:
-                // perspective, source, artefact, order.
+                // Filter — buttons. Order is driven by the header's system
+                // buttons; these facets refine within it (perspective/source/artefact).
                 { string_facet("Perspective", perspectives, f_perspective) }
                 { string_facet("Source", sources, f_source) }
                 { string_facet("Artefact", artefacts, f_artefact) }
-                <div class="facet">
-                    <span class="facet-label">{ "Order" }</span>
-                    <button
-                        class={ classes!("facet-chip", f_order.is_none().then_some("active")) }
-                        onclick={ { let f = f_order.clone(); Callback::from(move |_: MouseEvent| f.set(None)) } }
-                    >{ "All" }</button>
-                    { for orders.iter().map(|o| {
-                        let is_active = **f_order == Some(*o);
-                        let f = f_order.clone();
-                        let val = *o;
-                        let onclick = Callback::from(move |_: MouseEvent| {
-                            if *f == Some(val) { f.set(None) } else { f.set(Some(val)) }
-                        });
-                        html! {
-                            <button
-                                class={ classes!("facet-chip", is_active.then_some("active")) }
-                                onclick={ onclick }
-                                title={ order_name(*o) }
-                            >{ o.to_string() }</button>
-                        }
-                    }) }
-                </div>
             </div>
 
             <div class="ref-table-wrap">
@@ -508,15 +497,19 @@ fn citation_tags(
     }
 }
 
-fn compare_view(refs: &[ReferenceView]) -> Html {
+fn compare_view(refs: &[ReferenceView], filter_order: Option<i32>) -> Html {
     // (order, perspective) -> (coherence value, provenance). First wins (all
     // references from one perspective to one order-N system share its value).
+    // The header's order selection scopes which rows appear (Nullad = all).
     let mut cells: BTreeMap<(i32, String), (String, String)> = BTreeMap::new();
     let mut orders: BTreeSet<i32> = BTreeSet::new();
     let mut perspectives: BTreeSet<String> = BTreeSet::new();
 
     for r in refs {
         if let Some(sys) = &r.target_system {
+            if filter_order.is_some_and(|o| o != sys.order) {
+                continue;
+            }
             let p = persp(r);
             if p.is_empty() {
                 continue;

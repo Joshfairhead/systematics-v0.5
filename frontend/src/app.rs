@@ -6,14 +6,40 @@ use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
-/// Which top-level view the main pane shows.
-/// - **Nullad**: the raw registry — everything, as a data view (the reference
-///   browser) with search / sort / filter.
-/// - **Monad**: the scoped graph view (a system on the canvas).
+/// How the main pane *represents* the current selection.
+/// - **Graph**: the K-graph canvas — a scoped system, or (for Nullad) a blank
+///   canvas standing in for the future all-and-everything graph.
+/// - **Data**: the reference browser — every citation, filtered by the header's
+///   selected system button.
 #[derive(Clone, Copy, PartialEq)]
-pub enum AppView {
-    Nullad,
-    Monad,
+pub enum ViewMode {
+    Graph,
+    Data,
+}
+
+/// The header's selectable system keys, in order 1→12. Order 0 is **Nullad**
+/// (key `"nullad"`), prepended in the selector — the unbounded "all", which has
+/// no single system to render or filter to.
+const ORDER_KEYS: [&str; 12] = [
+    "monad", "dyad", "triad", "tetrad", "pentad", "hexad", "heptad", "octad",
+    "ennead", "decad", "undecad", "dodecad",
+];
+
+/// The order a header key filters/selects, or `None` for Nullad ("all").
+fn order_for_key(key: &str) -> Option<i32> {
+    ORDER_KEYS
+        .iter()
+        .position(|k| *k == key)
+        .map(|i| i as i32 + 1)
+}
+
+/// The header key for a system of the given order (inverse of `order_for_key`);
+/// falls back to Nullad for out-of-range orders.
+fn key_for_order(order: i32) -> String {
+    ORDER_KEYS
+        .get((order - 1) as usize)
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| "nullad".to_string())
 }
 
 /// Detect GraphQL endpoint based on current browser location
@@ -52,7 +78,7 @@ pub enum ApiAppMsg {
     NavigateBack,
     ToggleEdgeLabels,
     ReferencesLoaded(Vec<ReferenceView>),
-    SetView(AppView),
+    SetMode(ViewMode),
     AllReferencesLoaded(Vec<ReferenceView>),
     InstanceSystemsLoaded(Vec<InstanceSystem>),
     LoadInstance(String),
@@ -70,8 +96,11 @@ pub struct ApiApp {
     /// All citations within the current system, keyed by their target address —
     /// prefetched so nodes can show references as a hover tooltip.
     system_references: Vec<ReferenceView>,
-    /// Which top-level view the main pane shows (graph canvas vs reference browser).
-    view: AppView,
+    /// How the main pane represents the selection (graph canvas vs data browser).
+    mode: ViewMode,
+    /// The header's currently selected system key (`"nullad"`, `"monad"`, …).
+    /// Drives both which graph renders and which order the data view filters to.
+    selected_key: String,
     /// Every citation in the graph (enriched), loaded lazily on first entry to
     /// the References view — powers the browser's table + compare matrix.
     all_references: Vec<ReferenceView>,
@@ -125,7 +154,8 @@ impl Component for ApiApp {
             breadcrumbs: vec![],
             show_edge_labels: false,
             system_references: vec![],
-            view: AppView::Monad,
+            mode: ViewMode::Graph,
+            selected_key: "monad".to_string(),
             all_references: vec![],
             instance_systems: vec![],
             show_canonical: false,
@@ -135,12 +165,26 @@ impl Component for ApiApp {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             ApiAppMsg::SelectSystem(name) => {
-                // Clear breadcrumbs when manually selecting from sidebar
+                // The header buttons drive both views: which graph to render, and
+                // which order the data view filters to. Set the key optimistically
+                // so the highlight and the data filter update immediately.
+                self.selected_key = name.clone();
                 self.breadcrumbs.clear();
-                self.loading = true;
                 self.error = None;
 
-                // Fetch the selected system
+                if name == "nullad" {
+                    // Nullad = the unbounded "all". No single system to render:
+                    // a blank canvas in graph mode (future: an all-and-everything
+                    // undirected graph), no order filter in data mode.
+                    self.selected_system = None;
+                    self.system_references = vec![];
+                    self.loading = false;
+                    return true;
+                }
+
+                self.loading = true;
+                // Fetch the selected system (keeps the canvas in sync with the key
+                // even while browsing in data mode).
                 let link = ctx.link().clone();
                 let client = self.graphql_client.clone();
 
@@ -223,6 +267,8 @@ impl Component for ApiApp {
 
                 // Select the first system by default + prefetch its citations.
                 if let Some(first_system) = systems.first() {
+                    // Keep the header key authoritative for the default selection.
+                    self.selected_key = key_for_order(first_system.order);
                     self.selected_system = Some(first_system.clone());
                     let system_id = first_system.system_id.clone();
                     let link = ctx.link().clone();
@@ -242,6 +288,8 @@ impl Component for ApiApp {
             ApiAppMsg::SystemLoaded(system) => {
                 self.loading = false;
                 let system_id = system.system_id.clone();
+                // Sync the header highlight to the order now on the canvas.
+                self.selected_key = key_for_order(system.order);
                 self.selected_system = Some(*system);
                 // Prefetch citations for the new system (hover tooltips).
                 self.system_references = vec![];
@@ -269,10 +317,10 @@ impl Component for ApiApp {
                 self.system_references = refs;
                 true
             }
-            ApiAppMsg::SetView(view) => {
-                self.view = view;
-                // Lazily load all references the first time the browser opens.
-                if view == AppView::Nullad && self.all_references.is_empty() {
+            ApiAppMsg::SetMode(mode) => {
+                self.mode = mode;
+                // Lazily load all references the first time the data view opens.
+                if mode == ViewMode::Data && self.all_references.is_empty() {
                     let link = ctx.link().clone();
                     let client = self.graphql_client.clone();
                     spawn_local(async move {
@@ -292,9 +340,9 @@ impl Component for ApiApp {
             }
             ApiAppMsg::LoadInstance(id) => {
                 // Replace the canvas with the loaded instance system (single canvas).
-                // Load is the ELT triad's edge on the Nullad page, so switch to the
-                // Monad (graph) view to reveal what was loaded.
-                self.view = AppView::Monad;
+                // Load is the ELT triad's edge on the data view, so switch to the
+                // graph mode to reveal what was loaded.
+                self.mode = ViewMode::Graph;
                 self.breadcrumbs.clear();
                 self.loading = true;
                 self.error = None;
@@ -320,27 +368,22 @@ impl Component for ApiApp {
         let on_navigate = ctx.link().callback(ApiAppMsg::NavigateToSystem);
         let on_back = ctx.link().callback(|_| ApiAppMsg::NavigateBack);
         let on_toggle_edge_labels = ctx.link().callback(|_| ApiAppMsg::ToggleEdgeLabels);
-        let show_monad = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Monad));
-        let show_nullad = ctx.link().callback(|_| ApiAppMsg::SetView(AppView::Nullad));
         let on_load = ctx.link().callback(ApiAppMsg::LoadInstance);
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
+
+        // The Data toggle flips between the graph canvas and the reference browser.
+        let data_mode = self.mode == ViewMode::Data;
+        let on_toggle_data = {
+            let target = if data_mode { ViewMode::Graph } else { ViewMode::Data };
+            ctx.link().callback(move |_| ApiAppMsg::SetMode(target))
+        };
+        // The selected header key filters the data view (None = Nullad = all).
+        let filter_order = order_for_key(&self.selected_key);
 
         html! {
             <div class="app">
                 <div class="app-content">
                     <aside class="sidebar">
-                        // Top-level view switch — Nullad (the raw registry) before
-                        // Monad (the scoped graph view). Top-left of the header.
-                        <div class="view-switch">
-                            <button
-                                class={ if self.view == AppView::Nullad { "view-switch-btn active" } else { "view-switch-btn" } }
-                                onclick={ show_nullad }
-                            >{ "Nullad" }</button>
-                            <button
-                                class={ if self.view == AppView::Monad { "view-switch-btn active" } else { "view-switch-btn" } }
-                                onclick={ show_monad }
-                            >{ "Monad" }</button>
-                        </div>
                         {
                             if self.loading && self.systems.is_empty() {
                                 html! { <div class="loading">{"Loading systems..."}</div> }
@@ -354,16 +397,13 @@ impl Component for ApiApp {
                                     }
                                 }).collect();
 
-                                let selected_name = self.selected_system
-                                    .as_ref()
-                                    .map(|s| s.name.to_lowercase())
-                                    .unwrap_or_else(|| "monad".to_string());
-
                                 html! {
                                     <SystemSelector
                                         systems={ display_systems }
-                                        selected={ selected_name }
+                                        selected={ self.selected_key.clone() }
                                         on_select={ on_select }
+                                        data_mode={ data_mode }
+                                        on_toggle_data={ on_toggle_data }
                                     />
                                 }
                             }
@@ -371,12 +411,22 @@ impl Component for ApiApp {
                     </aside>
 
                     <main class="main-view">
-                        if self.view == AppView::Nullad {
+                        if self.mode == ViewMode::Data {
                             <ReferenceBrowser
                                 references={ self.all_references.clone() }
                                 instance_systems={ self.instance_systems.clone() }
                                 on_load={ on_load.clone() }
+                                filter_order={ filter_order }
                             />
+                        } else if self.selected_key == "nullad" {
+                            // Nullad in graph mode: a blank canvas standing in for
+                            // the future all-and-everything undirected graph.
+                            <div class="nullad-blank">
+                                <p class="nullad-blank-title">{ "Nullad — all & everything" }</p>
+                                <p class="nullad-blank-hint">
+                                    { "An undirected graph of everything will live here. Blank for now." }
+                                </p>
+                            </div>
                         } else {
                         // Breadcrumb trail
                         if !self.breadcrumbs.is_empty() {
