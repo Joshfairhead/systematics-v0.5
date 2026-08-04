@@ -10,6 +10,31 @@ map for auditing and refactoring the code back toward its systematic description
 things); a triad of *verbs* is edge-typed (operations). Every entry below is
 tagged accordingly.
 
+### Proposal — typing & the operations [for sign-off]
+
+**Apply the typing rule with no exceptions; drop "reconciler-typed."** When we
+wrote "Tag (=) reconciles Sort (+) / Filter (−)" as a triad of *terms*, that was
+mis-typed: **Sort, Filter, Tag, Search are verbs → they are edges (connectives),
+not vertices.** Impulse labels (+ / − / =) apply to connectives just as to terms,
+so a set of operation-verbs is a bundle of **edges** — a *fragment* of a system
+whose **vertices (nouns) are not yet identified**. We store such fragments and let
+the incomplete system show us what is and isn't figured out.
+
+**The operations octad [proposed].** The seven operation-verbs —
+**search · sort · filter · tag** (query) + **extract · load · transform** (ELT) —
+are **7 connectives**. A vertex of the **Octad** (K₈) has degree **7**: it connects
+to the other seven nodes. So the seven operations plausibly are the **seven edges
+incident to the "Critical Functions" node** of the octad — their far endpoints
+being the octad's other seven terms. This gives the operations a home to be folded
+into, rather than a free-floating "triad."
+
+**Sort/Filter, concretely.** Don't over-fix their semantics (they've churned): keep
+them as **edge-fragments** with the current UI realisation (Sort selects header
+tags; Filter scopes data by degree) as *one* working reading, and figure out the
+settled operation as we assemble the octad. **Also pursue the sequence Data (monad)
+→ key·value (dyad) → ELT (triad)** — data = tags; there is "something with sort ·
+filter · data · key · value" to resolve alongside it.
+
 **Status legend:** `impl` = in code · `seeded` = also a real System instance in
 the graph · `proposed` = named but not built/settled.
 
@@ -23,8 +48,8 @@ the graph · `proposed` = named but not built/settled.
 - **Determining conditions** (six laws over Time·Hyparxis·Eternity·Space) = *what the system exists to codify*.
 
 **Open / unresolved (do not assert):**
-- **Typing:** the noun=vertex / verb=edge rule vs the newer **reconciler-typed** triads (Sort/Filter are verb-ish yet appear as *terms*). Unreconciled.
-- **Sort/Filter semantics** have moved (latest: **Sort = select header tags**, **Filter = scope data by degree**); the **by-key/by-value** dyad is now under review, and the **symmetric-doubling** worked example that used it is superseded.
+- **Typing [proposal pending sign-off]:** the noun=vertex / verb=edge rule holds with **no exceptions**; "reconciler-typed" is dropped. The operation-verbs (search·sort·filter·tag + extract·load·transform) are **edges**, a fragment whose vertices are TBD — plausibly the **7 edges at the "Critical Functions" node of the Octad**. See *Proposal — typing & the operations*.
+- **Sort/Filter semantics** stay as edge-fragments (latest UI reading: Sort = select header tags, Filter = scope data by degree); the **by-key/by-value** dyad is under review; pursue the **Data → key·value → ELT** sequence. The **symmetric-doubling** worked example that used by-key/value is superseded.
 - **SPO ↔ category-theory ↔ systematics** are three *interchangeable* mediums (none primary); switching needs representational transforms — **not built**.
 - **Folding-in = CT-style composition** — not built (needs CT represented in-graph).
 - **Scoping shape:** order × degree, 3-D+ (DU1 geometry); order/degree terminology unsettled.
@@ -89,6 +114,16 @@ values make a statement — e.g. subject=`will`, predicate=`generates`, object=`
 node; so nodes, edges, systems, coherence, perspectives are *all* tagged triples. A
 **Perspective** is just a web of SPO links — which is why it may be retired as a
 separate container and kept only as the SPO substrate (arguably *everything*).
+
+**Definition — a Perspective is a bundle of Subject·Predicate·Object labels
+[proposed].** It is **self-referential** (a Perspective can be referenced within
+itself). This is likely a **tetrad: Perspective · Subject · Predicate · Object** —
+constructible in **AD4M** and **recursively modelled**: the *subject→predicate* link
+is itself a triple `subject(subject) · predicate · object(predicate)`, and the
+*predicate→object* link likewise `subject(predicate) · predicate · object(object)`,
+and so on (the Prolog engine unfolds it). So **AD4M's core architecture can be
+represented as a tetrad within AD4M itself** — a concrete instance of the
+self-documentation → self-construction goal.
 
 **Three interchangeable mediums [proposed — corrected].** SPO, category theory, and
 systematics are **not** a base-truth stack — none is primary. They are related and

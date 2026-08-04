@@ -14,21 +14,17 @@ place. Do not assert as settled.
 
 ## Author-contributed triads — source: **Josh Fairhead** (this conversation, 2026-08-04)
 
-### Root triad — Aesthetics · Harmony · Maths
-- **Aesthetics** — affirming **(+)**
-- **Harmony** — reconciling **(=)**
-- **Maths** — denying **(−)**
+**Impulse → position convention (confirmed): position 1 = + (affirming), 2 = −
+(denying), 3 = = (reconciling).** All triads below are seeded in that order.
 
-Each node **triplicates** into its own triad (the +/=/− carried down):
+### Root triad — Aesthetics (+) · Maths (−) · Harmony (=)
+Seeded `system_aesthetics_maths_harmony_3`.
 
-### Aesthetics → (Unity · Form · Variety)
-- **Unity** (+) · **Form** (=) · **Variety** (−)
+Each node **triplicates** into its own triad (the +/−/= carried down):
 
-### Harmony → (Inevitability · Proportion · Economy)
-- **Inevitability** (+) · **Proportion** (=) · **Economy** (−)
-
-### Maths → (Theorems · Proofs · Lemmas)
-- **Theorems** (+) · **Proofs** (=) · **Lemmas** (−)
+### Aesthetics → Unity (+) · Variety (−) · Form (=)
+### Harmony → Inevitability (+) · Economy (−) · Proportion (=)
+### Maths → Theorems (+) · Lemmas (−) · Proofs (=)
 
 **Maths triad — named connectives (edges):**
 - **Theorems ↔ Lemmas** — *bili* — the **generation** edge.
@@ -38,11 +34,19 @@ Each node **triplicates** into its own triad (the +/=/− carried down):
 *(Note the pairing: Fibonacci ratios converge to φ — the consent edge's recurrence
 and the proofs↔theorems edge's constant are the same relationship at two scales.)*
 
+### Life triad — Health (+) · Wealth (−) · Wisdom (=)
+**Not architectural** — perspective / tag = **"life"**. Source: **Josh Fairhead**.
+Seeded `system_life_3`. Just something not to forget.
+
 ---
 
 ## The determining conditions of science — what systematics really codifies
 
 Source: systematics (Bennett, *The Dramatic Universe* vol. 1) + Josh Fairhead's framing.
+
+> **Positioning is WIP / likely wrong.** The specific assignment of the four nodes
+> and the six law-edges is **not settled** (probably incorrect) — kept seeded as
+> work-in-progress and a useful tag for filtering. Do **not** rely on it.
 
 The **significance** of systematics: as a framework it **embodies and is composed
 of the determining conditions that classify the science** — the six laws:
@@ -54,12 +58,11 @@ of the determining conditions that classify the science** — the six laws:
 5. **Irreversibility** laws
 6. **Coexistence** laws
 
-Two candidate structures (possibly **both**):
-- **Hexad** — the six laws as its **nodes**.
-- **Tetrad** — four nodes **Time (Chronos) · Hyparxis · Eternity (Aionios) ·
-  Space**, with the **six laws as its edges**. (A K₄ tetrad has exactly **6 edges**,
-  which fits the six laws precisely — this is the DU1 six-dimensional geometry:
-  the four determining-condition "dimensions", their six pairwise laws.)
+**Structure — a tetrad** (seeded `system_determining_conditions_4`): four nodes
+**Time (Chronos) · Hyparxis · Eternity (Aionios) · Space**, with the **six laws as
+its edges**. A K₄ tetrad has exactly **6 edges**, fitting the six laws — the DU1
+six-dimensional geometry (four "dimensions", their six pairwise laws). *(No hexad
+alternative — the tetrad is the reading.)*
 
 **This is REALLY what the system is trying to codify and embody in itself as a
 representational medium** — the determining conditions are the point, not incidental.

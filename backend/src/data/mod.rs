@@ -335,35 +335,38 @@ pub fn build_fragments_from_tables() -> GraphContent {
     let mut content = GraphContent::default();
     let mut have_char = std::collections::HashSet::new();
 
-    // Root triad: Aesthetics (+) · Harmony (=) · Maths (−).
+    // Impulse → position convention: **pos1 = + (affirming), pos2 = − (denying),
+    // pos3 = = (reconciling)** — fixed by the confirmed-correct Maths sub-triad.
+
+    // Root triad: Aesthetics (+) · Maths (−) · Harmony (=).
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "Aesthetics Harmony Maths",
+        "Aesthetics Maths Harmony",
         3,
-        &slugs(&["aesthetics", "harmony", "maths"]),
+        &slugs(&["aesthetics", "maths", "harmony"]),
         &slugs(&["ahm_edge_1", "ahm_edge_2", "ahm_edge_3"]),
     );
-    // Aesthetics → Unity (+) · Form (=) · Variety (−).
+    // Aesthetics → Unity (+) · Variety (−) · Form (=).
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Aesthetics",
         3,
-        &slugs(&["unity", "form", "variety"]),
+        &slugs(&["unity", "variety", "form"]),
         &slugs(&["aesthetics_edge_1", "aesthetics_edge_2", "aesthetics_edge_3"]),
     );
-    // Harmony → Inevitability (+) · Proportion (=) · Economy (−).
+    // Harmony → Inevitability (+) · Economy (−) · Proportion (=).
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Harmony",
         3,
-        &slugs(&["inevitability", "proportion", "economy"]),
+        &slugs(&["inevitability", "economy", "proportion"]),
         &slugs(&["harmony_edge_1", "harmony_edge_2", "harmony_edge_3"]),
     );
-    // Maths → Theorems (+, pos1) · Lemmas (−, pos2) · Proofs (=, pos3); named edges
-    // on lines (1,2)=bili, (1,3)=φ, (2,3)=Fibonacci.
+    // Maths → Theorems (+) · Lemmas (−) · Proofs (=); named edges on lines
+    // (1,2)=bili, (1,3)=φ, (2,3)=Fibonacci.
     push_triadic_system(
         &mut content,
         &mut have_char,
@@ -371,6 +374,16 @@ pub fn build_fragments_from_tables() -> GraphContent {
         3,
         &slugs(&["theorems", "lemmas", "proofs"]),
         &slugs(&["bili", "phi", "fibonacci"]),
+    );
+    // Life triad (not architectural; perspective/tag = "life") — Health (+) ·
+    // Wealth (−) · Wisdom (=). Source: Josh Fairhead.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Life",
+        3,
+        &slugs(&["health", "wealth", "wisdom"]),
+        &slugs(&["life_edge_1", "life_edge_2", "life_edge_3"]),
     );
     // Determining Conditions of science — a K4 tetrad: Time (Chronos) · Hyparxis ·
     // Eternity (Aionios) · Space; the 6 laws as its 6 edges.

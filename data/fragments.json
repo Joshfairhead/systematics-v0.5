@@ -6,14 +6,14 @@
       "value": "Aesthetics"
     },
     {
-      "id": "char_word_harmony",
-      "kind": "word",
-      "value": "Harmony"
-    },
-    {
       "id": "char_word_maths",
       "kind": "word",
       "value": "Maths"
+    },
+    {
+      "id": "char_word_harmony",
+      "kind": "word",
+      "value": "Harmony"
     },
     {
       "id": "char_word_ahm_edge_1",
@@ -36,14 +36,14 @@
       "value": "Unity"
     },
     {
-      "id": "char_word_form",
-      "kind": "word",
-      "value": "Form"
-    },
-    {
       "id": "char_word_variety",
       "kind": "word",
       "value": "Variety"
+    },
+    {
+      "id": "char_word_form",
+      "kind": "word",
+      "value": "Form"
     },
     {
       "id": "char_word_aesthetics_edge_1",
@@ -66,14 +66,14 @@
       "value": "Inevitability"
     },
     {
-      "id": "char_word_proportion",
-      "kind": "word",
-      "value": "Proportion"
-    },
-    {
       "id": "char_word_economy",
       "kind": "word",
       "value": "Economy"
+    },
+    {
+      "id": "char_word_proportion",
+      "kind": "word",
+      "value": "Proportion"
     },
     {
       "id": "char_word_harmony_edge_1",
@@ -119,6 +119,36 @@
       "id": "char_word_fibonacci",
       "kind": "word",
       "value": "Fibonacci"
+    },
+    {
+      "id": "char_word_health",
+      "kind": "word",
+      "value": "Health"
+    },
+    {
+      "id": "char_word_wealth",
+      "kind": "word",
+      "value": "Wealth"
+    },
+    {
+      "id": "char_word_wisdom",
+      "kind": "word",
+      "value": "Wisdom"
+    },
+    {
+      "id": "char_word_life_edge_1",
+      "kind": "word",
+      "value": "Life Edge 1"
+    },
+    {
+      "id": "char_word_life_edge_2",
+      "kind": "word",
+      "value": "Life Edge 2"
+    },
+    {
+      "id": "char_word_life_edge_3",
+      "kind": "word",
+      "value": "Life Edge 3"
     },
     {
       "id": "char_word_time",
@@ -174,13 +204,13 @@
   "coordinates": [],
   "vocabularies": [
     {
-      "id": "vocab_aesthetics_harmony_maths_3",
-      "name": "Aesthetics Harmony Maths",
+      "id": "vocab_aesthetics_maths_harmony_3",
+      "name": "Aesthetics Maths Harmony",
       "order": 3,
       "terms": [
         "char_word_aesthetics",
-        "char_word_harmony",
-        "char_word_maths"
+        "char_word_maths",
+        "char_word_harmony"
       ],
       "connectives": [
         "char_word_ahm_edge_1",
@@ -194,8 +224,8 @@
       "order": 3,
       "terms": [
         "char_word_unity",
-        "char_word_form",
-        "char_word_variety"
+        "char_word_variety",
+        "char_word_form"
       ],
       "connectives": [
         "char_word_aesthetics_edge_1",
@@ -209,8 +239,8 @@
       "order": 3,
       "terms": [
         "char_word_inevitability",
-        "char_word_proportion",
-        "char_word_economy"
+        "char_word_economy",
+        "char_word_proportion"
       ],
       "connectives": [
         "char_word_harmony_edge_1",
@@ -231,6 +261,21 @@
         "char_word_bili",
         "char_word_phi",
         "char_word_fibonacci"
+      ]
+    },
+    {
+      "id": "vocab_life_3",
+      "name": "Life",
+      "order": 3,
+      "terms": [
+        "char_word_health",
+        "char_word_wealth",
+        "char_word_wisdom"
+      ],
+      "connectives": [
+        "char_word_life_edge_1",
+        "char_word_life_edge_2",
+        "char_word_life_edge_3"
       ]
     },
     {
@@ -255,14 +300,14 @@
   ],
   "systems": [
     {
-      "id": "system_aesthetics_harmony_maths_3",
-      "name": "Aesthetics Harmony Maths",
+      "id": "system_aesthetics_maths_harmony_3",
+      "name": "Aesthetics Maths Harmony",
       "order": 3,
       "coherence": "Dynamism",
       "term_designation": "Impulses",
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
-      "vocabulary_ref": "vocab_aesthetics_harmony_maths_3"
+      "vocabulary_ref": "vocab_aesthetics_maths_harmony_3"
     },
     {
       "id": "system_aesthetics_3",
@@ -293,6 +338,16 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_maths_3"
+    },
+    {
+      "id": "system_life_3",
+      "name": "Life",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_life_3"
     },
     {
       "id": "system_determining_conditions_4",
