@@ -13,6 +13,25 @@ tagged accordingly.
 **Status legend:** `impl` = in code · `seeded` = also a real System instance in
 the graph · `proposed` = named but not built/settled.
 
+## At a glance — settled vs open (review map)
+
+**Settled (load-bearing):**
+- The **Architecture Pentad** (Sign·Symbol·Syntax·Semantics·Grammar + 10 Mutualities) — seeded.
+- **Everything is a tag** = the predicate:object of an **SPO** triple; a Perspective is a web of SPO links.
+- **Nullad** (all elements) → **Extract** → **Monad** (a scoped subset, a real `Sequence`) → **core sequence** (articulates the monad).
+- **Goal = self-construction:** track each feature as a **fragment** in the Monad, then **fold it in**. Self-documentation is the first port of call.
+- **Determining conditions** (six laws over Time·Hyparxis·Eternity·Space) = *what the system exists to codify*.
+
+**Open / unresolved (do not assert):**
+- **Typing:** the noun=vertex / verb=edge rule vs the newer **reconciler-typed** triads (Sort/Filter are verb-ish yet appear as *terms*). Unreconciled.
+- **Sort/Filter semantics** have moved (latest: **Sort = select header tags**, **Filter = scope data by degree**); the **by-key/by-value** dyad is now under review, and the **symmetric-doubling** worked example that used it is superseded.
+- **SPO ↔ category-theory ↔ systematics** are three *interchangeable* mediums (none primary); switching needs representational transforms — **not built**.
+- **Folding-in = CT-style composition** — not built (needs CT represented in-graph).
+- **Scoping shape:** order × degree, 3-D+ (DU1 geometry); order/degree terminology unsettled.
+- **Determining conditions:** hexad-of-laws vs tetrad-with-law-edges vs both.
+- **Perspective** may be retired into the SPO substrate.
+- **ELT may *be* the Query triad** (Load = select keys); Data(monad)→key·value(dyad)→ELT(triad) unresolved.
+
 ## Self-documentation → self-construction [settled goal]
 
 Self-documentation is only the **first port of call**. The real goal is to **use
@@ -35,8 +54,9 @@ the system to construct itself** (bootstrap / self-hosting).
   Sort·Tag·Filter, Data·Graph·Table, Class·Instantiation·Instance triads +
   by-key/by-value dyad (dangling). Loop: build a feature → track it as a Monad
   fragment → later fold it in. **Author-contributed and systematics-core fragments
-  live in [`fragments.md`](fragments.md)** (e.g. the Aesthetics·Harmony·Maths triad;
-  the six determining-condition laws) — to be seeded and placed.
+  live in [`fragments.md`](fragments.md)** (the Aesthetics·Harmony·Maths triad; the
+  determining-conditions tetrad) — now **seeded as real systems**, still to be
+  *placed* (folded into a whole).
 - **Folding in = category-theory-style composition [proposed, large].** Assembly is
   not built and needs real work: we must first **represent category theory in the
   system as a graph** — a triad of *identity · composition · association* (possibly
@@ -87,11 +107,14 @@ The move that *builds* the architecture (distinct from the canonical 1→12 run)
 **symmetric doubling**: take a whole and split it, keeping symmetry, so **1 → 2 → 4
 → 8**:
 
-- **Monad → Dyad** — the whole splits into two poles (Tag → Sort/Filter; or by-key
-  ↔ by-value).
-- **Dyad → Tetrad** — each pole splits again (Sort → {by-key, by-value}; Filter →
-  {by-key, by-value}) — four leaves, still symmetric.
+- **Monad → Dyad** — the whole splits into two poles.
+- **Dyad → Tetrad** — each pole splits again — four leaves, still symmetric.
 - **Tetrad → Octad** — each leaf splits once more, retaining symmetry.
+
+*(The earlier worked example — Tag → {Sort, Filter} → {by-key, by-value} — is
+**superseded**: Sort/Filter were since redefined as header-tags / data-scoping, and
+the by-key/by-value dyad is under review. The system-level example below is the
+stable one.)*
 
 By the time the unfolding reaches a **System**, its own description is such a tree:
 **order · coherence · designation · characters**, where **designation** splits into
@@ -124,7 +147,8 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 
 | system | terms / edges | typing | status |
 |---|---|---|---|
-| **Organise** | four *sources* (nouns) — **TBD**; operations *sort · tag · filter · search* | **superseded** — the operations are now read as the **Sort · Tag · Filter triad** (above), with *search* a separate free-text mechanism, not a fourth term | proposed → recast as a triad |
+| **Determining Conditions** ⭐ | nodes **Time (Chronos) · Hyparxis · Eternity (Aionios) · Space** (the four "dimensions"); the **six laws as its six K₄ edges** — *statistical · correspondence · classification · conservation · irreversibility · coexistence*. **This is what the whole system is trying to codify** as a representational medium. | nodes=nouns, edges (laws)=the determining conditions | seeded `system_determining_conditions_4`; `docs/fragments.md`; [[determining-conditions]] | seeded (edge→law assignment TBD; may *also* be a hexad of the laws as nodes) |
+| ~~Organise~~ | four *sources* (nouns) — TBD; operations *sort · tag · filter · search* | **superseded** — the operations are now the **Sort · Tag · Filter triad** (below); *search* is a separate free-text mechanism, not a fourth term | discarded |
 
 ## Pentad (order 5 — Limits / Mutualities) — settled
 
@@ -149,24 +173,17 @@ Three distinct things — do not conflate them:
   opening the **Table** so you see all on load). **Sort** selects the header tags;
   **Filter** scopes by cite-degree; the **Data · Graph · Table** switch (right of
   the menu) chooses the view; the page hosts the **ELT triad**.
-- **Monad = the scoping/filter of the Nullad.** A Monad selects a subset of the
-  Nullad and **invokes an organising principle** based on some relationship (those
-  members may in turn have further relationships, visualised or not depending on
-  scope). Produced by **Extract**. **Graph view — deferred** (settle the data-view
-  sort/filter params first). A *Nullad* graph may not be feasibly viewable yet: it
-  condenses a Hilbert-space-like density (triads of SPO connecting to triads of
-  SPO…) — downcastable but messy, likely needing 3+ dimensions. Table↔Graph should
-  **share scope/selection** so a selection in one shows in the other.
-- **Monad (1) — a scoped registry.** A bounded universe of inquiry with a
-  **central point naming its unity** (e.g. "system architecture"), linking every
-  graph of relevance: the class/instance dyad, the ALP and ELT triads, the pegged
-  Pentad, other potential pentads/tetrads, and *implicit* knowledge-graph material
-  not yet assembled. Raw material for sorting/assembly, **not** the core sequence.
-  **Produced by Extract** (Nullad → Monad): a selection over the Nullad,
-  materialized as a persisted `Sequence` — so the scope is a **real graph object**
-  (id + members), not a transient client-side key. **UI: one entry on the current
-  graph view** (that node not yet built); for now Extract confirms the created
-  Monad by id.
+- **Monad (1) — the scoping/filter of the Nullad.** A bounded sub-universe: a Monad
+  selects a subset of the Nullad and **invokes an organising principle** with a
+  **central point naming its unity** (e.g. "system architecture"). It is **raw
+  material** for sorting/assembly (fragments + implicit material), **not** the core
+  sequence. **Produced by Extract** (Nullad → Monad): the selection is materialised
+  as a persisted `Sequence` — a **real graph object** (id + members), not a transient
+  client key. **UI:** one node on the graph view (not yet built; for now Extract
+  confirms the created Monad by id). **Graph view is deferred** until the data-view
+  sort/filter params settle; a *Nullad* graph condenses a Hilbert-space-like density
+  (SPO-triads-of-SPO-triads) — likely needs 3+ dimensions. Table↔Graph should
+  **share scope/selection**.
 - **Core sequence (1→12).** The systems of interest, produced **by performing
   operations on the monad** (sort → assemble → …). It *articulates* the monad; it
   is not the monad.
@@ -182,9 +199,12 @@ single node in the core Pentad.
 The live **Monad** is `sequence_architectural_monad` (seeded in
 `backend/data/perspectives/architecture_monad.json`) — members may be **explicit**
 (a resolvable `system:` address) or **implicit** (a dangling address = material
-still to be assembled). Members now: the **Pentad** and the **Citation triad**
-(explicit) and the **ELT triad** (`perspective:elt_triad`, implicit — documented
-but not yet seeded as a graph object).
+still to be assembled). **7 members:** the **Pentad** + **Citation triad** (explicit,
+seeded) and — dangling — the **ELT**, **Sort·Tag·Filter**, **Data·Graph·Table**,
+**Class·Instantiation·Instance** triads and the **by-key/by-value** dyad. The
+author + systematics-core fragments (`docs/fragments.md`) are now **seeded as real
+systems** (`system_aesthetics_harmony_maths_3`, …, `system_determining_conditions_4`)
+but not yet added as Monad members / placed.
 
 ## Practice
 
