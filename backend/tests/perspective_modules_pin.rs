@@ -115,11 +115,11 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 17 module-owned.
+    // Total systems = 12 canonical + 1 citation + 5 fragments + 17 module-owned.
     assert_eq!(
         graph.systems.len(),
-        30,
-        "expected 12 canonical + 1 citation + 17 module systems"
+        35,
+        "expected 12 canonical + 1 citation + 5 fragment + 17 module systems"
     );
 }
 

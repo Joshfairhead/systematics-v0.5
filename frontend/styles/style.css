@@ -500,24 +500,47 @@ body {
     position: relative;
 }
 
-/* Data · Graph · Table — one compact "View" toggle, right of the system menu. */
-.view-toggle {
+/* Data · Graph · Table — a bare boolean "View" toggle, right of the system menu. */
+.view-switch {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     margin: 0 0.75rem;
-    border: 1px solid rgba(163, 177, 198, 0.4);
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #4a5568;
-    border-radius: 8px;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.78rem;
-    white-space: nowrap;
+    border: none;
+    background: transparent;
     cursor: pointer;
 }
-.view-toggle:hover {
-    border-color: rgba(37, 99, 235, 0.4);
-    color: #2563eb;
+.view-switch-label {
+    color: #718096;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.view-switch-track {
+    position: relative;
+    width: 2rem;
+    height: 1.05rem;
+    border-radius: 999px;
+    background: rgba(163, 177, 198, 0.45);
+    transition: background 0.15s ease;
+}
+.view-switch-track.on {
+    background: rgba(37, 99, 235, 0.55);
+}
+.view-switch-thumb {
+    position: absolute;
+    top: 0.12rem;
+    left: 0.12rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s ease;
+}
+.view-switch-track.on .view-switch-thumb {
+    transform: translateX(0.95rem);
 }
 
 /* Nullad — the order-0 button leading the sequence. Subtle accent. */

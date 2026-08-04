@@ -29,6 +29,15 @@ pub fn citation_content() -> GraphContent {
     serde_json::from_str(CITATION_JSON).expect("data/citation.json is valid GraphContent")
 }
 
+/// The **fragments** seed — author-contributed triads + the determining-conditions
+/// tetrad (see `docs/fragments.md`). Tracked raw material, seeded so it resolves.
+const FRAGMENTS_JSON: &str = include_str!("../../../data/fragments.json");
+
+/// Parse the embedded fragments seed content.
+pub fn fragments_content() -> GraphContent {
+    serde_json::from_str(FRAGMENTS_JSON).expect("data/fragments.json is valid GraphContent")
+}
+
 /// The perspective module files, embedded into the binary at build time (like
 /// the canonical/citation seed). This is what a deployed build serves — no
 /// runtime filesystem, volume or working-directory assumption required.
@@ -125,6 +134,9 @@ pub fn build_graph() -> Graph {
     // The Citation triad ships as its own bundle, applied before marking
     // canonical so it counts as bundled (not user) content.
     graph.apply_content(&citation_content());
+    // The fragments (author triads + determining-conditions tetrad) ship the same
+    // way — durable seed, resolvable in the graph (see docs/fragments.md).
+    graph.apply_content(&fragments_content());
     graph.mark_canonical();
 
     graph
@@ -302,6 +314,80 @@ pub fn build_citation_from_tables() -> GraphContent {
             "citation_act_2_needs_research".to_string(),
             "citation_act_3_needs_research".to_string(),
         ],
+    );
+    content
+}
+
+/// Small helper: `Vec<String>` from string literals, for readability below.
+fn slugs(xs: &[&str]) -> Vec<String> {
+    xs.iter().map(|s| s.to_string()).collect()
+}
+
+/// Build the author-contributed and systematics-core **fragments** as their own
+/// bundle (`data/fragments.json`). Source of the author triads: **Josh Fairhead**
+/// (see `docs/fragments.md`). Each is a real K_n system (terms + named/placeholder
+/// connectives) so it resolves in the graph; metadata inherits the canonical order.
+///
+/// Maths triad term positions (theorems=1, lemmas=2, proofs=3) fix the named edges
+/// onto the K3 lines (1,2)(1,3)(2,3): bili · φ · Fibonacci. The Determining-
+/// Conditions tetrad is K4 (4 dimensions, 6 laws as its 6 edges — assignment TBD).
+pub fn build_fragments_from_tables() -> GraphContent {
+    let mut content = GraphContent::default();
+    let mut have_char = std::collections::HashSet::new();
+
+    // Root triad: Aesthetics (+) · Harmony (=) · Maths (−).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Aesthetics Harmony Maths",
+        3,
+        &slugs(&["aesthetics", "harmony", "maths"]),
+        &slugs(&["ahm_edge_1", "ahm_edge_2", "ahm_edge_3"]),
+    );
+    // Aesthetics → Unity (+) · Form (=) · Variety (−).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Aesthetics",
+        3,
+        &slugs(&["unity", "form", "variety"]),
+        &slugs(&["aesthetics_edge_1", "aesthetics_edge_2", "aesthetics_edge_3"]),
+    );
+    // Harmony → Inevitability (+) · Proportion (=) · Economy (−).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Harmony",
+        3,
+        &slugs(&["inevitability", "proportion", "economy"]),
+        &slugs(&["harmony_edge_1", "harmony_edge_2", "harmony_edge_3"]),
+    );
+    // Maths → Theorems (+, pos1) · Lemmas (−, pos2) · Proofs (=, pos3); named edges
+    // on lines (1,2)=bili, (1,3)=φ, (2,3)=Fibonacci.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Maths",
+        3,
+        &slugs(&["theorems", "lemmas", "proofs"]),
+        &slugs(&["bili", "phi", "fibonacci"]),
+    );
+    // Determining Conditions of science — a K4 tetrad: Time (Chronos) · Hyparxis ·
+    // Eternity (Aionios) · Space; the 6 laws as its 6 edges.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Determining Conditions",
+        4,
+        &slugs(&["time", "hyparxis", "eternity", "space"]),
+        &slugs(&[
+            "statistical",
+            "correspondence",
+            "classification",
+            "conservation",
+            "irreversibility",
+            "coexistence",
+        ]),
     );
     content
 }
@@ -784,6 +870,24 @@ mod tests {
         let content = build_citation_from_tables();
         let json = serde_json::to_string_pretty(&content).unwrap();
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../data/citation.json");
+        std::fs::write(path, json).unwrap();
+        eprintln!(
+            "wrote {} ({} chars, {} vocabularies, {} systems)",
+            path,
+            content.characters.len(),
+            content.vocabularies.len(),
+            content.systems.len()
+        );
+    }
+
+    /// Regenerate `data/fragments.json` from the Rust tables. Ignored by default:
+    /// `cargo test -p systematics-backend regenerate_fragments_seed -- --ignored`
+    #[test]
+    #[ignore]
+    fn regenerate_fragments_seed() {
+        let content = super::regen::build_fragments_from_tables();
+        let json = serde_json::to_string_pretty(&content).unwrap();
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../data/fragments.json");
         std::fs::write(path, json).unwrap();
         eprintln!(
             "wrote {} ({} chars, {} vocabularies, {} systems)",

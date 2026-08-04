@@ -75,13 +75,18 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
                 }
             </div>
 
-            // Data · Graph · Table — one compact toggle: shows the current view,
-            // clicking swaps to the other.
+            // Data · Graph · Table — a bare boolean toggle labelled only "View"
+            // (off = Table, on = Graph).
             <button
-                class="view-toggle"
+                class="view-switch"
                 onclick={ toggle_view }
-                title="View — switch between Graph and Table"
-            >{ format!("View: {current_label} ⇄") }</button>
+                title={ format!("View: {current_label} — click to switch") }
+            >
+                <span class="view-switch-label">{ "View" }</span>
+                <span class={ if props.mode == ViewMode::Graph { "view-switch-track on" } else { "view-switch-track" } }>
+                    <span class="view-switch-thumb" />
+                </span>
+            </button>
         </nav>
     }
 }

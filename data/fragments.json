@@ -1,0 +1,315 @@
+{
+  "characters": [
+    {
+      "id": "char_word_aesthetics",
+      "kind": "word",
+      "value": "Aesthetics"
+    },
+    {
+      "id": "char_word_harmony",
+      "kind": "word",
+      "value": "Harmony"
+    },
+    {
+      "id": "char_word_maths",
+      "kind": "word",
+      "value": "Maths"
+    },
+    {
+      "id": "char_word_ahm_edge_1",
+      "kind": "word",
+      "value": "Ahm Edge 1"
+    },
+    {
+      "id": "char_word_ahm_edge_2",
+      "kind": "word",
+      "value": "Ahm Edge 2"
+    },
+    {
+      "id": "char_word_ahm_edge_3",
+      "kind": "word",
+      "value": "Ahm Edge 3"
+    },
+    {
+      "id": "char_word_unity",
+      "kind": "word",
+      "value": "Unity"
+    },
+    {
+      "id": "char_word_form",
+      "kind": "word",
+      "value": "Form"
+    },
+    {
+      "id": "char_word_variety",
+      "kind": "word",
+      "value": "Variety"
+    },
+    {
+      "id": "char_word_aesthetics_edge_1",
+      "kind": "word",
+      "value": "Aesthetics Edge 1"
+    },
+    {
+      "id": "char_word_aesthetics_edge_2",
+      "kind": "word",
+      "value": "Aesthetics Edge 2"
+    },
+    {
+      "id": "char_word_aesthetics_edge_3",
+      "kind": "word",
+      "value": "Aesthetics Edge 3"
+    },
+    {
+      "id": "char_word_inevitability",
+      "kind": "word",
+      "value": "Inevitability"
+    },
+    {
+      "id": "char_word_proportion",
+      "kind": "word",
+      "value": "Proportion"
+    },
+    {
+      "id": "char_word_economy",
+      "kind": "word",
+      "value": "Economy"
+    },
+    {
+      "id": "char_word_harmony_edge_1",
+      "kind": "word",
+      "value": "Harmony Edge 1"
+    },
+    {
+      "id": "char_word_harmony_edge_2",
+      "kind": "word",
+      "value": "Harmony Edge 2"
+    },
+    {
+      "id": "char_word_harmony_edge_3",
+      "kind": "word",
+      "value": "Harmony Edge 3"
+    },
+    {
+      "id": "char_word_theorems",
+      "kind": "word",
+      "value": "Theorems"
+    },
+    {
+      "id": "char_word_lemmas",
+      "kind": "word",
+      "value": "Lemmas"
+    },
+    {
+      "id": "char_word_proofs",
+      "kind": "word",
+      "value": "Proofs"
+    },
+    {
+      "id": "char_word_bili",
+      "kind": "word",
+      "value": "Bili"
+    },
+    {
+      "id": "char_word_phi",
+      "kind": "word",
+      "value": "Phi"
+    },
+    {
+      "id": "char_word_fibonacci",
+      "kind": "word",
+      "value": "Fibonacci"
+    },
+    {
+      "id": "char_word_time",
+      "kind": "word",
+      "value": "Time"
+    },
+    {
+      "id": "char_word_hyparxis",
+      "kind": "word",
+      "value": "Hyparxis"
+    },
+    {
+      "id": "char_word_eternity",
+      "kind": "word",
+      "value": "Eternity"
+    },
+    {
+      "id": "char_word_space",
+      "kind": "word",
+      "value": "Space"
+    },
+    {
+      "id": "char_word_statistical",
+      "kind": "word",
+      "value": "Statistical"
+    },
+    {
+      "id": "char_word_correspondence",
+      "kind": "word",
+      "value": "Correspondence"
+    },
+    {
+      "id": "char_word_classification",
+      "kind": "word",
+      "value": "Classification"
+    },
+    {
+      "id": "char_word_conservation",
+      "kind": "word",
+      "value": "Conservation"
+    },
+    {
+      "id": "char_word_irreversibility",
+      "kind": "word",
+      "value": "Irreversibility"
+    },
+    {
+      "id": "char_word_coexistence",
+      "kind": "word",
+      "value": "Coexistence"
+    }
+  ],
+  "coordinates": [],
+  "vocabularies": [
+    {
+      "id": "vocab_aesthetics_harmony_maths_3",
+      "name": "Aesthetics Harmony Maths",
+      "order": 3,
+      "terms": [
+        "char_word_aesthetics",
+        "char_word_harmony",
+        "char_word_maths"
+      ],
+      "connectives": [
+        "char_word_ahm_edge_1",
+        "char_word_ahm_edge_2",
+        "char_word_ahm_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_aesthetics_3",
+      "name": "Aesthetics",
+      "order": 3,
+      "terms": [
+        "char_word_unity",
+        "char_word_form",
+        "char_word_variety"
+      ],
+      "connectives": [
+        "char_word_aesthetics_edge_1",
+        "char_word_aesthetics_edge_2",
+        "char_word_aesthetics_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_harmony_3",
+      "name": "Harmony",
+      "order": 3,
+      "terms": [
+        "char_word_inevitability",
+        "char_word_proportion",
+        "char_word_economy"
+      ],
+      "connectives": [
+        "char_word_harmony_edge_1",
+        "char_word_harmony_edge_2",
+        "char_word_harmony_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_maths_3",
+      "name": "Maths",
+      "order": 3,
+      "terms": [
+        "char_word_theorems",
+        "char_word_lemmas",
+        "char_word_proofs"
+      ],
+      "connectives": [
+        "char_word_bili",
+        "char_word_phi",
+        "char_word_fibonacci"
+      ]
+    },
+    {
+      "id": "vocab_determining_conditions_4",
+      "name": "Determining Conditions",
+      "order": 4,
+      "terms": [
+        "char_word_time",
+        "char_word_hyparxis",
+        "char_word_eternity",
+        "char_word_space"
+      ],
+      "connectives": [
+        "char_word_statistical",
+        "char_word_correspondence",
+        "char_word_classification",
+        "char_word_conservation",
+        "char_word_irreversibility",
+        "char_word_coexistence"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_aesthetics_harmony_maths_3",
+      "name": "Aesthetics Harmony Maths",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_aesthetics_harmony_maths_3"
+    },
+    {
+      "id": "system_aesthetics_3",
+      "name": "Aesthetics",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_aesthetics_3"
+    },
+    {
+      "id": "system_harmony_3",
+      "name": "Harmony",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_harmony_3"
+    },
+    {
+      "id": "system_maths_3",
+      "name": "Maths",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_maths_3"
+    },
+    {
+      "id": "system_determining_conditions_4",
+      "name": "Determining Conditions",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_determining_conditions_4"
+    }
+  ],
+  "perspectives": [],
+  "sources": [],
+  "artefacts": [],
+  "lookups": [],
+  "references": [],
+  "functors": [],
+  "sequences": []
+}
