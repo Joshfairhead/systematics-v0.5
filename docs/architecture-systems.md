@@ -24,15 +24,21 @@ the system to construct itself** (bootstrap / self-hosting).
   **without recourse to any out-of-system document**. This markdown registry is the
   interim; the app *is* its own documentation (**dynamic homoiconicity**). As the
   model changes in conversation, this updates in step.
-- **Track features as fragments, then fold them in.** Each feature we build is a
-  **fragment** — a loose low-order system floating in the **Architectural Monad**
-  (the raw-material pool). Fragments are tracked as **Monad members**: seeded ones
-  resolve; not-yet-assembled ones are *implicit / dangling* addresses. **Folding in**
-  = assembling fragments into higher-order systems (the core sequence / the Pentad).
+- **Track features as fragments, then fold them in.** A **fragment** is a collection
+  of isolated elements *as a unit* — a face in *some* graph (a triadic fragment = a
+  triangle in an as-yet-unknown K₄/K₅). It is a real graph object (a dyadic fragment
+  *is* a dyad) whose **whole is not yet known** — a dyad may belong in a pentad, a
+  pentad may be a partial octad. We track the relation as *a* system until we realise
+  its place. Fragments float in the **Architectural Monad** (the raw-material pool),
+  tracked as **Monad members**: seeded ones resolve; not-yet-placed ones dangle.
   Current tracked fragments: the Pentad + Citation triad (seeded), and the ELT triad,
-  **Sort·Tag·Filter triad**, and **by-key/by-value dyad** (dangling — this turn's
-  features). This is how the tool comes to build itself: build a feature → track it
-  as a fragment → later fold it in.
+  **Sort·Tag·Filter triad**, and **by-key/by-value dyad** (dangling). Loop: build a
+  feature → track it as a Monad fragment → later fold it in.
+- **Folding in = category-theory-style composition [proposed, large].** Assembly is
+  not built and needs real work: we must first **represent category theory in the
+  system as a graph** — a triad of *identity · composition · association* (possibly
+  coalesced with the SPO triad into a hexad — unsure) — before we can compose
+  fragments into higher systems properly.
 
 ## Everything is a tag [proposed — working principle]
 
@@ -40,10 +46,21 @@ In a view, **every attribute of every element is a tag** — a `key : value` pai
 (perspective, source, locator, artefact, order, coherence, designation, …). This is
 why the query controls are one triad rather than separate features: **Tag (=)
 reconciles Sort (+) and Filter (−)**. Sort prioritises the list by a tag; Filter
-adds/removes tags from the query. Because a tag is `key : value`, each of Sort and
-Filter splits along the **by-key ↔ by-value** dyad. The control is therefore a small
-tree — **Tag → {Sort, Filter} → {key, value}** — and it is **fractal**: the same
-shape recurs at every level.
+adds/removes tags from the query. Because a tag is `key : value`, each splits along
+the **by-key ↔ by-value** dyad.
+
+**A tag *is* the predicate:object of a triple.** Subject·Predicate·Object is the
+core triple for codifying *any* language. The S/P/O are the abstract keys; their
+values make a statement — e.g. subject=`will`, predicate=`generates`, object=`function`
+→ the generic triad **will-generates-function**. A tag = the predicate:value on a
+node; so nodes, edges, systems, coherence, perspectives are *all* tagged triples. A
+**Perspective** is just a web of SPO links — which is why it may be retired as a
+separate container and kept only as the SPO substrate (arguably *everything*).
+
+**Layering [proposed].** SPO can codify **category theory**; category theory can
+then express **systematics** in precise mathematical terms. (Linking semantics to a
+topological node reads as CT *associates* — "will *associates* node-1" — not
+"couples".) So: SPO → category theory → systematics.
 
 ## The generative process — symmetric doubling [proposed]
 
@@ -79,7 +96,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
 | **Operations (ELT)** | Extract · Load · Transform (verbs) → `createSequence` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
-| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**. *Everything in a view is a tag*; the reconciler's own by-key action **composes the view — you pick which tag keys are columns** (`ColKey`; default minimal — Order + Citation; Cites rarely). Sort prioritises the list by a tag; Filter adds/removes tags from the query. Each splits by the **by-key ↔ by-value** dyad. | reconciler-typed (Tag is the whole; Sort +, Filter − its poles) | UI: `components/reference_browser.rs` (the Tag reconciler tree + column composer) | impl v1 — columns-by-key + Sort-by-key + Filter-by-value live; Sort-by-value / Filter-by-key forthcoming |
+| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**. *Everything in a view is a tag* → a column is just a tag key surfaced. Realised concretely: **Filter = configuring which tag keys are the columns/headers** (`ColKey`; default minimal — Order + Citation; Cites off). **Sort = clicking a column header** (toggles ▲/▼). No separate value-facets or popup tree. | reconciler-typed (Tag is the whole; Sort +, Filter − its poles) | UI: `components/reference_browser.rs` (Columns configurator + header-click sort) | impl v1. Citation column renders the triad in order **Source · Artefact · Lookup** |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 
 ## Tetrad (order 4 — Sources / Interplays)
@@ -106,13 +123,15 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 Three distinct things — do not conflate them:
 
 - **Nullad (0) — the unbounded registry.** *Everything* in the tool. No scope.
-  Best expressed as a **data view over an `all` query** — the raw registry. **UI:**
-  the **order-0 button** leading the header sequence (Nullad · Monad · … · Dodecad);
-  a right-side **Data** toggle flips into the reference view, which the header
-  buttons then scope by order. The view is a **Tag reconciler**: everything is a
-  tag; you compose columns by picking tag keys (`ColKey`), and Tag (=) reconciles
-  Sort (+) / Filter (−). The page hosts the **ELT triad** (Extract + Load wired;
-  Transform unwired). *(Still fed by `allReferences`, not yet a true `all` query.)*
+  **UI:** the **order-0 button** leading the header sequence (Nullad · Monad · … ·
+  Dodecad); a right-side **Data** toggle opens the reference view, which the header
+  buttons scope by order. In the table, **Filter = configure which tag keys are
+  columns** and **Sort = click a column header**; the page hosts the **ELT triad**
+  (Extract + Load wired; Transform unwired). *(Still fed by `allReferences`.)*
+  **Next:** a **Graph view** tab beside Table — the Obsidian-style force-directed
+  graph of everything (nodes + SPO links). The **Monad** is the same graph with a
+  selected set of fragments grouped and labelled (a container name, or an
+  auto-generated identity) on its own canvas.
 - **Monad (1) — a scoped registry.** A bounded universe of inquiry with a
   **central point naming its unity** (e.g. "system architecture"), linking every
   graph of relevance: the class/instance dyad, the ALP and ELT triads, the pegged

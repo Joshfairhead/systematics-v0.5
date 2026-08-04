@@ -73,27 +73,6 @@ enum Tab {
     Compare,
 }
 
-#[derive(Clone, Copy, PartialEq)]
-enum SortCol {
-    Perspective,
-    Source,
-    Artefact,
-    Order,
-    Fragment,
-}
-
-impl SortCol {
-    fn label(self) -> &'static str {
-        match self {
-            SortCol::Perspective => "Perspective",
-            SortCol::Source => "Source",
-            SortCol::Artefact => "Artefact",
-            SortCol::Order => "Order",
-            SortCol::Fragment => "Cites",
-        }
-    }
-}
-
 /// A selectable column — one **tag key**. The view is composed by choosing which
 /// keys to show (the Tag reconciler's own by-key action). Everything is a tag, so
 /// a column is just a tag key surfaced.
@@ -146,20 +125,10 @@ fn order_of(r: &ReferenceView) -> Option<i32> {
 fn frag(r: &ReferenceView) -> String {
     r.target_fragment.clone().unwrap_or_default()
 }
-/// Whether a reference is in the current selection (header order + facets +
-/// search). Shared by the table (what to show) and Extract (what to materialize).
-fn passes_filters(
-    r: &ReferenceView,
-    filter_order: Option<i32>,
-    f_perspective: Option<&str>,
-    f_source: Option<&str>,
-    f_artefact: Option<&str>,
-    needle: &str,
-) -> bool {
+/// Whether a reference is in the current selection (header order + search).
+/// Shared by the table (what to show) and Extract (what to materialize).
+fn passes_filters(r: &ReferenceView, filter_order: Option<i32>, needle: &str) -> bool {
     filter_order.is_none_or(|o| order_of(r) == Some(o))
-        && f_perspective.is_none_or(|p| persp(r).as_str() == p)
-        && f_source.is_none_or(|s| src(r).as_str() == s)
-        && f_artefact.is_none_or(|a| art(r).as_str() == a)
         && (needle.is_empty() || {
             let hay = format!(
                 "{} {} {} {} {} {}",
@@ -189,16 +158,13 @@ fn provenance(r: &ReferenceView) -> String {
 #[function_component(ReferenceBrowser)]
 pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let tab = use_state(|| Tab::Table);
-    let sort_col = use_state(|| SortCol::Order);
+    // Sort is by a column (tag key), toggled by clicking its header.
+    let sort_col = use_state(|| ColKey::Order);
     let sort_asc = use_state(|| true);
-    let f_perspective = use_state(|| Option::<String>::None);
-    let f_source = use_state(|| Option::<String>::None);
-    let f_artefact = use_state(|| Option::<String>::None);
     let search = use_state(String::new);
     let load_open = use_state(|| false);
-    // The Tag reconciler popover. Tag (=) reconciles Sort (+) and Filter (−):
-    // everything in the view is a tag, so both operations act on tags.
-    let tags_open = use_state(|| false);
+    // Column configurator popover (which tag keys are shown as columns).
+    let cols_open = use_state(|| false);
     // Which tag keys are shown as columns — the view is composed by key. Minimal
     // by default (seeing every key at once is rarely useful).
     let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Citation]);
@@ -206,13 +172,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let refs = &props.references;
     // The order filter comes from the header (Nullad = None = all).
     let filter_order = props.filter_order;
-
-    // Distinct facet values (perspective/source/artefact refine within the
-    // header's order selection).
-    let perspectives: BTreeSet<String> =
-        refs.iter().map(persp).filter(|s| !s.is_empty()).collect();
-    let sources: BTreeSet<String> = refs.iter().map(src).filter(|s| !s.is_empty()).collect();
-    let artefacts: BTreeSet<String> = refs.iter().map(art).filter(|s| !s.is_empty()).collect();
 
     // Caption for the active header scope.
     let scope_label = match filter_order {
@@ -227,16 +186,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let mut seen = BTreeSet::new();
     let extract_members: Vec<String> = refs
         .iter()
-        .filter(|r| {
-            passes_filters(
-                r,
-                filter_order,
-                f_perspective.as_deref(),
-                f_source.as_deref(),
-                f_artefact.as_deref(),
-                &needle,
-            )
-        })
+        .filter(|r| passes_filters(r, filter_order, &needle))
         .filter_map(|r| r.target_system.as_ref().map(|s| format!("system:{}", s.id)))
         .filter(|m| seen.insert(m.clone()))
         .collect();
@@ -286,14 +236,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                         filter_order,
                         sort_col: &sort_col,
                         sort_asc: &sort_asc,
-                        f_perspective: &f_perspective,
-                        f_source: &f_source,
-                        f_artefact: &f_artefact,
                         search: &search,
-                        perspectives: &perspectives,
-                        sources: &sources,
-                        artefacts: &artefacts,
-                        tags_open: &tags_open,
+                        cols_open: &cols_open,
                         visible_cols: &visible_cols,
                     }),
                     Tab::Compare => compare_view(refs, filter_order),
@@ -408,60 +352,14 @@ struct TableCtx<'a> {
     refs: &'a [ReferenceView],
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
-    sort_col: &'a UseStateHandle<SortCol>,
+    /// Sort column (tag key) + direction — set by clicking a column header.
+    sort_col: &'a UseStateHandle<ColKey>,
     sort_asc: &'a UseStateHandle<bool>,
-    f_perspective: &'a UseStateHandle<Option<String>>,
-    f_source: &'a UseStateHandle<Option<String>>,
-    f_artefact: &'a UseStateHandle<Option<String>>,
     search: &'a UseStateHandle<String>,
-    perspectives: &'a BTreeSet<String>,
-    sources: &'a BTreeSet<String>,
-    artefacts: &'a BTreeSet<String>,
-    /// The Tag reconciler popover (holds the Sort/Filter × key/value tree).
-    tags_open: &'a UseStateHandle<bool>,
+    /// The column configurator popover (which tag keys are columns = Filter).
+    cols_open: &'a UseStateHandle<bool>,
     /// Which tag keys are shown as columns (the view, composed by key).
     visible_cols: &'a UseStateHandle<Vec<ColKey>>,
-}
-
-/// A toggle chip for a `String`-valued filter facet. Clicking a chip sets the
-/// filter; clicking the active chip clears it. These are the filter *buttons*.
-fn string_chip(state: &UseStateHandle<Option<String>>, value: &str) -> Html {
-    let is_active = state.as_deref() == Some(value);
-    let onclick = {
-        let state = state.clone();
-        let value = value.to_string();
-        Callback::from(move |_: MouseEvent| {
-            if state.as_deref() == Some(value.as_str()) {
-                state.set(None);
-            } else {
-                state.set(Some(value.clone()));
-            }
-        })
-    };
-    html! {
-        <button class={ classes!("facet-chip", is_active.then_some("active")) } onclick={ onclick }>
-            { value }
-        </button>
-    }
-}
-
-/// A whole facet row: a label, an "All" chip (clears the filter), then one
-/// toggle chip per distinct value.
-fn string_facet(label: &str, values: &BTreeSet<String>, state: &UseStateHandle<Option<String>>) -> Html {
-    let clear = {
-        let state = state.clone();
-        Callback::from(move |_: MouseEvent| state.set(None))
-    };
-    html! {
-        <div class="facet">
-            <span class="facet-label">{ label }</span>
-            <button
-                class={ classes!("facet-chip", state.is_none().then_some("active")) }
-                onclick={ clear }
-            >{ "All" }</button>
-            { for values.iter().map(|v| string_chip(state, v)) }
-        </div>
-    }
 }
 
 fn table_view(ctx: TableCtx) -> Html {
@@ -470,73 +368,31 @@ fn table_view(ctx: TableCtx) -> Html {
         filter_order,
         sort_col,
         sort_asc,
-        f_perspective,
-        f_source,
-        f_artefact,
         search,
-        perspectives,
-        sources,
-        artefacts,
-        tags_open,
+        cols_open,
         visible_cols,
     } = ctx;
 
-    // Filter — same predicate Extract uses (header order + facets + search).
+    // Filter — same predicate Extract uses (header order + search).
     let needle = search.to_lowercase();
-    let mut rows: Vec<&ReferenceView> = refs
-        .iter()
-        .filter(|r| {
-            passes_filters(
-                r,
-                filter_order,
-                f_perspective.as_deref(),
-                f_source.as_deref(),
-                f_artefact.as_deref(),
-                &needle,
-            )
-        })
-        .collect();
+    let mut rows: Vec<&ReferenceView> =
+        refs.iter().filter(|r| passes_filters(r, filter_order, &needle)).collect();
 
-    // Sort.
+    // Sort by the active column (tag key).
     let col = **sort_col;
     rows.sort_by(|a, b| {
         let ord = match col {
-            SortCol::Perspective => persp(a).cmp(&persp(b)),
-            SortCol::Source => src(a).cmp(&src(b)),
-            SortCol::Artefact => art(a).cmp(&art(b)),
-            SortCol::Order => order_of(a).cmp(&order_of(b)),
-            SortCol::Fragment => frag(a).cmp(&frag(b)),
+            ColKey::Order => order_of(a).cmp(&order_of(b)),
+            ColKey::Perspective => persp(a).cmp(&persp(b)),
+            ColKey::Citation => src(a).cmp(&src(b)),
+            ColKey::Cites => frag(a).cmp(&frag(b)),
+            ColKey::Note => a.note.cmp(&b.note),
         };
         if **sort_asc { ord } else { ord.reverse() }
     });
 
-    // Sort buttons (one per sortable column; clicking the active one flips
-    // direction). Sorting is button-driven, not just header clicks.
-    let sort_button = |c: SortCol| -> Html {
-        let sort_col = sort_col.clone();
-        let sort_asc = sort_asc.clone();
-        let active = *sort_col == c;
-        let arrow = if active {
-            if *sort_asc { " ▲" } else { " ▼" }
-        } else {
-            ""
-        };
-        let onclick = Callback::from(move |_: MouseEvent| {
-            if *sort_col == c {
-                sort_asc.set(!*sort_asc);
-            } else {
-                sort_col.set(c);
-                sort_asc.set(true);
-            }
-        });
-        html! {
-            <button class={ classes!("sort-chip", active.then_some("active")) } onclick={ onclick }>
-                { c.label() }{ arrow }
-            </button>
-        }
-    };
-
-    // Column toggle — add/remove a tag key from the view (the Tag = by-key action).
+    // Column toggle — configure which tag keys are columns (Filter = the
+    // configuration of headers). Everything is a tag; a column is a tag key.
     let col_chip = |k: ColKey| -> Html {
         let visible_cols = visible_cols.clone();
         let on = visible_cols.contains(&k);
@@ -557,13 +413,12 @@ fn table_view(ctx: TableCtx) -> Html {
     };
     // Visible columns in canonical order (independent of toggle order).
     let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
+
     let cell = |k: ColKey, r: &ReferenceView| -> Html {
         match k {
             ColKey::Order => html! { { order_of(r).map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } },
-            ColKey::Perspective => html! {
-                { persp_tag(r, f_perspective) }
-            },
-            ColKey::Citation => html! { { citation_tags(r, f_source, f_artefact) } },
+            ColKey::Perspective => persp_tag(r),
+            ColKey::Citation => citation_tags(r),
             ColKey::Cites => {
                 let f = frag(r);
                 let cites = if f.is_empty() { "whole system".to_string() } else { f };
@@ -574,6 +429,31 @@ fn table_view(ctx: TableCtx) -> Html {
         }
     };
 
+    // A sortable column header — click to sort by that tag; click again to flip.
+    let header = |k: ColKey| -> Html {
+        let sort_col = sort_col.clone();
+        let sort_asc = sort_asc.clone();
+        let active = *sort_col == k;
+        let arrow = if active {
+            if *sort_asc { " ▲" } else { " ▼" }
+        } else {
+            ""
+        };
+        let onclick = Callback::from(move |_: MouseEvent| {
+            if *sort_col == k {
+                sort_asc.set(!*sort_asc);
+            } else {
+                sort_col.set(k);
+                sort_asc.set(true);
+            }
+        });
+        html! {
+            <th class={ classes!("ref-th", active.then_some("sorted")) } onclick={ onclick }>
+                { k.label() }{ arrow }
+            </th>
+        }
+    };
+
     let on_search = {
         let search = search.clone();
         Callback::from(move |e: InputEvent| {
@@ -581,64 +461,27 @@ fn table_view(ctx: TableCtx) -> Html {
             search.set(v);
         })
     };
-
-    let toggle_tags = {
-        let s = tags_open.clone();
+    let toggle_cols = {
+        let s = cols_open.clone();
         Callback::from(move |_: MouseEvent| s.set(!*s))
     };
-    let filters_active = f_perspective.is_some() || f_source.is_some() || f_artefact.is_some();
-    let sort_summary = format!("{} {}", (**sort_col).label(), if **sort_asc { "▲" } else { "▼" });
 
     html! {
         <>
-            // Control bar: the Tag reconciler (holding the Sort/Filter tree) to the
-            // left of the search. Tag (=) reconciles Sort (+) and Filter (−).
+            // Control bar: column configuration (Filter = which tag keys are the
+            // headers) + search. Sort is by clicking a column header.
             <div class="ref-controlbar">
                 <div class="control-pop">
                     <button
-                        class={ classes!("control-btn", (filters_active || **tags_open).then_some("active")) }
-                        onclick={ toggle_tags }
-                        title="Tag (=) reconciles Sort (+) and Filter (−) — everything here is a tag"
-                    >{ "Tags ▾" }</button>
-                    if **tags_open {
-                        <div class="control-menu tag-tree">
-                            <div class="tag-root">{ "Tag (=)" }</div>
-                            // Tag (=) — compose the view by choosing tag keys as columns.
-                            <div class="tag-leaf tag-columns">
-                                <span class="tag-leaf-label">{ "columns · by key" }</span>
+                        class={ classes!("control-btn", (**cols_open).then_some("active")) }
+                        onclick={ toggle_cols }
+                        title="Columns — choose which tag keys are shown (Filter = configuring the headers)"
+                    >{ format!("Columns ({}) ▾", cols.len()) }</button>
+                    if **cols_open {
+                        <div class="control-menu">
+                            <span class="facet-label">{ "columns · tag keys" }</span>
+                            <div class="col-chips">
                                 { for ALL_COLS.into_iter().map(col_chip) }
-                            </div>
-                            <div class="tag-branches">
-                                // Sort (+): prioritise the list by a tag.
-                                <div class="tag-branch">
-                                    <div class="tag-branch-head">{ format!("Sort (+) · {sort_summary}") }</div>
-                                    <div class="tag-leaf">
-                                        <span class="tag-leaf-label">{ "by key" }</span>
-                                        { sort_button(SortCol::Order) }
-                                        { sort_button(SortCol::Perspective) }
-                                        { sort_button(SortCol::Source) }
-                                        { sort_button(SortCol::Artefact) }
-                                        { sort_button(SortCol::Fragment) }
-                                    </div>
-                                    <div class="tag-leaf">
-                                        <span class="tag-leaf-label">{ "by value" }</span>
-                                        <span class="tag-leaf-todo">{ "forthcoming" }</span>
-                                    </div>
-                                </div>
-                                // Filter (−): add/remove tags from the query.
-                                <div class="tag-branch">
-                                    <div class="tag-branch-head">{ "Filter (−)" }</div>
-                                    <div class="tag-leaf">
-                                        <span class="tag-leaf-label">{ "by key" }</span>
-                                        <span class="tag-leaf-todo">{ "forthcoming" }</span>
-                                    </div>
-                                    <div class="tag-leaf tag-leaf-col">
-                                        <span class="tag-leaf-label">{ "by value" }</span>
-                                        { string_facet("Perspective", perspectives, f_perspective) }
-                                        { string_facet("Source", sources, f_source) }
-                                        { string_facet("Artefact", artefacts, f_artefact) }
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     }
@@ -656,12 +499,12 @@ fn table_view(ctx: TableCtx) -> Html {
 
             <div class="ref-table-wrap">
                 if cols.is_empty() {
-                    <p class="ref-empty">{ "No columns — pick tag keys under Tags ▾ → columns." }</p>
+                    <p class="ref-empty">{ "No columns — pick tag keys under Columns ▾." }</p>
                 } else {
                     <table class="ref-table">
                         <thead>
                             <tr>
-                                { for cols.iter().map(|k| html!{ <th class="ref-th">{ k.label() }</th> }) }
+                                { for cols.iter().map(|k| header(*k)) }
                             </tr>
                         </thead>
                         <tbody>
@@ -678,52 +521,35 @@ fn table_view(ctx: TableCtx) -> Html {
     }
 }
 
-/// The **Perspective** tag for a reference — its own column key; clickable to
-/// filter (tagging and filtering share one surface).
-fn persp_tag(r: &ReferenceView, f_perspective: &UseStateHandle<Option<String>>) -> Html {
+/// The **Perspective** tag for a reference — its own column key (display only).
+fn persp_tag(r: &ReferenceView) -> Html {
     let perspective = persp(r);
     if perspective.is_empty() {
         return html! {};
     }
-    let f = f_perspective.clone();
-    let v = perspective.clone();
-    let onclick = Callback::from(move |_: MouseEvent| f.set(Some(v.clone())));
-    html! { <button class="tag tag-perspective" onclick={ onclick } title="Perspective (filter)">{ perspective }</button> }
+    html! { <span class="tag tag-perspective">{ perspective }</span> }
 }
 
-/// Render a reference's **citation triad** (source · locator · artefact) as tags.
-/// Source and artefact are clickable (they set the matching filter), so tagging
-/// and filtering share one surface. The Citation column key surfaces this.
-fn citation_tags(
-    r: &ReferenceView,
-    f_source: &UseStateHandle<Option<String>>,
-    f_artefact: &UseStateHandle<Option<String>>,
-) -> Html {
+/// Render a reference's **citation triad** in triad order — **Source · Artefact ·
+/// Lookup** (display only; the Citation column key surfaces this).
+fn citation_tags(r: &ReferenceView) -> Html {
     let source = src(r);
-    let locator = loc(r);
     let artefact = art(r);
+    let locator = loc(r);
 
-    let source_tag = (!source.is_empty()).then(|| {
-        let f = f_source.clone();
-        let v = source.clone();
-        let onclick = Callback::from(move |_: MouseEvent| f.set(Some(v.clone())));
-        html! { <button class="tag tag-source" onclick={ onclick } title="Source (filter)">{ source.clone() }</button> }
-    });
+    let source_tag = (!source.is_empty())
+        .then(|| html! { <span class="tag tag-source" title="Source">{ source }</span> });
     let artefact_url = r.artefact.as_ref().and_then(|a| a.url.clone()).unwrap_or_default();
-    let artefact_tag = (!artefact.is_empty()).then(|| {
-        let f = f_artefact.clone();
-        let v = artefact.clone();
-        let onclick = Callback::from(move |_: MouseEvent| f.set(Some(v.clone())));
-        html! { <button class="tag tag-artefact" onclick={ onclick } title={ artefact_url }>{ artefact.clone() }</button> }
-    });
+    let artefact_tag = (!artefact.is_empty())
+        .then(|| html! { <span class="tag tag-artefact" title={ artefact_url }>{ artefact }</span> });
     let locator_tag = (!locator.is_empty())
-        .then(|| html! { <span class="tag tag-locator">{ locator }</span> });
+        .then(|| html! { <span class="tag tag-locator" title="Lookup">{ locator }</span> });
 
     html! {
         <span class="tags">
             { source_tag.unwrap_or_default() }
-            { locator_tag.unwrap_or_default() }
             { artefact_tag.unwrap_or_default() }
+            { locator_tag.unwrap_or_default() }
         </span>
     }
 }

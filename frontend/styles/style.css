@@ -682,72 +682,13 @@ body {
     padding: 0.5rem;
     box-shadow: 0 8px 24px rgba(163, 177, 198, 0.4);
 }
-/* Tag reconciler tree: Tag (=) over Sort (+) | Filter (−), each with key/value. */
-.tag-tree {
-    min-width: 30rem;
-    max-width: 44rem;
-    max-height: 70vh;
-    overflow-y: auto;
-}
-.tag-root {
-    text-align: center;
-    font-weight: 600;
-    color: #7c3aed;
-    font-size: 0.8rem;
-    padding-bottom: 0.35rem;
-    border-bottom: 1px solid rgba(163, 177, 198, 0.3);
-    margin-bottom: 0.1rem;
-}
-.tag-branches {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-}
-.tag-branch {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding-left: 0.5rem;
-}
-.tag-branch:nth-child(1) {
-    border-left: 2px solid rgba(16, 185, 129, 0.45); /* Sort (+) */
-}
-.tag-branch:nth-child(2) {
-    border-left: 2px solid rgba(239, 68, 68, 0.35); /* Filter (−) */
-}
-.tag-branch-head {
-    font-weight: 600;
-    font-size: 0.78rem;
-    color: #4a5568;
-}
-.tag-leaf {
+/* Column configurator: chips for each tag key (which columns are shown). */
+.col-chips {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     gap: 0.3rem;
-}
-.tag-leaf-col {
-    flex-direction: column;
-    align-items: flex-start;
-}
-.tag-leaf-label {
-    color: #718096;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    min-width: 3.5rem;
-}
-.tag-leaf-todo {
-    color: #a0aec0;
-    font-size: 0.75rem;
-    font-style: italic;
-}
-/* Tag (=) column composer — spans the tree width, above the Sort/Filter branches. */
-.tag-columns {
-    padding-bottom: 0.4rem;
-    margin-bottom: 0.1rem;
-    border-bottom: 1px solid rgba(163, 177, 198, 0.3);
+    margin-top: 0.35rem;
+    max-width: 22rem;
 }
 .ref-empty {
     color: #a0aec0;
@@ -756,21 +697,13 @@ body {
     text-align: center;
 }
 
-.facet {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.3rem;
-}
 .facet-label {
     color: #718096;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    min-width: 5.5rem;
 }
-.facet-chip,
-.sort-chip {
+.facet-chip {
     border: 1px solid rgba(163, 177, 198, 0.4);
     background: rgba(255, 255, 255, 0.6);
     color: #4a5568;
@@ -779,8 +712,7 @@ body {
     font-size: 0.78rem;
     cursor: pointer;
 }
-.facet-chip.active,
-.sort-chip.active {
+.facet-chip.active {
     background: rgba(37, 99, 235, 0.15);
     border-color: rgba(37, 99, 235, 0.4);
     color: #2563eb;
@@ -854,6 +786,9 @@ button.tag {
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
+}
+.ref-th.sorted {
+    color: #2563eb;
 }
 .ref-table tbody tr:nth-child(even) {
     background: rgba(255, 255, 255, 0.35);
