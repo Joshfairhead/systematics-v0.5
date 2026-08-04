@@ -106,6 +106,57 @@ impl ColKey {
     }
 }
 
+/// The **degree / complexity** of what a reference cites (its target fragment).
+/// Nullad holds every element; scoping by kind lets you see only systems, or
+/// only nodes/edges, etc. (Node = a term (1); Edge = a connective (2); System =
+/// the whole; a *manifold* is a System not yet placed in a higher order.)
+#[derive(Clone, Copy, PartialEq)]
+enum CiteKind {
+    System,
+    Node,
+    Edge,
+    Coherence,
+    Designation,
+}
+
+const ALL_KINDS: [CiteKind; 5] = [
+    CiteKind::System,
+    CiteKind::Node,
+    CiteKind::Edge,
+    CiteKind::Coherence,
+    CiteKind::Designation,
+];
+
+impl CiteKind {
+    fn label(self) -> &'static str {
+        match self {
+            CiteKind::System => "System",
+            CiteKind::Node => "Node (1)",
+            CiteKind::Edge => "Edge (2)",
+            CiteKind::Coherence => "Coherence",
+            CiteKind::Designation => "Designation",
+        }
+    }
+}
+
+/// Classify a reference by what it cites (its `#fragment`), i.e. its degree.
+fn cite_kind(r: &ReferenceView) -> CiteKind {
+    let f = frag(r);
+    if f.is_empty() {
+        CiteKind::System
+    } else if f == "coherence" {
+        CiteKind::Coherence
+    } else if f.starts_with("term:") {
+        CiteKind::Node
+    } else if f.starts_with("conn:") {
+        CiteKind::Edge
+    } else if f.contains("designation") {
+        CiteKind::Designation
+    } else {
+        CiteKind::System
+    }
+}
+
 // -- small field accessors (references carry Option-wrapped nested data) --
 fn persp(r: &ReferenceView) -> String {
     r.perspective_name.clone().unwrap_or_default()
@@ -125,10 +176,17 @@ fn order_of(r: &ReferenceView) -> Option<i32> {
 fn frag(r: &ReferenceView) -> String {
     r.target_fragment.clone().unwrap_or_default()
 }
-/// Whether a reference is in the current selection (header order + search).
+/// Whether a reference is in the current selection: header **order** (Sort's
+/// scope), the **Filter** by cite-degree (`active_kinds`), and **search**.
 /// Shared by the table (what to show) and Extract (what to materialize).
-fn passes_filters(r: &ReferenceView, filter_order: Option<i32>, needle: &str) -> bool {
+fn passes_filters(
+    r: &ReferenceView,
+    filter_order: Option<i32>,
+    active_kinds: &[CiteKind],
+    needle: &str,
+) -> bool {
     filter_order.is_none_or(|o| order_of(r) == Some(o))
+        && active_kinds.contains(&cite_kind(r))
         && (needle.is_empty() || {
             let hay = format!(
                 "{} {} {} {} {} {}",
@@ -158,16 +216,14 @@ fn provenance(r: &ReferenceView) -> String {
 #[function_component(ReferenceBrowser)]
 pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let tab = use_state(|| Tab::Table);
-    // Sort is by a column (tag key), toggled by clicking its header.
-    let sort_col = use_state(|| ColKey::Order);
-    let sort_asc = use_state(|| true);
     let search = use_state(String::new);
     let load_open = use_state(|| false);
-    // Column configurator popover (which tag keys are shown as columns).
-    let cols_open = use_state(|| false);
-    // Which tag keys are shown as columns — the view is composed by key. Minimal
-    // by default (seeing every key at once is rarely useful).
+    // Sort (=) selects the header tags (which tag keys are columns).
+    let sort_open = use_state(|| false);
     let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Citation]);
+    // Filter (−) scopes the data returned, by cite-degree (Sys/Node/Edge/…).
+    let filter_open = use_state(|| false);
+    let active_kinds = use_state(|| ALL_KINDS.to_vec());
 
     let refs = &props.references;
     // The order filter comes from the header (Nullad = None = all).
@@ -186,7 +242,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let mut seen = BTreeSet::new();
     let extract_members: Vec<String> = refs
         .iter()
-        .filter(|r| passes_filters(r, filter_order, &needle))
+        .filter(|r| passes_filters(r, filter_order, &active_kinds, &needle))
         .filter_map(|r| r.target_system.as_ref().map(|s| format!("system:{}", s.id)))
         .filter(|m| seen.insert(m.clone()))
         .collect();
@@ -234,11 +290,11 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                     Tab::Table => table_view(TableCtx {
                         refs,
                         filter_order,
-                        sort_col: &sort_col,
-                        sort_asc: &sort_asc,
                         search: &search,
-                        cols_open: &cols_open,
+                        sort_open: &sort_open,
                         visible_cols: &visible_cols,
+                        filter_open: &filter_open,
+                        active_kinds: &active_kinds,
                     }),
                     Tab::Compare => compare_view(refs, filter_order),
                 }
@@ -352,47 +408,36 @@ struct TableCtx<'a> {
     refs: &'a [ReferenceView],
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
-    /// Sort column (tag key) + direction — set by clicking a column header.
-    sort_col: &'a UseStateHandle<ColKey>,
-    sort_asc: &'a UseStateHandle<bool>,
     search: &'a UseStateHandle<String>,
-    /// The column configurator popover (which tag keys are columns = Filter).
-    cols_open: &'a UseStateHandle<bool>,
-    /// Which tag keys are shown as columns (the view, composed by key).
+    /// Sort (=) popover — selecting the header tags (which keys are columns).
+    sort_open: &'a UseStateHandle<bool>,
     visible_cols: &'a UseStateHandle<Vec<ColKey>>,
+    /// Filter (−) popover — scoping the data by cite-degree.
+    filter_open: &'a UseStateHandle<bool>,
+    active_kinds: &'a UseStateHandle<Vec<CiteKind>>,
 }
 
 fn table_view(ctx: TableCtx) -> Html {
     let TableCtx {
         refs,
         filter_order,
-        sort_col,
-        sort_asc,
         search,
-        cols_open,
+        sort_open,
         visible_cols,
+        filter_open,
+        active_kinds,
     } = ctx;
 
-    // Filter — same predicate Extract uses (header order + search).
+    // Filter — same predicate Extract uses (header order + cite-degree + search).
     let needle = search.to_lowercase();
-    let mut rows: Vec<&ReferenceView> =
-        refs.iter().filter(|r| passes_filters(r, filter_order, &needle)).collect();
+    let mut rows: Vec<&ReferenceView> = refs
+        .iter()
+        .filter(|r| passes_filters(r, filter_order, active_kinds, &needle))
+        .collect();
+    // Default row order: by systematic order (the header axis).
+    rows.sort_by_key(|r| order_of(r));
 
-    // Sort by the active column (tag key).
-    let col = **sort_col;
-    rows.sort_by(|a, b| {
-        let ord = match col {
-            ColKey::Order => order_of(a).cmp(&order_of(b)),
-            ColKey::Perspective => persp(a).cmp(&persp(b)),
-            ColKey::Citation => src(a).cmp(&src(b)),
-            ColKey::Cites => frag(a).cmp(&frag(b)),
-            ColKey::Note => a.note.cmp(&b.note),
-        };
-        if **sort_asc { ord } else { ord.reverse() }
-    });
-
-    // Column toggle — configure which tag keys are columns (Filter = the
-    // configuration of headers). Everything is a tag; a column is a tag key.
+    // Sort (=) — select which tag keys are the columns (the header tags).
     let col_chip = |k: ColKey| -> Html {
         let visible_cols = visible_cols.clone();
         let on = visible_cols.contains(&k);
@@ -404,6 +449,25 @@ fn table_view(ctx: TableCtx) -> Html {
                 next.push(k);
             }
             visible_cols.set(next);
+        });
+        html! {
+            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
+                { k.label() }
+            </button>
+        }
+    };
+    // Filter (−) — scope the data returned by cite-degree.
+    let kind_chip = |k: CiteKind| -> Html {
+        let active_kinds = active_kinds.clone();
+        let on = active_kinds.contains(&k);
+        let onclick = Callback::from(move |_: MouseEvent| {
+            let mut next = (*active_kinds).clone();
+            if let Some(i) = next.iter().position(|c| *c == k) {
+                next.remove(i);
+            } else {
+                next.push(k);
+            }
+            active_kinds.set(next);
         });
         html! {
             <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
@@ -429,31 +493,6 @@ fn table_view(ctx: TableCtx) -> Html {
         }
     };
 
-    // A sortable column header — click to sort by that tag; click again to flip.
-    let header = |k: ColKey| -> Html {
-        let sort_col = sort_col.clone();
-        let sort_asc = sort_asc.clone();
-        let active = *sort_col == k;
-        let arrow = if active {
-            if *sort_asc { " ▲" } else { " ▼" }
-        } else {
-            ""
-        };
-        let onclick = Callback::from(move |_: MouseEvent| {
-            if *sort_col == k {
-                sort_asc.set(!*sort_asc);
-            } else {
-                sort_col.set(k);
-                sort_asc.set(true);
-            }
-        });
-        html! {
-            <th class={ classes!("ref-th", active.then_some("sorted")) } onclick={ onclick }>
-                { k.label() }{ arrow }
-            </th>
-        }
-    };
-
     let on_search = {
         let search = search.clone();
         Callback::from(move |e: InputEvent| {
@@ -461,27 +500,42 @@ fn table_view(ctx: TableCtx) -> Html {
             search.set(v);
         })
     };
-    let toggle_cols = {
-        let s = cols_open.clone();
-        Callback::from(move |_: MouseEvent| s.set(!*s))
-    };
+    let toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
+    let toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
+    let scoped = active_kinds.len() < ALL_KINDS.len();
 
     html! {
         <>
-            // Control bar: column configuration (Filter = which tag keys are the
-            // headers) + search. Sort is by clicking a column header.
+            // Control bar. Sort (=) selects the header tags (columns); Filter (−)
+            // scopes the data returned (by cite-degree). Then free-text search.
             <div class="ref-controlbar">
                 <div class="control-pop">
                     <button
-                        class={ classes!("control-btn", (**cols_open).then_some("active")) }
-                        onclick={ toggle_cols }
-                        title="Columns — choose which tag keys are shown (Filter = configuring the headers)"
-                    >{ format!("Columns ({}) ▾", cols.len()) }</button>
-                    if **cols_open {
+                        class={ classes!("control-btn", (**sort_open).then_some("active")) }
+                        onclick={ toggle_sort }
+                        title="Sort — select the header tags (which tag keys are columns)"
+                    >{ format!("Sort ({}) ▾", cols.len()) }</button>
+                    if **sort_open {
                         <div class="control-menu">
-                            <span class="facet-label">{ "columns · tag keys" }</span>
+                            <span class="facet-label">{ "header tags · columns" }</span>
                             <div class="col-chips">
                                 { for ALL_COLS.into_iter().map(col_chip) }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="control-pop">
+                    <button
+                        class={ classes!("control-btn", (scoped || **filter_open).then_some("active")) }
+                        onclick={ toggle_filter }
+                        title="Filter — scope the data returned, by cite degree (system / node / edge / …)"
+                    >{ if scoped { "Filter ● ▾" } else { "Filter ▾" } }</button>
+                    if **filter_open {
+                        <div class="control-menu">
+                            <span class="facet-label">{ "data · by cite degree" }</span>
+                            <div class="col-chips">
+                                { for ALL_KINDS.into_iter().map(kind_chip) }
                             </div>
                         </div>
                     }
@@ -499,12 +553,12 @@ fn table_view(ctx: TableCtx) -> Html {
 
             <div class="ref-table-wrap">
                 if cols.is_empty() {
-                    <p class="ref-empty">{ "No columns — pick tag keys under Columns ▾." }</p>
+                    <p class="ref-empty">{ "No columns — pick header tags under Sort ▾." }</p>
                 } else {
                     <table class="ref-table">
                         <thead>
                             <tr>
-                                { for cols.iter().map(|k| header(*k)) }
+                                { for cols.iter().map(|k| html!{ <th class="ref-th">{ k.label() }</th> }) }
                             </tr>
                         </thead>
                         <tbody>

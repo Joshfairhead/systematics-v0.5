@@ -1,5 +1,7 @@
 use yew::prelude::*;
 
+use crate::app::ViewMode;
+
 /// Simple display config for system selector (UI only)
 #[derive(Clone, PartialEq)]
 pub struct SystemDisplay {
@@ -14,10 +16,10 @@ pub struct SystemSelectorProps {
     /// The selected header key (`"nullad"`, `"monad"`, …).
     pub selected: String,
     pub on_select: Callback<String>,
-    /// Whether the data (reference) view is active — highlights the Data toggle.
-    pub data_mode: bool,
-    /// Flip between the graph canvas and the data view.
-    pub on_toggle_data: Callback<()>,
+    /// Which view of the Data is active (Graph or Table).
+    pub mode: ViewMode,
+    /// Switch the Data's view (Data · Graph · Table triad).
+    pub on_set_mode: Callback<ViewMode>,
 }
 
 #[function_component(SystemSelector)]
@@ -33,10 +35,16 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
         "nav-button nav-nullad"
     };
 
-    let toggle_data = {
-        let on_toggle_data = props.on_toggle_data.clone();
-        Callback::from(move |_| on_toggle_data.emit(()))
+    let set_graph = {
+        let on_set_mode = props.on_set_mode.clone();
+        Callback::from(move |_| on_set_mode.emit(ViewMode::Graph))
     };
+    let set_table = {
+        let on_set_mode = props.on_set_mode.clone();
+        Callback::from(move |_| on_set_mode.emit(ViewMode::Table))
+    };
+    let graph_class = if props.mode == ViewMode::Graph { "data-toggle active" } else { "data-toggle" };
+    let table_class = if props.mode == ViewMode::Table { "data-toggle active" } else { "data-toggle" };
 
     html! {
         <nav class="top-nav">
@@ -70,13 +78,12 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
                 }
             </div>
 
-            // Data toggle — right of the menu. Switches the viewer into the
-            // reference (data) view; the system buttons then filter it.
-            <button
-                class={ if props.data_mode { "data-toggle active" } else { "data-toggle" } }
-                onclick={ toggle_data }
-                title={ "Toggle the data (reference) view" }
-            >{ "Data" }</button>
+            // Data · Graph · Table — right of the menu. Switches how the scoped
+            // Data is viewed (a graph, or a table).
+            <div class="data-switch" title="Data — view as Graph or Table">
+                <button class={ graph_class } onclick={ set_graph }>{ "Graph" }</button>
+                <button class={ table_class } onclick={ set_table }>{ "Table" }</button>
+            </div>
         </nav>
     }
 }

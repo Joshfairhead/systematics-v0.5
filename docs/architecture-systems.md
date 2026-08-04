@@ -57,10 +57,16 @@ node; so nodes, edges, systems, coherence, perspectives are *all* tagged triples
 **Perspective** is just a web of SPO links — which is why it may be retired as a
 separate container and kept only as the SPO substrate (arguably *everything*).
 
-**Layering [proposed].** SPO can codify **category theory**; category theory can
-then express **systematics** in precise mathematical terms. (Linking semantics to a
-topological node reads as CT *associates* — "will *associates* node-1" — not
-"couples".) So: SPO → category theory → systematics.
+**Three interchangeable mediums [proposed — corrected].** SPO, category theory, and
+systematics are **not** a base-truth stack — none is primary. They are related and
+**mutually expressive**: each can express the others, and which is "primary" is a
+choice of perspective. A plausible reading: **CT = receptive, SPO = reconciler,
+systematics = affirmation**. Switching between them will likely require representing
+each object **three ways** — a **commuting triangle** in CT, an **SPO triple** in
+English, and a **triad** in systematics — with **representational transforms**
+between the three. (Linking semantics to a topological node reads as CT *associates*
+— "will *associates* node-1" — not "couples".) So Perspective is the *medium*, but
+the medium carries richer semantics extended by category theory.
 
 ## The generative process — symmetric doubling [proposed]
 
@@ -96,7 +102,9 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
 | **Operations (ELT)** | Extract · Load · Transform (verbs) → `createSequence` · `loadPerspective` · `applyFunctor` | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
-| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**. *Everything in a view is a tag* → a column is just a tag key surfaced. Realised concretely: **Filter = configuring which tag keys are the columns/headers** (`ColKey`; default minimal — Order + Citation; Cites off). **Sort = clicking a column header** (toggles ▲/▼). No separate value-facets or popup tree. | reconciler-typed (Tag is the whole; Sort +, Filter − its poles) | UI: `components/reference_browser.rs` (Columns configurator + header-click sort) | impl v1. Citation column renders the triad in order **Source · Artefact · Lookup** |
+| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**, mapping to **class / instantiation / instance**. **Sort = selecting the header tags** — which tag keys are the columns (the *class*: header/keys; `ColKey`; default Order + Citation). **Filter = scoping the data returned** in those columns (the *instances*: values) — currently by **cite-degree** (`CiteKind`: System / Node(1) / Edge(2) / Coherence / Designation), so you can view only systems (manifolds), or only nodes, etc. | reconciler-typed | UI: `components/reference_browser.rs` (Sort = column selector, Filter = degree scoper) | impl v1. Citation column in **Source · Artefact · Lookup** order |
+| **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |
+| **Class · Instantiation · Instance** | e.g. **K₄ (class) · Tetrad (instantiation) · Canonical Tetrad (instance)**. The abstract complete graph → its systematic instantiation → a concrete instance. Also the table's own structure: header/keys (class) · data types/keys (instantiation) · data/values (instance). | node-typed (nouns) | (documented; extends the existing Class/Instance dyad) | proposed |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 
 ## Tetrad (order 4 — Sources / Interplays)
@@ -122,16 +130,18 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 
 Three distinct things — do not conflate them:
 
-- **Nullad (0) — the unbounded registry.** *Everything* in the tool. No scope.
-  **UI:** the **order-0 button** leading the header sequence (Nullad · Monad · … ·
-  Dodecad); a right-side **Data** toggle opens the reference view, which the header
-  buttons scope by order. In the table, **Filter = configure which tag keys are
-  columns** and **Sort = click a column header**; the page hosts the **ELT triad**
-  (Extract + Load wired; Transform unwired). *(Still fed by `allReferences`.)*
-  **Next:** a **Graph view** tab beside Table — the Obsidian-style force-directed
-  graph of everything (nodes + SPO links). The **Monad** is the same graph with a
-  selected set of fragments grouped and labelled (a container name, or an
-  auto-generated identity) on its own canvas.
+- **Nullad (0) — the unbounded registry.** *Everything* — every element (all
+  "cites": systems, nodes, edges, coherence, designations) is an entry here. It is
+  the **default entry point** (order-0 button leading Nullad · Monad · … · Dodecad,
+  opening the **Table** so you see all on load). **Sort** selects the header tags;
+  **Filter** scopes by cite-degree; the **Data · Graph · Table** switch (right of
+  the menu) chooses the view; the page hosts the **ELT triad**.
+- **Monad = the scoping/filter of the Nullad.** A Monad selects a subset of the
+  Nullad and **invokes an organising principle** based on some relationship (those
+  members may in turn have further relationships, visualised or not depending on
+  scope). Produced by **Extract**. **Next:** a **Graph view** beside Table — the
+  Obsidian-style force graph of everything (nodes + SPO links); the Monad is that
+  graph with a selected set of fragments grouped and labelled on its own canvas.
 - **Monad (1) — a scoped registry.** A bounded universe of inquiry with a
   **central point naming its unity** (e.g. "system architecture"), linking every
   graph of relevance: the class/instance dyad, the ALP and ELT triads, the pegged

@@ -500,16 +500,22 @@ body {
     position: relative;
 }
 
-/* Data toggle — right of the system menu; flips to the reference view. */
-.data-toggle {
+/* Data · Graph · Table — segmented switch right of the system menu. */
+.data-switch {
     flex-shrink: 0;
+    display: inline-flex;
     margin: 0 1rem;
     border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+}
+.data-toggle {
+    border: none;
+    background: transparent;
     color: #4a5568;
-    border-radius: 10px;
     padding: 0.4rem 0.9rem;
     font-size: 0.85rem;
     cursor: pointer;
@@ -783,12 +789,8 @@ button.tag {
     z-index: 1;
 }
 .ref-th {
-    cursor: pointer;
     user-select: none;
     white-space: nowrap;
-}
-.ref-th.sorted {
-    color: #2563eb;
 }
 .ref-table tbody tr:nth-child(even) {
     background: rgba(255, 255, 255, 0.35);

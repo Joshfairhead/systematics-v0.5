@@ -6,15 +6,16 @@ use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
 
-/// How the main pane *represents* the current selection.
+/// How the **Data** (the content the header scopes) is represented. Data · Graph
+/// · Table is a triad: Data is the whole; Graph and Table are its two views.
 /// - **Graph**: the K-graph canvas — a scoped system, or (for Nullad) a blank
 ///   canvas standing in for the future all-and-everything graph.
-/// - **Data**: the reference browser — every citation, filtered by the header's
-///   selected system button.
+/// - **Table**: the reference browser — every element (all "cites"), scoped by
+///   the header's selected system button.
 #[derive(Clone, Copy, PartialEq)]
 pub enum ViewMode {
     Graph,
-    Data,
+    Table,
 }
 
 /// The header's selectable system keys, in order 1→12. Order 0 is **Nullad**
@@ -151,6 +152,15 @@ impl Component for ApiApp {
             }
         });
 
+        // Default entry point is the Nullad table (all elements), so load every
+        // reference up front rather than making the user click into it.
+        let link3 = ctx.link().clone();
+        let client3 = graphql_client.clone();
+        spawn_local(async move {
+            let refs = client3.fetch_all_references().await.unwrap_or_default();
+            link3.send_message(ApiAppMsg::AllReferencesLoaded(refs));
+        });
+
         Self {
             systems: vec![],
             selected_system: None,
@@ -160,8 +170,9 @@ impl Component for ApiApp {
             breadcrumbs: vec![],
             show_edge_labels: false,
             system_references: vec![],
-            mode: ViewMode::Graph,
-            selected_key: "monad".to_string(),
+            // Nullad, as a Table, is the default entry point (see all).
+            mode: ViewMode::Table,
+            selected_key: "nullad".to_string(),
             all_references: vec![],
             instance_systems: vec![],
             show_canonical: false,
@@ -272,23 +283,8 @@ impl Component for ApiApp {
                     );
                 }
 
-                // Select the first system by default + prefetch its citations.
-                if let Some(first_system) = systems.first() {
-                    // Keep the header key authoritative for the default selection.
-                    self.selected_key = key_for_order(first_system.order);
-                    self.selected_system = Some(first_system.clone());
-                    let system_id = first_system.system_id.clone();
-                    let link = ctx.link().clone();
-                    let client = self.graphql_client.clone();
-                    spawn_local(async move {
-                        let refs = client
-                            .fetch_references_for_system(&system_id)
-                            .await
-                            .unwrap_or_default();
-                        link.send_message(ApiAppMsg::ReferencesLoaded(refs));
-                    });
-                }
-
+                // Default entry point is the Nullad, so do NOT auto-select a
+                // system — the header stays on Nullad until the user picks one.
                 self.systems = systems;
                 true
             }
@@ -327,7 +323,7 @@ impl Component for ApiApp {
             ApiAppMsg::SetMode(mode) => {
                 self.mode = mode;
                 // Lazily load all references the first time the data view opens.
-                if mode == ViewMode::Data && self.all_references.is_empty() {
+                if mode == ViewMode::Table && self.all_references.is_empty() {
                     let link = ctx.link().clone();
                     let client = self.graphql_client.clone();
                     spawn_local(async move {
@@ -407,13 +403,10 @@ impl Component for ApiApp {
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
         let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
 
-        // The Data toggle flips between the graph canvas and the reference browser.
-        let data_mode = self.mode == ViewMode::Data;
-        let on_toggle_data = {
-            let target = if data_mode { ViewMode::Graph } else { ViewMode::Data };
-            ctx.link().callback(move |_| ApiAppMsg::SetMode(target))
-        };
-        // The selected header key filters the data view (None = Nullad = all).
+        // Data · Graph · Table: the Data (content the header scopes) has two views;
+        // this switch chooses Graph or Table.
+        let on_set_mode = ctx.link().callback(ApiAppMsg::SetMode);
+        // The selected header key scopes the data view (None = Nullad = all).
         let filter_order = order_for_key(&self.selected_key);
 
         html! {
@@ -438,8 +431,8 @@ impl Component for ApiApp {
                                         systems={ display_systems }
                                         selected={ self.selected_key.clone() }
                                         on_select={ on_select }
-                                        data_mode={ data_mode }
-                                        on_toggle_data={ on_toggle_data }
+                                        mode={ self.mode }
+                                        on_set_mode={ on_set_mode }
                                     />
                                 }
                             }
@@ -447,7 +440,7 @@ impl Component for ApiApp {
                     </aside>
 
                     <main class="main-view">
-                        if self.mode == ViewMode::Data {
+                        if self.mode == ViewMode::Table {
                             <ReferenceBrowser
                                 references={ self.all_references.clone() }
                                 instance_systems={ self.instance_systems.clone() }

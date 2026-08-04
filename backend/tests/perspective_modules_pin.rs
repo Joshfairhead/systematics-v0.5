@@ -170,6 +170,8 @@ fn architectural_monad_registry_loads() {
             "perspective:elt_triad",
             "perspective:sort_tag_filter_triad",
             "perspective:query_axis_dyad",
+            "perspective:data_graph_table_triad",
+            "perspective:class_instantiation_instance_triad",
         ]
     );
     // The Monad tracks features as fragments: seeded members resolve; fragments
@@ -180,4 +182,6 @@ fn architectural_monad_registry_loads() {
     assert!(!graph.resolves("perspective:elt_triad"));
     assert!(!graph.resolves("perspective:sort_tag_filter_triad"));
     assert!(!graph.resolves("perspective:query_axis_dyad"));
+    assert!(!graph.resolves("perspective:data_graph_table_triad"));
+    assert!(!graph.resolves("perspective:class_instantiation_instance_triad"));
 }
