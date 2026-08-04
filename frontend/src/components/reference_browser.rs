@@ -106,35 +106,39 @@ impl ColKey {
     }
 }
 
-/// The **degree / complexity** of what a reference cites (its target fragment).
-/// Nullad holds every element; scoping by kind lets you see only systems, or
-/// only nodes/edges, etc. (Node = a term (1); Edge = a connective (2); System =
-/// the whole; a *manifold* is a System not yet placed in a higher order.)
+/// The **degree** of what a reference cites (its target fragment) — the data
+/// categorised by number, per the schema: 1 term-designation · 2 connective-
+/// designation · 3 coherence · 4 term (character) · 5 connective (character) ·
+/// 6 system (their coalescence). Filtering by degree lets you see only systems
+/// (a *manifold* = a System not yet placed in a higher order), only terms, etc.
 #[derive(Clone, Copy, PartialEq)]
 enum CiteKind {
-    System,
-    Node,
-    Edge,
+    TermDesignation,
+    ConnectiveDesignation,
     Coherence,
-    Designation,
+    Term,
+    Connective,
+    System,
 }
 
-const ALL_KINDS: [CiteKind; 5] = [
-    CiteKind::System,
-    CiteKind::Node,
-    CiteKind::Edge,
+const ALL_KINDS: [CiteKind; 6] = [
+    CiteKind::TermDesignation,
+    CiteKind::ConnectiveDesignation,
     CiteKind::Coherence,
-    CiteKind::Designation,
+    CiteKind::Term,
+    CiteKind::Connective,
+    CiteKind::System,
 ];
 
 impl CiteKind {
     fn label(self) -> &'static str {
         match self {
-            CiteKind::System => "System",
-            CiteKind::Node => "Node (1)",
-            CiteKind::Edge => "Edge (2)",
+            CiteKind::TermDesignation => "Term designation",
+            CiteKind::ConnectiveDesignation => "Connective designation",
             CiteKind::Coherence => "Coherence",
-            CiteKind::Designation => "Designation",
+            CiteKind::Term => "Term",
+            CiteKind::Connective => "Connective",
+            CiteKind::System => "System",
         }
     }
 }
@@ -146,12 +150,14 @@ fn cite_kind(r: &ReferenceView) -> CiteKind {
         CiteKind::System
     } else if f == "coherence" {
         CiteKind::Coherence
+    } else if f == "term-designation" {
+        CiteKind::TermDesignation
+    } else if f == "connective-designation" {
+        CiteKind::ConnectiveDesignation
     } else if f.starts_with("term:") {
-        CiteKind::Node
+        CiteKind::Term
     } else if f.starts_with("conn:") {
-        CiteKind::Edge
-    } else if f.contains("designation") {
-        CiteKind::Designation
+        CiteKind::Connective
     } else {
         CiteKind::System
     }

@@ -500,31 +500,24 @@ body {
     position: relative;
 }
 
-/* Data · Graph · Table — segmented switch right of the system menu. */
-.data-switch {
+/* Data · Graph · Table — one compact "View" toggle, right of the system menu. */
+.view-toggle {
     flex-shrink: 0;
-    display: inline-flex;
-    margin: 0 1rem;
+    margin: 0 0.75rem;
     border: 1px solid rgba(163, 177, 198, 0.4);
-    border-radius: 10px;
-    overflow: hidden;
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-}
-.data-toggle {
-    border: none;
-    background: transparent;
     color: #4a5568;
-    padding: 0.4rem 0.9rem;
-    font-size: 0.85rem;
+    border-radius: 8px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
     cursor: pointer;
 }
-.data-toggle.active {
-    background: rgba(37, 99, 235, 0.15);
+.view-toggle:hover {
     border-color: rgba(37, 99, 235, 0.4);
     color: #2563eb;
-    font-weight: 600;
 }
 
 /* Nullad — the order-0 button leading the sequence. Subtle accent. */

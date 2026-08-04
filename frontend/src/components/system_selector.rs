@@ -35,16 +35,13 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
         "nav-button nav-nullad"
     };
 
-    let set_graph = {
+    // Data · Graph · Table condensed to a single "View" toggle (swaps the view).
+    let other_mode = if props.mode == ViewMode::Graph { ViewMode::Table } else { ViewMode::Graph };
+    let current_label = if props.mode == ViewMode::Graph { "Graph" } else { "Table" };
+    let toggle_view = {
         let on_set_mode = props.on_set_mode.clone();
-        Callback::from(move |_| on_set_mode.emit(ViewMode::Graph))
+        Callback::from(move |_| on_set_mode.emit(other_mode))
     };
-    let set_table = {
-        let on_set_mode = props.on_set_mode.clone();
-        Callback::from(move |_| on_set_mode.emit(ViewMode::Table))
-    };
-    let graph_class = if props.mode == ViewMode::Graph { "data-toggle active" } else { "data-toggle" };
-    let table_class = if props.mode == ViewMode::Table { "data-toggle active" } else { "data-toggle" };
 
     html! {
         <nav class="top-nav">
@@ -78,12 +75,13 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
                 }
             </div>
 
-            // Data · Graph · Table — right of the menu. Switches how the scoped
-            // Data is viewed (a graph, or a table).
-            <div class="data-switch" title="Data — view as Graph or Table">
-                <button class={ graph_class } onclick={ set_graph }>{ "Graph" }</button>
-                <button class={ table_class } onclick={ set_table }>{ "Table" }</button>
-            </div>
+            // Data · Graph · Table — one compact toggle: shows the current view,
+            // clicking swaps to the other.
+            <button
+                class="view-toggle"
+                onclick={ toggle_view }
+                title="View — switch between Graph and Table"
+            >{ format!("View: {current_label} ⇄") }</button>
         </nav>
     }
 }
