@@ -38,6 +38,21 @@ and the proofs↔theorems edge's constant are the same relationship at two scale
 **Not architectural** — perspective / tag = **"life"**. Source: **Josh Fairhead**.
 Seeded `system_life_3`. Just something not to forget.
 
+**Composition example — an emerging Tetrad [worth noting].** The Life case reveals
+a **Tetrad** whose four *sources* (Goal · Directive · Ground · Instrumental) are
+each filled by a system:
+- **Goal (Ideal)** — the canonical **Function·Being·Will** triad (`system_canonical_triad_3`).
+- **Directive** — an **instance** of FBW as the **Life perspective** (`system_life_3`).
+- **Ground** — the canonical **Citation triad** (`system_citation_3`).
+- **Instrumental** — the **citation instance** actually used (the concrete citations).
+
+**But it isn't composing as expected:** the Life triad currently loads as a bare
+*system* (a graph) with **no citation** — we expected to *compose the Life
+perspective and link it to an instance of the citation triad*. That it didn't tells
+us the composition machinery doesn't yet do this. Useful signal: the incomplete
+composition shows what we have and haven't built. (Related: the Nullad-shows-all /
+in-graph-reference work below.)
+
 ---
 
 ## The determining conditions of science — what systematics really codifies

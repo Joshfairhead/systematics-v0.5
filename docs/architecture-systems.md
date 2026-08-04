@@ -15,18 +15,20 @@ tagged accordingly.
 **Apply the typing rule with no exceptions; drop "reconciler-typed."** When we
 wrote "Tag (=) reconciles Sort (+) / Filter (−)" as a triad of *terms*, that was
 mis-typed: **Sort, Filter, Tag, Search are verbs → they are edges (connectives),
-not vertices.** Impulse labels (+ / − / =) apply to connectives just as to terms,
-so a set of operation-verbs is a bundle of **edges** — a *fragment* of a system
-whose **vertices (nouns) are not yet identified**. We store such fragments and let
-the incomplete system show us what is and isn't figured out.
+not vertices.** **Impulse labels (+ / − / =) apply only to terms (vertices), NOT to
+edges.** So a set of operation-verbs is a bundle of **edges** — a *fragment* of a
+system whose **vertices (nouns) are not yet identified**. We store such fragments
+and let the incomplete system show us what is and isn't figured out.
 
-**The operations octad [proposed].** The seven operation-verbs —
-**search · sort · filter · tag** (query) + **extract · load · transform** (ELT) —
-are **7 connectives**. A vertex of the **Octad** (K₈) has degree **7**: it connects
-to the other seven nodes. So the seven operations plausibly are the **seven edges
-incident to the "Critical Functions" node** of the octad — their far endpoints
-being the octad's other seven terms. This gives the operations a home to be folded
-into, rather than a free-floating "triad."
+**The Hodgson architecture octad [proposed].** It is *not* an "operations octad" —
+it is just the **architecture octad**, with **Critical Functions** as one node.
+Hodgson's octad, going round from the east: **smallest unit · critical functions ·
+supportive platform · necessary resources · integrative totality · inherent nature ·
+intrinsic values · organisational modes**. A K₈ vertex has degree **7**, so the
+seven operation-verbs **pair as edges incident to the Critical Functions node**.
+Concretely proposed: **sort = Critical Functions ↔ Necessary Resources**;
+**filter = Critical Functions ↔ Organisational Modes** (the rest TBD). This gives
+the operations a home to be folded into, rather than a free-floating "triad."
 
 **Sort/Filter, concretely.** Don't over-fix their semantics (they've churned): keep
 them as **edge-fragments** with the current UI realisation (Sort selects header

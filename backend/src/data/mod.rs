@@ -386,7 +386,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["life_edge_1", "life_edge_2", "life_edge_3"]),
     );
     // Determining Conditions of science — a K4 tetrad: Time (Chronos) · Hyparxis ·
-    // Eternity (Aionios) · Space; the 6 laws as its 6 edges.
+    // Eternity (Aionios) · Space; the 6 laws as its 6 edges. (Positioning WIP.)
     push_triadic_system(
         &mut content,
         &mut have_char,
@@ -402,6 +402,48 @@ pub fn build_fragments_from_tables() -> GraphContent {
             "coexistence",
         ]),
     );
+
+    // ---- Architecture-project WIP fragments (documented in-graph) ----
+
+    // AD4M Perspective tetrad [WIP]: Perspective · Subject · Predicate · Object.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "AD4M Perspective",
+        4,
+        &slugs(&["perspective", "subject", "predicate", "object"]),
+        &slugs(&["ad4m_edge_1", "ad4m_edge_2", "ad4m_edge_3", "ad4m_edge_4", "ad4m_edge_5", "ad4m_edge_6"]),
+    );
+    // SPO triad [WIP] — Subject · Predicate · Object as terms (the triple's roles).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "SPO",
+        3,
+        &slugs(&["spo_subject", "spo_predicate", "spo_object"]),
+        &slugs(&["spo_edge_1", "spo_edge_2", "spo_edge_3"]),
+    );
+    // ELT triad [WIP] — the operations are VERBS = the three EDGES (extract · load
+    // · transform); the vertices are TBD (placeholder nodes).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "ELT",
+        3,
+        &slugs(&["elt_node_1", "elt_node_2", "elt_node_3"]),
+        &slugs(&["extract", "load", "transform"]),
+    );
+    // The Data → Key:Value → ELT progression (monad → dyad → triad) [WIP].
+    push_triadic_system(&mut content, &mut have_char, "Data", 1, &slugs(&["data"]), &slugs(&[]));
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Key Value",
+        2,
+        &slugs(&["key", "value"]),
+        &slugs(&["key_value_edge"]),
+    );
+
     content
 }
 
