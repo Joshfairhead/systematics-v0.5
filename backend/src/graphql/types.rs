@@ -857,6 +857,77 @@ impl MutationRoot {
         Ok(GqlSystem::new(sys))
     }
 
+    /// Author a whole System from custom term/connective **values** — the in-app
+    /// editor path (build characters + vocabulary + system at runtime, persisted
+    /// to the user store), instead of defining it in Rust seed tables.
+    async fn author_system(
+        &self,
+        ctx: &Context<'_>,
+        input: AuthorSystemInput,
+    ) -> async_graphql::Result<GqlSystem> {
+        let order = input.order as u8;
+        if !(1..=12).contains(&order) {
+            return Err(Error::new(format!("order {order} out of range 1..=12")));
+        }
+        let grammar = Grammar::for_order(order);
+        let expected_conn = grammar.expected_connectives();
+        if input.terms.len() != order as usize {
+            return Err(Error::new(format!(
+                "expected {order} terms, got {}",
+                input.terms.len()
+            )));
+        }
+        if input.connectives.len() != expected_conn {
+            return Err(Error::new(format!(
+                "order {order} expects {expected_conn} connectives, got {}",
+                input.connectives.len()
+            )));
+        }
+
+        // Match the id scheme used by `with_auto_id` so char ids stay unique.
+        let slug = input.name.to_lowercase().replace(' ', "_");
+        let sys_id = format!("system_{slug}_{order}");
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.system(&sys_id).is_some() {
+            return Err(Error::new(format!("System '{sys_id}' already exists")));
+        }
+
+        let mut characters = Vec::new();
+        let mut term_ids = Vec::new();
+        for (i, value) in input.terms.iter().enumerate() {
+            let id = format!("char_word_{slug}_t{}", i + 1);
+            characters.push(Character::new(id.clone(), "word", value.clone()));
+            term_ids.push(id);
+        }
+        let mut conn_ids = Vec::new();
+        for (j, value) in input.connectives.iter().enumerate() {
+            let id = format!("char_word_{slug}_c{}", j + 1);
+            characters.push(Character::new(id.clone(), "word", value.clone()));
+            conn_ids.push(id);
+        }
+        let vocab = Vocabulary::with_auto_id(&input.name, order, term_ids, conn_ids);
+        let vocab_id = vocab.id.clone();
+        let system = System::with_auto_id(
+            &input.name,
+            order,
+            input.coherence.unwrap_or_else(|| "Custom".to_string()),
+            input.term_designation.unwrap_or_else(|| "Terms".to_string()),
+            input.connective_designation.unwrap_or_else(|| "Connectives".to_string()),
+            format!("grammar_{order}"),
+            &vocab_id,
+        );
+        let content = crate::core::content::GraphContent {
+            characters,
+            vocabularies: vec![vocab],
+            systems: vec![system.clone()],
+            ..Default::default()
+        };
+        graph.apply_content(&content);
+        persist(ctx, &graph);
+        Ok(GqlSystem::new(system))
+    }
+
     async fn update_system(
         &self,
         ctx: &Context<'_>,
@@ -1679,6 +1750,19 @@ pub struct SystemInput {
     pub connective_designation: String,
     pub grammar_ref: String,
     pub vocabulary_ref: String,
+}
+
+/// Author a System from custom **values** — the in-app editor input. `terms` has
+/// `order` entries; `connectives` has C(order,2). Metadata is optional (defaults).
+#[derive(InputObject)]
+pub struct AuthorSystemInput {
+    pub name: String,
+    pub order: i32,
+    pub terms: Vec<String>,
+    pub connectives: Vec<String>,
+    pub coherence: Option<String>,
+    pub term_designation: Option<String>,
+    pub connective_designation: Option<String>,
 }
 
 impl SystemInput {
