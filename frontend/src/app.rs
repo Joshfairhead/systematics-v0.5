@@ -1,7 +1,7 @@
 use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::{
-    AuthorRequest, ExtractRequest, ReferenceBrowser, SystemTemplate,
+    AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
 };
 use crate::components::system_editor::SystemEditor;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
@@ -501,6 +501,25 @@ impl Component for ApiApp {
             })
             .collect();
         all_systems.extend(self.instance_systems.iter().cloned());
+        // The focused system's raw nodes (terms) + edges (connectives) as data rows
+        // (shown in the table when the Term/Connective filter is turned on).
+        let raw_elements: Vec<RawElement> = self
+            .selected_system
+            .as_ref()
+            .map(|s| {
+                let mut v: Vec<RawElement> = s
+                    .terms
+                    .iter()
+                    .map(|t| RawElement { name: t.value.clone(), order: s.order, is_edge: false })
+                    .collect();
+                v.extend(s.connectives.iter().map(|c| RawElement {
+                    name: c.character_value.clone(),
+                    order: s.order,
+                    is_edge: true,
+                }));
+                v
+            })
+            .unwrap_or_default();
 
         // Data · Graph · Table: the Data (content the header scopes) has two views;
         // this switch chooses Graph or Table.
@@ -550,6 +569,7 @@ impl Component for ApiApp {
                                 extract_note={ self.extract_note.clone() }
                                 on_author={ on_author }
                                 templates={ templates }
+                                raw_elements={ raw_elements }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for

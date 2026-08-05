@@ -63,6 +63,19 @@ pub struct ReferenceBrowserProps {
     /// ("open the canonical system, then customise").
     #[prop_or_default]
     pub templates: Vec<SystemTemplate>,
+    /// The focused system's raw nodes (terms) + edges (connectives), shown as rows
+    /// when the Term/Connective filter is on (off by default).
+    #[prop_or_default]
+    pub raw_elements: Vec<RawElement>,
+}
+
+/// A raw node (term) or edge (connective) of the focused system — a data row.
+#[derive(Clone, PartialEq)]
+pub struct RawElement {
+    pub name: String,
+    pub order: i32,
+    /// false = node (term), true = edge (connective).
+    pub is_edge: bool,
 }
 
 /// The canonical term/connective values for one order — an editor prefill source.
@@ -138,6 +151,7 @@ impl ColKey {
 enum Row<'a> {
     Sys(&'a InstanceSystem),
     Ref(&'a ReferenceView),
+    Raw(&'a RawElement),
 }
 
 impl Row<'_> {
@@ -145,18 +159,21 @@ impl Row<'_> {
         match self {
             Row::Sys(s) => Some(s.order),
             Row::Ref(r) => order_of(r),
+            Row::Raw(e) => Some(e.order),
         }
     }
     fn kind(&self) -> CiteKind {
         match self {
             Row::Sys(_) => CiteKind::System,
             Row::Ref(r) => cite_kind(r),
+            Row::Raw(e) => if e.is_edge { CiteKind::Connective } else { CiteKind::Term },
         }
     }
     /// Lower-cased haystack for free-text search.
     fn hay(&self) -> String {
         match self {
             Row::Sys(s) => s.name.to_lowercase(),
+            Row::Raw(e) => e.name.to_lowercase(),
             Row::Ref(r) => format!(
                 "{} {} {} {} {} {}",
                 persp(r), src(r), art(r), loc(r), r.target,
@@ -170,6 +187,7 @@ impl Row<'_> {
         match self {
             Row::Sys(s) => Some(format!("system:{}", s.id)),
             Row::Ref(r) => r.target_system.as_ref().map(|s| format!("system:{}", s.id)),
+            Row::Raw(_) => None,
         }
     }
 }
@@ -259,12 +277,17 @@ fn passes_row(row: Row, filter_order: Option<i32>, active_kinds: &[CiteKind], ne
         && (needle.is_empty() || row.hay().contains(needle))
 }
 
-/// All Nullad rows (every System + every Reference), unfiltered, in a stable order.
-fn all_rows<'a>(systems: &'a [InstanceSystem], refs: &'a [ReferenceView]) -> Vec<Row<'a>> {
+/// All Nullad rows (every System + Reference + focused raw node/edge), unfiltered.
+fn all_rows<'a>(
+    systems: &'a [InstanceSystem],
+    refs: &'a [ReferenceView],
+    raw: &'a [RawElement],
+) -> Vec<Row<'a>> {
     systems
         .iter()
         .map(Row::Sys)
         .chain(refs.iter().map(Row::Ref))
+        .chain(raw.iter().map(Row::Raw))
         .collect()
 }
 fn provenance(r: &ReferenceView) -> String {
@@ -299,6 +322,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
 
     let refs = &props.references;
     let systems = &props.instance_systems;
+    let raw = &props.raw_elements;
     // The order filter comes from the header (Nullad = None = all).
     let filter_order = props.filter_order;
 
@@ -312,7 +336,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // (Systems directly; References via their target), as `system:<id>` members.
     let needle = search.to_lowercase();
     let mut seen = BTreeSet::new();
-    let extract_members: Vec<String> = all_rows(systems, refs)
+    let extract_members: Vec<String> = all_rows(systems, refs, raw)
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, &active_kinds, &needle))
         .filter_map(|row| row.system_addr())
@@ -433,6 +457,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                     Tab::Table => table_view(TableCtx {
                         refs,
                         systems,
+                        raw,
                         on_load: &props.on_load,
                         filter_order,
                         search: &search,
@@ -545,6 +570,8 @@ struct TableCtx<'a> {
     refs: &'a [ReferenceView],
     /// Every system in the graph — shown as rows alongside references.
     systems: &'a [InstanceSystem],
+    /// The focused system's raw nodes/edges (shown when Term/Connective on).
+    raw: &'a [RawElement],
     /// Click a system row to view it (loads into the graph).
     on_load: &'a Callback<String>,
     /// Order filter from the header (`None` = Nullad = all).
@@ -562,6 +589,7 @@ fn table_view(ctx: TableCtx) -> Html {
     let TableCtx {
         refs,
         systems,
+        raw,
         on_load,
         filter_order,
         search,
@@ -572,9 +600,9 @@ fn table_view(ctx: TableCtx) -> Html {
     } = ctx;
 
     // Filter — same predicate Extract uses (header order + cite-degree + search).
-    // Rows are every System + every Reference (Nullad = all elements).
+    // Rows are every System + Reference + the focused system's raw nodes/edges.
     let needle = search.to_lowercase();
-    let mut rows: Vec<Row> = all_rows(systems, refs)
+    let mut rows: Vec<Row> = all_rows(systems, refs, raw)
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
         .collect();
@@ -635,6 +663,12 @@ fn table_view(ctx: TableCtx) -> Html {
             (ColKey::Name, Row::Ref(r)) => html! {
                 { r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_default() }
             },
+            (ColKey::Name, Row::Raw(e)) => {
+                let cls = if e.is_edge { "tag tag-locator" } else { "tag tag-perspective" };
+                html! { <span class={ cls }>{ &e.name }</span> }
+            }
+            (ColKey::Cites, Row::Raw(e)) => html! { { if e.is_edge { "edge" } else { "node" } } },
+            (_, Row::Raw(_)) => html! {},
             (ColKey::Perspective, Row::Ref(r)) => persp_tag(r),
             (ColKey::Citation, Row::Ref(r)) => citation_tags(r),
             (ColKey::Cites, Row::Ref(r)) => {
