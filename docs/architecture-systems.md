@@ -26,9 +26,16 @@ Hodgson's octad, going round from the east: **smallest unit · critical function
 supportive platform · necessary resources · integrative totality · inherent nature ·
 intrinsic values · organisational modes**. A K₈ vertex has degree **7**, so the
 seven operation-verbs **pair as edges incident to the Critical Functions node**.
-Concretely proposed: **sort = Critical Functions ↔ Necessary Resources**;
-**filter = Critical Functions ↔ Organisational Modes** (the rest TBD). This gives
-the operations a home to be folded into, rather than a free-floating "triad."
+Mapping so far (proposed):
+- **sort** = Critical Functions ↔ Necessary Resources
+- **filter** = Critical Functions ↔ Organisational Modes
+- **validation** (the typing rule / Dyad's force) = another Critical-Functions edge,
+  likely to **Inherent Nature** or **Intrinsic Values**
+- **Citation** = the **Intrinsic Values** node itself (a *node*, not an edge) — so
+  *validation* may be exactly the edge Critical Functions ↔ Citation.
+
+This gives the operations (and citation) a home in the architecture octad to be
+folded into, rather than free-floating "triads." Rest of the seven edges TBD.
 
 **Sort/Filter, concretely.** Don't over-fix their semantics (they've churned): keep
 them as **edge-fragments** with the current UI realisation (Sort selects header
@@ -58,6 +65,17 @@ the graph · `proposed` = named but not built/settled.
 - **Determining conditions:** hexad-of-laws vs tetrad-with-law-edges vs both.
 - **Perspective** may be retired into the SPO substrate.
 - **ELT may *be* the Query triad** (Load = select keys); Data(monad)→key·value(dyad)→ELT(triad) unresolved.
+- **Seeding is code-defined, not app-created [cleanup question].** "Seed" here means
+  **both**: a system is *defined in Rust tables* (`data/mod.rs`
+  `build_*_from_tables` + `push_triadic_system`) → serialized to a *JSON data file*
+  (`data/{canonical,citation,fragments}.json`, via ignored regen tests) → *loaded
+  into the graph* at startup (`build_graph` `apply_content`). So systems **are placed
+  in the system** (resolvable, visible) but their **source of truth is code**, not
+  data authored *through* the app. The homoiconic / self-construction goal wants
+  systems **created and edited as data in-app** (an `createSystem`-style flow /
+  compose-via-Extract), retiring the Rust generator. That is the "big cleanup" —
+  scoped, not yet done. (User data — Monads from Extract — already takes the
+  app→`store.json` path.)
 
 ## Self-documentation → self-construction [settled goal]
 
