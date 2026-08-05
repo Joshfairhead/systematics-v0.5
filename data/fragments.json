@@ -251,34 +251,19 @@
       "value": "Ad4m Edge 6"
     },
     {
-      "id": "char_word_spo_subject",
+      "id": "char_word_spo_node_1",
       "kind": "word",
-      "value": "Spo Subject"
+      "value": "Spo Node 1"
     },
     {
-      "id": "char_word_spo_predicate",
+      "id": "char_word_spo_node_2",
       "kind": "word",
-      "value": "Spo Predicate"
+      "value": "Spo Node 2"
     },
     {
-      "id": "char_word_spo_object",
+      "id": "char_word_spo_node_3",
       "kind": "word",
-      "value": "Spo Object"
-    },
-    {
-      "id": "char_word_spo_edge_1",
-      "kind": "word",
-      "value": "Spo Edge 1"
-    },
-    {
-      "id": "char_word_spo_edge_2",
-      "kind": "word",
-      "value": "Spo Edge 2"
-    },
-    {
-      "id": "char_word_spo_edge_3",
-      "kind": "word",
-      "value": "Spo Edge 3"
+      "value": "Spo Node 3"
     },
     {
       "id": "char_word_elt_node_1",
@@ -451,14 +436,14 @@
       "name": "SPO",
       "order": 3,
       "terms": [
-        "char_word_spo_subject",
-        "char_word_spo_predicate",
-        "char_word_spo_object"
+        "char_word_spo_node_1",
+        "char_word_spo_node_2",
+        "char_word_spo_node_3"
       ],
       "connectives": [
-        "char_word_spo_edge_1",
-        "char_word_spo_edge_2",
-        "char_word_spo_edge_3"
+        "char_word_subject",
+        "char_word_predicate",
+        "char_word_object"
       ]
     },
     {
@@ -486,8 +471,8 @@
       "connectives": []
     },
     {
-      "id": "vocab_key_value_2",
-      "name": "Key Value",
+      "id": "vocab_data_2",
+      "name": "Data",
       "order": 2,
       "terms": [
         "char_word_key",
@@ -600,14 +585,14 @@
       "vocabulary_ref": "vocab_data_1"
     },
     {
-      "id": "system_key_value_2",
-      "name": "Key Value",
+      "id": "system_data_2",
+      "name": "Data",
       "order": 2,
       "coherence": "Complementarity",
       "term_designation": "Poles",
       "connective_designation": "Force",
       "grammar_ref": "grammar_2",
-      "vocabulary_ref": "vocab_key_value_2"
+      "vocabulary_ref": "vocab_data_2"
     }
   ],
   "perspectives": [],

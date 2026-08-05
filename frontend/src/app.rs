@@ -442,6 +442,18 @@ impl Component for ApiApp {
                 connectives: s.connectives.iter().map(|c| c.character_value.clone()).collect(),
             })
             .collect();
+        // ALL systems as table rows: canonical (from the loaded set) + instance
+        // (non-canonical). Both clickable to view.
+        let mut all_systems: Vec<InstanceSystem> = self
+            .systems
+            .iter()
+            .map(|s| InstanceSystem {
+                id: s.system_id.clone(),
+                name: s.name.clone(),
+                order: s.order,
+            })
+            .collect();
+        all_systems.extend(self.instance_systems.iter().cloned());
 
         // Data · Graph · Table: the Data (content the header scopes) has two views;
         // this switch chooses Graph or Table.
@@ -483,7 +495,7 @@ impl Component for ApiApp {
                         if self.mode == ViewMode::Table {
                             <ReferenceBrowser
                                 references={ self.all_references.clone() }
-                                instance_systems={ self.instance_systems.clone() }
+                                instance_systems={ all_systems }
                                 on_load={ on_load.clone() }
                                 filter_order={ filter_order }
                                 on_extract={ on_extract }

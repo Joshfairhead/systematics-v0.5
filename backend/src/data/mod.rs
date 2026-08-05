@@ -414,14 +414,15 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["perspective", "subject", "predicate", "object"]),
         &slugs(&["ad4m_edge_1", "ad4m_edge_2", "ad4m_edge_3", "ad4m_edge_4", "ad4m_edge_5", "ad4m_edge_6"]),
     );
-    // SPO triad [WIP] — Subject · Predicate · Object as terms (the triple's roles).
+    // SPO triad [WIP] — the Perspective triad: subject · predicate · object are the
+    // three EDGES (a triple's roles); the three nodes are TBD (perspective parts).
     push_triadic_system(
         &mut content,
         &mut have_char,
         "SPO",
         3,
-        &slugs(&["spo_subject", "spo_predicate", "spo_object"]),
-        &slugs(&["spo_edge_1", "spo_edge_2", "spo_edge_3"]),
+        &slugs(&["spo_node_1", "spo_node_2", "spo_node_3"]),
+        &slugs(&["subject", "predicate", "object"]),
     );
     // ELT triad [WIP] — the operations are VERBS = the three EDGES (extract · load
     // · transform); the vertices are TBD (placeholder nodes).
@@ -433,12 +434,14 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["elt_node_1", "elt_node_2", "elt_node_3"]),
         &slugs(&["extract", "load", "transform"]),
     );
-    // The Data → Key:Value → ELT progression (monad → dyad → triad) [WIP].
+    // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order 1);
+    // the dyad (key · value) is ALSO called "Data" (data = a key:value tag) and
+    // links to the Data monad. (Two "Data" systems, orders 1 and 2.)
     push_triadic_system(&mut content, &mut have_char, "Data", 1, &slugs(&["data"]), &slugs(&[]));
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "Key Value",
+        "Data",
         2,
         &slugs(&["key", "value"]),
         &slugs(&["key_value_edge"]),

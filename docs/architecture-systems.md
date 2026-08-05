@@ -35,6 +35,8 @@ Mapping so far (proposed) — **all edges incident to Critical Functions (CF)**:
   left) — an **edge**. *Citation and validation are two separate edges.* (Alt
   reading: if citation is taken as the top *node*, validation = CF ↔ Intrinsic
   Values — but the settled-here reading is both are edges.)
+- **edit** (edit a system in-place — name, node/edge labels — a critical function)
+  = CF ↔ **Smallest Holonic Unit** (the east / "right" node).
 
 Rest of the seven CF-edges TBD. This gives the operations (and citation/validation)
 a home in the architecture octad to be folded into, rather than free-floating "triads."
