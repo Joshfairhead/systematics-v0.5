@@ -210,12 +210,12 @@ Three distinct things — do not conflate them:
   opening the **Table** so you see all on load). **Sort** selects the header tags;
   **Filter** scopes by cite-degree; the **Data · Graph · Table** switch (right of
   the menu) chooses the view; the page hosts the **ELT triad**.
-  **[correction — next]** The Nullad Table should show **all systems** (every
-  system in the graph), not only those carrying citations — the seeded fragments
-  (e.g. the Determining Conditions tetrad) currently resolve but don't appear here.
-  The **Load** menu should be for **loading systems external to the tool** (JSON
-  import, etc.), *not* for listing internal systems. This is the "true `all`
-  query" work.
+  **[done]** The Nullad Table now shows **all elements as rows** — every **System**
+  (via `instanceSystems`, incl. the seeded fragments) *and* every **Reference** —
+  unified as `Row::Sys | Row::Ref`, with a **Name** column. **Load** is now a
+  **file picker** (opens the OS browser for a JSON system file; import format still
+  TBD) — no longer a list of internal systems. *(Not yet a single backend `all`
+  query — the frontend unions systems + references.)*
 - **Monad (1) — the scoping/filter of the Nullad.** A bounded sub-universe: a Monad
   selects a subset of the Nullad and **invokes an organising principle** with a
   **central point naming its unity** (e.g. "system architecture"). It is **raw

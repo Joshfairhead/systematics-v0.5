@@ -79,6 +79,7 @@ enum Tab {
 #[derive(Clone, Copy, PartialEq)]
 enum ColKey {
     Order,
+    Name,
     Perspective,
     Citation,
     Cites,
@@ -86,8 +87,9 @@ enum ColKey {
 }
 
 /// Canonical column order (independent of the order keys were toggled on).
-const ALL_COLS: [ColKey; 5] = [
+const ALL_COLS: [ColKey; 6] = [
     ColKey::Order,
+    ColKey::Name,
     ColKey::Perspective,
     ColKey::Citation,
     ColKey::Cites,
@@ -98,10 +100,53 @@ impl ColKey {
     fn label(self) -> &'static str {
         match self {
             ColKey::Order => "Order",
+            ColKey::Name => "Name",
             ColKey::Perspective => "Perspective",
             ColKey::Citation => "Citation",
             ColKey::Cites => "Cites",
             ColKey::Note => "Note",
+        }
+    }
+}
+
+/// A Nullad row is an **element**: either a System (a fragment/system in the
+/// graph) or a Reference (a citation). Everything is data; both are rows.
+#[derive(Clone, Copy)]
+enum Row<'a> {
+    Sys(&'a InstanceSystem),
+    Ref(&'a ReferenceView),
+}
+
+impl Row<'_> {
+    fn order(&self) -> Option<i32> {
+        match self {
+            Row::Sys(s) => Some(s.order),
+            Row::Ref(r) => order_of(r),
+        }
+    }
+    fn kind(&self) -> CiteKind {
+        match self {
+            Row::Sys(_) => CiteKind::System,
+            Row::Ref(r) => cite_kind(r),
+        }
+    }
+    /// Lower-cased haystack for free-text search.
+    fn hay(&self) -> String {
+        match self {
+            Row::Sys(s) => s.name.to_lowercase(),
+            Row::Ref(r) => format!(
+                "{} {} {} {} {} {}",
+                persp(r), src(r), art(r), loc(r), r.target,
+                r.note.clone().unwrap_or_default()
+            )
+            .to_lowercase(),
+        }
+    }
+    /// `system:<id>` address for Extract (a Reference contributes its target).
+    fn system_addr(&self) -> Option<String> {
+        match self {
+            Row::Sys(s) => Some(format!("system:{}", s.id)),
+            Row::Ref(r) => r.target_system.as_ref().map(|s| format!("system:{}", s.id)),
         }
     }
 }
@@ -182,30 +227,22 @@ fn order_of(r: &ReferenceView) -> Option<i32> {
 fn frag(r: &ReferenceView) -> String {
     r.target_fragment.clone().unwrap_or_default()
 }
-/// Whether a reference is in the current selection: header **order** (Sort's
-/// scope), the **Filter** by cite-degree (`active_kinds`), and **search**.
+/// Whether a **row** (System or Reference) is in the current selection: header
+/// **order** (Sort's scope), the **Filter** by cite-degree, and **search**.
 /// Shared by the table (what to show) and Extract (what to materialize).
-fn passes_filters(
-    r: &ReferenceView,
-    filter_order: Option<i32>,
-    active_kinds: &[CiteKind],
-    needle: &str,
-) -> bool {
-    filter_order.is_none_or(|o| order_of(r) == Some(o))
-        && active_kinds.contains(&cite_kind(r))
-        && (needle.is_empty() || {
-            let hay = format!(
-                "{} {} {} {} {} {}",
-                persp(r),
-                src(r),
-                art(r),
-                loc(r),
-                r.target,
-                r.note.clone().unwrap_or_default()
-            )
-            .to_lowercase();
-            hay.contains(needle)
-        })
+fn passes_row(row: Row, filter_order: Option<i32>, active_kinds: &[CiteKind], needle: &str) -> bool {
+    filter_order.is_none_or(|o| row.order() == Some(o))
+        && active_kinds.contains(&row.kind())
+        && (needle.is_empty() || row.hay().contains(needle))
+}
+
+/// All Nullad rows (every System + every Reference), unfiltered, in a stable order.
+fn all_rows<'a>(systems: &'a [InstanceSystem], refs: &'a [ReferenceView]) -> Vec<Row<'a>> {
+    systems
+        .iter()
+        .map(Row::Sys)
+        .chain(refs.iter().map(Row::Ref))
+        .collect()
 }
 fn provenance(r: &ReferenceView) -> String {
     let s = src(r);
@@ -223,15 +260,15 @@ fn provenance(r: &ReferenceView) -> String {
 pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let tab = use_state(|| Tab::Table);
     let search = use_state(String::new);
-    let load_open = use_state(|| false);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
-    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Citation]);
+    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Citation]);
     // Filter (−) scopes the data returned, by cite-degree (Sys/Node/Edge/…).
     let filter_open = use_state(|| false);
     let active_kinds = use_state(|| ALL_KINDS.to_vec());
 
     let refs = &props.references;
+    let systems = &props.instance_systems;
     // The order filter comes from the header (Nullad = None = all).
     let filter_order = props.filter_order;
 
@@ -241,15 +278,14 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         None => "Nullad — all orders".to_string(),
     };
 
-    // The Extract selection: distinct target systems of the currently-filtered
-    // references, as `system:<id>` member addresses. This is what Extract
-    // materializes into a Monad.
+    // The Extract selection: distinct systems among the currently-filtered rows
+    // (Systems directly; References via their target), as `system:<id>` members.
     let needle = search.to_lowercase();
     let mut seen = BTreeSet::new();
-    let extract_members: Vec<String> = refs
-        .iter()
-        .filter(|r| passes_filters(r, filter_order, &active_kinds, &needle))
-        .filter_map(|r| r.target_system.as_ref().map(|s| format!("system:{}", s.id)))
+    let extract_members: Vec<String> = all_rows(systems, refs)
+        .into_iter()
+        .filter(|row| passes_row(*row, filter_order, &active_kinds, &needle))
+        .filter_map(|row| row.system_addr())
         .filter(|m| seen.insert(m.clone()))
         .collect();
     // Provisional Monad name (the "integral" naming is a later refinement).
@@ -270,9 +306,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         <div class="reference-browser">
             // ELT triad — the operation edge. Extract · Load · Transform.
             { elt_triad(EltCtx {
-                instance_systems: &props.instance_systems,
-                on_load: &props.on_load,
-                load_open: &load_open,
                 extract_members: &extract_members,
                 extract_name: &extract_name,
                 on_extract: &props.on_extract,
@@ -289,12 +322,13 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                     onclick={ switch_tab(Tab::Compare) }
                 >{ "Compare by order" }</button>
                 <span class="ref-scope">{ scope_label }</span>
-                <span class="ref-count">{ format!("{} references", refs.len()) }</span>
+                <span class="ref-count">{ format!("{} systems · {} refs", systems.len(), refs.len()) }</span>
             </div>
             {
                 match *tab {
                     Tab::Table => table_view(TableCtx {
                         refs,
+                        systems,
                         filter_order,
                         search: &search,
                         sort_open: &sort_open,
@@ -311,9 +345,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
 
 /// Grouped arguments for the ELT triad control.
 struct EltCtx<'a> {
-    instance_systems: &'a [InstanceSystem],
-    on_load: &'a Callback<String>,
-    load_open: &'a UseStateHandle<bool>,
     /// The current selection to Extract, as `system:<id>` member addresses.
     extract_members: &'a [String],
     /// Provisional name for the Monad Extract would create.
@@ -329,19 +360,22 @@ struct EltCtx<'a> {
 /// - **Transform** (apply a Functor) is the third edge, not yet wired.
 fn elt_triad(ctx: EltCtx) -> Html {
     let EltCtx {
-        instance_systems,
-        on_load,
-        load_open,
         extract_members,
         extract_name,
         on_extract,
         extract_note,
     } = ctx;
 
-    let toggle = {
-        let o = load_open.clone();
-        Callback::from(move |_: MouseEvent| o.set(!*o))
-    };
+    // Load opens the OS file browser to pick a JSON system file. (Import format is
+    // not settled yet — for now we just read the chosen file's name/size.)
+    let on_file = Callback::from(move |e: Event| {
+        let input = e.target_unchecked_into::<HtmlInputElement>();
+        if let Some(f) = input.files().and_then(|fs| fs.get(0)) {
+            web_sys::console::log_1(
+                &format!("Load: {} ({} bytes) — JSON import TBD", f.name(), f.size()).into(),
+            );
+        }
+    });
 
     let can_extract = !extract_members.is_empty();
     let on_extract_click = {
@@ -369,32 +403,15 @@ fn elt_triad(ctx: EltCtx) -> Html {
                 title={ extract_title }
             >{ format!("Extract ({})", extract_members.len()) }</button>
 
-            <div class="elt-load">
-                <button class="elt-btn" onclick={ toggle }>
-                    { if **load_open { "Load ▴" } else { "Load ▾" } }
-                </button>
-                if **load_open {
-                    <div class="load-menu">
-                        if instance_systems.is_empty() {
-                            <span class="load-empty">{ "no instance systems" }</span>
-                        }
-                        { for instance_systems.iter().map(|inst| {
-                            let id = inst.id.clone();
-                            let on_load = on_load.clone();
-                            let o = load_open.clone();
-                            let onclick = Callback::from(move |_: MouseEvent| {
-                                on_load.emit(id.clone());
-                                o.set(false);
-                            });
-                            html! {
-                                <button class="load-item" onclick={ onclick }>
-                                    { format!("{} · {}", inst.order, inst.name) }
-                                </button>
-                            }
-                        }) }
-                    </div>
-                }
-            </div>
+            <label class="elt-btn" title="Load — open a JSON system file (import format TBD)">
+                { "Load ↥" }
+                <input
+                    type="file"
+                    accept="application/json,.json"
+                    style="display:none;"
+                    onchange={ on_file }
+                />
+            </label>
 
             <button
                 class="elt-btn"
@@ -412,6 +429,8 @@ fn elt_triad(ctx: EltCtx) -> Html {
 /// Grouped arguments for the table view (keeps the signature under one struct).
 struct TableCtx<'a> {
     refs: &'a [ReferenceView],
+    /// Every system in the graph — shown as rows alongside references.
+    systems: &'a [InstanceSystem],
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     search: &'a UseStateHandle<String>,
@@ -426,6 +445,7 @@ struct TableCtx<'a> {
 fn table_view(ctx: TableCtx) -> Html {
     let TableCtx {
         refs,
+        systems,
         filter_order,
         search,
         sort_open,
@@ -435,13 +455,14 @@ fn table_view(ctx: TableCtx) -> Html {
     } = ctx;
 
     // Filter — same predicate Extract uses (header order + cite-degree + search).
+    // Rows are every System + every Reference (Nullad = all elements).
     let needle = search.to_lowercase();
-    let mut rows: Vec<&ReferenceView> = refs
-        .iter()
-        .filter(|r| passes_filters(r, filter_order, active_kinds, &needle))
+    let mut rows: Vec<Row> = all_rows(systems, refs)
+        .into_iter()
+        .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
         .collect();
     // Default row order: by systematic order (the header axis).
-    rows.sort_by_key(|r| order_of(r));
+    rows.sort_by_key(|row| row.order());
 
     // Sort (=) — select which tag keys are the columns (the header tags).
     let col_chip = |k: ColKey| -> Html {
@@ -484,18 +505,26 @@ fn table_view(ctx: TableCtx) -> Html {
     // Visible columns in canonical order (independent of toggle order).
     let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
 
-    let cell = |k: ColKey, r: &ReferenceView| -> Html {
-        match k {
-            ColKey::Order => html! { { order_of(r).map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } },
-            ColKey::Perspective => persp_tag(r),
-            ColKey::Citation => citation_tags(r),
-            ColKey::Cites => {
+    let cell = |k: ColKey, row: &Row| -> Html {
+        let order_cell = |o: Option<i32>| html! { { o.map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } };
+        match (k, row) {
+            (ColKey::Order, _) => order_cell(row.order()),
+            (ColKey::Name, Row::Sys(s)) => html! { <span class="tag tag-system">{ &s.name }</span> },
+            (ColKey::Name, Row::Ref(r)) => html! {
+                { r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_default() }
+            },
+            (ColKey::Perspective, Row::Ref(r)) => persp_tag(r),
+            (ColKey::Citation, Row::Ref(r)) => citation_tags(r),
+            (ColKey::Cites, Row::Ref(r)) => {
                 let f = frag(r);
                 let cites = if f.is_empty() { "whole system".to_string() } else { f };
                 let target_label = r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_else(|| r.target.clone());
                 html! { <span title={ target_label }>{ cites }</span> }
             }
-            ColKey::Note => html! { { r.note.clone().unwrap_or_default() } },
+            (ColKey::Note, Row::Ref(r)) => html! { { r.note.clone().unwrap_or_default() } },
+            // System rows carry no perspective/citation/cites/note — a whole system.
+            (ColKey::Cites, Row::Sys(_)) => html! { { "whole system" } },
+            (_, Row::Sys(_)) => html! {},
         }
     };
 

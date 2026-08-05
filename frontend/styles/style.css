@@ -757,6 +757,11 @@ body {
 button.tag {
     cursor: pointer;
 }
+.tag-system {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+    font-weight: 600;
+}
 .tag-perspective {
     background: rgba(139, 92, 246, 0.14);
     color: #7c3aed;
