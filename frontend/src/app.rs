@@ -1,6 +1,8 @@
 use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
-use crate::components::reference_browser::{AuthorRequest, ExtractRequest, ReferenceBrowser};
+use crate::components::reference_browser::{
+    AuthorRequest, ExtractRequest, ReferenceBrowser, SystemTemplate,
+};
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
@@ -430,6 +432,16 @@ impl Component for ApiApp {
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
         let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
         let on_author = ctx.link().callback(ApiAppMsg::AuthorSystem);
+        // Canonical term/connective values per order — the editor's prefill source.
+        let templates: Vec<SystemTemplate> = self
+            .systems
+            .iter()
+            .map(|s| SystemTemplate {
+                order: s.order,
+                terms: s.terms.iter().map(|t| t.value.clone()).collect(),
+                connectives: s.connectives.iter().map(|c| c.character_value.clone()).collect(),
+            })
+            .collect();
 
         // Data · Graph · Table: the Data (content the header scopes) has two views;
         // this switch chooses Graph or Table.
@@ -477,6 +489,7 @@ impl Component for ApiApp {
                                 on_extract={ on_extract }
                                 extract_note={ self.extract_note.clone() }
                                 on_author={ on_author }
+                                templates={ templates }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for

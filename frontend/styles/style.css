@@ -794,6 +794,15 @@ button.tag {
     color: #b45309;
     font-weight: 600;
 }
+/* Clickable system name → view the system in the graph. */
+button.row-open {
+    border: none;
+    cursor: pointer;
+}
+button.row-open:hover {
+    text-decoration: underline;
+    background: rgba(245, 158, 11, 0.28);
+}
 .tag-perspective {
     background: rgba(139, 92, 246, 0.14);
     color: #7c3aed;

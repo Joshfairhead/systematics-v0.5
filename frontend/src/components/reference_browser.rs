@@ -59,6 +59,18 @@ pub struct ReferenceBrowserProps {
     pub extract_note: Option<String>,
     /// Author a new System from custom term/connective values (the editor).
     pub on_author: Callback<AuthorRequest>,
+    /// Canonical term/connective values per order — the editor prefills from these
+    /// ("open the canonical system, then customise").
+    #[prop_or_default]
+    pub templates: Vec<SystemTemplate>,
+}
+
+/// The canonical term/connective values for one order — an editor prefill source.
+#[derive(Clone, PartialEq)]
+pub struct SystemTemplate {
+    pub order: i32,
+    pub terms: Vec<String>,
+    pub connectives: Vec<String>,
 }
 
 /// A request to author (create) a System from custom values — the editor path.
@@ -355,6 +367,17 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             });
         })
     };
+    // Prefill from the canonical system of the current order ("open the canonical").
+    let on_prefill = {
+        let (templates, ed_order, ed_terms, ed_conns) =
+            (props.templates.clone(), ed_order.clone(), ed_terms.clone(), ed_conns.clone());
+        Callback::from(move |_: MouseEvent| {
+            if let Some(t) = templates.iter().find(|t| t.order == *ed_order) {
+                ed_terms.set(t.terms.clone());
+                ed_conns.set(t.connectives.clone());
+            }
+        })
+    };
     let can_create = !ed_name.trim().is_empty()
         && ed_terms.iter().all(|t| !t.trim().is_empty())
         && ed_conns.iter().all(|c| !c.trim().is_empty());
@@ -378,6 +401,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                         <label class="ed-label">{ "Order" }
                             <input class="ed-input ed-order" type="number" min="1" max="12" value={ ed_order_val.to_string() } oninput={ on_ed_order } />
                         </label>
+                        <button class="elt-btn" onclick={ on_prefill } title="Prefill terms/connectives from the canonical system of this order">{ "↺ Canonical" }</button>
                         <button class="elt-btn" disabled={ !can_create } onclick={ on_create }>{ "Create system" }</button>
                     </div>
                     <div class="editor-fields">
@@ -408,6 +432,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                     Tab::Table => table_view(TableCtx {
                         refs,
                         systems,
+                        on_load: &props.on_load,
                         filter_order,
                         search: &search,
                         sort_open: &sort_open,
@@ -519,6 +544,8 @@ struct TableCtx<'a> {
     refs: &'a [ReferenceView],
     /// Every system in the graph — shown as rows alongside references.
     systems: &'a [InstanceSystem],
+    /// Click a system row to view it (loads into the graph).
+    on_load: &'a Callback<String>,
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     search: &'a UseStateHandle<String>,
@@ -534,6 +561,7 @@ fn table_view(ctx: TableCtx) -> Html {
     let TableCtx {
         refs,
         systems,
+        on_load,
         filter_order,
         search,
         sort_open,
@@ -597,7 +625,12 @@ fn table_view(ctx: TableCtx) -> Html {
         let order_cell = |o: Option<i32>| html! { { o.map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } };
         match (k, row) {
             (ColKey::Order, _) => order_cell(row.order()),
-            (ColKey::Name, Row::Sys(s)) => html! { <span class="tag tag-system">{ &s.name }</span> },
+            (ColKey::Name, Row::Sys(s)) => {
+                let on_load = on_load.clone();
+                let id = s.id.clone();
+                let onclick = Callback::from(move |_: MouseEvent| on_load.emit(id.clone()));
+                html! { <button class="tag tag-system row-open" onclick={ onclick } title="View this system">{ &s.name }</button> }
+            }
             (ColKey::Name, Row::Ref(r)) => html! {
                 { r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_default() }
             },
