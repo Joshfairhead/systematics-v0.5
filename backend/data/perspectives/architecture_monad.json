@@ -10,7 +10,9 @@
         "perspective:sort_tag_filter_triad",
         "perspective:query_axis_dyad",
         "perspective:data_graph_table_triad",
-        "perspective:class_instantiation_instance_triad"
+        "perspective:class_instantiation_instance_triad",
+        "perspective:compose",
+        "perspective:edit"
       ]
     }
   ]

@@ -115,11 +115,11 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 11 fragments + 17 module-owned.
+    // Total systems = 12 canonical + 1 citation + 12 fragments + 17 module-owned.
     assert_eq!(
         graph.systems.len(),
-        41,
-        "expected 12 canonical + 1 citation + 11 fragment + 17 module systems"
+        42,
+        "expected 12 canonical + 1 citation + 12 fragment + 17 module systems"
     );
 }
 
@@ -172,6 +172,8 @@ fn architectural_monad_registry_loads() {
             "perspective:query_axis_dyad",
             "perspective:data_graph_table_triad",
             "perspective:class_instantiation_instance_triad",
+            "perspective:compose",
+            "perspective:edit",
         ]
     );
     // The Monad tracks features as fragments: seeded members resolve; fragments

@@ -414,15 +414,25 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["perspective", "subject", "predicate", "object"]),
         &slugs(&["ad4m_edge_1", "ad4m_edge_2", "ad4m_edge_3", "ad4m_edge_4", "ad4m_edge_5", "ad4m_edge_6"]),
     );
-    // SPO triad [WIP] — the Perspective triad: subject · predicate · object are the
-    // three EDGES (a triple's roles); the three nodes are TBD (perspective parts).
+    // Perspective triad [WIP] — subject · predicate · object are the three EDGES
+    // (a triple's roles); the three nodes are TBD (perspective parts).
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "SPO",
+        "Perspective",
         3,
-        &slugs(&["spo_node_1", "spo_node_2", "spo_node_3"]),
+        &slugs(&["perspective_node_1", "perspective_node_2", "perspective_node_3"]),
         &slugs(&["subject", "predicate", "object"]),
+    );
+    // Class · Instantiation · Instance triad [WIP] — e.g. K₄ (class) · Tetrad
+    // (instantiation) · Canonical Tetrad (instance).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Class Instantiation Instance",
+        3,
+        &slugs(&["class", "instantiation", "instance"]),
+        &slugs(&["cii_edge_1", "cii_edge_2", "cii_edge_3"]),
     );
     // ELT triad [WIP] — the operations are VERBS = the three EDGES (extract · load
     // · transform); the vertices are TBD (placeholder nodes).
@@ -446,6 +456,18 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["key", "value"]),
         &slugs(&["key_value_edge"]),
     );
+
+    // The Data progression as a Sequence: monad → dyad → triad (Data → Data →
+    // ELT). Links the Data monad and dyad (in-graph navigation is design-TBD).
+    content.sequences.push(crate::core::Sequence::new(
+        "sequence_data_progression",
+        "Data",
+        vec![
+            "system:system_data_1".to_string(),
+            "system:system_data_2".to_string(),
+            "system:system_elt_3".to_string(),
+        ],
+    ));
 
     content
 }

@@ -251,19 +251,49 @@
       "value": "Ad4m Edge 6"
     },
     {
-      "id": "char_word_spo_node_1",
+      "id": "char_word_perspective_node_1",
       "kind": "word",
-      "value": "Spo Node 1"
+      "value": "Perspective Node 1"
     },
     {
-      "id": "char_word_spo_node_2",
+      "id": "char_word_perspective_node_2",
       "kind": "word",
-      "value": "Spo Node 2"
+      "value": "Perspective Node 2"
     },
     {
-      "id": "char_word_spo_node_3",
+      "id": "char_word_perspective_node_3",
       "kind": "word",
-      "value": "Spo Node 3"
+      "value": "Perspective Node 3"
+    },
+    {
+      "id": "char_word_class",
+      "kind": "word",
+      "value": "Class"
+    },
+    {
+      "id": "char_word_instantiation",
+      "kind": "word",
+      "value": "Instantiation"
+    },
+    {
+      "id": "char_word_instance",
+      "kind": "word",
+      "value": "Instance"
+    },
+    {
+      "id": "char_word_cii_edge_1",
+      "kind": "word",
+      "value": "Cii Edge 1"
+    },
+    {
+      "id": "char_word_cii_edge_2",
+      "kind": "word",
+      "value": "Cii Edge 2"
+    },
+    {
+      "id": "char_word_cii_edge_3",
+      "kind": "word",
+      "value": "Cii Edge 3"
     },
     {
       "id": "char_word_elt_node_1",
@@ -432,18 +462,33 @@
       ]
     },
     {
-      "id": "vocab_spo_3",
-      "name": "SPO",
+      "id": "vocab_perspective_3",
+      "name": "Perspective",
       "order": 3,
       "terms": [
-        "char_word_spo_node_1",
-        "char_word_spo_node_2",
-        "char_word_spo_node_3"
+        "char_word_perspective_node_1",
+        "char_word_perspective_node_2",
+        "char_word_perspective_node_3"
       ],
       "connectives": [
         "char_word_subject",
         "char_word_predicate",
         "char_word_object"
+      ]
+    },
+    {
+      "id": "vocab_class_instantiation_instance_3",
+      "name": "Class Instantiation Instance",
+      "order": 3,
+      "terms": [
+        "char_word_class",
+        "char_word_instantiation",
+        "char_word_instance"
+      ],
+      "connectives": [
+        "char_word_cii_edge_1",
+        "char_word_cii_edge_2",
+        "char_word_cii_edge_3"
       ]
     },
     {
@@ -555,14 +600,24 @@
       "vocabulary_ref": "vocab_ad4m_perspective_4"
     },
     {
-      "id": "system_spo_3",
-      "name": "SPO",
+      "id": "system_perspective_3",
+      "name": "Perspective",
       "order": 3,
       "coherence": "Dynamism",
       "term_designation": "Impulses",
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
-      "vocabulary_ref": "vocab_spo_3"
+      "vocabulary_ref": "vocab_perspective_3"
+    },
+    {
+      "id": "system_class_instantiation_instance_3",
+      "name": "Class Instantiation Instance",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_class_instantiation_instance_3"
     },
     {
       "id": "system_elt_3",
@@ -601,5 +656,15 @@
   "lookups": [],
   "references": [],
   "functors": [],
-  "sequences": []
+  "sequences": [
+    {
+      "id": "sequence_data_progression",
+      "name": "Data",
+      "members": [
+        "system:system_data_1",
+        "system:system_data_2",
+        "system:system_elt_3"
+      ]
+    }
+  ]
 }

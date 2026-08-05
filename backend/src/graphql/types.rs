@@ -250,6 +250,9 @@ impl QueryRoot {
         g.systems
             .iter()
             .filter(|s| s.id != canonical_system_id(s.order))
+            // Hide empty/unlabelled systems (e.g. un-scraped DU1) so they don't
+            // give misleading blank representations.
+            .filter(|s| g.vocabulary(&s.vocabulary_ref).is_some_and(|v| !v.terms.is_empty()))
             .map(|s| GqlSystem::new(s.clone()))
             .collect()
     }
