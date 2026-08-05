@@ -36,7 +36,13 @@ Mapping so far (proposed) — **all edges incident to Critical Functions (CF)**:
   reading: if citation is taken as the top *node*, validation = CF ↔ Intrinsic
   Values — but the settled-here reading is both are edges.)
 - **edit** (edit a system in-place — name, node/edge labels — a critical function)
-  = CF ↔ **Smallest Holonic Unit** (the east / "right" node).
+  = CF ↔ **Smallest Holonic Unit** (the east / "right" node). Edit is a
+  *transformation*, so it also relates to the **Transform** node/operation.
+- **tags** = **Smallest Holonic Unit ↔ Organisational Modes** (an edge).
+- **types** = **Organisational Modes ↔ (the largest whole)** (an edge). So
+  **Types · Tags** reads as a dyad — the two poles that ELT's data sits between.
+- **compose** — an operation whose octad home is TBD; tracked in the Architecture
+  Monad for now (`perspective:compose`), alongside **edit** (`perspective:edit`).
 
 Rest of the seven CF-edges TBD. This gives the operations (and citation/validation)
 a home in the architecture octad to be folded into, rather than free-floating "triads."

@@ -3,6 +3,7 @@ use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::{
     AuthorRequest, ExtractRequest, ReferenceBrowser, SystemTemplate,
 };
+use crate::components::system_editor::SystemEditor;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
@@ -82,6 +83,8 @@ pub enum ApiAppMsg {
     ToggleEdgeLabels,
     ReferencesLoaded(Vec<ReferenceView>),
     SetMode(ViewMode),
+    /// Toggle Graph ↔ Table (the `v` hotkey).
+    ToggleView,
     AllReferencesLoaded(Vec<ReferenceView>),
     InstanceSystemsLoaded(Vec<InstanceSystem>),
     LoadInstance(String),
@@ -92,6 +95,8 @@ pub enum ApiAppMsg {
     MonadExtracted(String),
     /// Author a new System from custom values (the in-app editor).
     AuthorSystem(AuthorRequest),
+    /// Toggle the in-graph system editor.
+    ToggleEditing,
 }
 
 pub struct ApiApp {
@@ -121,6 +126,8 @@ pub struct ApiApp {
     show_canonical: bool,
     /// Feedback from the last Extract (Nullad → Monad), shown in the data view.
     extract_note: Option<String>,
+    /// Whether the in-graph system editor is open.
+    editing: bool,
 }
 
 impl Component for ApiApp {
@@ -156,6 +163,32 @@ impl Component for ApiApp {
             }
         });
 
+        // Global `v` hotkey → toggle the View (Graph ↔ Table), ignored while typing.
+        {
+            use wasm_bindgen::JsCast;
+            let link_kb = ctx.link().clone();
+            let closure = wasm_bindgen::closure::Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(
+                move |e: web_sys::KeyboardEvent| {
+                    if let Some(t) = e.target().and_then(|t| t.dyn_into::<web_sys::HtmlElement>().ok()) {
+                        let tag = t.tag_name().to_lowercase();
+                        if tag == "input" || tag == "textarea" || t.is_content_editable() {
+                            return;
+                        }
+                    }
+                    if e.key().eq_ignore_ascii_case("v") {
+                        link_kb.send_message(ApiAppMsg::ToggleView);
+                    }
+                },
+            );
+            if let Some(win) = web_sys::window() {
+                let _ = win.add_event_listener_with_callback(
+                    "keydown",
+                    closure.as_ref().unchecked_ref(),
+                );
+            }
+            closure.forget();
+        }
+
         // Default entry point is the Nullad table (all elements), so load every
         // reference up front rather than making the user click into it.
         let link3 = ctx.link().clone();
@@ -181,6 +214,7 @@ impl Component for ApiApp {
             instance_systems: vec![],
             show_canonical: false,
             extract_note: None,
+            editing: false,
         }
     }
 
@@ -324,6 +358,15 @@ impl Component for ApiApp {
                 self.system_references = refs;
                 true
             }
+            ApiAppMsg::ToggleView => {
+                let target = if self.mode == ViewMode::Graph {
+                    ViewMode::Table
+                } else {
+                    ViewMode::Graph
+                };
+                ctx.link().send_message(ApiAppMsg::SetMode(target));
+                false
+            }
             ApiAppMsg::SetMode(mode) => {
                 self.mode = mode;
                 // Lazily load all references the first time the data view opens.
@@ -395,6 +438,10 @@ impl Component for ApiApp {
                 self.extract_note = Some(note);
                 true
             }
+            ApiAppMsg::ToggleEditing => {
+                self.editing = !self.editing;
+                true
+            }
             ApiAppMsg::AuthorSystem(req) => {
                 self.extract_note = Some(format!("Authoring “{}”…", req.name));
                 let link = ctx.link().clone();
@@ -458,6 +505,7 @@ impl Component for ApiApp {
         // Data · Graph · Table: the Data (content the header scopes) has two views;
         // this switch chooses Graph or Table.
         let on_set_mode = ctx.link().callback(ApiAppMsg::SetMode);
+        let on_toggle_editing = ctx.link().callback(|_| ApiAppMsg::ToggleEditing);
         // The selected header key scopes the data view (None = Nullad = all).
         let filter_order = order_for_key(&self.selected_key);
 
@@ -547,15 +595,29 @@ impl Component for ApiApp {
                                 html! { <div class="loading">{"Loading system..."}</div> }
                             } else if let Some(ref system) = self.selected_system {
                                 html! {
-                                    <ApiGraphView
-                                        system={ system.clone() }
-                                        on_navigate={ Some(on_navigate) }
-                                        show_edge_labels={ self.show_edge_labels }
-                                        on_toggle_edge_labels={ Some(on_toggle_edge_labels.clone()) }
-                                        references={ self.system_references.clone() }
-                                        show_canonical={ self.show_canonical }
-                                        on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
-                                    />
+                                    <div class="graph-with-editor">
+                                        <button
+                                            class={ if self.editing { "edit-toggle active" } else { "edit-toggle" } }
+                                            onclick={ on_toggle_editing.clone() }
+                                            title="Edit this system — name, node & edge labels"
+                                        >{ if self.editing { "✎ Editing" } else { "✎ Edit" } }</button>
+                                        if self.editing {
+                                            <SystemEditor
+                                                key={ system.system_id.clone() }
+                                                system={ system.clone() }
+                                                on_author={ on_author.clone() }
+                                            />
+                                        }
+                                        <ApiGraphView
+                                            system={ system.clone() }
+                                            on_navigate={ Some(on_navigate) }
+                                            show_edge_labels={ self.show_edge_labels }
+                                            on_toggle_edge_labels={ Some(on_toggle_edge_labels.clone()) }
+                                            references={ self.system_references.clone() }
+                                            show_canonical={ self.show_canonical }
+                                            on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
+                                        />
+                                    </div>
                                 }
                             } else {
                                 html! { <div class="loading">{"Select a system"}</div> }

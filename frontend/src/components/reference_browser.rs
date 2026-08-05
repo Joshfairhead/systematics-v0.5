@@ -286,9 +286,10 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
     let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Citation]);
-    // Filter (−) scopes the data returned, by cite-degree (Sys/Node/Edge/…).
+    // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
+    // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
-    let active_kinds = use_state(|| ALL_KINDS.to_vec());
+    let active_kinds = use_state(|| vec![CiteKind::System]);
     // Editor: author a new System from custom values (the app-authored path).
     let editor_open = use_state(|| false);
     let ed_name = use_state(String::new);

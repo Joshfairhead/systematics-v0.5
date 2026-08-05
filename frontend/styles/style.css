@@ -643,6 +643,26 @@ body {
     color: #2c3e50;
 }
 .ed-name { flex: 1; min-width: 12rem; }
+.ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
+/* In-graph system editor. */
+.graph-with-editor { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.system-editor { width: 100%; }
+.edit-toggle {
+    align-self: flex-end;
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.7);
+    color: #4a5568;
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.edit-toggle.active {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.4);
+    color: #2563eb;
+    font-weight: 600;
+}
 .ed-order { width: 3.5rem; margin-left: 0.3rem; }
 .ed-label { font-size: 0.75rem; color: #718096; display: inline-flex; align-items: center; }
 /* Extract feedback (Nullad → Monad result). */
