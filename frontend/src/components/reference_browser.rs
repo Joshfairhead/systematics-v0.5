@@ -54,9 +54,20 @@ pub struct ReferenceBrowserProps {
     pub filter_order: Option<i32>,
     /// Extract (Nullad → Monad): materialize the current selection as a Monad.
     pub on_extract: Callback<ExtractRequest>,
-    /// Feedback from the last Extract (e.g. "Extracted 'Monad …' (n members)").
+    /// Feedback from the last Extract / author (shown in the Editor).
     #[prop_or_default]
     pub extract_note: Option<String>,
+    /// Author a new System from custom term/connective values (the editor).
+    pub on_author: Callback<AuthorRequest>,
+}
+
+/// A request to author (create) a System from custom values — the editor path.
+#[derive(Clone, PartialEq)]
+pub struct AuthorRequest {
+    pub name: String,
+    pub order: i32,
+    pub terms: Vec<String>,
+    pub connectives: Vec<String>,
 }
 
 /// A request to Extract the current selection into a Monad — a provisional name
@@ -266,6 +277,12 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // Filter (−) scopes the data returned, by cite-degree (Sys/Node/Edge/…).
     let filter_open = use_state(|| false);
     let active_kinds = use_state(|| ALL_KINDS.to_vec());
+    // Editor: author a new System from custom values (the app-authored path).
+    let editor_open = use_state(|| false);
+    let ed_name = use_state(String::new);
+    let ed_order = use_state(|| 3i32);
+    let ed_terms = use_state(|| vec![String::new(); 3]);
+    let ed_conns = use_state(|| vec![String::new(); 3]);
 
     let refs = &props.references;
     let systems = &props.instance_systems;
@@ -302,15 +319,77 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         }
     };
 
+    // ---- Editor form: author a System from custom values ----
+    let toggle_editor = { let o = editor_open.clone(); Callback::from(move |_: MouseEvent| o.set(!*o)) };
+    let on_ed_name = { let s = ed_name.clone(); Callback::from(move |e: InputEvent| s.set(e.target_unchecked_into::<HtmlInputElement>().value())) };
+    let on_ed_order = {
+        let (ed_order, ed_terms, ed_conns) = (ed_order.clone(), ed_terms.clone(), ed_conns.clone());
+        Callback::from(move |e: InputEvent| {
+            let n = e.target_unchecked_into::<HtmlInputElement>().value().parse::<i32>().unwrap_or(3).clamp(1, 12);
+            ed_order.set(n);
+            ed_terms.set(vec![String::new(); n as usize]);
+            ed_conns.set(vec![String::new(); (n * (n - 1) / 2) as usize]);
+        })
+    };
+    // An input bound to index `i` of a Vec<String> state.
+    let vec_input = |state: &UseStateHandle<Vec<String>>, i: usize, ph: String| -> Html {
+        let val = state.get(i).cloned().unwrap_or_default();
+        let state = state.clone();
+        let oninput = Callback::from(move |e: InputEvent| {
+            let v = e.target_unchecked_into::<HtmlInputElement>().value();
+            let mut next = (*state).clone();
+            if i < next.len() { next[i] = v; }
+            state.set(next);
+        });
+        html! { <input class="ed-input" placeholder={ph} value={ val } oninput={ oninput } /> }
+    };
+    let ed_order_val = *ed_order;
+    let on_create = {
+        let (on_author, ed_name, ed_terms, ed_conns) = (props.on_author.clone(), ed_name.clone(), ed_terms.clone(), ed_conns.clone());
+        Callback::from(move |_: MouseEvent| {
+            on_author.emit(AuthorRequest {
+                name: (*ed_name).clone(),
+                order: ed_order_val,
+                terms: (*ed_terms).clone(),
+                connectives: (*ed_conns).clone(),
+            });
+        })
+    };
+    let can_create = !ed_name.trim().is_empty()
+        && ed_terms.iter().all(|t| !t.trim().is_empty())
+        && ed_conns.iter().all(|c| !c.trim().is_empty());
+
     html! {
         <div class="reference-browser">
-            // ELT triad — the operation edge. Extract · Load · Transform.
+            // Editor (the operation edge): Extract · Load · Transform + New system.
             { elt_triad(EltCtx {
                 extract_members: &extract_members,
                 extract_name: &extract_name,
                 on_extract: &props.on_extract,
                 extract_note: props.extract_note.as_deref(),
+                editor_open: &editor_open,
+                toggle_editor: &toggle_editor,
             }) }
+
+            if *editor_open {
+                <div class="editor-form">
+                    <div class="editor-row">
+                        <input class="ed-input ed-name" placeholder="New system name" value={ (*ed_name).clone() } oninput={ on_ed_name } />
+                        <label class="ed-label">{ "Order" }
+                            <input class="ed-input ed-order" type="number" min="1" max="12" value={ ed_order_val.to_string() } oninput={ on_ed_order } />
+                        </label>
+                        <button class="elt-btn" disabled={ !can_create } onclick={ on_create }>{ "Create system" }</button>
+                    </div>
+                    <div class="editor-fields">
+                        <span class="facet-label">{ format!("Terms ({})", ed_order_val) }</span>
+                        { for (0..ed_order_val as usize).map(|i| vec_input(&ed_terms, i, format!("term {}", i + 1))) }
+                    </div>
+                    <div class="editor-fields">
+                        <span class="facet-label">{ format!("Connectives ({})", ed_order_val * (ed_order_val - 1) / 2) }</span>
+                        { for (0..(ed_order_val * (ed_order_val - 1) / 2) as usize).map(|j| vec_input(&ed_conns, j, format!("edge {}", j + 1))) }
+                    </div>
+                </div>
+            }
 
             <div class="ref-tabs">
                 <button
@@ -343,15 +422,17 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     }
 }
 
-/// Grouped arguments for the ELT triad control.
+/// Grouped arguments for the ELT / Editor control.
 struct EltCtx<'a> {
     /// The current selection to Extract, as `system:<id>` member addresses.
     extract_members: &'a [String],
     /// Provisional name for the Monad Extract would create.
     extract_name: &'a str,
     on_extract: &'a Callback<ExtractRequest>,
-    /// Feedback from the last Extract, if any.
+    /// Feedback from the last Extract / author, if any.
     extract_note: Option<&'a str>,
+    editor_open: &'a UseStateHandle<bool>,
+    toggle_editor: &'a Callback<MouseEvent>,
 }
 
 /// The ELT triad control: Extract · Load · Transform.
@@ -364,6 +445,8 @@ fn elt_triad(ctx: EltCtx) -> Html {
         extract_name,
         on_extract,
         extract_note,
+        editor_open,
+        toggle_editor,
     } = ctx;
 
     // Load opens the OS file browser to pick a JSON system file. (Import format is
@@ -395,7 +478,12 @@ fn elt_triad(ctx: EltCtx) -> Html {
     );
 
     html! {
-        <div class="elt-triad" title="Operation edge (ELT): Extract · Load · Transform">
+        <div class="elt-triad" title="Editor — Extract · Load · Transform + author a new system">
+            <button
+                class={ classes!("elt-btn", (**editor_open).then_some("active")) }
+                onclick={ toggle_editor.clone() }
+                title="New — author a system from custom terms/connectives"
+            >{ if **editor_open { "New ▴" } else { "New ▾" } }</button>
             <button
                 class="elt-btn"
                 disabled={ !can_extract }

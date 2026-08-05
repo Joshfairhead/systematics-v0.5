@@ -1,6 +1,6 @@
 use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView};
 use crate::components::graph_view::ApiGraphView;
-use crate::components::reference_browser::{ExtractRequest, ReferenceBrowser};
+use crate::components::reference_browser::{AuthorRequest, ExtractRequest, ReferenceBrowser};
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
@@ -86,8 +86,10 @@ pub enum ApiAppMsg {
     ToggleCanonical,
     /// Extract the current data-view selection into a Monad (Nullad → Monad).
     ExtractMonad(ExtractRequest),
-    /// Result feedback from the last Extract.
+    /// Result feedback from the last Extract / author.
     MonadExtracted(String),
+    /// Author a new System from custom values (the in-app editor).
+    AuthorSystem(AuthorRequest),
 }
 
 pub struct ApiApp {
@@ -391,6 +393,31 @@ impl Component for ApiApp {
                 self.extract_note = Some(note);
                 true
             }
+            ApiAppMsg::AuthorSystem(req) => {
+                self.extract_note = Some(format!("Authoring “{}”…", req.name));
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    match client
+                        .author_system(&req.name, req.order, req.terms, req.connectives)
+                        .await
+                    {
+                        Ok(sys) => {
+                            link.send_message(ApiAppMsg::MonadExtracted(format!(
+                                "Authored system “{}” → {} (order {})",
+                                sys.name, sys.id, sys.order
+                            )));
+                            // Refetch so the new system appears in the Nullad table.
+                            if let Ok(instances) = client.fetch_instance_systems().await {
+                                link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                            }
+                        }
+                        Err(e) => link
+                            .send_message(ApiAppMsg::MonadExtracted(format!("Author failed: {e}"))),
+                    }
+                });
+                true
+            }
         }
     }
 
@@ -402,6 +429,7 @@ impl Component for ApiApp {
         let on_load = ctx.link().callback(ApiAppMsg::LoadInstance);
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
         let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
+        let on_author = ctx.link().callback(ApiAppMsg::AuthorSystem);
 
         // Data · Graph · Table: the Data (content the header scopes) has two views;
         // this switch chooses Graph or Table.
@@ -448,6 +476,7 @@ impl Component for ApiApp {
                                 filter_order={ filter_order }
                                 on_extract={ on_extract }
                                 extract_note={ self.extract_note.clone() }
+                                on_author={ on_author }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for

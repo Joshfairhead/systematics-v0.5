@@ -613,6 +613,38 @@ body {
     font-size: 0.8rem;
     padding: 0.35rem 0.6rem;
 }
+/* Editor form — author a system from custom values. */
+.editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+}
+.editor-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.editor-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+}
+.ed-input {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.82rem;
+    color: #2c3e50;
+}
+.ed-name { flex: 1; min-width: 12rem; }
+.ed-order { width: 3.5rem; margin-left: 0.3rem; }
+.ed-label { font-size: 0.75rem; color: #718096; display: inline-flex; align-items: center; }
 /* Extract feedback (Nullad → Monad result). */
 .elt-note {
     margin-left: 0.5rem;

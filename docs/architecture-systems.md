@@ -26,16 +26,18 @@ Hodgson's octad, going round from the east: **smallest unit · critical function
 supportive platform · necessary resources · integrative totality · inherent nature ·
 intrinsic values · organisational modes**. A K₈ vertex has degree **7**, so the
 seven operation-verbs **pair as edges incident to the Critical Functions node**.
-Mapping so far (proposed):
-- **sort** = Critical Functions ↔ Necessary Resources
-- **filter** = Critical Functions ↔ Organisational Modes
-- **validation** (the typing rule / Dyad's force) = another Critical-Functions edge,
-  likely to **Inherent Nature** or **Intrinsic Values**
-- **Citation** = the **Intrinsic Values** node itself (a *node*, not an edge) — so
-  *validation* may be exactly the edge Critical Functions ↔ Citation.
+Mapping so far (proposed) — **all edges incident to Critical Functions (CF)**:
+- **sort** = CF ↔ Necessary Resources
+- **filter** = CF ↔ Organisational Modes
+- **citation** = CF ↔ **Intrinsic Nature** (the *top* node, sometimes "esoteric
+  source") — an **edge**, not a node.
+- **validation** (the typing rule / Dyad's force) = CF ↔ **Inherent Nature** (top
+  left) — an **edge**. *Citation and validation are two separate edges.* (Alt
+  reading: if citation is taken as the top *node*, validation = CF ↔ Intrinsic
+  Values — but the settled-here reading is both are edges.)
 
-This gives the operations (and citation) a home in the architecture octad to be
-folded into, rather than free-floating "triads." Rest of the seven edges TBD.
+Rest of the seven CF-edges TBD. This gives the operations (and citation/validation)
+a home in the architecture octad to be folded into, rather than free-floating "triads."
 
 **Sort/Filter, concretely.** Don't over-fix their semantics (they've churned): keep
 them as **edge-fragments** with the current UI realisation (Sort selects header
@@ -72,10 +74,12 @@ the graph · `proposed` = named but not built/settled.
   into the graph* at startup (`build_graph` `apply_content`). So systems **are placed
   in the system** (resolvable, visible) but their **source of truth is code**, not
   data authored *through* the app. The homoiconic / self-construction goal wants
-  systems **created and edited as data in-app** (an `createSystem`-style flow /
-  compose-via-Extract), retiring the Rust generator. That is the "big cleanup" —
-  scoped, not yet done. (User data — Monads from Extract — already takes the
-  app→`store.json` path.)
+  systems **created and edited as data in-app**, retiring the Rust generator.
+  **First step done:** the **`authorSystem`** mutation + the **Editor** form build a
+  system from custom term/connective values at runtime and persist it (it renders
+  and appears in the Nullad table). Remaining cleanup: migrate the code-defined
+  seeds (fragments first, canonical last) to app/JSON-authored data. (User data —
+  Monads from Extract — already takes the app→`store.json` path.)
 
 ## Self-documentation → self-construction [settled goal]
 
@@ -191,7 +195,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | system | terms / role | node- or edge-typed | code | status |
 |---|---|---|---|---|
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
-| **Operations (ELT)** | Extract · Load · Transform (verbs) → `createSequence` · `loadPerspective` · `applyFunctor`. **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
+| **Editor (ELT + author)** | Extract · Load · Transform (verbs) → `createSequence` · file-picker (import TBD) · `applyFunctor`; **plus author** (`authorSystem`). This triad is really the **Editor** — the in-app authoring surface (build a system from custom terms/connectives, compose/extract). **SPO is the *Perspective* triad** (Subject·Predicate·Object). **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
 | **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**, mapping to **class / instantiation / instance**. **Sort = selecting the header tags** — which tag keys are the columns (the *class*: header/keys; `ColKey`; default Order + Citation). **Filter = scoping the data returned** in those columns (the *instances*: values), by **cite-degree** — the data categorised by number per the schema **1 term-designation · 2 connective-designation · 3 coherence · 4 term · 5 connective · 6 system** (their coalescence). So you can view only systems (*manifolds* = systems not yet placed), only terms, only connectives, etc. | reconciler-typed | UI: `components/reference_browser.rs` (`CiteKind`; Sort = column selector, Filter = degree scoper) | impl v1. Citation column in **Source · Artefact · Lookup** order |
 | **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |

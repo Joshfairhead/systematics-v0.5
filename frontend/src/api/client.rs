@@ -145,6 +145,12 @@ struct CreateSequenceResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct AuthorSystemResponse {
+    #[serde(rename = "authorSystem")]
+    author_system: Option<InstanceSystem>,
+}
+
+#[derive(Deserialize, Debug)]
 struct RenderSystemResponse {
     #[serde(rename = "renderSystem")]
     render_system: Option<RenderedSystem>,
@@ -486,6 +492,36 @@ impl GraphQLClient {
             .data
             .and_then(|d| d.create_sequence)
             .ok_or_else(|| ApiError::ParseError("createSequence returned no data".to_string()))
+    }
+
+    /// Author a System from custom term/connective **values** (the in-app editor
+    /// path — builds characters + vocabulary + system server-side, persisted).
+    pub async fn author_system(
+        &self,
+        name: &str,
+        order: i32,
+        terms: Vec<String>,
+        connectives: Vec<String>,
+    ) -> Result<InstanceSystem, ApiError> {
+        let query = r#"
+            mutation Author($input: AuthorSystemInput!) {
+                authorSystem(input: $input) { id name order }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "name": name, "order": order, "terms": terms, "connectives": connectives }
+        });
+        let response: GraphQLResponse<AuthorSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.author_system)
+            .ok_or_else(|| ApiError::ParseError("authorSystem returned no data".to_string()))
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(
