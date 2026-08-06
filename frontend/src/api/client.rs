@@ -145,6 +145,11 @@ struct CreateSequenceResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct SequencesResponse {
+    sequences: Vec<SequenceView>,
+}
+
+#[derive(Deserialize, Debug)]
 struct AuthorSystemResponse {
     #[serde(rename = "authorSystem")]
     author_system: Option<InstanceSystem>,
@@ -462,6 +467,19 @@ impl GraphQLClient {
         }
 
         Ok(response.data.map(|d| d.all_references).unwrap_or_default())
+    }
+
+    /// Every Sequence (Monad / registry) in the graph — id, name, members.
+    pub async fn fetch_sequences(&self) -> Result<Vec<SequenceView>, ApiError> {
+        let query = r#"{ sequences { id name members } }"#;
+        let response: GraphQLResponse<SequencesResponse> =
+            self.execute_query(query, None).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.sequences).unwrap_or_default())
     }
 
     /// Extract (Nullad → Monad): materialize a selection as a persisted

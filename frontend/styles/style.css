@@ -827,6 +827,16 @@ button.row-open:hover {
     background: rgba(139, 92, 246, 0.14);
     color: #7c3aed;
 }
+.tag-monad {
+    background: rgba(37, 99, 235, 0.16);
+    color: #1d4ed8;
+    font-weight: 600;
+}
+.tag-member {
+    background: rgba(163, 177, 198, 0.22);
+    color: #4a5568;
+    font-size: 0.72rem;
+}
 .tag-source {
     background: rgba(37, 99, 235, 0.12);
     color: #2563eb;

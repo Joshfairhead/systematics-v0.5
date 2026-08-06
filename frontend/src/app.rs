@@ -1,4 +1,4 @@
-use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView};
+use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView, SequenceView};
 use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::{
     AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
@@ -97,6 +97,8 @@ pub enum ApiAppMsg {
     AuthorSystem(AuthorRequest),
     /// Toggle the in-graph system editor.
     ToggleEditing,
+    /// All sequences/monads loaded.
+    SequencesLoaded(Vec<SequenceView>),
 }
 
 pub struct ApiApp {
@@ -128,6 +130,8 @@ pub struct ApiApp {
     extract_note: Option<String>,
     /// Whether the in-graph system editor is open.
     editing: bool,
+    /// Every Sequence / Monad in the graph — shown as rows in the data view.
+    sequences: Vec<SequenceView>,
 }
 
 impl Component for ApiApp {
@@ -198,6 +202,14 @@ impl Component for ApiApp {
             link3.send_message(ApiAppMsg::AllReferencesLoaded(refs));
         });
 
+        // Sequences / Monads — shown as rows in the data view.
+        let link4 = ctx.link().clone();
+        let client4 = graphql_client.clone();
+        spawn_local(async move {
+            let seqs = client4.fetch_sequences().await.unwrap_or_default();
+            link4.send_message(ApiAppMsg::SequencesLoaded(seqs));
+        });
+
         Self {
             systems: vec![],
             selected_system: None,
@@ -215,6 +227,7 @@ impl Component for ApiApp {
             show_canonical: false,
             extract_note: None,
             editing: false,
+            sequences: vec![],
         }
     }
 
@@ -442,6 +455,10 @@ impl Component for ApiApp {
                 self.editing = !self.editing;
                 true
             }
+            ApiAppMsg::SequencesLoaded(seqs) => {
+                self.sequences = seqs;
+                true
+            }
             ApiAppMsg::AuthorSystem(req) => {
                 self.extract_note = Some(format!("Authoring “{}”…", req.name));
                 let link = ctx.link().clone();
@@ -575,6 +592,7 @@ impl Component for ApiApp {
                                 on_author={ on_author }
                                 templates={ templates }
                                 raw_elements={ raw_elements }
+                                sequences={ self.sequences.clone() }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for

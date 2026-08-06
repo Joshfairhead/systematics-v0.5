@@ -434,16 +434,26 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["class", "instantiation", "instance"]),
         &slugs(&["cii_edge_1", "cii_edge_2", "cii_edge_3"]),
     );
-    // Operations triad [WIP] — ELT (Extract · Load · Transform) as the three EDGES;
-    // vertices TBD. ELT is isomorphic to RAG (data-warehouse ↔ generative-AI); both
-    // are *composition*. The six permutations of the triad = the six laws of three.
+    // Operations triad [WIP] — ELT: Extract · Load · Transform as the three NODES;
+    // edges TBD. ELT ≅ RAG (data-warehouse ↔ generative-AI): the same isomorphic
+    // triangle; both are *composition*. The 3!=6 permutations = the six laws of three.
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Operations",
         3,
-        &slugs(&["operations_node_1", "operations_node_2", "operations_node_3"]),
         &slugs(&["extract", "load", "transform"]),
+        &slugs(&["op_edge_1", "op_edge_2", "op_edge_3"]),
+    );
+    // Composition triad [WIP] — RAG: Retrieve · Augment · Generate as the nodes;
+    // the generative-AI isomorph of ELT (Operations). Both are composition.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Composition",
+        3,
+        &slugs(&["retrieve", "augment", "generate"]),
+        &slugs(&["comp_edge_1", "comp_edge_2", "comp_edge_3"]),
     );
     // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order 1);
     // the dyad (key · value) is ALSO called "Data" (data = a key:value tag) and

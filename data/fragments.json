@@ -296,21 +296,6 @@
       "value": "Cii Edge 3"
     },
     {
-      "id": "char_word_operations_node_1",
-      "kind": "word",
-      "value": "Operations Node 1"
-    },
-    {
-      "id": "char_word_operations_node_2",
-      "kind": "word",
-      "value": "Operations Node 2"
-    },
-    {
-      "id": "char_word_operations_node_3",
-      "kind": "word",
-      "value": "Operations Node 3"
-    },
-    {
       "id": "char_word_extract",
       "kind": "word",
       "value": "Extract"
@@ -324,6 +309,51 @@
       "id": "char_word_transform",
       "kind": "word",
       "value": "Transform"
+    },
+    {
+      "id": "char_word_op_edge_1",
+      "kind": "word",
+      "value": "Op Edge 1"
+    },
+    {
+      "id": "char_word_op_edge_2",
+      "kind": "word",
+      "value": "Op Edge 2"
+    },
+    {
+      "id": "char_word_op_edge_3",
+      "kind": "word",
+      "value": "Op Edge 3"
+    },
+    {
+      "id": "char_word_retrieve",
+      "kind": "word",
+      "value": "Retrieve"
+    },
+    {
+      "id": "char_word_augment",
+      "kind": "word",
+      "value": "Augment"
+    },
+    {
+      "id": "char_word_generate",
+      "kind": "word",
+      "value": "Generate"
+    },
+    {
+      "id": "char_word_comp_edge_1",
+      "kind": "word",
+      "value": "Comp Edge 1"
+    },
+    {
+      "id": "char_word_comp_edge_2",
+      "kind": "word",
+      "value": "Comp Edge 2"
+    },
+    {
+      "id": "char_word_comp_edge_3",
+      "kind": "word",
+      "value": "Comp Edge 3"
     },
     {
       "id": "char_word_data",
@@ -496,14 +526,29 @@
       "name": "Operations",
       "order": 3,
       "terms": [
-        "char_word_operations_node_1",
-        "char_word_operations_node_2",
-        "char_word_operations_node_3"
-      ],
-      "connectives": [
         "char_word_extract",
         "char_word_load",
         "char_word_transform"
+      ],
+      "connectives": [
+        "char_word_op_edge_1",
+        "char_word_op_edge_2",
+        "char_word_op_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_composition_3",
+      "name": "Composition",
+      "order": 3,
+      "terms": [
+        "char_word_retrieve",
+        "char_word_augment",
+        "char_word_generate"
+      ],
+      "connectives": [
+        "char_word_comp_edge_1",
+        "char_word_comp_edge_2",
+        "char_word_comp_edge_3"
       ]
     },
     {
@@ -628,6 +673,16 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_operations_3"
+    },
+    {
+      "id": "system_composition_3",
+      "name": "Composition",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_composition_3"
     },
     {
       "id": "system_data_1",

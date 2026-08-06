@@ -24,7 +24,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
-use crate::api::client::{InstanceSystem, ReferenceView};
+use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
 
 /// Standard order labels (the invariant systematics names), used to label the
 /// compare-matrix rows regardless of how each perspective names its systems.
@@ -67,6 +67,10 @@ pub struct ReferenceBrowserProps {
     /// when the Term/Connective filter is on (off by default).
     #[prop_or_default]
     pub raw_elements: Vec<RawElement>,
+    /// Every Sequence / Monad in the graph — shown as rows (Cites = its members),
+    /// so monads (e.g. the Architecture Monad) and their members are visible.
+    #[prop_or_default]
+    pub sequences: Vec<SequenceView>,
 }
 
 /// A raw node (term) or edge (connective) of the focused system — a data row.
@@ -152,6 +156,7 @@ enum Row<'a> {
     Sys(&'a InstanceSystem),
     Ref(&'a ReferenceView),
     Raw(&'a RawElement),
+    Seq(&'a SequenceView),
 }
 
 impl Row<'_> {
@@ -160,11 +165,15 @@ impl Row<'_> {
             Row::Sys(s) => Some(s.order),
             Row::Ref(r) => order_of(r),
             Row::Raw(e) => Some(e.order),
+            // A monad's order = its member count (a scoped "all" of N members).
+            Row::Seq(s) => Some(s.members.len() as i32),
         }
     }
     fn kind(&self) -> CiteKind {
         match self {
             Row::Sys(_) => CiteKind::System,
+            // Monads/sequences are system-like containers → show with Systems.
+            Row::Seq(_) => CiteKind::System,
             Row::Ref(r) => cite_kind(r),
             Row::Raw(e) => if e.is_edge { CiteKind::Connective } else { CiteKind::Term },
         }
@@ -174,6 +183,7 @@ impl Row<'_> {
         match self {
             Row::Sys(s) => s.name.to_lowercase(),
             Row::Raw(e) => e.name.to_lowercase(),
+            Row::Seq(s) => format!("{} {}", s.name, s.members.join(" ")).to_lowercase(),
             Row::Ref(r) => format!(
                 "{} {} {} {} {} {}",
                 persp(r), src(r), art(r), loc(r), r.target,
@@ -187,7 +197,7 @@ impl Row<'_> {
         match self {
             Row::Sys(s) => Some(format!("system:{}", s.id)),
             Row::Ref(r) => r.target_system.as_ref().map(|s| format!("system:{}", s.id)),
-            Row::Raw(_) => None,
+            Row::Raw(_) | Row::Seq(_) => None,
         }
     }
 }
@@ -277,15 +287,18 @@ fn passes_row(row: Row, filter_order: Option<i32>, active_kinds: &[CiteKind], ne
         && (needle.is_empty() || row.hay().contains(needle))
 }
 
-/// All Nullad rows (every System + Reference + focused raw node/edge), unfiltered.
+/// All Nullad rows (every System + Sequence/Monad + Reference + focused raw
+/// node/edge), unfiltered.
 fn all_rows<'a>(
     systems: &'a [InstanceSystem],
+    seqs: &'a [SequenceView],
     refs: &'a [ReferenceView],
     raw: &'a [RawElement],
 ) -> Vec<Row<'a>> {
     systems
         .iter()
         .map(Row::Sys)
+        .chain(seqs.iter().map(Row::Seq))
         .chain(refs.iter().map(Row::Ref))
         .chain(raw.iter().map(Row::Raw))
         .collect()
@@ -323,6 +336,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let refs = &props.references;
     let systems = &props.instance_systems;
     let raw = &props.raw_elements;
+    let seqs = &props.sequences;
     // The order filter comes from the header (Nullad = None = all).
     let filter_order = props.filter_order;
 
@@ -336,7 +350,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // (Systems directly; References via their target), as `system:<id>` members.
     let needle = search.to_lowercase();
     let mut seen = BTreeSet::new();
-    let extract_members: Vec<String> = all_rows(systems, refs, raw)
+    let extract_members: Vec<String> = all_rows(systems, seqs, refs, raw)
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, &active_kinds, &needle))
         .filter_map(|row| row.system_addr())
@@ -457,6 +471,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                     Tab::Table => table_view(TableCtx {
                         refs,
                         systems,
+                        seqs,
                         raw,
                         on_load: &props.on_load,
                         filter_order,
@@ -570,6 +585,8 @@ struct TableCtx<'a> {
     refs: &'a [ReferenceView],
     /// Every system in the graph — shown as rows alongside references.
     systems: &'a [InstanceSystem],
+    /// Every Sequence / Monad — shown as rows (Cites = members).
+    seqs: &'a [SequenceView],
     /// The focused system's raw nodes/edges (shown when Term/Connective on).
     raw: &'a [RawElement],
     /// Click a system row to view it (loads into the graph).
@@ -589,6 +606,7 @@ fn table_view(ctx: TableCtx) -> Html {
     let TableCtx {
         refs,
         systems,
+        seqs,
         raw,
         on_load,
         filter_order,
@@ -600,9 +618,9 @@ fn table_view(ctx: TableCtx) -> Html {
     } = ctx;
 
     // Filter — same predicate Extract uses (header order + cite-degree + search).
-    // Rows are every System + Reference + the focused system's raw nodes/edges.
+    // Rows: every System + Monad + Reference + the focused system's raw nodes/edges.
     let needle = search.to_lowercase();
-    let mut rows: Vec<Row> = all_rows(systems, refs, raw)
+    let mut rows: Vec<Row> = all_rows(systems, seqs, refs, raw)
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
         .collect();
@@ -669,6 +687,14 @@ fn table_view(ctx: TableCtx) -> Html {
             }
             (ColKey::Cites, Row::Raw(e)) => html! { { if e.is_edge { "edge" } else { "node" } } },
             (_, Row::Raw(_)) => html! {},
+            // A Monad / Sequence row: name as a tag, members listed under Cites.
+            (ColKey::Name, Row::Seq(s)) => html! { <span class="tag tag-monad">{ &s.name }</span> },
+            (ColKey::Cites, Row::Seq(s)) => html! {
+                <span class="tags">
+                    { for s.members.iter().map(|m| html!{ <span class="tag tag-member">{ m }</span> }) }
+                </span>
+            },
+            (_, Row::Seq(_)) => html! {},
             (ColKey::Perspective, Row::Ref(r)) => persp_tag(r),
             (ColKey::Citation, Row::Ref(r)) => citation_tags(r),
             (ColKey::Cites, Row::Ref(r)) => {
