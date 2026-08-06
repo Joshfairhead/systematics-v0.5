@@ -456,6 +456,11 @@ impl Component for ApiApp {
                                 "Authored system “{}” → {} (order {})",
                                 sys.name, sys.id, sys.order
                             )));
+                            // Load the authored system so the graph updates to it.
+                            match client.fetch_rendered_by_id(&sys.id).await {
+                                Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                                Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                            }
                             // Refetch so the new system appears in the Nullad table.
                             if let Ok(instances) = client.fetch_instance_systems().await {
                                 link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));

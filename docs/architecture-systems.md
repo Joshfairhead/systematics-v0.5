@@ -89,6 +89,31 @@ the graph · `proposed` = named but not built/settled.
   seeds (fragments first, canonical last) to app/JSON-authored data. (User data —
   Monads from Extract — already takes the app→`store.json` path.)
 
+## Monads, operations, and the six laws of three [proposed — potentially major]
+
+**A Monad is a container in category theory** — *context management*: a **container**
+(dyadic: the wrapped value + an operator) plus **operations** governed by the three
+monad laws — **identity · composition (bind) · associativity**.
+
+**There are exactly six operations = the six permutations of a triad = Bennett's
+"six laws of three."** A triad's three positions permute in 3! = **6** ways — the
+six relational dynamics of the triad. Bennett names them **identity · freedom ·
+concentration · expansion · interaction · order**. (This is why "Operations" is a
+triad-derived set, not an arbitrary list.)
+
+**ELT ≅ RAG.** Extract·Load·Transform (data-warehouse) and Retrieve·Augment·Generate
+(generative-AI) are the **same isomorphic triangle** — both are **composition**. So
+the **Operations** triad (renamed from ELT) links to *composition*; its operations
+are permutations of the triad.
+
+**Hypothesis [flagged as potentially big — NOT verified].** Bennett's six laws of the
+triad may **group into three pairs**, each pair mapping to one **category-theory
+axiom**: identity · composition · associativity. If so, every CT axiom becomes a
+**dyad of JGB laws** — a homoiconic bridge from category theory into Bennett's world
+at the foundations. That would carry us into the **Tetrad (Time · Space · Hyparxis ·
+Eternity)** and its **six edges**, marking the move **from Function to Being**.
+Record and pursue; do not assert.
+
 ## Self-documentation → self-construction [settled goal]
 
 Self-documentation is only the **first port of call**. The real goal is to **use
@@ -203,7 +228,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | system | terms / role | node- or edge-typed | code | status |
 |---|---|---|---|---|
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
-| **Editor (ELT + author)** | Extract · Load · Transform (verbs) → `createSequence` · file-picker (import TBD) · `applyFunctor`; **plus author** (`authorSystem`). This triad is really the **Editor** — the in-app authoring surface (build a system from custom terms/connectives, compose/extract). **SPO is the *Perspective* triad** (Subject·Predicate·Object). **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
+| **Operations (ELT ≅ RAG)** | Extract · Load · Transform — **renamed from ELT to "Operations"** (not "compose"). **ELT ≅ RAG** (data-warehouse ↔ generative-AI): the same isomorphic triangle, both **composition**. The six permutations of the triad = the **six laws of three** (see below). Wired: `createSequence` · file-picker · `applyFunctor` + author (`authorSystem`), surfaced by the in-app **Editor**. **SPO = the *Perspective* triad** (Subject·Predicate·Object as edges). **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
 | **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**, mapping to **class / instantiation / instance**. **Sort = selecting the header tags** — which tag keys are the columns (the *class*: header/keys; `ColKey`; default Order + Citation). **Filter = scoping the data returned** in those columns (the *instances*: values), by **cite-degree** — the data categorised by number per the schema **1 term-designation · 2 connective-designation · 3 coherence · 4 term · 5 connective · 6 system** (their coalescence). So you can view only systems (*manifolds* = systems not yet placed), only terms, only connectives, etc. | reconciler-typed | UI: `components/reference_browser.rs` (`CiteKind`; Sort = column selector, Filter = degree scoper) | impl v1. Citation column in **Source · Artefact · Lookup** order |
 | **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |

@@ -434,14 +434,15 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["class", "instantiation", "instance"]),
         &slugs(&["cii_edge_1", "cii_edge_2", "cii_edge_3"]),
     );
-    // ELT triad [WIP] — the operations are VERBS = the three EDGES (extract · load
-    // · transform); the vertices are TBD (placeholder nodes).
+    // Operations triad [WIP] — ELT (Extract · Load · Transform) as the three EDGES;
+    // vertices TBD. ELT is isomorphic to RAG (data-warehouse ↔ generative-AI); both
+    // are *composition*. The six permutations of the triad = the six laws of three.
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "ELT",
+        "Operations",
         3,
-        &slugs(&["elt_node_1", "elt_node_2", "elt_node_3"]),
+        &slugs(&["operations_node_1", "operations_node_2", "operations_node_3"]),
         &slugs(&["extract", "load", "transform"]),
     );
     // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order 1);
@@ -465,7 +466,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
         vec![
             "system:system_data_1".to_string(),
             "system:system_data_2".to_string(),
-            "system:system_elt_3".to_string(),
+            "system:system_operations_3".to_string(),
         ],
     ));
 

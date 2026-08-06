@@ -296,19 +296,19 @@
       "value": "Cii Edge 3"
     },
     {
-      "id": "char_word_elt_node_1",
+      "id": "char_word_operations_node_1",
       "kind": "word",
-      "value": "Elt Node 1"
+      "value": "Operations Node 1"
     },
     {
-      "id": "char_word_elt_node_2",
+      "id": "char_word_operations_node_2",
       "kind": "word",
-      "value": "Elt Node 2"
+      "value": "Operations Node 2"
     },
     {
-      "id": "char_word_elt_node_3",
+      "id": "char_word_operations_node_3",
       "kind": "word",
-      "value": "Elt Node 3"
+      "value": "Operations Node 3"
     },
     {
       "id": "char_word_extract",
@@ -492,13 +492,13 @@
       ]
     },
     {
-      "id": "vocab_elt_3",
-      "name": "ELT",
+      "id": "vocab_operations_3",
+      "name": "Operations",
       "order": 3,
       "terms": [
-        "char_word_elt_node_1",
-        "char_word_elt_node_2",
-        "char_word_elt_node_3"
+        "char_word_operations_node_1",
+        "char_word_operations_node_2",
+        "char_word_operations_node_3"
       ],
       "connectives": [
         "char_word_extract",
@@ -620,14 +620,14 @@
       "vocabulary_ref": "vocab_class_instantiation_instance_3"
     },
     {
-      "id": "system_elt_3",
-      "name": "ELT",
+      "id": "system_operations_3",
+      "name": "Operations",
       "order": 3,
       "coherence": "Dynamism",
       "term_designation": "Impulses",
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
-      "vocabulary_ref": "vocab_elt_3"
+      "vocabulary_ref": "vocab_operations_3"
     },
     {
       "id": "system_data_1",
@@ -663,7 +663,7 @@
       "members": [
         "system:system_data_1",
         "system:system_data_2",
-        "system:system_elt_3"
+        "system:system_operations_3"
       ]
     }
   ]
