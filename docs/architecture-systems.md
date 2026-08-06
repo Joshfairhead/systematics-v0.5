@@ -114,6 +114,38 @@ at the foundations. That would carry us into the **Tetrad (Time · Space · Hypa
 Eternity)** and its **six edges**, marking the move **from Function to Being**.
 Record and pursue; do not assert.
 
+## Representation medium — AD4M, directed dyads, the reference triple [proposed]
+
+Rethinking the representation model (user, 2026-08-06):
+
+**AD4M codifies a DYAD, not a triad.** A perspective link is *first-node → predicate →
+second-node* = **subject → predicate → object** = a **directed dyad**. SPO on its own is
+a triangle with **one subject node and two object nodes** — it cannot *be* a clean triad
+by itself.
+
+**A triad is a CHAIN of SPO dyads** — the **middle term connects two triples**: the
+*object* of one becomes the *subject* of the next. Take the foundational **FBW** triad
+(Function·Being·Will) with edges **generation · consent · decision**:
+- **Expansion (1-2-3):** Will —*generation*→ Function; then Function —*consent*→ Being.
+  *"will generates function which consents to being [used]."*
+- **Concentration (2-1-3):** Function —*generation*→ Will —*decision*→ reconciler.
+- **Interaction (1-3-2):** "language is always an interaction."
+
+**Dyads are always directed** (essence *partitions* existence). So **SPO is a directed
+flow = expansion = creation**; anything using SPO in a 1-2-3 sequence is an *expansion
+operation*. **AD4M cannot do loops** — SPO is always directed / a partition; closing a K3
+needs an extra object-predicate-object hop. Applying the six laws over each node-edge-node
+gives **18 results** (3 edges × 6 permutations); the six laws read as **chains of ~5
+entries** (e.g. *will–generation–function–consent–being*). [Captured; not fully settled.]
+
+**The reference system is triadic: key · value · reference.** A **key can hold many
+values**, each with its own **reference** — you reference the *value in relation to a key*
+(the key names the *type/grouping*, e.g. `coherence`). One AD4M reading: **reference =
+subject, value = object, key = predicate** (to be ironed out). This is why a Pentad can
+take its **coherence** ("Quintessence") from **DU1** while its **terms** come from
+**DU2/DU3** — each element independently referenced; where sources conflict, assemble a
+**compound system** citing all three. (This is the shape behind #25 and #28.)
+
 ## Self-documentation → self-construction [settled goal]
 
 Self-documentation is only the **first port of call**. The real goal is to **use
