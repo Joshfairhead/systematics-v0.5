@@ -134,6 +134,32 @@ the *group* identity is `123` yet Bennett labels that **expansion**, and calls t
 3-cycle `231` **identity** — so JGB "identity" ≠ CT/group identity. Record and pursue;
 do not assert.
 
+**The S₃ multiplication table** (row ∘ col, one-line-notation composition; verified):
+
+|        | exp | idn | ord | con | fre | int |
+|--------|-----|-----|-----|-----|-----|-----|
+| **exp** (123) | exp | idn | ord | con | fre | int |
+| **idn** (231) | idn | ord | exp | fre | int | con |
+| **ord** (312) | ord | exp | idn | int | con | fre |
+| **con** (213) | con | int | fre | exp | ord | idn |
+| **fre** (321) | fre | con | int | idn | exp | ord |
+| **int** (132) | int | fre | con | ord | idn | exp |
+
+The **rotations {exp, idn, ord}** form the cyclic subgroup A₃; the **reflections
+{con, fre, int}** are the three transpositions. **exp = the group identity `e`.**
+
+**CT-axioms-as-EDGES [user's reframe, more promising than pair-grouping].** Rather
+than mapping the six laws to three axiom-*pairs*, map the three CT axioms to the
+**three edges of the FBW triad** (generation · consent · decision):
+- **composition = generation**
+- **associativity = consent**
+- **identity = decision**
+
+So the axioms live on the **edges**; the six laws are the **traversals** (S₃) of the
+triad — plausibly the **functorial semantics** of how composition applies. Note this
+makes CT-identity = the *decision* edge — **not** JGB's "identity" law (231), matching
+the confirmed mismatch. [Promising; unverified.]
+
 ## Representation medium — AD4M, directed dyads, the reference triple [proposed]
 
 Rethinking the representation model (user, 2026-08-06):
@@ -177,6 +203,32 @@ Open question: are those three laws themselves **given structure** (a triad) or 
 loosely? Structure and process **cannot be purely partitioned** — a process needs
 structure; structure is composed through process — so **something reconciles them**, and
 that reconciler looks like the identity/composition/associativity triad itself. [Open.]
+
+**DU1 categories = a horizontal Dodecad [Q2].** *What DU1 actually says:* the seed
+(`du1_perspective.py`) takes DU1 ch.2 **"The Progression of the Categories"** — its
+**12 systemic attributes** (Wholeness · Polarity · Relatedness · Subsistence ·
+Potentiality · Repetition · Structure · Individuality · Pattern · Creativity ·
+Domination · Autocracy) — and maps each onto our **`coherence`** field. So **DU1 calls
+them "categories / systemic attributes," not "coherence"** — mapping them to *coherence*
+is **our** interpretation (a reasonable one: the category is what coheres the order),
+not DU1's word. The **canonical** systems currently carry *different* coherences
+(tetrad = "Activity Field"; DU1 = "Subsistence") that are **not definitively
+referenced** — so canonical may be wrong; if DU1 proves foundational, promote DU1's
+categories to canonical. **The elegant structural fact [confirmed]:** the 12 coherence
+values, one per order, ARE a **Dodecad** — a *horizontal* 12-term sequence running
+across the header/coherence row (order 1→12). So "the coherence attribute" is itself an
+order-12 system whose terms are the categories. **[Structurally sound; adopt if the
+canonical re-declaration goes DU1's way.]**
+
+**Anchoring — the least-prescriptive substrate [proposed].** All semantics should
+attach to a **topological anchor** (position in a K_n), so different semantic triangles'
+`+` terms (Will, Source, …) attach to the *same* node (position 1). A point should know
+only *"I am position 2 of 3"* — no categorisation schema — and semantics reference it.
+(This is already the codebase shape: a **Grammar** = position-based topology; a
+**Vocabulary** = the semantic word-values that reference it. So `order × position =
+location` works *without* explicit category labels on the point.) The FP monad template
+— **type wrapper · unit/return · bind (flatMap)** — is the target shape for composable
+**code monads** (eventually all code lives in these).
 
 ## Self-documentation → self-construction [settled goal]
 

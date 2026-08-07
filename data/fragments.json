@@ -394,6 +394,56 @@
       "id": "char_word_key_value_edge",
       "kind": "word",
       "value": "Key Value Edge"
+    },
+    {
+      "id": "char_word_monad",
+      "kind": "word",
+      "value": "Monad"
+    },
+    {
+      "id": "char_word_container",
+      "kind": "word",
+      "value": "Container"
+    },
+    {
+      "id": "char_word_operations",
+      "kind": "word",
+      "value": "Operations"
+    },
+    {
+      "id": "char_word_container_operations_edge",
+      "kind": "word",
+      "value": "Container Operations Edge"
+    },
+    {
+      "id": "char_word_identity",
+      "kind": "word",
+      "value": "Identity"
+    },
+    {
+      "id": "char_word_associativity",
+      "kind": "word",
+      "value": "Associativity"
+    },
+    {
+      "id": "char_word_composition",
+      "kind": "word",
+      "value": "Composition"
+    },
+    {
+      "id": "char_word_iac_edge_1",
+      "kind": "word",
+      "value": "Iac Edge 1"
+    },
+    {
+      "id": "char_word_iac_edge_2",
+      "kind": "word",
+      "value": "Iac Edge 2"
+    },
+    {
+      "id": "char_word_iac_edge_3",
+      "kind": "word",
+      "value": "Iac Edge 3"
     }
   ],
   "coordinates": [],
@@ -606,6 +656,42 @@
       "connectives": [
         "char_word_key_value_edge"
       ]
+    },
+    {
+      "id": "vocab_monad_1",
+      "name": "Monad",
+      "order": 1,
+      "terms": [
+        "char_word_monad"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_container_operations_2",
+      "name": "Container Operations",
+      "order": 2,
+      "terms": [
+        "char_word_container",
+        "char_word_operations"
+      ],
+      "connectives": [
+        "char_word_container_operations_edge"
+      ]
+    },
+    {
+      "id": "vocab_identity_associativity_composition_3",
+      "name": "Identity Associativity Composition",
+      "order": 3,
+      "terms": [
+        "char_word_identity",
+        "char_word_associativity",
+        "char_word_composition"
+      ],
+      "connectives": [
+        "char_word_iac_edge_1",
+        "char_word_iac_edge_2",
+        "char_word_iac_edge_3"
+      ]
     }
   ],
   "systems": [
@@ -748,6 +834,36 @@
       "connective_designation": "Force",
       "grammar_ref": "grammar_2",
       "vocabulary_ref": "vocab_data_2"
+    },
+    {
+      "id": "system_monad_1",
+      "name": "Monad",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_monad_1"
+    },
+    {
+      "id": "system_container_operations_2",
+      "name": "Container Operations",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_container_operations_2"
+    },
+    {
+      "id": "system_identity_associativity_composition_3",
+      "name": "Identity Associativity Composition",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_identity_associativity_composition_3"
     }
   ],
   "perspectives": [],
@@ -764,6 +880,15 @@
         "system:system_data_1",
         "system:system_data_2",
         "system:system_operations_3"
+      ]
+    },
+    {
+      "id": "sequence_ct_monad",
+      "name": "Monad (CT)",
+      "members": [
+        "system:system_monad_1",
+        "system:system_container_operations_2",
+        "system:system_identity_associativity_composition_3"
       ]
     }
   ]

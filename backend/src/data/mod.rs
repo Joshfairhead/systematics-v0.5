@@ -491,6 +491,36 @@ pub fn build_fragments_from_tables() -> GraphContent {
         ],
     ));
 
+    // The CT monad as a sequence: Monad (1) → {Container · Operations} dyad (2) →
+    // {Identity · Associativity · Composition} triad (3). A monad needs structure
+    // (container) AND process (operations), governed by the three CT axioms.
+    push_triadic_system(&mut content, &mut have_char, "Monad", 1, &slugs(&["monad"]), &slugs(&[]));
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Container Operations",
+        2,
+        &slugs(&["container", "operations"]),
+        &slugs(&["container_operations_edge"]),
+    );
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Identity Associativity Composition",
+        3,
+        &slugs(&["identity", "associativity", "composition"]),
+        &slugs(&["iac_edge_1", "iac_edge_2", "iac_edge_3"]),
+    );
+    content.sequences.push(crate::core::Sequence::new(
+        "sequence_ct_monad",
+        "Monad (CT)",
+        vec![
+            "system:system_monad_1".to_string(),
+            "system:system_container_operations_2".to_string(),
+            "system:system_identity_associativity_composition_3".to_string(),
+        ],
+    ));
+
     content
 }
 

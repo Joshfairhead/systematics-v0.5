@@ -688,11 +688,20 @@ fn table_view(ctx: TableCtx) -> Html {
             }
             (ColKey::Cites, Row::Raw(e)) => html! { { if e.is_edge { "edge" } else { "node" } } },
             (_, Row::Raw(_)) => html! {},
-            // A Monad / Sequence row: name as a tag (with member count), members
-            // listed under Cites.
-            (ColKey::Name, Row::Seq(s)) => html! {
-                <span class="tag tag-monad">{ format!("⬡ {} ({})", s.name, s.members.len()) }</span>
-            },
+            // A Monad / Sequence row: name as a tag (member count), clickable to
+            // view its first system member in the graph.
+            (ColKey::Name, Row::Seq(s)) => {
+                let label = format!("⬡ {} ({})", s.name, s.members.len());
+                match s.members.iter().find_map(|m| m.strip_prefix("system:")) {
+                    Some(id) => {
+                        let on_load = on_load.clone();
+                        let id = id.to_string();
+                        let onclick = Callback::from(move |_: MouseEvent| on_load.emit(id.clone()));
+                        html! { <button class="tag tag-monad row-open" onclick={ onclick } title="View this monad's first member">{ label }</button> }
+                    }
+                    None => html! { <span class="tag tag-monad">{ label }</span> },
+                }
+            }
             (ColKey::Cites, Row::Seq(s)) => html! {
                 <span class="tags">
                     { for s.members.iter().map(|m| html!{ <span class="tag tag-member">{ m }</span> }) }
