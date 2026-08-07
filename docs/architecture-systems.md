@@ -106,13 +106,33 @@ triad-derived set, not an arbitrary list.)
 the **Operations** triad (renamed from ELT) links to *composition*; its operations
 are permutations of the triad.
 
-**Hypothesis [flagged as potentially big — NOT verified].** Bennett's six laws of the
-triad may **group into three pairs**, each pair mapping to one **category-theory
-axiom**: identity · composition · associativity. If so, every CT axiom becomes a
-**dyad of JGB laws** — a homoiconic bridge from category theory into Bennett's world
-at the foundations. That would carry us into the **Tetrad (Time · Space · Hyparxis ·
-Eternity)** and its **six edges**, marking the move **from Function to Being**.
-Record and pursue; do not assert.
+**The assignments (user, 2026-08-06)** — each ordering of the triad's positions →
+one law:
+
+| order | law | permutation type |
+|---|---|---|
+| 123 | **expansion** | identity perm `e` (even) |
+| 231 | **identity** | 3-cycle (even) |
+| 312 | **order** | 3-cycle (even) |
+| 132 | **interaction** | transposition (odd) |
+| 213 | **concentration** | transposition (odd) |
+| 321 | **freedom** | transposition (odd) |
+
+So the six laws **are** the symmetric group **S₃**. Even/odd splits them 3+3
+(rotations {expansion, identity, order} vs reflections {interaction, concentration,
+freedom}). Two clean 3-pairings fall out: by **reversal** (123↔321
+expansion/freedom · 132↔231 interaction/identity · 213↔312 concentration/order) or
+by **shared leading term** (start-1 {expansion, interaction} · start-2 {concentration,
+identity} · start-3 {order, freedom}).
+
+**Hypothesis [flagged as potentially big — NOT verified].** One of those 3-pairings
+maps onto **category theory's three axioms — identity · composition · associativity**
+— turning each CT axiom into a **dyad of JGB laws**: a homoiconic CT↔Bennett bridge
+at the foundations, carrying us into the **Tetrad (Time · Space · Hyparxis ·
+Eternity)** + its **six edges** (Function→Being). **Note the mismatch to resolve**:
+the *group* identity is `123` yet Bennett labels that **expansion**, and calls the
+3-cycle `231` **identity** — so JGB "identity" ≠ CT/group identity. Record and pursue;
+do not assert.
 
 ## Representation medium — AD4M, directed dyads, the reference triple [proposed]
 
@@ -123,28 +143,40 @@ second-node* = **subject → predicate → object** = a **directed dyad**. SPO o
 a triangle with **one subject node and two object nodes** — it cannot *be* a clean triad
 by itself.
 
-**A triad is a CHAIN of SPO dyads** — the **middle term connects two triples**: the
-*object* of one becomes the *subject* of the next. Take the foundational **FBW** triad
-(Function·Being·Will) with edges **generation · consent · decision**:
-- **Expansion (1-2-3):** Will —*generation*→ Function; then Function —*consent*→ Being.
-  *"will generates function which consents to being [used]."*
-- **Concentration (2-1-3):** Function —*generation*→ Will —*decision*→ reconciler.
-- **Interaction (1-3-2):** "language is always an interaction."
+**Chaining SPOs into a triad is problematic [tension — user, 2026-08-06].** Earlier we
+read a triad as a chain of directed SPO dyads (object-of-one = subject-of-next). But a
+**triad edge is UNDIRECTED**: Will→Function and Function→Will share the *same* edge
+(*generation*). A directed SPO flow can't cleanly reconstruct an undirected triad — so
+"chain through shared middle terms" is not settled. **AD4M (directed dyads) cannot do
+loops**; closing a K3 needs an extra hop, and directionality fights the triad's symmetry.
+Take **FBW** (Function·Being·Will) with edges **generation · consent · decision**; the
+six laws over each node-edge-node give **18 readings** (3 edges × 6 permutations) — e.g.
+expansion *"will generates function which consents to being"* — reading as **chains of
+~5 entries** (*will–generation–function–consent–being*). [Captured; unresolved.]
 
-**Dyads are always directed** (essence *partitions* existence). So **SPO is a directed
-flow = expansion = creation**; anything using SPO in a 1-2-3 sequence is an *expansion
-operation*. **AD4M cannot do loops** — SPO is always directed / a partition; closing a K3
-needs an extra object-predicate-object hop. Applying the six laws over each node-edge-node
-gives **18 results** (3 edges × 6 permutations); the six laws read as **chains of ~5
-entries** (e.g. *will–generation–function–consent–being*). [Captured; not fully settled.]
+**Which law is SPO? [revised — user leans *interaction*].** Prior note said SPO =
+expansion (1-2-3). Latest: **SPO ≈ interaction (132)** — subject *affirms* (+),
+*reconciled through* the predicate (=), *with* the object (−); *"language is always an
+interaction."* (Still hedged; expansion vs interaction not final.)
 
-**The reference system is triadic: key · value · reference.** A **key can hold many
-values**, each with its own **reference** — you reference the *value in relation to a key*
-(the key names the *type/grouping*, e.g. `coherence`). One AD4M reading: **reference =
-subject, value = object, key = predicate** (to be ironed out). This is why a Pentad can
-take its **coherence** ("Quintessence") from **DU1** while its **terms** come from
-**DU2/DU3** — each element independently referenced; where sources conflict, assemble a
-**compound system** citing all three. (This is the shape behind #25 and #28.)
+**The reference system is triadic — the *Data Object*: key (+) · value (−) · reference
+(=)** (seeded `system_data_object_3`; likely a Perspective once sequenced +=− / 132
+interaction). A **key holds many values**, each with its own **reference** — you
+reference the *value in relation to its key* (the key names the type/grouping, e.g.
+`coherence`). So a Pentad takes its **coherence** ("Quintessence") from **DU1** while its
+**terms** come from **DU2/DU3** — each element independently referenced; conflicts →
+assemble a **compound system** citing all three. (The shape behind #25/#28.) The user is
+**not sold on SPO** as the only shape — the reference may be a **variable-length chain**
+(*element · key · value · reference*), not just a triple; the reference triple should be
+implemented now even without composability. **CT as the substrate** is attractive but
+implementation is open.
+
+**A monad needs structure AND process.** A category-theory monad is not a real monad
+without **operations** (and they must obey **identity · composition · associativity**).
+Open question: are those three laws themselves **given structure** (a triad) or held
+loosely? Structure and process **cannot be purely partitioned** — a process needs
+structure; structure is composed through process — so **something reconciles them**, and
+that reconciler looks like the identity/composition/associativity triad itself. [Open.]
 
 ## Self-documentation → self-construction [settled goal]
 

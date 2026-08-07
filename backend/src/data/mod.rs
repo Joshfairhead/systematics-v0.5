@@ -424,6 +424,17 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["perspective_node_1", "perspective_node_2", "perspective_node_3"]),
         &slugs(&["subject", "predicate", "object"]),
     );
+    // Data Object triad [WIP] — the reference triple: key (+) · value (−) ·
+    // reference (=). A key holds many values, each independently referenced (the
+    // basis of #25/#28). Likely a Perspective once sequenced +=− / 132 interaction.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Data Object",
+        3,
+        &slugs(&["key", "value", "reference"]),
+        &slugs(&["do_edge_1", "do_edge_2", "do_edge_3"]),
+    );
     // Class · Instantiation · Instance triad [WIP] — e.g. K₄ (class) · Tetrad
     // (instantiation) · Canonical Tetrad (instance).
     push_triadic_system(
