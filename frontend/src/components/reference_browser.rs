@@ -59,6 +59,10 @@ pub struct ReferenceBrowserProps {
     pub extract_note: Option<String>,
     /// Author a new System from custom term/connective values (the editor).
     pub on_author: Callback<AuthorRequest>,
+    /// Enter a sequence/monad (its member addresses) — header buttons then
+    /// navigate within it. `on_load` is the per-system fallback.
+    #[prop_or_default]
+    pub on_view_sequence: Callback<Vec<String>>,
     /// Canonical term/connective values per order — the editor prefills from these
     /// ("open the canonical system, then customise").
     #[prop_or_default]
@@ -173,10 +177,9 @@ impl Row<'_> {
     fn kind(&self) -> CiteKind {
         match self {
             Row::Sys(_) => CiteKind::System,
-            // Monads/sequences are system-like containers → show with Systems.
-            Row::Seq(_) => CiteKind::System,
             Row::Ref(r) => cite_kind(r),
             Row::Raw(e) => if e.is_edge { CiteKind::Connective } else { CiteKind::Term },
+            Row::Seq(_) => CiteKind::Sequence,
         }
     }
     /// Lower-cased haystack for free-text search.
@@ -216,15 +219,17 @@ enum CiteKind {
     Term,
     Connective,
     System,
+    Sequence,
 }
 
-const ALL_KINDS: [CiteKind; 6] = [
+const ALL_KINDS: [CiteKind; 7] = [
     CiteKind::TermDesignation,
     CiteKind::ConnectiveDesignation,
     CiteKind::Coherence,
     CiteKind::Term,
     CiteKind::Connective,
     CiteKind::System,
+    CiteKind::Sequence,
 ];
 
 impl CiteKind {
@@ -236,6 +241,7 @@ impl CiteKind {
             CiteKind::Term => "Term",
             CiteKind::Connective => "Connective",
             CiteKind::System => "System",
+            CiteKind::Sequence => "Sequence",
         }
     }
 }
@@ -326,7 +332,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
-    let active_kinds = use_state(|| vec![CiteKind::System]);
+    let active_kinds = use_state(|| vec![CiteKind::System, CiteKind::Sequence]);
     // Editor: author a new System from custom values (the app-authored path).
     let editor_open = use_state(|| false);
     let ed_name = use_state(String::new);
@@ -475,6 +481,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                         seqs,
                         raw,
                         on_load: &props.on_load,
+                        on_view_sequence: &props.on_view_sequence,
                         filter_order,
                         search: &search,
                         sort_open: &sort_open,
@@ -592,6 +599,8 @@ struct TableCtx<'a> {
     raw: &'a [RawElement],
     /// Click a system row to view it (loads into the graph).
     on_load: &'a Callback<String>,
+    /// Click a monad row to enter it (navigate its members via the header).
+    on_view_sequence: &'a Callback<Vec<String>>,
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     search: &'a UseStateHandle<String>,
@@ -610,6 +619,7 @@ fn table_view(ctx: TableCtx) -> Html {
         seqs,
         raw,
         on_load,
+        on_view_sequence,
         filter_order,
         search,
         sort_open,
@@ -692,14 +702,13 @@ fn table_view(ctx: TableCtx) -> Html {
             // view its first system member in the graph.
             (ColKey::Name, Row::Seq(s)) => {
                 let label = format!("⬡ {} ({})", s.name, s.members.len());
-                match s.members.iter().find_map(|m| m.strip_prefix("system:")) {
-                    Some(id) => {
-                        let on_load = on_load.clone();
-                        let id = id.to_string();
-                        let onclick = Callback::from(move |_: MouseEvent| on_load.emit(id.clone()));
-                        html! { <button class="tag tag-monad row-open" onclick={ onclick } title="View this monad's first member">{ label }</button> }
-                    }
-                    None => html! { <span class="tag tag-monad">{ label }</span> },
+                if s.members.iter().any(|m| m.starts_with("system:")) {
+                    let on_view_sequence = on_view_sequence.clone();
+                    let members = s.members.clone();
+                    let onclick = Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
+                    html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this monad — header buttons navigate its members">{ label }</button> }
+                } else {
+                    html! { <span class="tag tag-monad">{ label }</span> }
                 }
             }
             (ColKey::Cites, Row::Seq(s)) => html! {

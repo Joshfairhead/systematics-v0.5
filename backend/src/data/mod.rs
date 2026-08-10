@@ -424,6 +424,18 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["perspective_node_1", "perspective_node_2", "perspective_node_3"]),
         &slugs(&["subject", "predicate", "object"]),
     );
+    // Order · Position · Location triad [WIP] — the topological anchor. `order ×
+    // position = location`; most triples attach to a location (e.g. Location ·
+    // Term-character · Source; Lines = Location · Connection · Location). May fold
+    // into a pentad.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Order Position Location",
+        3,
+        &slugs(&["order", "position", "location"]),
+        &slugs(&["opl_edge_1", "opl_edge_2", "opl_edge_3"]),
+    );
     // Data Object triad [WIP] — the reference triple: key (+) · value (−) ·
     // reference (=). A key holds many values, each independently referenced (the
     // basis of #25/#28). Likely a Perspective once sequenced +=− / 132 interaction.

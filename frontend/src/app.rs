@@ -99,6 +99,8 @@ pub enum ApiAppMsg {
     ToggleEditing,
     /// All sequences/monads loaded.
     SequencesLoaded(Vec<SequenceView>),
+    /// Enter a monad/sequence (member addresses) — navigate its members by order.
+    ViewSequence(Vec<String>),
 }
 
 pub struct ApiApp {
@@ -132,6 +134,28 @@ pub struct ApiApp {
     editing: bool,
     /// Every Sequence / Monad in the graph — shown as rows in the data view.
     sequences: Vec<SequenceView>,
+    /// When navigating inside a monad/sequence: its member addresses. Header
+    /// order buttons then load the member of that order (not the canonical one).
+    active_sequence: Option<Vec<String>>,
+}
+
+impl ApiApp {
+    /// The order of a system by id (canonical `self.systems` or `instance_systems`).
+    fn system_order(&self, id: &str) -> Option<i32> {
+        self.systems
+            .iter()
+            .find(|s| s.system_id == id)
+            .map(|s| s.order)
+            .or_else(|| self.instance_systems.iter().find(|s| s.id == id).map(|s| s.order))
+    }
+    /// The sequence member (system id) whose resolved order matches, if any.
+    fn sequence_member_for_order(&self, members: &[String], order: i32) -> Option<String> {
+        members
+            .iter()
+            .filter_map(|m| m.strip_prefix("system:"))
+            .find(|id| self.system_order(id) == Some(order))
+            .map(|id| id.to_string())
+    }
 }
 
 impl Component for ApiApp {
@@ -228,6 +252,7 @@ impl Component for ApiApp {
             extract_note: None,
             editing: false,
             sequences: vec![],
+            active_sequence: None,
         }
     }
 
@@ -245,10 +270,32 @@ impl Component for ApiApp {
                     // Nullad = the unbounded "all". No single system to render:
                     // a blank canvas in graph mode (future: an all-and-everything
                     // undirected graph), no order filter in data mode.
+                    self.active_sequence = None; // leave any monad context
                     self.selected_system = None;
                     self.system_references = vec![];
                     self.loading = false;
                     return true;
+                }
+
+                // Inside a monad/sequence: the header navigates its members by
+                // order (e.g. Monad(CT)→Dyad = Container·Operations, not canonical).
+                if let Some(members) = self.active_sequence.clone() {
+                    if let Some(order) = order_for_key(&name) {
+                        if let Some(id) = self.sequence_member_for_order(&members, order) {
+                            self.loading = true;
+                            let link = ctx.link().clone();
+                            let client = self.graphql_client.clone();
+                            spawn_local(async move {
+                                match client.fetch_rendered_by_id(&id).await {
+                                    Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                                    Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                                }
+                            });
+                            return true;
+                        }
+                    }
+                    // No member at this order → leave the monad, fall to canonical.
+                    self.active_sequence = None;
                 }
 
                 self.loading = true;
@@ -451,6 +498,28 @@ impl Component for ApiApp {
                 self.extract_note = Some(note);
                 true
             }
+            ApiAppMsg::ViewSequence(members) => {
+                // Enter a monad/sequence: show its first system member in the graph;
+                // the header then navigates the rest by order.
+                self.mode = ViewMode::Graph;
+                self.breadcrumbs.clear();
+                let first = members
+                    .iter()
+                    .find_map(|m| m.strip_prefix("system:").map(|s| s.to_string()));
+                self.active_sequence = Some(members);
+                if let Some(id) = first {
+                    self.loading = true;
+                    let link = ctx.link().clone();
+                    let client = self.graphql_client.clone();
+                    spawn_local(async move {
+                        match client.fetch_rendered_by_id(&id).await {
+                            Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                            Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                        }
+                    });
+                }
+                true
+            }
             ApiAppMsg::ToggleEditing => {
                 self.editing = !self.editing;
                 true
@@ -501,6 +570,7 @@ impl Component for ApiApp {
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
         let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
         let on_author = ctx.link().callback(ApiAppMsg::AuthorSystem);
+        let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
         // Canonical term/connective values per order — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
             .systems
@@ -593,6 +663,7 @@ impl Component for ApiApp {
                                 templates={ templates }
                                 raw_elements={ raw_elements }
                                 sequences={ self.sequences.clone() }
+                                on_view_sequence={ on_view_sequence }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for
