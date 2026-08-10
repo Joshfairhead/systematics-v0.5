@@ -65,12 +65,17 @@ the graph · `proposed` = named but not built/settled.
 - **Nullad** (all elements) → **Extract** → **Monad** (a scoped subset, a real `Sequence`) → **core sequence** (articulates the monad).
 - **Goal = self-construction:** track each feature as a **fragment** in the Monad, then **fold it in**. Self-documentation is the first port of call.
 - **Determining conditions** (six laws over Time·Hyparxis·Eternity·Space) = *what the system exists to codify*.
+- **Sequence-context navigation (built):** enter a monad → the header order-buttons step its **members** by order (Monad(CT)→Dyad loads Container·Operations). Sequences are a filterable element kind.
+- **Order·Position·Location** seeded as the topological anchor (order × position = location).
 
 **Open / unresolved (do not assert):**
 - **Typing [proposal pending sign-off]:** the noun=vertex / verb=edge rule holds with **no exceptions**; "reconciler-typed" is dropped. The operation-verbs (search·sort·filter·tag + extract·load·transform) are **edges**, a fragment whose vertices are TBD — plausibly the **7 edges at the "Critical Functions" node of the Octad**. See *Proposal — typing & the operations*.
 - **Sort/Filter semantics** stay as edge-fragments (latest UI reading: Sort = select header tags, Filter = scope data by degree); the **by-key/by-value** dyad is under review; pursue the **Data → key·value → ELT** sequence. The **symmetric-doubling** worked example that used by-key/value is superseded.
 - **SPO ↔ category-theory ↔ systematics** are three *interchangeable* mediums (none primary); switching needs representational transforms — **not built**.
 - **Folding-in = CT-style composition** — not built (needs CT represented in-graph).
+- **CT axioms ↔ systematics:** axioms-as-edges is **cooled off** (user, 2026-08-10); no favoured mapping. **Traversal logic** (how S₃ laws act as moves over a K_n; how folding composes them) is the **open problem**, ahead of any CT bridge.
+- **The view's reconciler:** revised to **Systems (=) / Sort (+) / Filter (−)** (compose the view *from* systems) — supersedes "Tag (=)"; the **metadata-dodecads-as-rules** data model (4 order-12 systems → match → RAG operation) is proposed, not built.
+- **The location web:** Order·Position·Location + Location·Term·Source + Lines(=Location·Connection·Location) is a **mixed fragment that may fold into a pentad** — containing whole unknown.
 - **Scoping shape:** order × degree, 3-D+ (DU1 geometry); order/degree terminology unsettled.
 - **Determining conditions:** hexad-of-laws vs tetrad-with-law-edges vs both.
 - **Perspective** may be retired into the SPO substrate.
@@ -159,6 +164,17 @@ So the axioms live on the **edges**; the six laws are the **traversals** (S₃) 
 triad — plausibly the **functorial semantics** of how composition applies. Note this
 makes CT-identity = the *decision* edge — **not** JGB's "identity" law (231), matching
 the confirmed mismatch. [Promising; unverified.]
+
+**Cooled off (user, 2026-08-10):** *"I'm not sure about the CT axioms as edges."* The
+edge mapping is **no longer favoured** — treat it as one candidate, not the working
+model. Both the axioms-as-pairs and the axioms-as-edges readings stay parked.
+
+**Traversal logic is the open problem [user, 2026-08-10].** Whatever CT ends up mapping
+to, *how you walk a sequence/graph* is still unspecified. Entering a monad and stepping
+its members by **order** (Monad→Dyad→Triad) is the first concrete traversal we built
+(sequence-context navigation, `app.rs`), but the general rule — how the six laws (S₃)
+act as *moves* over a triad/K_n, and how folding-in composes those moves — is **not
+settled**. This is the next thing to figure out, ahead of committing to any CT bridge.
 
 ## Representation medium — AD4M, directed dyads, the reference triple [proposed]
 
@@ -270,6 +286,18 @@ reconciles Sort (+) and Filter (−)**. Sort prioritises the list by a tag; Filt
 adds/removes tags from the query. Because a tag is `key : value`, each splits along
 the **by-key ↔ by-value** dyad.
 
+**Revised reconciler — Systems (=), not Tag (user, 2026-08-10).** The view should be
+**composed from systems themselves**, not from a free-floating notion of "tag." A tag's
+keys are just the terms of the **metadata dodecads** (see next section), and those
+dodecads *are* systems. So the query triad is now read as **Systems (=) reconciles
+Sort (+) and Filter (−)**: **Sort** selects which system's terms become the **columns**
+(which dodecad's keys you look through), **Filter** scopes the **rows** (which values /
+instances survive), and **Systems** is the reconciling middle — the metadata-systems the
+whole view is built out of. This supersedes "Tag (=)" as the reconciler while keeping the
++/−/= assignment (Sort affirms an ordering, Filter denies rows, Systems reconciles). It
+also makes the view **self-hosting**: the thing you browse *with* is made of the same
+systems you browse. [proposed — the current working reading.]
+
 **Scoping is multi-dimensional [proposed — more than a matrix].** Locating a
 specific element is a relation of at least **order** (the system name, 1→12) and
 **degree** (term-designation / connective-designation / coherence / term /
@@ -308,6 +336,73 @@ English, and a **triad** in systematics — with **representational transforms**
 between the three. (Linking semantics to a topological node reads as CT *associates*
 — "will *associates* node-1" — not "couples".) So Perspective is the *medium*, but
 the medium carries richer semantics extended by category theory.
+
+## Metadata dodecads as rules [proposed — the data model]
+
+**The fundamental unit is a system.** Everything else is described *by* systems, and
+that description is itself made of systems — specifically **order-12 systems** (Dodecads),
+one per metadata dimension. This is the concrete form of "compose the view from systems."
+
+**The stack of metadata dodecads (user, 2026-08-10).** A system is pinned down by
+applying several 12-term systems to it:
+1. **A 12-term system articulates the *set of systems*** — the roster/enumeration of the
+   twelve orders (Monad … Dodecad). This is the *order* axis: every system has an order
+   1→12, i.e. it is a term of this dodecad.
+2. **A 12-term system supplies the `coherence` attribute** — the **DU1 horizontal
+   Dodecad** (Wholeness · Polarity · … · Autocracy), one coherence value per order. (See
+   *Representation medium — DU1 categories = a horizontal Dodecad*.)
+3. **A 12-term system supplies `term_designation`** and **a fourth supplies
+   `connective_designation`** — the impulse/act names (terms) and the force/relation
+   names (connectives) drawn per order.
+
+So each **column** in the data view is the **terms of one metadata dodecad**; a system's
+row is where it lands in each. The metadata is *not* ad-hoc fields — it is **four order-12
+systems** applied to the base system.
+
+**The metadata acts as a set of rules.** Once every system carries `{order, coherence,
+term-designation, connective-designation}` as dodecad-terms, you can **match over them**:
+
+> `match: system.name is Triad AND coherence is Dynamism → …`
+
+A rule is a **pattern over the metadata columns** (the keys) selecting a **value** in
+each — i.e. the same **key : value** tag mechanism, now read as a query predicate. This
+connects directly to **Sort/Filter** (Filter = the match clause; Sort = which columns you
+match on) and to the **Systems (=) reconciler** above.
+
+**The rule's action is an Operations/Composition (RAG) triad [user, 2026-08-10].** The
+"→" of a rule is plausibly the **RAG/Composition** triad applied as an operation:
+**retrieve data · augment with graph · generate vocabulary** (`system_composition_3`,
+Retrieve·Augment·Generate). So: *match the metadata* (the pattern) → *retrieve* the
+matching systems → *augment* with their graph neighbourhood → *generate* new vocabulary
+(a derived system/term). Rules are therefore **systems acting on systems** — the
+self-construction loop expressed as query + composition. [proposed; the operation triad
+binding is a working guess, not built.]
+
+## The location web — Order · Position · Location and its triples [proposed]
+
+**Order · Position · Location is a seeded architectural triad** (`system_order_position_
+location_3`). It is the **topological anchor** made explicit: **order × position =
+location**. An element does not need a category schema — it needs only to know *"I am
+position p of an order-n system"*, and that `(order, position)` pair **is** its location
+(a node in a K_n). Semantics then *reference* the location rather than living on it (the
+Grammar = topology, Vocabulary = referencing words split — see *Anchoring*).
+
+**Triples attach to a location [user, 2026-08-10].** With a location as the stable anchor,
+we codify further triads that hang off it:
+- **Location · Term · Source** — *this location* carries *this term character*, per *this
+  source* (the provenance triple, the shape behind the reference/citation model). A
+  location can hold many such triples (one per perspective/source), which is exactly the
+  cross-perspective comparison the Reference Browser exists for.
+- **Lines are triples too: Location · Connection · Location** — an **edge** is a triple of
+  two locations joined by a connection. (Nodes are anchored by `(order, position)`; edges
+  are anchored by the *pair* of locations they join.) This gives edges the same
+  first-class, referenceable footing as nodes (the #28 direction).
+
+**A mixed system that may fold into a pentad [user, 2026-08-10, flagged].** Order,
+Position, Location, Term, Source, Connection are not one clean triad — they interlock
+(a triad of anchoring + a triad of attachment + a triad of connection). The user
+suspects this **"interesting mixed system … MAY filter into a pentad."** Tracked as a
+fragment; the containing whole (pentad?) is **not yet known** — do not assert its order.
 
 ## The generative process — symmetric doubling [proposed]
 
