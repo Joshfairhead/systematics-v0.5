@@ -63,6 +63,13 @@ pub struct ReferenceBrowserProps {
     /// navigate within it. `on_load` is the per-system fallback.
     #[prop_or_default]
     pub on_view_sequence: Callback<Vec<String>>,
+    /// Delete a sequence/monad by id (the ✕ on a monad row).
+    #[prop_or_default]
+    pub on_delete_sequence: Callback<String>,
+    /// When a **bucket** monad is entered, scope the table to just these member
+    /// addresses (`system:<id>`). `None` = no scope (the whole registry).
+    #[prop_or_default]
+    pub scope_ids: Option<Vec<String>>,
     /// Canonical term/connective values per order — the editor prefills from these
     /// ("open the canonical system, then customise").
     #[prop_or_default]
@@ -293,6 +300,15 @@ fn passes_row(row: Row, filter_order: Option<i32>, active_kinds: &[CiteKind], ne
         && active_kinds.contains(&row.kind())
         && (needle.is_empty() || row.hay().contains(needle))
 }
+/// Whether a row falls inside a **bucket scope** (a monad's member addresses).
+/// `None` = no scope (whole registry). A scoped view lists only the members
+/// (systems addressed as `system:<id>`, plus references onto them).
+fn in_scope(row: &Row, scope: Option<&[String]>) -> bool {
+    match scope {
+        None => true,
+        Some(members) => row.system_addr().is_some_and(|a| members.iter().any(|m| *m == a)),
+    }
+}
 
 /// All Nullad rows (every System + Sequence/Monad + Reference + focused raw
 /// node/edge), unfiltered.
@@ -346,6 +362,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let seqs = &props.sequences;
     // The order filter comes from the header (Nullad = None = all).
     let filter_order = props.filter_order;
+    // A bucket monad scopes the view to its members (a group for sorting).
+    let scope = props.scope_ids.as_deref();
 
     // Caption for the active header scope.
     let scope_label = match filter_order {
@@ -360,6 +378,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let extract_members: Vec<String> = all_rows(systems, seqs, refs, raw)
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, &active_kinds, &needle))
+        .filter(|row| in_scope(row, scope))
         .filter_map(|row| row.system_addr())
         .filter(|m| seen.insert(m.clone()))
         .collect();
@@ -482,7 +501,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                         raw,
                         on_load: &props.on_load,
                         on_view_sequence: &props.on_view_sequence,
+                        on_delete_sequence: &props.on_delete_sequence,
                         filter_order,
+                        scope,
                         search: &search,
                         sort_open: &sort_open,
                         visible_cols: &visible_cols,
@@ -601,8 +622,12 @@ struct TableCtx<'a> {
     on_load: &'a Callback<String>,
     /// Click a monad row to enter it (navigate its members via the header).
     on_view_sequence: &'a Callback<Vec<String>>,
+    /// Delete a monad row (the ✕).
+    on_delete_sequence: &'a Callback<String>,
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
+    /// Bucket scope — when a bucket monad is entered, show only its members.
+    scope: Option<&'a [String]>,
     search: &'a UseStateHandle<String>,
     /// Sort (=) popover — selecting the header tags (which keys are columns).
     sort_open: &'a UseStateHandle<bool>,
@@ -620,7 +645,9 @@ fn table_view(ctx: TableCtx) -> Html {
         raw,
         on_load,
         on_view_sequence,
+        on_delete_sequence,
         filter_order,
+        scope,
         search,
         sort_open,
         visible_cols,
@@ -634,6 +661,7 @@ fn table_view(ctx: TableCtx) -> Html {
     let mut rows: Vec<Row> = all_rows(systems, seqs, refs, raw)
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
+        .filter(|row| in_scope(row, scope))
         .collect();
     // Default row order: by systematic order (the header axis).
     rows.sort_by_key(|row| row.order());
@@ -702,14 +730,24 @@ fn table_view(ctx: TableCtx) -> Html {
             // view its first system member in the graph.
             (ColKey::Name, Row::Seq(s)) => {
                 let label = format!("⬡ {} ({})", s.name, s.members.len());
-                if s.members.iter().any(|m| m.starts_with("system:")) {
+                let del = {
+                    let on_delete_sequence = on_delete_sequence.clone();
+                    let id = s.id.clone();
+                    let onclick = Callback::from(move |e: MouseEvent| {
+                        e.stop_propagation();
+                        on_delete_sequence.emit(id.clone());
+                    });
+                    html! { <button class="row-delete" onclick={ onclick } title="Delete this monad">{ "✕" }</button> }
+                };
+                let name_tag = if s.members.iter().any(|m| m.starts_with("system:")) {
                     let on_view_sequence = on_view_sequence.clone();
                     let members = s.members.clone();
                     let onclick = Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
                     html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this monad — header buttons navigate its members">{ label }</button> }
                 } else {
                     html! { <span class="tag tag-monad">{ label }</span> }
-                }
+                };
+                html! { <span class="monad-cell">{ name_tag }{ del }</span> }
             }
             (ColKey::Cites, Row::Seq(s)) => html! {
                 <span class="tags">

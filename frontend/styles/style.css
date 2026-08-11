@@ -218,6 +218,24 @@ body {
         0 4px 12px rgba(163, 177, 198, 0.25);
 }
 
+/* Order buttons unreachable in the current monad context — greyed, unclickable. */
+.nav-button.disabled,
+.nav-button:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    filter: grayscale(0.5);
+}
+.nav-button.disabled:hover,
+.nav-button:disabled:hover {
+    background: rgba(255, 255, 255, 0.5);
+    color: #4a5568;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transform: none;
+    box-shadow: none;
+}
+
 .main-view {
     flex: 1;
     display: flex;
@@ -831,6 +849,27 @@ button.row-open:hover {
     background: rgba(37, 99, 235, 0.16);
     color: #1d4ed8;
     font-weight: 600;
+}
+/* A monad row: the name tag with a small delete ✕ trailing it. */
+.monad-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.row-delete {
+    border: none;
+    background: transparent;
+    color: #b0367a;
+    cursor: pointer;
+    font-size: 0.72rem;
+    line-height: 1;
+    padding: 0.15rem 0.3rem;
+    border-radius: 6px;
+    opacity: 0.55;
+}
+.row-delete:hover {
+    opacity: 1;
+    background: rgba(214, 40, 118, 0.14);
 }
 .tag-member {
     background: rgba(163, 177, 198, 0.22);

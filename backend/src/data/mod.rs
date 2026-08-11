@@ -533,6 +533,40 @@ pub fn build_fragments_from_tables() -> GraphContent {
         ],
     ));
 
+    // ---- Author-contributed triads (perspective/tag, not architectural) ----
+
+    // Requests triad [Josh Fairhead] — Ask (+) · Context (−) · Urgency (=): the
+    // shape of a request (what is asked, in what context, at what urgency).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Requests",
+        3,
+        &slugs(&["ask", "context", "urgency"]),
+        &slugs(&["requests_edge_1", "requests_edge_2", "requests_edge_3"]),
+    );
+    // Identification triad [Ouspensky, The Fourth Way] — Like (+) · Dislike (−) ·
+    // Identification (=): like and dislike are both identification.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Identification",
+        3,
+        &slugs(&["like", "dislike", "identification"]),
+        &slugs(&["identification_edge_1", "identification_edge_2", "identification_edge_3"]),
+    );
+    // Negative-emotion triad [Ouspensky, The Fourth Way] — Negative emotion (+) ·
+    // Identification (−) · Imagination (=). Shares the `identification` character
+    // with the Identification triad (same term, reused across systems).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Negative Emotion",
+        3,
+        &slugs(&["negative_emotion", "identification", "imagination"]),
+        &slugs(&["ne_edge_1", "ne_edge_2", "ne_edge_3"]),
+    );
+
     content
 }
 

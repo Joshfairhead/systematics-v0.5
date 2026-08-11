@@ -474,6 +474,91 @@
       "id": "char_word_iac_edge_3",
       "kind": "word",
       "value": "Iac Edge 3"
+    },
+    {
+      "id": "char_word_ask",
+      "kind": "word",
+      "value": "Ask"
+    },
+    {
+      "id": "char_word_context",
+      "kind": "word",
+      "value": "Context"
+    },
+    {
+      "id": "char_word_urgency",
+      "kind": "word",
+      "value": "Urgency"
+    },
+    {
+      "id": "char_word_requests_edge_1",
+      "kind": "word",
+      "value": "Requests Edge 1"
+    },
+    {
+      "id": "char_word_requests_edge_2",
+      "kind": "word",
+      "value": "Requests Edge 2"
+    },
+    {
+      "id": "char_word_requests_edge_3",
+      "kind": "word",
+      "value": "Requests Edge 3"
+    },
+    {
+      "id": "char_word_like",
+      "kind": "word",
+      "value": "Like"
+    },
+    {
+      "id": "char_word_dislike",
+      "kind": "word",
+      "value": "Dislike"
+    },
+    {
+      "id": "char_word_identification",
+      "kind": "word",
+      "value": "Identification"
+    },
+    {
+      "id": "char_word_identification_edge_1",
+      "kind": "word",
+      "value": "Identification Edge 1"
+    },
+    {
+      "id": "char_word_identification_edge_2",
+      "kind": "word",
+      "value": "Identification Edge 2"
+    },
+    {
+      "id": "char_word_identification_edge_3",
+      "kind": "word",
+      "value": "Identification Edge 3"
+    },
+    {
+      "id": "char_word_negative_emotion",
+      "kind": "word",
+      "value": "Negative Emotion"
+    },
+    {
+      "id": "char_word_imagination",
+      "kind": "word",
+      "value": "Imagination"
+    },
+    {
+      "id": "char_word_ne_edge_1",
+      "kind": "word",
+      "value": "Ne Edge 1"
+    },
+    {
+      "id": "char_word_ne_edge_2",
+      "kind": "word",
+      "value": "Ne Edge 2"
+    },
+    {
+      "id": "char_word_ne_edge_3",
+      "kind": "word",
+      "value": "Ne Edge 3"
     }
   ],
   "coordinates": [],
@@ -737,6 +822,51 @@
         "char_word_iac_edge_2",
         "char_word_iac_edge_3"
       ]
+    },
+    {
+      "id": "vocab_requests_3",
+      "name": "Requests",
+      "order": 3,
+      "terms": [
+        "char_word_ask",
+        "char_word_context",
+        "char_word_urgency"
+      ],
+      "connectives": [
+        "char_word_requests_edge_1",
+        "char_word_requests_edge_2",
+        "char_word_requests_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_identification_3",
+      "name": "Identification",
+      "order": 3,
+      "terms": [
+        "char_word_like",
+        "char_word_dislike",
+        "char_word_identification"
+      ],
+      "connectives": [
+        "char_word_identification_edge_1",
+        "char_word_identification_edge_2",
+        "char_word_identification_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_negative_emotion_3",
+      "name": "Negative Emotion",
+      "order": 3,
+      "terms": [
+        "char_word_negative_emotion",
+        "char_word_identification",
+        "char_word_imagination"
+      ],
+      "connectives": [
+        "char_word_ne_edge_1",
+        "char_word_ne_edge_2",
+        "char_word_ne_edge_3"
+      ]
     }
   ],
   "systems": [
@@ -919,6 +1049,36 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_identity_associativity_composition_3"
+    },
+    {
+      "id": "system_requests_3",
+      "name": "Requests",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_requests_3"
+    },
+    {
+      "id": "system_identification_3",
+      "name": "Identification",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_identification_3"
+    },
+    {
+      "id": "system_negative_emotion_3",
+      "name": "Negative Emotion",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_negative_emotion_3"
     }
   ],
   "perspectives": [],

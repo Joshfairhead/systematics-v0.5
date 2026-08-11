@@ -15,6 +15,11 @@ pub struct SystemSelectorProps {
     pub systems: Vec<SystemDisplay>,
     /// The selected header key (`"nullad"`, `"monad"`, …).
     pub selected: String,
+    /// Which order keys are *reachable*. `None` = canonical (all enabled). When a
+    /// sequence/monad is loaded, only the orders it contains stay clickable; the
+    /// rest are greyed out (impossible in that context). Nullad is always enabled.
+    #[prop_or_default]
+    pub enabled: Option<Vec<String>>,
     pub on_select: Callback<String>,
     /// Which view of the Data is active (Graph or Table).
     pub mode: ViewMode,
@@ -54,6 +59,12 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
                 {
                     props.systems.iter().map(|system| {
                         let is_selected = system.name == props.selected;
+                        // In a sequence context, orders the sequence doesn't contain
+                        // are unreachable → greyed out and unclickable.
+                        let disabled = props
+                            .enabled
+                            .as_ref()
+                            .is_some_and(|e| !e.contains(&system.name));
                         let system_name = system.name.clone();
                         let onclick = {
                             let on_select = props.on_select.clone();
@@ -62,11 +73,19 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
                             })
                         };
 
+                        let class = if is_selected {
+                            "nav-button selected"
+                        } else if disabled {
+                            "nav-button disabled"
+                        } else {
+                            "nav-button"
+                        };
                         html! {
                             <button
-                                class={ if is_selected { "nav-button selected" } else { "nav-button" } }
+                                class={ class }
+                                disabled={ disabled }
                                 onclick={ onclick }
-                                title={ system.k_notation.clone() }
+                                title={ if disabled { "Not in this monad's sequence".to_string() } else { system.k_notation.clone() } }
                             >
                                 { &system.display_name }
                             </button>

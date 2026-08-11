@@ -150,6 +150,12 @@ struct SequencesResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct DeleteSequenceResponse {
+    #[serde(rename = "deleteSequence")]
+    delete_sequence: bool,
+}
+
+#[derive(Deserialize, Debug)]
 struct AuthorSystemResponse {
     #[serde(rename = "authorSystem")]
     author_system: Option<InstanceSystem>,
@@ -510,6 +516,25 @@ impl GraphQLClient {
             .data
             .and_then(|d| d.create_sequence)
             .ok_or_else(|| ApiError::ParseError("createSequence returned no data".to_string()))
+    }
+
+    /// Delete a Sequence (Monad) by id — removes it from the graph and the user
+    /// store. Used to clear stray Extract monads. Returns whether it existed.
+    pub async fn delete_sequence(&self, id: &str) -> Result<bool, ApiError> {
+        let query = r#"
+            mutation DeleteSequence($id: String!) {
+                deleteSequence(id: $id)
+            }
+        "#;
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<DeleteSequenceResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.delete_sequence).unwrap_or(false))
     }
 
     /// Author a System from custom term/connective **values** (the in-app editor

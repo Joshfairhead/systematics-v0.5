@@ -115,11 +115,11 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 18 fragments + 17 module-owned.
+    // Total systems = 12 canonical + 1 citation + 21 fragments + 17 module-owned.
     assert_eq!(
         graph.systems.len(),
-        48,
-        "expected 12 canonical + 1 citation + 18 fragment + 17 module systems"
+        51,
+        "expected 12 canonical + 1 citation + 21 fragment + 17 module systems"
     );
 }
 
@@ -162,28 +162,25 @@ fn architectural_monad_registry_loads() {
     let monad = graph
         .sequence("sequence_architectural_monad")
         .expect("Architectural Monad registry loaded from its module");
+    // A **bucket**: the architecture systems grouped for sorting (several triads,
+    // so it is not an order-linear sequence). Order does not matter here.
     assert_eq!(
         monad.members,
         vec![
-            "system:system_architecture_pentad_5",
+            "system:system_data_2",
+            "system:system_order_position_location_3",
             "system:system_citation_3",
-            "perspective:elt_triad",
-            "perspective:sort_tag_filter_triad",
-            "perspective:query_axis_dyad",
-            "perspective:data_graph_table_triad",
-            "perspective:class_instantiation_instance_triad",
-            "perspective:compose",
-            "perspective:edit",
+            "system:system_identity_associativity_composition_3",
+            "system:system_architecture_pentad_5",
+            "system:system_architecture_octad_8",
         ]
     );
-    // The Monad tracks features as fragments: seeded members resolve; fragments
-    // still to be folded in are *implicit* (dangling) addresses — tracked but not
-    // yet assembled into a graph object.
-    assert!(graph.resolves("system:system_architecture_pentad_5"));
+    // Seeded members resolve; the architecture **octad** is documented but not yet
+    // seeded — a *dangling* address (tracked, not yet assembled into a system).
+    assert!(graph.resolves("system:system_data_2"));
+    assert!(graph.resolves("system:system_order_position_location_3"));
     assert!(graph.resolves("system:system_citation_3"));
-    assert!(!graph.resolves("perspective:elt_triad"));
-    assert!(!graph.resolves("perspective:sort_tag_filter_triad"));
-    assert!(!graph.resolves("perspective:query_axis_dyad"));
-    assert!(!graph.resolves("perspective:data_graph_table_triad"));
-    assert!(!graph.resolves("perspective:class_instantiation_instance_triad"));
+    assert!(graph.resolves("system:system_identity_associativity_composition_3"));
+    assert!(graph.resolves("system:system_architecture_pentad_5"));
+    assert!(!graph.resolves("system:system_architecture_octad_8"));
 }

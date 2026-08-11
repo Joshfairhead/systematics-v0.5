@@ -101,6 +101,8 @@ pub enum ApiAppMsg {
     SequencesLoaded(Vec<SequenceView>),
     /// Enter a monad/sequence (member addresses) — navigate its members by order.
     ViewSequence(Vec<String>),
+    /// Delete a Sequence/Monad by id (e.g. a stray Extract monad), then refresh.
+    DeleteSequence(String),
 }
 
 pub struct ApiApp {
@@ -137,6 +139,10 @@ pub struct ApiApp {
     /// When navigating inside a monad/sequence: its member addresses. Header
     /// order buttons then load the member of that order (not the canonical one).
     active_sequence: Option<Vec<String>>,
+    /// When a **bucket** monad is entered (a group, not an order-linear sequence),
+    /// the data view is scoped to just these member addresses — the "group for
+    /// sorting" the Architectural Monad provides. `None` = no scope (whole registry).
+    scope_members: Option<Vec<String>>,
 }
 
 impl ApiApp {
@@ -155,6 +161,36 @@ impl ApiApp {
             .filter_map(|m| m.strip_prefix("system:"))
             .find(|id| self.system_order(id) == Some(order))
             .map(|id| id.to_string())
+    }
+    /// The distinct orders of a sequence's *system* members, in ascending order.
+    fn member_orders(&self, members: &[String]) -> Vec<i32> {
+        let mut orders: Vec<i32> = members
+            .iter()
+            .filter_map(|m| m.strip_prefix("system:"))
+            .filter_map(|id| self.system_order(id))
+            .collect();
+        orders.sort_unstable();
+        orders.dedup();
+        orders
+    }
+    /// An **ordered core-sequence** has at most one member per order, so the header
+    /// can step it order-by-order (Monad→Dyad→Triad). A **bucket** (e.g. the
+    /// Architectural Monad — several triads) fails this and is treated as a group.
+    fn is_order_navigable(&self, members: &[String]) -> bool {
+        let system_members = members.iter().filter(|m| m.starts_with("system:")).count();
+        system_members > 0 && self.member_orders(members).len() == system_members
+    }
+    /// The header keys reachable in the current context. `None` when not in a
+    /// sequence (canonical: all enabled). In an order-navigable sequence, only the
+    /// member orders are enabled. In a bucket, no order button is enabled (it is a
+    /// group, not a path — you filter it in the table; Nullad exits).
+    fn enabled_order_keys(&self) -> Option<Vec<String>> {
+        let members = self.active_sequence.as_ref()?;
+        if self.is_order_navigable(members) {
+            Some(self.member_orders(members).into_iter().map(key_for_order).collect())
+        } else {
+            Some(Vec::new())
+        }
     }
 }
 
@@ -253,6 +289,7 @@ impl Component for ApiApp {
             editing: false,
             sequences: vec![],
             active_sequence: None,
+            scope_members: None,
         }
     }
 
@@ -267,19 +304,24 @@ impl Component for ApiApp {
                 self.error = None;
 
                 if name == "nullad" {
-                    // Nullad = the unbounded "all". No single system to render:
-                    // a blank canvas in graph mode (future: an all-and-everything
-                    // undirected graph), no order filter in data mode.
+                    // Nullad = the unbounded "all", and the reset: clicking it drops
+                    // any monad context and scope, back to the whole registry. No
+                    // single system to render (blank canvas in graph mode), no order
+                    // filter and no member-scope in data mode.
                     self.active_sequence = None; // leave any monad context
+                    self.scope_members = None; // drop any bucket scope
                     self.selected_system = None;
                     self.system_references = vec![];
                     self.loading = false;
                     return true;
                 }
 
-                // Inside a monad/sequence: the header navigates its members by
-                // order (e.g. Monad(CT)→Dyad = Container·Operations, not canonical).
+                // Inside an *order-navigable* monad/sequence: the header navigates its
+                // members by order (e.g. Monad(CT)→Dyad = Container·Operations, not
+                // canonical). Buckets (several members of the same order) aren't
+                // order-linear — their order buttons are greyed, so this is skipped.
                 if let Some(members) = self.active_sequence.clone() {
+                    if self.is_order_navigable(&members) {
                     if let Some(order) = order_for_key(&name) {
                         if let Some(id) = self.sequence_member_for_order(&members, order) {
                             self.loading = true;
@@ -296,6 +338,7 @@ impl Component for ApiApp {
                     }
                     // No member at this order → leave the monad, fall to canonical.
                     self.active_sequence = None;
+                    }
                 }
 
                 self.loading = true;
@@ -451,8 +494,11 @@ impl Component for ApiApp {
             ApiAppMsg::LoadInstance(id) => {
                 // Replace the canvas with the loaded instance system (single canvas).
                 // Load is the ELT triad's edge on the data view, so switch to the
-                // graph mode to reveal what was loaded.
+                // graph mode to reveal what was loaded. Loading a standalone system
+                // leaves any monad/bucket context (its grouping no longer applies).
                 self.mode = ViewMode::Graph;
+                self.active_sequence = None;
+                self.scope_members = None;
                 self.breadcrumbs.clear();
                 self.loading = true;
                 self.error = None;
@@ -499,24 +545,37 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ViewSequence(members) => {
-                // Enter a monad/sequence: show its first system member in the graph;
-                // the header then navigates the rest by order.
-                self.mode = ViewMode::Graph;
                 self.breadcrumbs.clear();
-                let first = members
-                    .iter()
-                    .find_map(|m| m.strip_prefix("system:").map(|s| s.to_string()));
-                self.active_sequence = Some(members);
-                if let Some(id) = first {
-                    self.loading = true;
-                    let link = ctx.link().clone();
-                    let client = self.graphql_client.clone();
-                    spawn_local(async move {
-                        match client.fetch_rendered_by_id(&id).await {
-                            Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
-                            Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
-                        }
-                    });
+                if self.is_order_navigable(&members) {
+                    // Ordered core-sequence (Monad(CT), Data): enter it in the graph;
+                    // the header then steps its members by order, greying the rest.
+                    self.mode = ViewMode::Graph;
+                    self.scope_members = None;
+                    let first = members
+                        .iter()
+                        .find_map(|m| m.strip_prefix("system:").map(|s| s.to_string()));
+                    self.active_sequence = Some(members);
+                    if let Some(id) = first {
+                        self.loading = true;
+                        let link = ctx.link().clone();
+                        let client = self.graphql_client.clone();
+                        spawn_local(async move {
+                            match client.fetch_rendered_by_id(&id).await {
+                                Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                                Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                            }
+                        });
+                    }
+                } else {
+                    // Bucket (Architectural Monad — several triads): not a path but a
+                    // group. Scope the Table to its members for sorting; the order
+                    // buttons are greyed (no single order to step to). Nullad exits.
+                    self.mode = ViewMode::Table;
+                    self.selected_key = "nullad".to_string(); // drop any order filter
+                    self.active_sequence = Some(members.clone());
+                    self.scope_members = Some(members);
+                    self.selected_system = None;
+                    self.loading = false;
                 }
                 true
             }
@@ -526,6 +585,27 @@ impl Component for ApiApp {
             }
             ApiAppMsg::SequencesLoaded(seqs) => {
                 self.sequences = seqs;
+                true
+            }
+            ApiAppMsg::DeleteSequence(id) => {
+                // If the deleted monad is the one we're inside, leave its context.
+                self.active_sequence = None;
+                self.scope_members = None;
+                self.extract_note = Some("Deleting monad…".to_string());
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    let note = match client.delete_sequence(&id).await {
+                        Ok(true) => format!("Deleted monad {id}."),
+                        Ok(false) => format!("No monad {id} to delete."),
+                        Err(e) => format!("Delete failed: {e}"),
+                    };
+                    // Refresh the sequence list so the row disappears.
+                    if let Ok(seqs) = client.fetch_sequences().await {
+                        link.send_message(ApiAppMsg::SequencesLoaded(seqs));
+                    }
+                    link.send_message(ApiAppMsg::MonadExtracted(note));
+                });
                 true
             }
             ApiAppMsg::AuthorSystem(req) => {
@@ -571,6 +651,7 @@ impl Component for ApiApp {
         let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
         let on_author = ctx.link().callback(ApiAppMsg::AuthorSystem);
         let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
+        let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
         // Canonical term/connective values per order — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
             .systems
@@ -641,6 +722,7 @@ impl Component for ApiApp {
                                     <SystemSelector
                                         systems={ display_systems }
                                         selected={ self.selected_key.clone() }
+                                        enabled={ self.enabled_order_keys() }
                                         on_select={ on_select }
                                         mode={ self.mode }
                                         on_set_mode={ on_set_mode }
@@ -664,6 +746,8 @@ impl Component for ApiApp {
                                 raw_elements={ raw_elements }
                                 sequences={ self.sequences.clone() }
                                 on_view_sequence={ on_view_sequence }
+                                on_delete_sequence={ on_delete_sequence }
+                                scope_ids={ self.scope_members.clone() }
                             />
                         } else if self.selected_key == "nullad" {
                             // Nullad in graph mode: a blank canvas standing in for
