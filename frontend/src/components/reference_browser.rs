@@ -633,9 +633,19 @@ fn table_view(ctx: TableCtx) -> Html {
                 let onclick = Callback::from(move |_: MouseEvent| on_load.emit(id.clone()));
                 html! { <button class="tag tag-system row-open" onclick={ onclick } title="View this system">{ &s.name }</button> }
             }
-            (ColKey::Name, Row::Ref(r)) => html! {
-                { r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_default() }
-            },
+            (ColKey::Name, Row::Ref(r)) => {
+                // A reference's cited system is clickable → load it into the graph
+                // (so DU citations like "Dramatic Universe I Heptad" are viewable).
+                match r.target_system.as_ref() {
+                    Some(s) => {
+                        let on_load = on_load.clone();
+                        let id = s.id.clone();
+                        let onclick = Callback::from(move |_: MouseEvent| on_load.emit(id.clone()));
+                        html! { <button class="tag tag-system row-open" onclick={ onclick } title="View the cited system in the graph">{ &s.name }</button> }
+                    }
+                    None => html! { { r.target.clone() } },
+                }
+            }
             (ColKey::Name, Row::Raw(e)) => {
                 let cls = if e.is_edge { "tag tag-locator" } else { "tag tag-perspective" };
                 html! { <span class={ cls }>{ &e.name }</span> }
@@ -699,10 +709,18 @@ fn table_view(ctx: TableCtx) -> Html {
 
     html! {
         <>
-            // Control bar (single line): New · Sort (=) · Filter (−) · search ·
-            // Extract·Load·Transform. Sort selects header tags (columns); Filter
-            // scopes the data (by cite-degree); ELT is the operation edge, right.
+            // Control bar (single line): Extract·Load·Transform (left) · search ·
+            // New · Sort (=) · Filter (−) (right). ELT is the operation edge; Sort
+            // selects header tags (columns); Filter scopes the data (by cite-degree).
             <div class="ref-controlbar">
+                { elt_btns }
+                <input
+                    class="ref-search"
+                    type="text"
+                    placeholder="Search…"
+                    value={ (**search).clone() }
+                    oninput={ on_search }
+                />
                 { new_btn }
                 <div class="control-pop">
                     <button
@@ -736,15 +754,7 @@ fn table_view(ctx: TableCtx) -> Html {
                     }
                 </div>
 
-                <input
-                    class="ref-search"
-                    type="text"
-                    placeholder="Search…"
-                    value={ (**search).clone() }
-                    oninput={ on_search }
-                />
                 <span class="ref-count">{ format!("{} shown", rows.len()) }</span>
-                { elt_btns }
             </div>
 
             // Data-entry plane — folds down under the control bar when New is open.
