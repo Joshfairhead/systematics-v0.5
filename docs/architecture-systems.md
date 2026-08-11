@@ -66,7 +66,9 @@ the graph · `proposed` = named but not built/settled.
 - **Goal = self-construction:** track each feature as a **fragment** in the Monad, then **fold it in**. Self-documentation is the first port of call.
 - **Determining conditions** (six laws over Time·Hyparxis·Eternity·Space) = *what the system exists to codify*.
 - **Sequence-context navigation (built):** enter a monad → the header order-buttons step its **members** by order (Monad(CT)→Dyad loads Container·Operations). Sequences are a filterable element kind.
+- **Monads are core-sequences OR buckets (built):** an ordered core-sequence order-steps with the unreachable orders **greyed out**; a **bucket** (several members of one order, e.g. the Architectural Monad's triads) **scopes the Table to its members for sorting**. Monad rows carry a **delete ✕** (`deleteSequence`).
 - **Order·Position·Location** seeded as the topological anchor (order × position = location).
+- **Sort/Filter reconciler = Data / Perspective** (not "System" — too precise): sort/filter over *any* datum in a system (term · connective · designation · reference · artefact).
 
 **Open / unresolved (do not assert):**
 - **Typing [proposal pending sign-off]:** the noun=vertex / verb=edge rule holds with **no exceptions**; "reconciler-typed" is dropped. The operation-verbs (search·sort·filter·tag + extract·load·transform) are **edges**, a fragment whose vertices are TBD — plausibly the **7 edges at the "Critical Functions" node of the Octad**. See *Proposal — typing & the operations*.
@@ -298,6 +300,18 @@ whole view is built out of. This supersedes "Tag (=)" as the reconciler while ke
 also makes the view **self-hosting**: the thing you browse *with* is made of the same
 systems you browse. [proposed — the current working reading.]
 
+**Refined — the reconciler is Data / Perspective, not "System" (user, 2026-08-11).**
+"System" is *too precise*: you sort and filter by **any datum inside a system** — a
+term, a connective, a designation, a coherence, a reference, an artefact — not by whole
+systems only. Two worked examples: *sort by system type, filter to only the 3rd term*;
+*sort by reference, filter to a particular artefact*. What reconciles Sort (+) and
+Filter (−) is therefore the **Data** (equivalently the **Perspective** — the web of
+those data), the general field of addressable values, of which a system is one shape.
+So: **Data / Perspective (=) reconciles Sort (+) and Filter (−)**, and both act over the
+**whole datum space** (terms · connectives · designations · coherences · references),
+not just the system roster. (This is why the cite-degree filter already ranges over
+term/connective/designation/coherence — that range is the point, not an add-on.)
+
 **Scoping is multi-dimensional [proposed — more than a matrix].** Locating a
 specific element is a relation of at least **order** (the system name, 1→12) and
 **degree** (term-designation / connective-designation / coherence / term /
@@ -358,6 +372,25 @@ applying several 12-term systems to it:
 So each **column** in the data view is the **terms of one metadata dodecad**; a system's
 row is where it lands in each. The metadata is *not* ad-hoc fields — it is **four order-12
 systems** applied to the base system.
+
+**The full specification is itself a system — a pentad/hexad/heptad (user, 2026-08-11).**
+Take the four metadata dodecads as four *dimensions* of a system's specification, then
+add the system's own **terms** and **connectives**:
+
+| # | dimension | what it is |
+|---|---|---|
+| 1 | order | which of Monad…Dodecad (the roster dodecad) |
+| 2 | coherence | the DU1 category dodecad value |
+| 3 | term-designation | the impulse/act-name dodecad value |
+| 4 | connective-designation | the force/relation-name dodecad value |
+| 5 | terms | the vertex characters (the vocabulary's nouns) |
+| 6 | connectives | the edge characters (the vocabulary's verbs) |
+
+Order + the three designations = a **tetrad** of dodecads; **+ terms** makes a **pentad**;
+**+ connectives** a **hexad** (and, if terms and connectives are counted with their
+*designations* as a pair, a **heptad**). The exact order (5/6/7) is unsettled — but the
+claim is firm: *a system is fully specified by a small system of dodecads plus its own
+characters*, i.e. the description is homoiconic (a system describing a system). [proposed.]
 
 **The metadata acts as a set of rules.** Once every system carries `{order, coherence,
 term-designation, connective-designation}` as dodecad-terms, you can **match over them**:
@@ -497,6 +530,20 @@ Three distinct things — do not conflate them:
   operations on the monad** (sort → assemble → …). It *articulates* the monad; it
   is not the monad.
 
+**A monad is either an ordered core-sequence or a bucket [built, user 2026-08-11].**
+A `Sequence`'s members can play two different roles, and the UI now tells them apart by
+whether the members' **system orders are distinct** (`is_order_navigable`):
+- **Ordered core-sequence** — at most one member per order (Monad(CT):
+  Monad·Container·Operations·Identity·Assoc·Composition; Data: Data·Data·Operations).
+  Entering it opens the **graph** and the header **steps it by order** (Monad→Dyad→Triad);
+  the orders it lacks are **greyed out** (unreachable in that context). Nullad exits.
+- **Bucket** — a *group* with several members of the **same order** (the Architectural
+  Monad has three triads). It is not a path, so it can't be order-stepped; entering it
+  **scopes the Table to its members** (a group *for sorting*) and greys every order
+  button. This is exactly "group several systems into a monad as members for sorting."
+A bucket is the natural home for the **`sequence` filter kind** and for the "associate
+X with architecture" gesture — associating = **adding X to the architecture bucket**.
+
 **Systems are lenses on the monad.** Each order is the *same* monad **reformulated
 at a resolution**: the Pentad expresses its significance in 5 Limits + 10
 Mutualities; a triad reformulates its core dynamics in 3 terms + 3 connectives;
@@ -506,14 +553,17 @@ strings*. Everything is **fractal / holonic**: five tetrads in the monad may be 
 single node in the core Pentad.
 
 The live **Monad** is `sequence_architectural_monad` (seeded in
-`backend/data/perspectives/architecture_monad.json`) — members may be **explicit**
-(a resolvable `system:` address) or **implicit** (a dangling address = material
-still to be assembled). **7 members:** the **Pentad** + **Citation triad** (explicit,
-seeded) and — dangling — the **ELT**, **Sort·Tag·Filter**, **Data·Graph·Table**,
-**Class·Instantiation·Instance** triads and the **by-key/by-value** dyad. The
-author + systematics-core fragments (`docs/fragments.md`) are now **seeded as real
-systems** (`system_aesthetics_harmony_maths_3`, …, `system_determining_conditions_4`)
-but not yet added as Monad members / placed.
+`backend/data/perspectives/architecture_monad.json`), now a **bucket** of the
+architecture systems for sorting — members are **explicit** (a resolvable `system:`
+address) or **implicit** (a dangling address = material still to be assembled).
+**6 members:** the **Data (key·value) dyad**, **Order·Position·Location**, **Citation**,
+**Identity·Associativity·Composition** and the **Architecture Pentad** (explicit, seeded)
++ the **Architecture Octad** (dangling — documented in the octad mapping below, not yet
+seeded as a system). The feature-fragments it used to track (ELT, Sort·Tag·Filter,
+Data·Graph·Table, Class·Instantiation·Instance, by-key/by-value) are superseded by real
+seeded systems and are documented here rather than dangling in the bucket. Other
+author + systematics-core fragments (`docs/fragments.md`) are seeded as real systems but
+not yet placed.
 
 ## Practice
 

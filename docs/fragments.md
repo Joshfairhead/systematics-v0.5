@@ -38,6 +38,18 @@ and the proofs↔theorems edge's constant are the same relationship at two scale
 **Not architectural** — perspective / tag = **"life"**. Source: **Josh Fairhead**.
 Seeded `system_life_3`. Just something not to forget.
 
+### Requests triad — Ask (+) · Context (−) · Urgency (=)
+The shape of a request: *what* is asked, in *what context*, at *what urgency*.
+Source: **Josh Fairhead** (2026-08-11). Seeded `system_requests_3`.
+
+### Identification triad — Like (+) · Dislike (−) · Identification (=)
+*Like and dislike are both identification.* Source: **P. D. Ouspensky, _The Fourth
+Way_**. Seeded `system_identification_3`.
+
+### Negative-emotion triad — Negative emotion (+) · Identification (−) · Imagination (=)
+Source: **P. D. Ouspensky, _The Fourth Way_**. Seeded `system_negative_emotion_3`;
+its middle term reuses the **Identification** character (shared across both triads).
+
 **Composition example — an emerging Tetrad [worth noting].** The Life case reveals
 a **Tetrad** whose four *sources* (Goal · Directive · Ground · Instrumental) are
 each filled by a system:
