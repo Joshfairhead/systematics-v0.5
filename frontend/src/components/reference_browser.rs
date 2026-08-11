@@ -416,39 +416,84 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         && ed_terms.iter().all(|t| !t.trim().is_empty())
         && ed_conns.iter().all(|c| !c.trim().is_empty());
 
+    // Load opens the OS file browser to pick a JSON system file (import format TBD).
+    let on_file = Callback::from(move |e: Event| {
+        let input = e.target_unchecked_into::<HtmlInputElement>();
+        if let Some(f) = input.files().and_then(|fs| fs.get(0)) {
+            web_sys::console::log_1(
+                &format!("Load: {} ({} bytes) — JSON import TBD", f.name(), f.size()).into(),
+            );
+        }
+    });
+    let can_extract = !extract_members.is_empty();
+    let on_extract_click = {
+        let on_extract = props.on_extract.clone();
+        let name = extract_name.clone();
+        let members = extract_members.clone();
+        Callback::from(move |_: MouseEvent| {
+            on_extract.emit(ExtractRequest { name: name.clone(), members: members.clone() })
+        })
+    };
+    let extract_title = format!(
+        "Extract — materialize this selection ({} systems) into a Monad (Nullad → Monad)",
+        extract_members.len()
+    );
+
+    // New (left of Sort) folds the data-entry plane down under the search bar.
+    let new_btn = html! {
+        <button
+            class={ classes!("elt-btn", (*editor_open).then_some("active")) }
+            onclick={ toggle_editor.clone() }
+            title="New — author a system from custom terms/connectives"
+        >{ if *editor_open { "New ▴" } else { "New ▾" } }</button>
+    };
+    // Extract · Load · Transform (right of the search bar) — the operation edge.
+    let elt_btns = html! {
+        <>
+            <button class="elt-btn" disabled={ !can_extract } onclick={ on_extract_click } title={ extract_title }>
+                { format!("Extract ({})", extract_members.len()) }
+            </button>
+            <label class="elt-btn" title="Load — open a JSON system file (import format TBD)">
+                { "Load ↥" }
+                <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
+            </label>
+            <button class="elt-btn" disabled=true title="Transform — apply a Functor to a loaded system. Not yet wired.">
+                { "Transform" }
+            </button>
+            if let Some(note) = props.extract_note.as_deref() {
+                <span class="elt-note">{ note }</span>
+            }
+        </>
+    };
+    // The data-entry plane — folds under the control bar when New is open. Temporary
+    // scaffolding until on-graph label editing lands.
+    let editor_form = if *editor_open {
+        html! {
+            <div class="editor-form">
+                <div class="editor-row">
+                    <input class="ed-input ed-name" placeholder="New system name" value={ (*ed_name).clone() } oninput={ on_ed_name } />
+                    <label class="ed-label">{ "Order" }
+                        <input class="ed-input ed-order" type="number" min="1" max="12" value={ ed_order_val.to_string() } oninput={ on_ed_order } />
+                    </label>
+                    <button class="elt-btn" onclick={ on_prefill } title="Prefill terms/connectives from the canonical system of this order">{ "↺ Canonical" }</button>
+                    <button class="elt-btn" disabled={ !can_create } onclick={ on_create }>{ "Create system" }</button>
+                </div>
+                <div class="editor-fields">
+                    <span class="facet-label">{ format!("Terms ({})", ed_order_val) }</span>
+                    { for (0..ed_order_val as usize).map(|i| vec_input(&ed_terms, i, format!("term {}", i + 1))) }
+                </div>
+                <div class="editor-fields">
+                    <span class="facet-label">{ format!("Connectives ({})", ed_order_val * (ed_order_val - 1) / 2) }</span>
+                    { for (0..(ed_order_val * (ed_order_val - 1) / 2) as usize).map(|j| vec_input(&ed_conns, j, format!("edge {}", j + 1))) }
+                </div>
+            </div>
+        }
+    } else {
+        html! {}
+    };
+
     html! {
         <div class="reference-browser">
-            // Editor (the operation edge): Extract · Load · Transform + New system.
-            { elt_triad(EltCtx {
-                extract_members: &extract_members,
-                extract_name: &extract_name,
-                on_extract: &props.on_extract,
-                extract_note: props.extract_note.as_deref(),
-                editor_open: &editor_open,
-                toggle_editor: &toggle_editor,
-            }) }
-
-            if *editor_open {
-                <div class="editor-form">
-                    <div class="editor-row">
-                        <input class="ed-input ed-name" placeholder="New system name" value={ (*ed_name).clone() } oninput={ on_ed_name } />
-                        <label class="ed-label">{ "Order" }
-                            <input class="ed-input ed-order" type="number" min="1" max="12" value={ ed_order_val.to_string() } oninput={ on_ed_order } />
-                        </label>
-                        <button class="elt-btn" onclick={ on_prefill } title="Prefill terms/connectives from the canonical system of this order">{ "↺ Canonical" }</button>
-                        <button class="elt-btn" disabled={ !can_create } onclick={ on_create }>{ "Create system" }</button>
-                    </div>
-                    <div class="editor-fields">
-                        <span class="facet-label">{ format!("Terms ({})", ed_order_val) }</span>
-                        { for (0..ed_order_val as usize).map(|i| vec_input(&ed_terms, i, format!("term {}", i + 1))) }
-                    </div>
-                    <div class="editor-fields">
-                        <span class="facet-label">{ format!("Connectives ({})", ed_order_val * (ed_order_val - 1) / 2) }</span>
-                        { for (0..(ed_order_val * (ed_order_val - 1) / 2) as usize).map(|j| vec_input(&ed_conns, j, format!("edge {}", j + 1))) }
-                    </div>
-                </div>
-            }
-
             { table_view(TableCtx {
                 refs,
                 systems,
@@ -464,99 +509,10 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 visible_cols: &visible_cols,
                 filter_open: &filter_open,
                 active_kinds: &active_kinds,
+                new_btn,
+                elt_btns,
+                editor_form,
             }) }
-        </div>
-    }
-}
-
-/// Grouped arguments for the ELT / Editor control.
-struct EltCtx<'a> {
-    /// The current selection to Extract, as `system:<id>` member addresses.
-    extract_members: &'a [String],
-    /// Provisional name for the Monad Extract would create.
-    extract_name: &'a str,
-    on_extract: &'a Callback<ExtractRequest>,
-    /// Feedback from the last Extract / author, if any.
-    extract_note: Option<&'a str>,
-    editor_open: &'a UseStateHandle<bool>,
-    toggle_editor: &'a Callback<MouseEvent>,
-}
-
-/// The ELT triad control: Extract · Load · Transform.
-/// - **Extract** materializes the current selection into a Monad (Nullad → Monad).
-/// - **Load** opens a menu of instance systems.
-/// - **Transform** (apply a Functor) is the third edge, not yet wired.
-fn elt_triad(ctx: EltCtx) -> Html {
-    let EltCtx {
-        extract_members,
-        extract_name,
-        on_extract,
-        extract_note,
-        editor_open,
-        toggle_editor,
-    } = ctx;
-
-    // Load opens the OS file browser to pick a JSON system file. (Import format is
-    // not settled yet — for now we just read the chosen file's name/size.)
-    let on_file = Callback::from(move |e: Event| {
-        let input = e.target_unchecked_into::<HtmlInputElement>();
-        if let Some(f) = input.files().and_then(|fs| fs.get(0)) {
-            web_sys::console::log_1(
-                &format!("Load: {} ({} bytes) — JSON import TBD", f.name(), f.size()).into(),
-            );
-        }
-    });
-
-    let can_extract = !extract_members.is_empty();
-    let on_extract_click = {
-        let on_extract = on_extract.clone();
-        let name = extract_name.to_string();
-        let members = extract_members.to_vec();
-        Callback::from(move |_: MouseEvent| {
-            on_extract.emit(ExtractRequest {
-                name: name.clone(),
-                members: members.clone(),
-            })
-        })
-    };
-    let extract_title = format!(
-        "Extract — materialize this selection ({} systems) into a Monad (Nullad → Monad)",
-        extract_members.len()
-    );
-
-    html! {
-        <div class="elt-triad" title="Editor — Extract · Load · Transform + author a new system">
-            <button
-                class={ classes!("elt-btn", (**editor_open).then_some("active")) }
-                onclick={ toggle_editor.clone() }
-                title="New — author a system from custom terms/connectives"
-            >{ if **editor_open { "New ▴" } else { "New ▾" } }</button>
-            <button
-                class="elt-btn"
-                disabled={ !can_extract }
-                onclick={ on_extract_click }
-                title={ extract_title }
-            >{ format!("Extract ({})", extract_members.len()) }</button>
-
-            <label class="elt-btn" title="Load — open a JSON system file (import format TBD)">
-                { "Load ↥" }
-                <input
-                    type="file"
-                    accept="application/json,.json"
-                    style="display:none;"
-                    onchange={ on_file }
-                />
-            </label>
-
-            <button
-                class="elt-btn"
-                disabled=true
-                title="Transform — apply a Functor to a loaded system. Not yet wired."
-            >{ "Transform" }</button>
-
-            if let Some(note) = extract_note {
-                <span class="elt-note">{ note }</span>
-            }
         </div>
     }
 }
@@ -587,6 +543,11 @@ struct TableCtx<'a> {
     /// Filter (−) popover — scoping the data by cite-degree.
     filter_open: &'a UseStateHandle<bool>,
     active_kinds: &'a UseStateHandle<Vec<CiteKind>>,
+    /// New toggle (placed left of Sort); ELT buttons (right of search); and the
+    /// editor plane that folds under the control bar. Pre-rendered in the body.
+    new_btn: Html,
+    elt_btns: Html,
+    editor_form: Html,
 }
 
 fn table_view(ctx: TableCtx) -> Html {
@@ -605,6 +566,9 @@ fn table_view(ctx: TableCtx) -> Html {
         visible_cols,
         filter_open,
         active_kinds,
+        new_btn,
+        elt_btns,
+        editor_form,
     } = ctx;
 
     // Filter — same predicate Extract uses (header order + cite-degree + search).
@@ -735,9 +699,11 @@ fn table_view(ctx: TableCtx) -> Html {
 
     html! {
         <>
-            // Control bar. Sort (=) selects the header tags (columns); Filter (−)
-            // scopes the data returned (by cite-degree). Then free-text search.
+            // Control bar (single line): New · Sort (=) · Filter (−) · search ·
+            // Extract·Load·Transform. Sort selects header tags (columns); Filter
+            // scopes the data (by cite-degree); ELT is the operation edge, right.
             <div class="ref-controlbar">
+                { new_btn }
                 <div class="control-pop">
                     <button
                         class={ classes!("control-btn", (**sort_open).then_some("active")) }
@@ -778,7 +744,11 @@ fn table_view(ctx: TableCtx) -> Html {
                     oninput={ on_search }
                 />
                 <span class="ref-count">{ format!("{} shown", rows.len()) }</span>
+                { elt_btns }
             </div>
+
+            // Data-entry plane — folds down under the control bar when New is open.
+            { editor_form }
 
             <div class="ref-table-wrap">
                 if cols.is_empty() {
