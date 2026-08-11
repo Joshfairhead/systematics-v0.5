@@ -485,6 +485,18 @@ is the **subject**. This answers the open questions:
   the **six laws (S₃) are the six directed readings** of the undirected triad — so directedness
   enters by *choosing a reading*. Don't conflate the storage primitive (directed SPO) with the
   semantic object (the undirected K_n).
+- **RESOLUTION of the tension [user, 2026-08-12] — you store directed, and declare undirected
+  as closure under the six laws.** You cannot write a fact without a direction (bytes have an
+  order). So: store directed SPO atoms; **an undirected triad = the equivalence class (orbit) of
+  any one directed reading under S₃** — i.e. "undirected" *means* "closed under the six laws."
+  You don't choose *store-undirected* vs *think-algorithmically*: **undirected storage = directed
+  storage + the six-law symmetry group.** The Grammar (topology) already encodes the undirected
+  K_n; the six laws are its symmetry group; an SPO write is one serialization; reading it back
+  through S₃ recovers the whole. The **six laws ARE the traversal algorithm** — concretely, a
+  triple store keeps the **S₃ permutation indexes** (SPO, SOP, PSO, POS, OSP, OPS; cf. Hexastore)
+  so a query fixing *any* subset of positions range-scans the right ordering. "Sort by value,
+  filter by key" = pick the permutation to scan. So the traversal-logic gap and the
+  directed/undirected tension are the *same* thing, resolved together.
 
 *(The `location · key · value · source` framing below is superseded by SPO above, but its
 content-addressing / reciprocal-lookup / six-laws-as-traversal reasoning still holds — read
