@@ -19,7 +19,7 @@
 //! system ids, not a shared canonical address), resolved server-side into
 //! `ReferenceView.target_system`.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -118,11 +118,6 @@ pub struct ExtractRequest {
     pub members: Vec<String>,
 }
 
-#[derive(Clone, Copy, PartialEq)]
-enum Tab {
-    Table,
-    Compare,
-}
 
 /// A selectable column — one **tag key**. The view is composed by choosing which
 /// keys to show (the Tag reconciler's own by-key action). Everything is a tag, so
@@ -326,21 +321,9 @@ fn all_rows<'a>(
         .chain(raw.iter().map(Row::Raw))
         .collect()
 }
-fn provenance(r: &ReferenceView) -> String {
-    let s = src(r);
-    let l = loc(r);
-    if l.is_empty() {
-        s
-    } else if s.is_empty() {
-        l
-    } else {
-        format!("{s} · {l}")
-    }
-}
 
 #[function_component(ReferenceBrowser)]
 pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
-    let tab = use_state(|| Tab::Table);
     let search = use_state(String::new);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
@@ -365,12 +348,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // A bucket monad scopes the view to its members (a group for sorting).
     let scope = props.scope_ids.as_deref();
 
-    // Caption for the active header scope.
-    let scope_label = match filter_order {
-        Some(o) => format!("{} {} only", o, order_name(o)),
-        None => "Nullad — all orders".to_string(),
-    };
-
     // The Extract selection: distinct systems among the currently-filtered rows
     // (Systems directly; References via their target), as `system:<id>` members.
     let needle = search.to_lowercase();
@@ -386,14 +363,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let extract_name = match filter_order {
         Some(o) => format!("Monad — {} {}", o, order_name(o)),
         None => format!("Monad — Nullad selection ({})", extract_members.len()),
-    };
-
-    let switch_tab = {
-        let tab = tab.clone();
-        move |t: Tab| {
-            let tab = tab.clone();
-            Callback::from(move |_: MouseEvent| tab.set(t))
-        }
     };
 
     // ---- Editor form: author a System from custom values ----
@@ -480,39 +449,22 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 </div>
             }
 
-            <div class="ref-tabs">
-                <button
-                    class={ if *tab == Tab::Table { "ref-tab active" } else { "ref-tab" } }
-                    onclick={ switch_tab(Tab::Table) }
-                >{ "Table" }</button>
-                <button
-                    class={ if *tab == Tab::Compare { "ref-tab active" } else { "ref-tab" } }
-                    onclick={ switch_tab(Tab::Compare) }
-                >{ "Compare by order" }</button>
-                <span class="ref-scope">{ scope_label }</span>
-                <span class="ref-count">{ format!("{} systems · {} refs", systems.len(), refs.len()) }</span>
-            </div>
-            {
-                match *tab {
-                    Tab::Table => table_view(TableCtx {
-                        refs,
-                        systems,
-                        seqs,
-                        raw,
-                        on_load: &props.on_load,
-                        on_view_sequence: &props.on_view_sequence,
-                        on_delete_sequence: &props.on_delete_sequence,
-                        filter_order,
-                        scope,
-                        search: &search,
-                        sort_open: &sort_open,
-                        visible_cols: &visible_cols,
-                        filter_open: &filter_open,
-                        active_kinds: &active_kinds,
-                    }),
-                    Tab::Compare => compare_view(refs, filter_order),
-                }
-            }
+            { table_view(TableCtx {
+                refs,
+                systems,
+                seqs,
+                raw,
+                on_load: &props.on_load,
+                on_view_sequence: &props.on_view_sequence,
+                on_delete_sequence: &props.on_delete_sequence,
+                filter_order,
+                scope,
+                search: &search,
+                sort_open: &sort_open,
+                visible_cols: &visible_cols,
+                filter_open: &filter_open,
+                active_kinds: &active_kinds,
+            }) }
         </div>
     }
 }
@@ -882,61 +834,5 @@ fn citation_tags(r: &ReferenceView) -> Html {
             { artefact_tag.unwrap_or_default() }
             { locator_tag.unwrap_or_default() }
         </span>
-    }
-}
-
-fn compare_view(refs: &[ReferenceView], filter_order: Option<i32>) -> Html {
-    // (order, perspective) -> (coherence value, provenance). First wins (all
-    // references from one perspective to one order-N system share its value).
-    // The header's order selection scopes which rows appear (Nullad = all).
-    let mut cells: BTreeMap<(i32, String), (String, String)> = BTreeMap::new();
-    let mut orders: BTreeSet<i32> = BTreeSet::new();
-    let mut perspectives: BTreeSet<String> = BTreeSet::new();
-
-    for r in refs {
-        if let Some(sys) = &r.target_system {
-            if filter_order.is_some_and(|o| o != sys.order) {
-                continue;
-            }
-            let p = persp(r);
-            if p.is_empty() {
-                continue;
-            }
-            orders.insert(sys.order);
-            perspectives.insert(p.clone());
-            cells
-                .entry((sys.order, p))
-                .or_insert_with(|| (sys.coherence.clone(), provenance(r)));
-        }
-    }
-
-    let perspectives: Vec<String> = perspectives.into_iter().collect();
-
-    html! {
-        <div class="ref-table-wrap">
-            <table class="ref-table compare-matrix">
-                <thead>
-                    <tr>
-                        <th class="ref-th">{ "Order" }</th>
-                        { for perspectives.iter().map(|p| html!{ <th class="ref-th">{ p }</th> }) }
-                    </tr>
-                </thead>
-                <tbody>
-                    { for orders.iter().map(|o| html!{
-                        <tr>
-                            <td class="compare-order">{ format!("{} {}", o, order_name(*o)) }</td>
-                            { for perspectives.iter().map(|p| {
-                                match cells.get(&(*o, p.clone())) {
-                                    Some((coherence, prov)) => html!{
-                                        <td class="compare-cell" title={ prov.clone() }>{ coherence }</td>
-                                    },
-                                    None => html!{ <td class="compare-cell empty">{ "—" }</td> },
-                                }
-                            }) }
-                        </tr>
-                    }) }
-                </tbody>
-            </table>
-        </div>
     }
 }
