@@ -156,6 +156,18 @@ struct DeleteSequenceResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct DeleteSystemResponse {
+    #[serde(rename = "deleteSystem")]
+    delete_system: bool,
+}
+
+#[derive(Deserialize, Debug)]
+struct DeleteReferenceResponse {
+    #[serde(rename = "deleteReference")]
+    delete_reference: bool,
+}
+
+#[derive(Deserialize, Debug)]
 struct AuthorSystemResponse {
     #[serde(rename = "authorSystem")]
     author_system: Option<InstanceSystem>,
@@ -535,6 +547,34 @@ impl GraphQLClient {
             ));
         }
         Ok(response.data.map(|d| d.delete_sequence).unwrap_or(false))
+    }
+
+    /// Delete a System by id (removes it + its vocabulary from graph and store).
+    pub async fn delete_system(&self, id: &str) -> Result<bool, ApiError> {
+        let query = r#"mutation Del($id: String!) { deleteSystem(id: $id) }"#;
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<DeleteSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.delete_system).unwrap_or(false))
+    }
+
+    /// Delete a Reference (citation) by id.
+    pub async fn delete_reference(&self, id: &str) -> Result<bool, ApiError> {
+        let query = r#"mutation Del($id: String!) { deleteReference(id: $id) }"#;
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<DeleteReferenceResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.delete_reference).unwrap_or(false))
     }
 
     /// Author a System from custom term/connective **values** (the in-app editor

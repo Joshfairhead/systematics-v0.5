@@ -929,6 +929,32 @@ button.row-open:hover {
 .ref-table tbody tr:hover {
     background: rgba(37, 99, 235, 0.06);
 }
+/* Row-select CRUD: leading checkbox column, selected-row tint, delete button. */
+.row-select {
+    width: 1.6rem;
+    text-align: center !important;
+    padding-left: 0.4rem !important;
+    padding-right: 0.2rem !important;
+}
+.row-select input {
+    cursor: pointer;
+}
+.ref-table tbody tr.row-selected {
+    background: rgba(214, 40, 118, 0.10);
+}
+.row-delete-btn {
+    border: 1px solid rgba(214, 40, 118, 0.4);
+    background: rgba(214, 40, 118, 0.12);
+    color: #b0367a;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.row-delete-btn:hover {
+    background: rgba(214, 40, 118, 0.2);
+}
 
 .compare-matrix .compare-order {
     font-weight: 600;

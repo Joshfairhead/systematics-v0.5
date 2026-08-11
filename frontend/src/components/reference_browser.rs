@@ -19,7 +19,7 @@
 //! system ids, not a shared canonical address), resolved server-side into
 //! `ReferenceView.target_system`.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet};
 
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -66,6 +66,9 @@ pub struct ReferenceBrowserProps {
     /// Delete a sequence/monad by id (the ✕ on a monad row).
     #[prop_or_default]
     pub on_delete_sequence: Callback<String>,
+    /// Delete selected rows by address (`system:` / `sequence:` / `reference:`).
+    #[prop_or_default]
+    pub on_delete_rows: Callback<Vec<String>>,
     /// When a **bucket** monad is entered, scope the table to just these member
     /// addresses (`system:<id>`). `None` = no scope (the whole registry).
     #[prop_or_default]
@@ -304,6 +307,16 @@ fn in_scope(row: &Row, scope: Option<&[String]>) -> bool {
         Some(members) => row.system_addr().is_some_and(|a| members.iter().any(|m| *m == a)),
     }
 }
+/// A row's **deletable address** (`system:` / `sequence:` / `reference:`), used by
+/// row-select CRUD. Raw nodes/edges are ephemeral (derived) — not deletable.
+fn row_addr(row: &Row) -> Option<String> {
+    match row {
+        Row::Sys(s) => Some(format!("system:{}", s.id)),
+        Row::Seq(s) => Some(format!("sequence:{}", s.id)),
+        Row::Ref(r) => Some(format!("reference:{}", r.id)),
+        Row::Raw(_) => None,
+    }
+}
 
 /// All Nullad rows (every System + Sequence/Monad + Reference + focused raw
 /// node/edge), unfiltered.
@@ -332,6 +345,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
     let active_kinds = use_state(|| vec![CiteKind::System, CiteKind::Sequence]);
+    // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
+    let selected = use_state(HashSet::<String>::new);
     // Editor: author a new System from custom values (the app-authored path).
     let editor_open = use_state(|| false);
     let ed_name = use_state(String::new);
@@ -502,6 +517,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 on_load: &props.on_load,
                 on_view_sequence: &props.on_view_sequence,
                 on_delete_sequence: &props.on_delete_sequence,
+                on_delete_rows: &props.on_delete_rows,
                 filter_order,
                 scope,
                 search: &search,
@@ -509,6 +525,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 visible_cols: &visible_cols,
                 filter_open: &filter_open,
                 active_kinds: &active_kinds,
+                selected: &selected,
                 new_btn,
                 elt_btns,
                 editor_form,
@@ -532,6 +549,8 @@ struct TableCtx<'a> {
     on_view_sequence: &'a Callback<Vec<String>>,
     /// Delete a monad row (the ✕).
     on_delete_sequence: &'a Callback<String>,
+    /// Delete selected rows by address (row-select CRUD).
+    on_delete_rows: &'a Callback<Vec<String>>,
     /// Order filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     /// Bucket scope — when a bucket monad is entered, show only its members.
@@ -543,6 +562,8 @@ struct TableCtx<'a> {
     /// Filter (−) popover — scoping the data by cite-degree.
     filter_open: &'a UseStateHandle<bool>,
     active_kinds: &'a UseStateHandle<Vec<CiteKind>>,
+    /// Selected row addresses (row-select CRUD).
+    selected: &'a UseStateHandle<HashSet<String>>,
     /// New toggle (placed left of Sort); ELT buttons (right of search); and the
     /// editor plane that folds under the control bar. Pre-rendered in the body.
     new_btn: Html,
@@ -559,6 +580,7 @@ fn table_view(ctx: TableCtx) -> Html {
         on_load,
         on_view_sequence,
         on_delete_sequence,
+        on_delete_rows,
         filter_order,
         scope,
         search,
@@ -566,6 +588,7 @@ fn table_view(ctx: TableCtx) -> Html {
         visible_cols,
         filter_open,
         active_kinds,
+        selected,
         new_btn,
         elt_btns,
         editor_form,
@@ -707,6 +730,20 @@ fn table_view(ctx: TableCtx) -> Html {
     let toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
     let scoped = active_kinds.len() < ALL_KINDS.len();
 
+    // Row-select CRUD: delete the selected addresses, then clear the selection.
+    let on_delete_selected = {
+        let selected = selected.clone();
+        let on_delete_rows = on_delete_rows.clone();
+        Callback::from(move |_: MouseEvent| {
+            let addrs: Vec<String> = selected.iter().cloned().collect();
+            if !addrs.is_empty() {
+                on_delete_rows.emit(addrs);
+            }
+            selected.set(HashSet::new());
+        })
+    };
+    let sel_count = selected.len();
+
     html! {
         <>
             // Control bar (single line): Extract·Load·Transform (left) · search ·
@@ -755,6 +792,12 @@ fn table_view(ctx: TableCtx) -> Html {
                 </div>
 
                 <span class="ref-count">{ format!("{} shown", rows.len()) }</span>
+                if sel_count > 0 {
+                    <button class="row-delete-btn" onclick={ on_delete_selected }
+                        title="Delete the selected systems / monads / references">
+                        { format!("🗑 Delete {sel_count} selected") }
+                    </button>
+                }
             </div>
 
             // Data-entry plane — folds down under the control bar when New is open.
@@ -767,14 +810,35 @@ fn table_view(ctx: TableCtx) -> Html {
                     <table class="ref-table">
                         <thead>
                             <tr>
+                                <th class="ref-th row-select" />
                                 { for cols.iter().map(|k| html!{ <th class="ref-th">{ k.label() }</th> }) }
                             </tr>
                         </thead>
                         <tbody>
-                            { for rows.iter().map(|r| html!{
-                                <tr>
-                                    { for cols.iter().map(|k| html!{ <td>{ cell(*k, r) }</td> }) }
-                                </tr>
+                            { for rows.iter().map(|r| {
+                                let addr = row_addr(r);
+                                let checked = addr.as_ref().is_some_and(|a| selected.contains(a));
+                                let on_toggle = {
+                                    let selected = selected.clone();
+                                    let addr = addr.clone();
+                                    Callback::from(move |_: MouseEvent| {
+                                        if let Some(a) = &addr {
+                                            let mut next = (*selected).clone();
+                                            if !next.remove(a) { next.insert(a.clone()); }
+                                            selected.set(next);
+                                        }
+                                    })
+                                };
+                                html!{
+                                    <tr class={ if checked { "row-selected" } else { "" } }>
+                                        <td class="row-select">
+                                            if addr.is_some() {
+                                                <input type="checkbox" checked={ checked } onclick={ on_toggle } />
+                                            }
+                                        </td>
+                                        { for cols.iter().map(|k| html!{ <td>{ cell(*k, r) }</td> }) }
+                                    </tr>
+                                }
                             }) }
                         </tbody>
                     </table>

@@ -103,6 +103,9 @@ pub enum ApiAppMsg {
     ViewSequence(Vec<String>),
     /// Delete a Sequence/Monad by id (e.g. a stray Extract monad), then refresh.
     DeleteSequence(String),
+    /// Delete selected rows (addresses `system:<id>` / `sequence:<id>` /
+    /// `reference:<id>`), dispatching to the right mutation, then refresh.
+    DeleteRows(Vec<String>),
 }
 
 pub struct ApiApp {
@@ -608,6 +611,51 @@ impl Component for ApiApp {
                 });
                 true
             }
+            ApiAppMsg::DeleteRows(addrs) => {
+                // Delete each selected row by its address prefix, then refresh all
+                // three collections so the table reflects the CRUD.
+                self.active_sequence = None;
+                self.scope_members = None;
+                self.extract_note = Some(format!("Deleting {} item(s)…", addrs.len()));
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    let mut ok = 0usize;
+                    let mut failed = 0usize;
+                    for addr in &addrs {
+                        let res = if let Some(id) = addr.strip_prefix("system:") {
+                            client.delete_system(id).await
+                        } else if let Some(id) = addr.strip_prefix("sequence:") {
+                            client.delete_sequence(id).await
+                        } else if let Some(id) = addr.strip_prefix("reference:") {
+                            client.delete_reference(id).await
+                        } else {
+                            Ok(false)
+                        };
+                        match res {
+                            Ok(true) => ok += 1,
+                            _ => failed += 1,
+                        }
+                    }
+                    // Refresh systems, references, and sequences.
+                    if let Ok(instances) = client.fetch_instance_systems().await {
+                        link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                    }
+                    if let Ok(refs) = client.fetch_all_references().await {
+                        link.send_message(ApiAppMsg::AllReferencesLoaded(refs));
+                    }
+                    if let Ok(seqs) = client.fetch_sequences().await {
+                        link.send_message(ApiAppMsg::SequencesLoaded(seqs));
+                    }
+                    let note = if failed == 0 {
+                        format!("Deleted {ok} item(s).")
+                    } else {
+                        format!("Deleted {ok}, {failed} failed/absent.")
+                    };
+                    link.send_message(ApiAppMsg::MonadExtracted(note));
+                });
+                true
+            }
             ApiAppMsg::AuthorSystem(req) => {
                 self.extract_note = Some(format!("Authoring “{}”…", req.name));
                 let link = ctx.link().clone();
@@ -652,6 +700,7 @@ impl Component for ApiApp {
         let on_author = ctx.link().callback(ApiAppMsg::AuthorSystem);
         let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
         let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
+        let on_delete_rows = ctx.link().callback(ApiAppMsg::DeleteRows);
         // Canonical term/connective values per order — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
             .systems
@@ -747,6 +796,7 @@ impl Component for ApiApp {
                                 sequences={ self.sequences.clone() }
                                 on_view_sequence={ on_view_sequence }
                                 on_delete_sequence={ on_delete_sequence }
+                                on_delete_rows={ on_delete_rows }
                                 scope_ids={ self.scope_members.clone() }
                             />
                         } else if self.selected_key == "nullad" {
