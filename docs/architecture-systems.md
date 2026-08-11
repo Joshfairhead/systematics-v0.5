@@ -75,7 +75,8 @@ the graph · `proposed` = named but not built/settled.
 - **Sort/Filter semantics** stay as edge-fragments (latest UI reading: Sort = select header tags, Filter = scope data by degree); the **by-key/by-value** dyad is under review; pursue the **Data → key·value → ELT** sequence. The **symmetric-doubling** worked example that used by-key/value is superseded.
 - **SPO ↔ category-theory ↔ systematics** are three *interchangeable* mediums (none primary); switching needs representational transforms — **not built**.
 - **Folding-in = CT-style composition** — not built (needs CT represented in-graph).
-- **CT axioms ↔ systematics:** axioms-as-edges is **cooled off** (user, 2026-08-10); no favoured mapping. **Traversal logic** (how S₃ laws act as moves over a K_n; how folding composes them) is the **open problem**, ahead of any CT bridge.
+- **CT axioms ↔ systematics:** axioms-as-edges is **cooled off** (user, 2026-08-10); no favoured mapping. **Traversal logic** now has a working home — see *The reference tuple*: content-addressing = **identity**; the **six laws (S₃) = the directed readings/traversals** of a referenced triple (the associative-lookup layer). Firmer than the CT-edge reading; still proposed.
+- **The reference-tuple store [recommended, awaiting sign-off]:** `location · key · value · source`, every column an anchor → reciprocal key↔value lookup + provenance = the Data Object store = content-addressing done right = the Holochain/AD4M shape, built in-graph now (no runtime port). Nullad = the content-addressed heap; a Monad = a scoped "universe" over it.
 - **The view's reconciler:** revised to **Systems (=) / Sort (+) / Filter (−)** (compose the view *from* systems) — supersedes "Tag (=)"; the **metadata-dodecads-as-rules** data model (4 order-12 systems → match → RAG operation) is proposed, not built.
 - **The location web:** Order·Position·Location + Location·Term·Source + Lines(=Location·Connection·Location) is a **mixed fragment that may fold into a pentad** — containing whole unknown.
 - **Scoping shape:** order × degree, 3-D+ (DU1 geometry); order/degree terminology unsettled.
@@ -436,6 +437,96 @@ Position, Location, Term, Source, Connection are not one clean triad — they in
 (a triad of anchoring + a triad of attachment + a triad of connection). The user
 suspects this **"interesting mixed system … MAY filter into a pentad."** Tracked as a
 fragment; the containing whole (pentad?) is **not yet known** — do not assert its order.
+
+## The reference tuple — anchoring, content-addressing, reciprocal lookup [proposed — the store]
+
+This is the concrete data model behind "the Data Object store," articulated with the
+user (2026-08-11). It resolves *how* a system is assembled from components with provenance.
+
+**Two strata: canonical topology (unreferenced) vs referenced semantics.**
+- **Topology is canonical and needs no reference.** Order *n* ⇒ *n* positions and
+  `C(n,2)` edges (a K_n). "Position 1 of a triad," "the edge (1,2)" are pure coordinates —
+  no citation. This is the **Grammar** (`grammar_<n>`), already in the codebase.
+- **Semantics are referenced.** The term/connective *values* affixed to those positions
+  (`Will`, `Function`, …) are claims by a **source** and must carry provenance.
+
+**The anchor is the LOCATION; the value is content-addressed; provenance is a link.**
+- A **location** = `(order, position)` — the topological coordinate (the OPL triad:
+  `order × position = location`). This is the **anchor / key**. It is canonical, so it is
+  itself content-addressable (hash of the coordinate).
+- A **value** (a term character like `Will`, a coherence like `Dynamism`) is
+  **content-addressed** — one shared entry, reused by every location/system that cites it
+  (the codebase already dedups `char_word_<slug>`; content-addressing = *id is the hash of
+  the word*). **Content addressing = the identity function** (a value is itself, addressed
+  by itself) — it gives dedup/identity but *not* lookup.
+- A **reference** links a location-anchor to a value **with a source** (the Citation
+  triad: Source · Artefact · Lookup). *This is the answer to the user's question:*
+  **yes — topological positions become anchor keys, and term characters become
+  content-addressed values linked to them, each link carrying its provenance.**
+
+**So the unit of storage is a REFERENCE TUPLE, and every column is an anchor:**
+
+> `(location = ⟨order, position⟩) · key · value · source`
+
+e.g. `⟨3,1⟩ · term · Will · DU3`  and  `⟨3,·⟩ · coherence · Dynamism · DU3`.
+Coherence anchors at the **order** level (whole system), not a single position; terms
+anchor at a **position**. This is why *"3 · coherence · Dynamism"* and
+*"3 · position 1 · Will"* are different arities of the same tuple shape — coherence is
+`⟨order⟩·key·value·src`, a term is `⟨order,position⟩·key·value·src`.
+
+**Reciprocal lookup = functional dependencies over the tuple [the user's XXX/YYY].**
+Because *every column is independently anchored* (content-addressed + linked from each
+side), you can enter the relation from any dimension and project the rest — exactly the
+user's `3·coherence·XXX·source·Bennett·YYY`:
+- `(order 3, key coherence, perspective **DU3**) → value **Dynamism**`
+- `(order 3, key coherence, perspective **DU1**) → value **Relatedness**`
+- reciprocally `(order 3, key coherence, value **Dynamism**) → perspective **DU3**`;
+  `(… value **Relatedness**) → perspective **DU1**`.
+
+So `coherence` genuinely **holds two values** at order 3, disambiguated by **source** —
+no contradiction, a *compound* citing both. Filling any blank that functionally
+determines the rest retrieves the others; choosing DU1 vs DU3 *transforms* the projection
+("reciprocal transformations that update state chains"). **This is precisely
+sort/filter by key OR by value:** grouping by the `key` column is sort-by-key; grouping by
+the `value` column is sort-by-value; filtering by `source` is filter-by-reference. The
+store and the query are the *same* structure seen from different columns.
+
+**Content-addressing (identity) + the six laws (associativity of reading) [proposed —
+answers "are the six laws associativity laws?"].** Content addressing supplies **identity**
+(the `e`/`123` law: a value equals itself). The *lookup* is the other half, and it is
+**directional traversal**: reading the tuple `location → key → value` vs
+`value → key → location` (the reciprocal) are two different **orderings** of the same
+triadic relation. The **six laws of three = S₃ = the six directed readings** of a triad
+(`123 … 321`). So the six laws are best read as the **traversal orders** of a referenced
+triple — *not* associativity in the strict monoid sense, but the thing associativity
+*guarantees*: that chained traversals compose unambiguously (you can hop
+location→key→value→source in any grouping and land in the same place). Precisely:
+- **identity** (content address) = a value/anchor is itself;
+- **the six S₃ permutations** = the six ways to *read/traverse* the triad (key→value,
+  value→key, …) — the associative-lookup layer;
+- **associativity** = the property that lets those traversals chain into a coherent index.
+
+Mapped onto **topology · geometry · semantics**: the **topology** (K_n positions) is the
+*set*; **S₃ / the six laws** are the *permutations/traversals* acting on it (at order 3,
+S₃ is also the triangle's symmetry group D₃ — geometry and permutation coincide);
+**semantics** are the referenced values the traversals read. This is the same **traversal
+logic** flagged open earlier — now with a concrete home: *how you read a reference tuple*.
+[Proposed; the S₃-as-traversal reading is firmer than the earlier CT-axioms-as-edges one,
+which stays cooled off.]
+
+**Is this content addressing / Holochain? Is it a transition moment? [recommendation].**
+The *model* — content-addressed value entries + typed links from multiple anchors + source
+provenance — **is** the Holochain/AD4M shape (DHT entries = content-addressed values;
+links = the key↔value index; source chain / citation = provenance). **Recommendation: do
+not port to a Holochain runtime now** (a hApp is a real rewrite); instead **adopt the
+discipline in the current graph** — content-address the value characters, make
+`location→key→value→source` explicit links, keep the store DHT-portable — so a
+Holochain/AD4M backend later is a *swap, not a rewrite*. The **Data Object store and
+content addressing are the same work**, not alternatives; that is the "existing
+infrastructure" the user pointed at, expressed in-graph. The **Nullad = the
+content-addressed heap** (the DHT / bulk); a **Monad = a scoped perspective that draws a
+boundary — a "universe"** — over that heap (so fragments need no home *other than* the
+heap; the Monad is the home). [Recommended direction — awaiting sign-off before build.]
 
 ## The generative process — symmetric doubling [proposed]
 
