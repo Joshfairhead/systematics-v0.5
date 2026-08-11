@@ -43,14 +43,14 @@ characters expressed as functors/morphisms with the right name).
 
 | Edge (Limit–Limit) | Mutuality | Instance in the tool | |
 |---|---|---|---|
-| Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position); **read as CT associativity** (user 2026-08-11) | [U] |
-| Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering); **read as CT composition** (user 2026-08-11) | [U] |
-| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (core notions: identity, composition, associativity); the CT-**identity** edge (≙ content-addressing: a value is itself) | [U] |
+| Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position); a CT axiom — **associativity** or **composition** [direction UNRESOLVED, see below] | [U] |
+| Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering); a CT axiom — **composition** or **associativity** [direction UNRESOLVED] | [U] |
+| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (core notions: identity, composition, associativity) | [U] |
 | Grammar – Semantics | **aspiration** | the **set of coherence attributes** (monad→dodecad) as *demands* on each system — coherence-as-potential (a digital embodiment, not a label-field), actualized at the hexad | [P?] |
 | Sign – Semantics | **function** ✓ | the functional meaning of each sign | [U] |
 | Sign – Syntax | **input** | **assembly pieces** — points, coordinates, terms; and, in scope, **modules / data streams** | [U] |
 | Sign – Symbol | **range-of-significance** | **3D upcast geometry** — dodecahedron etc. (external potential) | [U] |
-| Semantics – Syntax | **range-of-potential** | **the rendered systems 1–12 as a whole** (internal potential) | [U] |
+| Semantics – Syntax | **range-of-potential** | **the rendered systems 1–12 as a whole** (internal potential); **CT identity ≙ content-addressing** (a value is itself) — the line between Semantics and Syntax [user 2026-08-11] | [U] |
 | Semantics – Symbol | **output** | **self-describing protocols** — the symbol as a system that describes itself; generative (labelled graphs → small language models / codebase automation) | [P] |
 | Syntax – Symbol | **form** ✓ | **`resolve_system`** — compiles signs into the symbol | [U] |
 
@@ -59,15 +59,25 @@ The payoff: the pentad's edges are already-present layers of the codebase
 where they aren't yet, they name what to build (module inputs, generative
 outputs). The architecture organizes itself into its own order-5 system.
 
-**The CT axioms live on the Grammar-edges [user, 2026-08-11 — supersedes CT-axioms-as-triad-edges].**
+**The CT axioms live on the pentad's edges [user, 2026-08-11 — supersedes CT-axioms-as-triad-edges].**
 The three category-theory axioms find a home not on a *triad's* edges (the cooled-off
-FBW reading) but as three **Grammar-incident mutualities** of this pentad:
-**identity** = the Grammar–Syntax *operation*/Functor edge (≙ content-addressing — a value
-is itself); **composition** = Grammar–Symbol (*Colour*); **associativity** = Grammar–Sign
-(*Number*). This dovetails with *The reference tuple* in `architecture-systems.md`:
-content-addressing supplies **identity**, and the S₃ traversals supply the
-**associative** lookup — so the store's two halves are two of the Grammar's own edges.
-[Proposed; firmer than the CT-axioms-as-triad-edges reading, which stays cooled off.]
+FBW reading) but as **mutualities** of this pentad:
+- **identity ≙ content-addressing** = the **Semantics–Syntax** edge (*range-of-potential*) —
+  *"content addressing is the line between semantics and syntax"* (user's correction; **not**
+  the Functor/operation edge as first written). A value is itself.
+- **composition** and **associativity** = the **Number** (Grammar–Sign, quantitative-match)
+  and **Colour** (Grammar–Symbol, qualitative-match) edges — **but which-is-which is
+  UNRESOLVED**: the user gave two opposite mappings in one message —
+  *"number should be composition, colour associativity"* vs *"composition replaces colour and
+  associativity replaces number as qualitative/quantitative match."* **Not baked into the graph
+  data** until confirmed. The user also notes these may sit better as **new nodes on the
+  aspiration (Grammar–Semantics) / operation (Grammar–Syntax) edges** rather than relabelling
+  Number/Colour — a later refinement.
+
+This dovetails with *The reference tuple* in `architecture-systems.md`: content-addressing
+supplies **identity**, and the S₃ traversals supply the **associative** lookup — so the
+store's identity/associativity halves are pentad edges. [Proposed; firmer than the
+CT-axioms-as-triad-edges reading, which stays cooled off. Number/Colour direction pending.]
 
 ## AD4M resolution (subject · predicate · object)
 
