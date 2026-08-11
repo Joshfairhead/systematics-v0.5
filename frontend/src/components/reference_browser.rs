@@ -602,6 +602,24 @@ fn table_view(ctx: TableCtx) -> Html {
         .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
         .filter(|row| in_scope(row, scope))
         .collect();
+    // A reference is **metadata on its subject system**, not a peer row. If the
+    // system it cites is already shown, fold the reference away (this is what made
+    // a whole-system citation appear as a second, duplicate "system"). References
+    // whose subject isn't shown still surface (they're the only representation).
+    let shown_sys: HashSet<&str> = rows
+        .iter()
+        .filter_map(|r| match r {
+            Row::Sys(s) => Some(s.id.as_str()),
+            _ => None,
+        })
+        .collect();
+    rows.retain(|r| match r {
+        Row::Ref(rf) => rf
+            .target_system
+            .as_ref()
+            .is_none_or(|ts| !shown_sys.contains(ts.id.as_str())),
+        _ => true,
+    });
     // Default row order: by systematic order (the header axis).
     rows.sort_by_key(|row| row.order());
 
