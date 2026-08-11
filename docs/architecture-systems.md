@@ -443,6 +443,53 @@ fragment; the containing whole (pentad?) is **not yet known** — do not assert 
 This is the concrete data model behind "the Data Object store," articulated with the
 user (2026-08-11). It resolves *how* a system is assembled from components with provenance.
 
+**RESOLVED — the primitive is an SPO triple, not `key·value·source` (user, 2026-08-11).**
+The user correctly rejected `location · key · value · source` as the unit: in it,
+*location* and *source* are **both keys with their own values**, and "order 3" already
+splits into key `order` + value `3` — so singling out one "key" and one "value" is
+arbitrary, and *"keys and values don't make a whole lot of sense"* at this grain. The fix:
+the atomic unit is a **Subject · Predicate · Object** triple — a directed **AD4M/RDF link**.
+Everything decomposes into these:
+- `⟨node⟩ · order · 3` · `⟨node⟩ · position · 1` · `⟨node⟩ · term · Will`
+- `⟨system⟩ · coherence · Dynamism`
+
+So there is **no privileged key/value**: `order`, `position`, `coherence`, the designations,
+`source` are all **predicates**; `3`, `1`, `Dynamism`, `DU3` are all **objects**; the entity
+is the **subject**. This answers the open questions:
+- **"All keys are anchors."** ✅ Yes — every **predicate** is an anchor (a column you can
+  enter the graph from). System Order, Coherence, Term-Designation, Connective-Designation
+  are the predicates every system carries; Term/Connective **characters** are predicates too,
+  more instance-dependent.
+- **"Location is made up; use order + position, compute location."** ✅ Adopted. Don't store
+  a `location` node — store `⟨node⟩·order·3` and `⟨node⟩·position·1`; **location = the pair,
+  computed.** Terms attach to those (Will at order 3, position 1), no `location` anchor needed.
+- **Provenance = reify the link.** *"There must be a link from reference to 3 and coherence
+  to know the value is Dynamism"* — exactly RDF reification / an AD4M link-as-entity: the
+  assertion becomes a subject, `⟨assertion⟩·source·DU3`, and the Citation triad
+  (Source·Artefact·Lookup) hangs off it. Two assertions coexist on the same
+  `(system, coherence)`: `·source·DU3 → Dynamism` and `·source·DU1 → Relatedness` — a
+  compound, no contradiction.
+- **Sort/Filter = index by triple position.** *"Sort by the value of DU1 and filter by the
+  key of triads"* → **Sort** indexes the **object** (value = `DU1`); **Filter** indexes the
+  **predicate/object** (key = `order`=`3`). Each of Sort/Filter can act on any of S/P/O — so
+  they are not fixed to key or value; that flexibility *is* the by-key/by-value freedom. A
+  triple-store keeps the **S₃ permutation indexes** (SPO, POS, OSP, …) precisely for this —
+  the concrete, non-hand-wavy version of "the six laws are the traversals."
+- **We already have most of it.** The codebase `Reference` is nearly this SPO-with-provenance
+  link: `target = "system:<id>#<fragment>"` is **subject + predicate**, and it carries
+  `source/artefact/lookup` (**provenance**). The missing piece is the **object** — the
+  *asserted value* (e.g. `Dynamism`) as a first-class, content-addressed node rather than a
+  string on the target system. Completing that = the #25 remodel = the first cut.
+- **Tension to respect [known].** SPO is **directed**; a systematics triad is **undirected**
+  (AD4M codifies a *directed dyad*). The store layer is directed SPO (fine for facts/queries);
+  the **six laws (S₃) are the six directed readings** of the undirected triad — so directedness
+  enters by *choosing a reading*. Don't conflate the storage primitive (directed SPO) with the
+  semantic object (the undirected K_n).
+
+*(The `location · key · value · source` framing below is superseded by SPO above, but its
+content-addressing / reciprocal-lookup / six-laws-as-traversal reasoning still holds — read
+"key" as "predicate", "value" as "object", "location" as "the order+position predicates".)*
+
 **Two strata: canonical topology (unreferenced) vs referenced semantics.**
 - **Topology is canonical and needs no reference.** Order *n* ⇒ *n* positions and
   `C(n,2)` edges (a K_n). "Position 1 of a triad," "the edge (1,2)" are pure coordinates —
@@ -527,6 +574,17 @@ infrastructure" the user pointed at, expressed in-graph. The **Nullad = the
 content-addressed heap** (the DHT / bulk); a **Monad = a scoped perspective that draws a
 boundary — a "universe"** — over that heap (so fragments need no home *other than* the
 heap; the Monad is the home). [Recommended direction — awaiting sign-off before build.]
+
+**Many triads need "worlds" to fit into [user, 2026-08-11].** Scraping *The Dramatic
+Universe* Vol. 2 for triads yields a *lot* of them — free-floating triads that need
+**containing systems** to make sense of. This is the **fragment → fold-in** loop and the
+**Monad-as-universe** boundary together: an isolated triad is a *face* of some larger K_n,
+and its **"world"** is the higher-order system (or the scoped Monad) it inhabits — Bennett's
+own doctrine of **Worlds** (DU Vol. 2–3) is exactly this containment. So the store must
+make a triad **first-class and addressable even before its world is known** (a dangling
+fragment in the heap), and let a Monad later *claim* it into a world. Practically: the SPO
+store + the bucket/Monad = a triad can exist in the Nullad heap and be pulled into as many
+worlds (Monads) as cite it. [Direction; the "world" system-type is not yet modelled.]
 
 ## The generative process — symmetric doubling [proposed]
 

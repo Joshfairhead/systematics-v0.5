@@ -43,9 +43,9 @@ characters expressed as functors/morphisms with the right name).
 
 | Edge (Limit–Limit) | Mutuality | Instance in the tool | |
 |---|---|---|---|
-| Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position) | [U] |
-| Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering) | [U] |
-| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (core notions: identity, composition, associativity) | [U] |
+| Grammar – Sign | **quantitative-match** | **Number** — Order (1–12) + Position (expresses order *and* position); **read as CT associativity** (user 2026-08-11) | [U] |
+| Grammar – Symbol | **qualitative-match** | **Colour** — the colour vocabulary (qualitative rendering); **read as CT composition** (user 2026-08-11) | [U] |
+| Grammar – Syntax | **operation** | **Functor / morphism** — category theory: the substrate *language* the system is written in (core notions: identity, composition, associativity); the CT-**identity** edge (≙ content-addressing: a value is itself) | [U] |
 | Grammar – Semantics | **aspiration** | the **set of coherence attributes** (monad→dodecad) as *demands* on each system — coherence-as-potential (a digital embodiment, not a label-field), actualized at the hexad | [P?] |
 | Sign – Semantics | **function** ✓ | the functional meaning of each sign | [U] |
 | Sign – Syntax | **input** | **assembly pieces** — points, coordinates, terms; and, in scope, **modules / data streams** | [U] |
@@ -58,6 +58,16 @@ The payoff: the pentad's edges are already-present layers of the codebase
 (number, colour, geometry/3D, functors, rendered systems, the compiler) — and
 where they aren't yet, they name what to build (module inputs, generative
 outputs). The architecture organizes itself into its own order-5 system.
+
+**The CT axioms live on the Grammar-edges [user, 2026-08-11 — supersedes CT-axioms-as-triad-edges].**
+The three category-theory axioms find a home not on a *triad's* edges (the cooled-off
+FBW reading) but as three **Grammar-incident mutualities** of this pentad:
+**identity** = the Grammar–Syntax *operation*/Functor edge (≙ content-addressing — a value
+is itself); **composition** = Grammar–Symbol (*Colour*); **associativity** = Grammar–Sign
+(*Number*). This dovetails with *The reference tuple* in `architecture-systems.md`:
+content-addressing supplies **identity**, and the S₃ traversals supply the
+**associative** lookup — so the store's two halves are two of the Grammar's own edges.
+[Proposed; firmer than the CT-axioms-as-triad-edges reading, which stays cooled off.]
 
 ## AD4M resolution (subject · predicate · object)
 
