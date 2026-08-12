@@ -850,6 +850,11 @@ button.row-open:hover {
     color: #1d4ed8;
     font-weight: 600;
 }
+/* Coherence-by-source: each perspective's coherence claim on a system (value · source). */
+.tag-coherence {
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+}
 /* A monad row: the name tag with a small delete ✕ trailing it. */
 .monad-cell {
     display: inline-flex;

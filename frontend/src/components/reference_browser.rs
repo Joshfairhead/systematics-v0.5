@@ -129,6 +129,7 @@ pub struct ExtractRequest {
 enum ColKey {
     Order,
     Name,
+    Coherence,
     Perspective,
     Citation,
     Cites,
@@ -136,9 +137,10 @@ enum ColKey {
 }
 
 /// Canonical column order (independent of the order keys were toggled on).
-const ALL_COLS: [ColKey; 6] = [
+const ALL_COLS: [ColKey; 7] = [
     ColKey::Order,
     ColKey::Name,
+    ColKey::Coherence,
     ColKey::Perspective,
     ColKey::Citation,
     ColKey::Cites,
@@ -150,6 +152,7 @@ impl ColKey {
         match self {
             ColKey::Order => "Order",
             ColKey::Name => "Name",
+            ColKey::Coherence => "Coherence",
             ColKey::Perspective => "Perspective",
             ColKey::Citation => "Citation",
             ColKey::Cites => "Cites",
@@ -340,7 +343,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let search = use_state(String::new);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
-    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Citation]);
+    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Coherence, ColKey::Citation]);
     // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
@@ -731,6 +734,44 @@ fn table_view(ctx: TableCtx) -> Html {
                 html! { <span title={ target_label }>{ cites }</span> }
             }
             (ColKey::Note, Row::Ref(r)) => html! { { r.note.clone().unwrap_or_default() } },
+            // A coherence assertion shown on its own (subject not present): its value.
+            (ColKey::Coherence, Row::Ref(r)) => {
+                if frag(r) == "coherence" {
+                    match &r.object {
+                        Some(o) => html! { <span class="tag tag-coherence">{ o }</span> },
+                        None => html! {},
+                    }
+                } else {
+                    html! {}
+                }
+            }
+            // Coherence-by-source: every perspective's coherence claim on THIS system,
+            // gathered from the references that target `system:<id>#coherence` (their
+            // SPO `object` is the value). This is the reference-tuple made visible.
+            (ColKey::Coherence, Row::Sys(s)) => {
+                let want = format!("system:{}#coherence", s.id);
+                let items: Vec<Html> = refs
+                    .iter()
+                    .filter(|r| r.target == want)
+                    .filter_map(|r| {
+                        r.object
+                            .clone()
+                            .map(|o| (o, r.perspective_name.clone().unwrap_or_default()))
+                    })
+                    .map(|(val, src)| {
+                        html! {
+                            <span class="tag tag-coherence" title={ src.clone() }>
+                                { if src.is_empty() { val } else { format!("{val} · {src}") } }
+                            </span>
+                        }
+                    })
+                    .collect();
+                if items.is_empty() {
+                    html! {}
+                } else {
+                    html! { <span class="tags">{ for items }</span> }
+                }
+            }
             // System rows carry no perspective/citation/cites/note — a whole system.
             (ColKey::Cites, Row::Sys(_)) => html! { { "whole system" } },
             (_, Row::Sys(_)) => html! {},
