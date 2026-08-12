@@ -124,6 +124,12 @@ pub struct Reference {
     pub lookup_ref: Option<String>,
     #[serde(default)]
     pub note: Option<String>,
+    /// The **object** of the SPO triple this reference asserts: the *value* the
+    /// source affixes to `target` (the predicate). E.g. target `…#coherence`,
+    /// object `"Relatedness"` (per DU1). `None` = the reference only points, it
+    /// does not (yet) carry its asserted value. (The #25 reference-tuple field.)
+    #[serde(default)]
+    pub object: Option<String>,
 }
 
 impl Reference {
@@ -145,7 +151,14 @@ impl Reference {
             artefact_ref,
             lookup_ref,
             note,
+            object: None,
         }
+    }
+
+    /// Set the asserted **object** (value) of this reference (the #25 field).
+    pub fn with_object(mut self, object: Option<String>) -> Self {
+        self.object = object;
+        self
     }
 
     /// Deterministic id from perspective + target + source.

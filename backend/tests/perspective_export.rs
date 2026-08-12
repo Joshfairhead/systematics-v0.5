@@ -26,20 +26,22 @@ fn bundled_module_reexports_its_own_systems() {
 
     let exported = graph.export_perspective("perspective_dramatic_universe_vol_1");
 
-    // DU1 owns 12 systemic-attribute systems. Before the bundled/canonical split
-    // these were dropped on re-export (module ids had been marked canonical).
+    // DU1 now owns a single system — its **Coherence Dodecad** (the 12 categories)
+    // — and references the canonical systems by address (it was re-declared onto
+    // canonical, dropping its 12 empty per-order shells). The one owned system must
+    // still survive re-export (the bundled/canonical split guarantee).
     assert_eq!(
         exported.systems.len(),
-        12,
-        "DU1 must re-export its own 12 systems, got {}",
+        1,
+        "DU1 must re-export its own Coherence Dodecad, got {}",
         exported.systems.len()
     );
     assert!(
         exported
             .systems
             .iter()
-            .any(|s| s.id == "system_dramatic_universe_i_triad_3"),
-        "the DU1 triad system must survive re-export"
+            .any(|s| s.id == "system_du1_coherence_dodecad_12"),
+        "the DU1 Coherence Dodecad must survive re-export"
     );
 }
 
@@ -74,11 +76,13 @@ fn du1_module_round_trips_losslessly() {
     let assembled = assembled_graph();
     let exported = assembled.export_perspective("perspective_dramatic_universe_vol_1");
 
-    // DU1 is fully self-contained today (owns its systems + citation entities),
-    // so it has no external dependencies.
+    // DU1 now composes by address (like DU3): it references the canonical systems,
+    // so its manifest records those canonical deps rather than being empty.
     assert!(
-        exported.manifest.is_empty(),
-        "DU1 owns everything it cites; manifest should be empty, got {:?}",
+        exported
+            .manifest
+            .contains(&"system:system_canonical_heptad_7".to_string()),
+        "DU1 now cites canonical systems; manifest must record them, got {:?}",
         exported.manifest
     );
 
@@ -154,10 +158,19 @@ fn manifest_serializes_additively() {
     // GraphQL query returns.
     let graph = assembled_graph();
 
-    let du1 = graph.export_perspective("perspective_dramatic_universe_vol_1");
-    let du1_json = serde_json::to_string(&du1).unwrap();
+    // A self-contained module (owns everything it cites) has an empty manifest,
+    // which must be omitted from JSON. The Architecture Pentad owns + cites only
+    // its own pentad, so it is such a module. (DU1 no longer is — it now cites
+    // canonical by address.)
+    let pentad = graph.export_perspective("perspective_architecture_pentad");
+    let pentad_json = serde_json::to_string(&pentad).unwrap();
     assert!(
-        !du1_json.contains("manifest"),
+        pentad.manifest.is_empty(),
+        "the Architecture Pentad owns everything it cites, got {:?}",
+        pentad.manifest
+    );
+    assert!(
+        !pentad_json.contains("manifest"),
         "an empty manifest must be omitted from JSON, so old files stay identical"
     );
 

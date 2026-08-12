@@ -29,6 +29,7 @@ async fn all_references_exposes_resolved_browser_fields() {
                 perspectiveName
                 target
                 targetFragment
+                object
                 targetSystem { order name coherence }
             }
         }
@@ -37,20 +38,20 @@ async fn all_references_exposes_resolved_browser_fields() {
     assert!(resp.errors.is_empty(), "query errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
     let refs = data["allReferences"].as_array().unwrap();
-    assert_eq!(refs.len(), 75, "all 75 references present");
+    assert_eq!(refs.len(), 64, "all 64 references present");
 
-    // DU1's heptad coherence citation: system:system_dramatic_universe_i_heptad_7#coherence.
+    // DU1 now asserts its heptad coherence onto the CANONICAL heptad, carrying the
+    // value ("Structure") as the reference's SPO `object`.
     let du1_heptad = refs
         .iter()
-        .find(|r| r["target"] == "system:system_dramatic_universe_i_heptad_7#coherence")
-        .expect("DU1 heptad coherence citation present");
+        .find(|r| r["target"] == "system:system_canonical_heptad_7#coherence"
+            && r["perspectiveName"] == "Dramatic Universe Vol 1")
+        .expect("DU1 heptad coherence citation onto canonical present");
 
-    // The perspective *name* (the reference web), distinct from the artefact title.
-    assert_eq!(du1_heptad["perspectiveName"], "Dramatic Universe Vol 1");
     assert_eq!(du1_heptad["targetFragment"], "coherence");
     assert_eq!(du1_heptad["targetSystem"]["order"], 7);
-    // The value that the compare matrix shows for DU1's heptad column.
-    assert_eq!(du1_heptad["targetSystem"]["coherence"], "Structure");
+    // The value DU1 affixes is now the reference `object` (not a field on a shell).
+    assert_eq!(du1_heptad["object"], "Structure");
 }
 
 #[tokio::test]
@@ -70,10 +71,11 @@ async fn whole_system_citation_has_empty_fragment() {
     let refs = data["allReferences"].as_array().unwrap();
 
     // A whole-system citation (no '#') resolves an empty fragment but still a system.
+    // DU1's whole-system citation now points at its Coherence Dodecad (order 12).
     let whole = refs
         .iter()
-        .find(|r| r["target"] == "system:system_dramatic_universe_i_heptad_7")
-        .expect("DU1 whole-heptad citation present");
+        .find(|r| r["target"] == "system:system_du1_coherence_dodecad_12")
+        .expect("DU1 whole-dodecad citation present");
     assert_eq!(whole["targetFragment"], "");
-    assert_eq!(whole["targetSystem"]["order"], 7);
+    assert_eq!(whole["targetSystem"]["order"], 12);
 }

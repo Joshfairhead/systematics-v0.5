@@ -29,8 +29,8 @@ fn embedded_modules_are_complete_without_a_filesystem() {
     );
     assert_eq!(
         graph.references.len(),
-        75,
-        "all 75 references must be embedded in the binary"
+        64,
+        "all 64 references must be embedded in the binary"
     );
     assert_eq!(
         graph.perspectives().len(),
@@ -38,7 +38,7 @@ fn embedded_modules_are_complete_without_a_filesystem() {
         "all 15 perspectives must be embedded in the binary"
     );
     assert!(
-        graph.system("system_dramatic_universe_i_triad_3").is_some(),
+        graph.system("system_du1_coherence_dodecad_12").is_some(),
         "a module-owned system must be present from the embedded copy"
     );
 

@@ -1999,6 +1999,11 @@ impl GqlReference {
     async fn note(&self) -> Option<&str> {
         self.inner.note.as_deref()
     }
+    /// The **object** of the SPO assertion — the *value* the source affixes to the
+    /// target predicate (e.g. target `…#coherence`, object `"Relatedness"`). #25.
+    async fn object(&self) -> Option<&str> {
+        self.inner.object.as_deref()
+    }
     /// Resolve the cited Source (provenance origin).
     async fn source(&self, ctx: &Context<'_>) -> Option<GqlSource> {
         let g = graph_snapshot(ctx).await;

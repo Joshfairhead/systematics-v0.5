@@ -89,6 +89,10 @@ pub struct ReferenceView {
     /// system). `None` unless selected.
     #[serde(rename = "targetFragment", default)]
     pub target_fragment: Option<String>,
+    /// The **object** of the SPO assertion — the value the source affixes to the
+    /// target predicate (e.g. `coherence` → `"Structure"` per DU1). #25.
+    #[serde(default)]
+    pub object: Option<String>,
     /// Resolved target System (order/name/coherence/designations). `None` unless
     /// selected or when the target system isn't loaded.
     #[serde(rename = "targetSystem", default)]
@@ -466,6 +470,7 @@ impl GraphQLClient {
                     note
                     perspectiveName
                     targetFragment
+                    object
                     source { name kind }
                     artefact { title url }
                     lookup { locator }

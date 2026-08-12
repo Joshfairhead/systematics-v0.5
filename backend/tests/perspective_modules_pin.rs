@@ -20,23 +20,15 @@
 use systematics_backend::core::Graph;
 use systematics_backend::data;
 
-/// The 17 systems that live in (are owned by) the perspective module files:
-/// DU1's 12 systemic-attribute systems, DU2's 3 systems, the Elementary
-/// Systematics triad, and the self-describing Architecture Pentad. Canonical
-/// (12) and citation (1) systems are seeded separately and are *not* here.
+/// The 6 systems that live in (are owned by) the perspective module files:
+/// DU1's single **Coherence Dodecad** (its 12 categories, was 12 empty shells),
+/// DU2's 3 systems, the Elementary Systematics triad, and the self-describing
+/// Architecture Pentad. Canonical (12) and citation (1) systems are seeded
+/// separately and are *not* here.
 const MODULE_OWNED_SYSTEMS: &[&str] = &[
-    "system_dramatic_universe_i_monad_1",
-    "system_dramatic_universe_i_dyad_2",
-    "system_dramatic_universe_i_triad_3",
-    "system_dramatic_universe_i_tetrad_4",
-    "system_dramatic_universe_i_pentad_5",
-    "system_dramatic_universe_i_hexad_6",
-    "system_dramatic_universe_i_heptad_7",
-    "system_dramatic_universe_i_octad_8",
-    "system_dramatic_universe_i_ennead_9",
-    "system_dramatic_universe_i_decad_10",
-    "system_dramatic_universe_i_undecad_11",
-    "system_dramatic_universe_i_dodecad_12",
+    // DU1 no longer owns 12 empty per-order shells — it references the *canonical*
+    // systems (like DU3) and collects its 12 coherence categories in ONE Dodecad.
+    "system_du1_coherence_dodecad_12",
     "system_dramatic_universe_ii_dyad_2",
     "system_dramatic_universe_ii_triad_3",
     "system_dramatic_universe_ii_tetrad_4",
@@ -79,8 +71,9 @@ fn all_references_present_and_resolve() {
 
     assert_eq!(
         graph.references.len(),
-        75,
-        "expected 75 references (68 sources + 7 on the Architecture Pentad)"
+        64,
+        "expected 64 references (DU1 re-declared onto canonical: 27→15, carrying \
+         coherence values as reference `object`s)"
     );
 
     // Every reference targets `system:<id>[#...]`; each must resolve to a System
@@ -115,11 +108,12 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 21 fragments + 17 module-owned.
+    // Total systems = 12 canonical + 1 citation + 21 fragments + 6 module-owned
+    // (DU1's 12 shells collapsed into 1 Coherence Dodecad: 17 → 6 module systems).
     assert_eq!(
         graph.systems.len(),
-        51,
-        "expected 12 canonical + 1 citation + 21 fragment + 17 module systems"
+        40,
+        "expected 12 canonical + 1 citation + 21 fragment + 6 module systems"
     );
 }
 
