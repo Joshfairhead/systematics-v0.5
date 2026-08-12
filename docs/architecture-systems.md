@@ -550,6 +550,21 @@ sort/filter by key OR by value:** grouping by the `key` column is sort-by-key; g
 the `value` column is sort-by-value; filtering by `source` is filter-by-reference. The
 store and the query are the *same* structure seen from different columns.
 
+**BUILT — the Filter is now an SPO query (2026-08-12).** The primitive cite-degree filter
+was replaced by a **predicate → object** drill-down (`reference_browser.rs`): pick a
+**predicate (key)** — Type · Order · Coherence · Source — and the filter surfaces that
+predicate's distinct **objects (values)** to pick from. Crucially the value is **not
+attached to the subject** (no coherence *column*); selecting the `coherence` predicate
+*discovers* its options (Wholeness … Relatedness … Autocracy, and any conflicting
+Dynamism) and picking one keeps the subjects asserting it (Relatedness → the canonical
+Triad). `Type` keeps the old row-kind chips as the base predicate. This is the user's
+"display the two options when the coherence key is selected." **Only `coherence` is a real
+SPO object so far** (from DU1's references); `order`/`source` read system-fields/perspective,
+`term`/`connective` predicates come as the data is **transformed into SPO** — which the user
+noted is *itself a meta-ELT/Operations act* (extract the field → load as a reference →
+transform the primitive): the tool ELT-ing its own schema. Next: a Term predicate over
+`#term:N` reference objects, then systems.
+
 **Content-addressing (identity) + the six laws (associativity of reading) [proposed —
 answers "are the six laws associativity laws?"].** Content addressing supplies **identity**
 (the `e`/`123` law: a value equals itself). The *lookup* is the other half, and it is
