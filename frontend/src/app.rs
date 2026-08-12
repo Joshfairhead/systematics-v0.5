@@ -720,6 +720,8 @@ impl Component for ApiApp {
                 id: s.system_id.clone(),
                 name: s.name.clone(),
                 order: s.order,
+                terms: s.terms.iter().map(|t| t.value.clone()).collect(),
+                connectives: s.connectives.iter().map(|c| c.character_value.clone()).collect(),
             })
             .collect();
         all_systems.extend(self.instance_systems.iter().cloned());

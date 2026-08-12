@@ -1628,6 +1628,31 @@ impl GqlSystem {
     async fn vocabulary_ref(&self) -> &str {
         &self.inner.vocabulary_ref
     }
+    /// The system's **term-character values** (the vocabulary's nouns), resolved —
+    /// so the SPO filter can offer/match every system's terms (a base-space read).
+    async fn terms(&self, ctx: &Context<'_>) -> Vec<String> {
+        let g = graph_snapshot(ctx).await;
+        g.vocabulary(&self.inner.vocabulary_ref)
+            .map(|v| {
+                v.terms
+                    .iter()
+                    .filter_map(|c| g.character(c).map(|c| c.value.clone()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+    /// The system's **connective-character values** (the vocabulary's verbs), resolved.
+    async fn connectives(&self, ctx: &Context<'_>) -> Vec<String> {
+        let g = graph_snapshot(ctx).await;
+        g.vocabulary(&self.inner.vocabulary_ref)
+            .map(|v| {
+                v.connectives
+                    .iter()
+                    .filter_map(|c| g.character(c).map(|c| c.value.clone()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
 }
 
 pub struct GqlSequence {

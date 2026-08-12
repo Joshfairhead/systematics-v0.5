@@ -408,6 +408,18 @@ fn pred_values(pred: FilterPred, systems: &[InstanceSystem], refs: &[ReferenceVi
                 }
             }
         }
+        // Term/Connective: base-space values (every system's own characters) UNION
+        // any perspectival assertions (references carrying an object).
+        FilterPred::Term => {
+            for s in systems {
+                set.extend(s.terms.iter().cloned());
+            }
+        }
+        FilterPred::Connective => {
+            for s in systems {
+                set.extend(s.connectives.iter().cloned());
+            }
+        }
         p => {
             if let Some(fk) = p.fragment_key() {
                 for r in refs {
@@ -416,6 +428,16 @@ fn pred_values(pred: FilterPred, systems: &[InstanceSystem], refs: &[ReferenceVi
                             set.insert(o.clone());
                         }
                     }
+                }
+            }
+        }
+    }
+    // Also fold in perspectival assertions (reference objects) for fragment preds.
+    if let Some(fk) = pred.fragment_key() {
+        for r in refs {
+            if frag_pred(&frag(r)) == fk {
+                if let Some(o) = &r.object {
+                    set.insert(o.clone());
                 }
             }
         }
@@ -448,12 +470,20 @@ fn spo_match(row: &Row, pred: FilterPred, vals: &HashSet<String>, refs: &[Refere
             let fk = p.fragment_key().unwrap_or("");
             match row {
                 Row::Sys(s) => {
+                    // Base-space: the system's own characters (Term/Connective).
+                    let field_match = match p {
+                        FilterPred::Term => s.terms.iter().any(|t| vals.contains(t)),
+                        FilterPred::Connective => s.connectives.iter().any(|c| vals.contains(c)),
+                        _ => false,
+                    };
+                    // Perspectival: an assertion (reference object) on this system.
                     let prefix = format!("system:{}#", s.id);
-                    refs.iter().any(|r| {
+                    let ref_match = refs.iter().any(|r| {
                         r.target.starts_with(&prefix)
                             && frag_pred(&frag(r)) == fk
                             && r.object.as_ref().is_some_and(|o| vals.contains(o))
-                    })
+                    });
+                    field_match || ref_match
                 }
                 Row::Ref(r) => {
                     frag_pred(&frag(r)) == fk && r.object.as_ref().is_some_and(|o| vals.contains(o))

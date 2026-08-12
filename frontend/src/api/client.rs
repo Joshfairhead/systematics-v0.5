@@ -124,6 +124,12 @@ pub struct InstanceSystem {
     pub id: String,
     pub name: String,
     pub order: i32,
+    /// The system's term-character values (nouns) — for the SPO Term predicate.
+    #[serde(default)]
+    pub terms: Vec<String>,
+    /// The system's connective-character values (verbs) — for the Connective predicate.
+    #[serde(default)]
+    pub connectives: Vec<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -350,7 +356,7 @@ impl GraphQLClient {
 
     /// The non-canonical instance systems the Load control browses.
     pub async fn fetch_instance_systems(&self) -> Result<Vec<InstanceSystem>, ApiError> {
-        let query = r#"query { instanceSystems { id name order } }"#;
+        let query = r#"query { instanceSystems { id name order terms connectives } }"#;
         let response: GraphQLResponse<InstanceSystemsResponse> =
             self.execute_query(query, None).await?;
         if let Some(errors) = response.errors {
