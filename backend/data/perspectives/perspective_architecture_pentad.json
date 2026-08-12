@@ -13,7 +13,7 @@
     {
       "id": "char_word_colour",
       "kind": "word",
-      "value": "Colour"
+      "value": "Associativity"
     },
     {
       "id": "char_word_functor",
@@ -38,7 +38,7 @@
     {
       "id": "char_word_number",
       "kind": "word",
-      "value": "Number"
+      "value": "Composition"
     },
     {
       "id": "char_word_progression",
