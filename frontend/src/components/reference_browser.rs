@@ -19,7 +19,7 @@
 //! system ids, not a shared canonical address), resolved server-side into
 //! `ReferenceView.target_system`.
 
-use std::collections::{BTreeSet, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -318,27 +318,73 @@ fn row_addr(row: &Row) -> Option<String> {
     }
 }
 
-/// The **predicate (key)** the Filter is currently querying. Filtering is an
-/// **SPO query**: pick a predicate, then pick its **objects (values)** — e.g.
-/// predicate `Coherence` surfaces `Relatedness`/`Dynamism`/… (never attached to a
-/// subject, discovered on selection). `Type` is the base predicate (row *kind*).
-#[derive(Clone, Copy, PartialEq)]
+/// A **predicate (key)** the Filter can query. Filtering is an **SPO query**: pick
+/// a predicate, then pick its **objects (values)** — e.g. `Coherence` surfaces
+/// `Relatedness`/`Dynamism`/… (never attached to a subject, discovered on
+/// selection). Constraints **stack**: each active predicate AND-s with the others.
+/// `Type` is the base predicate (row *kind*); the fragment predicates
+/// (Coherence/Term/Connective/designations) are auto-discovered from the data.
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 enum FilterPred {
     Type,
     Order,
-    Coherence,
     Source,
+    Coherence,
+    Term,
+    Connective,
+    TermDesignation,
+    ConnectiveDesignation,
 }
-const ALL_PREDS: [FilterPred; 4] =
-    [FilterPred::Type, FilterPred::Order, FilterPred::Coherence, FilterPred::Source];
+const ALL_PREDS: [FilterPred; 8] = [
+    FilterPred::Type,
+    FilterPred::Order,
+    FilterPred::Source,
+    FilterPred::Coherence,
+    FilterPred::Term,
+    FilterPred::Connective,
+    FilterPred::TermDesignation,
+    FilterPred::ConnectiveDesignation,
+];
 impl FilterPred {
     fn label(self) -> &'static str {
         match self {
             FilterPred::Type => "Type",
             FilterPred::Order => "Order",
-            FilterPred::Coherence => "Coherence",
             FilterPred::Source => "Source",
+            FilterPred::Coherence => "Coherence",
+            FilterPred::Term => "Term",
+            FilterPred::Connective => "Connective",
+            FilterPred::TermDesignation => "Term designation",
+            FilterPred::ConnectiveDesignation => "Connective designation",
         }
+    }
+    /// The reference `#fragment` this predicate reads its objects from, if any.
+    fn fragment_key(self) -> Option<&'static str> {
+        match self {
+            FilterPred::Coherence => Some("coherence"),
+            FilterPred::Term => Some("term"),
+            FilterPred::Connective => Some("connective"),
+            FilterPred::TermDesignation => Some("term-designation"),
+            FilterPred::ConnectiveDesignation => Some("connective-designation"),
+            _ => None,
+        }
+    }
+}
+
+/// Map a reference `#fragment` to its predicate key (`term:2` → `term`, …).
+fn frag_pred(f: &str) -> &'static str {
+    if f == "coherence" {
+        "coherence"
+    } else if f.starts_with("term:") {
+        "term"
+    } else if f.starts_with("conn:") {
+        "connective"
+    } else if f == "term-designation" {
+        "term-designation"
+    } else if f == "connective-designation" {
+        "connective-designation"
+    } else {
+        ""
     }
 }
 
@@ -353,15 +399,6 @@ fn pred_values(pred: FilterPred, systems: &[InstanceSystem], refs: &[ReferenceVi
                 set.insert(order_name(s.order));
             }
         }
-        FilterPred::Coherence => {
-            for r in refs {
-                if frag(r) == "coherence" {
-                    if let Some(o) = &r.object {
-                        set.insert(o.clone());
-                    }
-                }
-            }
-        }
         FilterPred::Source => {
             for r in refs {
                 if let Some(p) = &r.perspective_name {
@@ -371,13 +408,24 @@ fn pred_values(pred: FilterPred, systems: &[InstanceSystem], refs: &[ReferenceVi
                 }
             }
         }
+        p => {
+            if let Some(fk) = p.fragment_key() {
+                for r in refs {
+                    if frag_pred(&frag(r)) == fk {
+                        if let Some(o) = &r.object {
+                            set.insert(o.clone());
+                        }
+                    }
+                }
+            }
+        }
     }
     set.into_iter().collect()
 }
 
-/// Whether a **subject row** satisfies the SPO value-filter: it carries a
-/// `(predicate, value)` assertion for some selected value. Empty selection = no
-/// constraint (all pass). `Type` is handled by the kind filter, not here.
+/// Whether a **subject row** satisfies ONE predicate's value-filter (empty selection
+/// = no constraint). Fragment predicates match a `system:<id>#<frag>` assertion whose
+/// `object` is selected; `Order`/`Source` read the system field / perspective.
 fn spo_match(row: &Row, pred: FilterPred, vals: &HashSet<String>, refs: &[ReferenceView]) -> bool {
     if vals.is_empty() {
         return true;
@@ -385,18 +433,6 @@ fn spo_match(row: &Row, pred: FilterPred, vals: &HashSet<String>, refs: &[Refere
     match pred {
         FilterPred::Type => true,
         FilterPred::Order => row.order().is_some_and(|o| vals.contains(&order_name(o))),
-        FilterPred::Coherence => match row {
-            Row::Sys(s) => {
-                let want = format!("system:{}#coherence", s.id);
-                refs.iter().any(|r| {
-                    r.target == want && r.object.as_ref().is_some_and(|o| vals.contains(o))
-                })
-            }
-            Row::Ref(r) => {
-                frag(r) == "coherence" && r.object.as_ref().is_some_and(|o| vals.contains(o))
-            }
-            _ => false,
-        },
         FilterPred::Source => match row {
             Row::Ref(r) => r.perspective_name.as_ref().is_some_and(|p| vals.contains(p)),
             Row::Sys(s) => {
@@ -408,7 +444,29 @@ fn spo_match(row: &Row, pred: FilterPred, vals: &HashSet<String>, refs: &[Refere
             }
             _ => false,
         },
+        p => {
+            let fk = p.fragment_key().unwrap_or("");
+            match row {
+                Row::Sys(s) => {
+                    let prefix = format!("system:{}#", s.id);
+                    refs.iter().any(|r| {
+                        r.target.starts_with(&prefix)
+                            && frag_pred(&frag(r)) == fk
+                            && r.object.as_ref().is_some_and(|o| vals.contains(o))
+                    })
+                }
+                Row::Ref(r) => {
+                    frag_pred(&frag(r)) == fk && r.object.as_ref().is_some_and(|o| vals.contains(o))
+                }
+                _ => false,
+            }
+        }
     }
+}
+
+/// A row passes the Filter when it satisfies **every** stacked predicate constraint.
+fn spo_all(row: &Row, constraints: &HashMap<FilterPred, HashSet<String>>, refs: &[ReferenceView]) -> bool {
+    constraints.iter().all(|(p, vals)| spo_match(row, *p, vals, refs))
 }
 
 /// All Nullad rows (every System + Sequence/Monad + Reference + focused raw
@@ -438,10 +496,11 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
     let active_kinds = use_state(|| vec![CiteKind::System, CiteKind::Sequence]);
-    // SPO filter: which predicate (key) is being queried, and the selected object
-    // values. `Type` uses `active_kinds`; other predicates use `spo_vals`.
+    // SPO filter: which predicate (key) is being *viewed* in the menu, and the
+    // **stacked** constraints (predicate → selected object values). `Type` uses
+    // `active_kinds`; the other predicates stack here and AND together.
     let filter_pred = use_state(|| FilterPred::Type);
-    let spo_vals = use_state(HashSet::<String>::new);
+    let spo_constraints = use_state(HashMap::<FilterPred, HashSet<String>>::new);
     // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
     let selected = use_state(HashSet::<String>::new);
     // Editor: author a new System from custom values (the app-authored path).
@@ -468,7 +527,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, &active_kinds, &needle))
         .filter(|row| in_scope(row, scope))
-        .filter(|row| spo_match(row, *filter_pred, &spo_vals, refs))
+        .filter(|row| spo_all(row, &spo_constraints, refs))
         .filter_map(|row| row.system_addr())
         .filter(|m| seen.insert(m.clone()))
         .collect();
@@ -624,7 +683,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 filter_open: &filter_open,
                 active_kinds: &active_kinds,
                 filter_pred: &filter_pred,
-                spo_vals: &spo_vals,
+                spo_constraints: &spo_constraints,
                 selected: &selected,
                 new_btn,
                 elt_btns,
@@ -662,9 +721,9 @@ struct TableCtx<'a> {
     /// Filter (−) popover — scoping the data by cite-degree.
     filter_open: &'a UseStateHandle<bool>,
     active_kinds: &'a UseStateHandle<Vec<CiteKind>>,
-    /// SPO filter: the queried predicate + its selected object values.
+    /// SPO filter: the viewed predicate + the stacked (predicate → values) constraints.
     filter_pred: &'a UseStateHandle<FilterPred>,
-    spo_vals: &'a UseStateHandle<HashSet<String>>,
+    spo_constraints: &'a UseStateHandle<HashMap<FilterPred, HashSet<String>>>,
     /// Selected row addresses (row-select CRUD).
     selected: &'a UseStateHandle<HashSet<String>>,
     /// New toggle (placed left of Sort); ELT buttons (right of search); and the
@@ -692,7 +751,7 @@ fn table_view(ctx: TableCtx) -> Html {
         filter_open,
         active_kinds,
         filter_pred,
-        spo_vals,
+        spo_constraints,
         selected,
         new_btn,
         elt_btns,
@@ -706,7 +765,7 @@ fn table_view(ctx: TableCtx) -> Html {
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
         .filter(|row| in_scope(row, scope))
-        .filter(|row| spo_match(row, **filter_pred, spo_vals, refs))
+        .filter(|row| spo_all(row, spo_constraints, refs))
         .collect();
     // A reference is **metadata on its subject system**, not a peer row. If the
     // system it cites is already shown, fold the reference away (this is what made
@@ -767,32 +826,34 @@ fn table_view(ctx: TableCtx) -> Html {
             </button>
         }
     };
-    // Filter (−), SPO redesign — pick the **predicate** (key) to query…
+    // Filter (−), SPO redesign — pick the **predicate** (key) to query. Switching
+    // predicate keeps the other constraints (they stack). A dot marks a predicate
+    // that has active values.
     let pred_tab = |p: FilterPred| -> Html {
         let on = **filter_pred == p;
+        let active = spo_constraints.get(&p).is_some_and(|v| !v.is_empty());
         let fp = filter_pred.clone();
-        let sv = spo_vals.clone();
-        let onclick = Callback::from(move |_: MouseEvent| {
-            fp.set(p);
-            sv.set(HashSet::new()); // switching predicate resets the object selection
-        });
+        let onclick = Callback::from(move |_: MouseEvent| fp.set(p));
         html! {
             <button class={ classes!("facet-tab", on.then_some("active")) } onclick={ onclick }>
-                { p.label() }
+                { p.label() }{ if active { " ●" } else { "" } }
             </button>
         }
     };
-    // …then pick its **objects** (values) — the SPO drill-down.
-    let val_chip = |v: String| -> Html {
-        let on = spo_vals.contains(&v);
-        let sv = spo_vals.clone();
+    // …then pick its **objects** (values) — the SPO drill-down. Toggling a value
+    // updates only this predicate's slot in the stacked constraints.
+    let val_chip = |p: FilterPred, v: String| -> Html {
+        let on = spo_constraints.get(&p).is_some_and(|s| s.contains(&v));
+        let sc = spo_constraints.clone();
         let vc = v.clone();
         let onclick = Callback::from(move |_: MouseEvent| {
-            let mut next = (*sv).clone();
-            if !next.remove(&vc) {
-                next.insert(vc.clone());
+            let mut next = (*sc).clone();
+            let slot = next.entry(p).or_default();
+            if !slot.remove(&vc) {
+                slot.insert(vc.clone());
             }
-            sv.set(next);
+            next.retain(|_, s| !s.is_empty()); // drop empty slots (no constraint)
+            sc.set(next);
         });
         html! {
             <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
@@ -885,7 +946,7 @@ fn table_view(ctx: TableCtx) -> Html {
     };
     let toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
     let toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
-    let scoped = active_kinds.len() < ALL_KINDS.len() || !spo_vals.is_empty();
+    let scoped = active_kinds.len() < ALL_KINDS.len() || !spo_constraints.is_empty();
 
     // Row-select CRUD: delete the selected addresses, then clear the selection.
     let on_delete_selected = {
@@ -940,9 +1001,16 @@ fn table_view(ctx: TableCtx) -> Html {
                     >{ if scoped { "Filter ● ▾" } else { "Filter ▾" } }</button>
                     if **filter_open {
                         <div class="control-menu">
-                            <span class="facet-label">{ "filter — predicate (key)" }</span>
+                            <span class="facet-label">{ "filter — predicate (key), stackable" }</span>
                             <div class="facet-tabs">
-                                { for ALL_PREDS.into_iter().map(pred_tab) }
+                                {
+                                    // Auto-discover: Type is always available; every other
+                                    // predicate appears only if the data has values for it.
+                                    for ALL_PREDS.into_iter()
+                                        .filter(|p| *p == FilterPred::Type
+                                            || !pred_values(*p, systems, refs).is_empty())
+                                        .map(pred_tab)
+                                }
                             </div>
                             <span class="facet-label">
                                 { format!("{} — objects (values)", (**filter_pred).label()) }
@@ -952,11 +1020,12 @@ fn table_view(ctx: TableCtx) -> Html {
                                     if **filter_pred == FilterPred::Type {
                                         html! { for ALL_KINDS.into_iter().map(kind_chip) }
                                     } else {
-                                        let vals = pred_values(**filter_pred, systems, refs);
+                                        let pred = **filter_pred;
+                                        let vals = pred_values(pred, systems, refs);
                                         if vals.is_empty() {
                                             html! { <span class="facet-hint">{ "no values in the current data" }</span> }
                                         } else {
-                                            html! { for vals.into_iter().map(val_chip) }
+                                            html! { for vals.into_iter().map(|v| val_chip(pred, v)) }
                                         }
                                     }
                                 }
