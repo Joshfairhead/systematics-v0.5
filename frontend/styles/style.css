@@ -880,6 +880,12 @@ button.row-open:hover {
     font-size: 0.78rem;
     font-style: italic;
 }
+/* The source(s) that assert an object — the quad's provenance, shown on a chip. */
+.facet-src {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 400;
+}
 /* A monad row: the name tag with a small delete ✕ trailing it. */
 .monad-cell {
     display: inline-flex;

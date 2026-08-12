@@ -19,7 +19,7 @@
 //! system ids, not a shared canonical address), resolved server-side into
 //! `ReferenceView.target_system`.
 
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -296,7 +296,8 @@ fn build_triples(
         });
     };
     for s in systems {
-        base(&s.id, "type", "System".into());
+        // No `type` predicate — order designates the system; a bare System/Monad
+        // "type" clashes with order=Monad and adds nothing.
         base(&s.id, "order", order_name(s.order));
         for term in &s.terms {
             base(&s.id, "term", term.clone());
@@ -305,9 +306,7 @@ fn build_triples(
             base(&s.id, "connective", c.clone());
         }
     }
-    for seq in seqs {
-        base(&seq.id, "type", "Monad".into());
-    }
+    let _ = seqs; // monads carry no base-space triples yet (they show unfiltered)
     for r in refs {
         let Some(ts) = &r.target_system else { continue };
         let src = r.perspective_name.clone().unwrap_or_default();
@@ -351,15 +350,23 @@ fn all_predicates(triples: &[Triple]) -> Vec<String> {
     out
 }
 
-/// Distinct **objects** for a predicate -- the values a user picks from.
-fn pred_objects(triples: &[Triple], pred: &str) -> Vec<String> {
-    let mut set: BTreeSet<String> = BTreeSet::new();
+/// Distinct **objects** for a predicate, each with the **sources** that assert it.
+/// A bare object is ambiguous (triad·coherence·? is Relatedness *or* Dynamism); the
+/// source is what disambiguates — so the store is really a QUAD (S·P·O·source), and
+/// the objects are shown source-qualified. Base-space facts have no source.
+fn pred_object_rows(triples: &[Triple], pred: &str) -> Vec<(String, Vec<String>)> {
+    let mut map: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for t in triples {
         if t.predicate == pred {
-            set.insert(t.object.clone());
+            let entry = map.entry(t.object.clone()).or_default();
+            if !t.source.is_empty() {
+                entry.insert(t.source.clone());
+            }
         }
     }
-    set.into_iter().collect()
+    map.into_iter()
+        .map(|(o, srcs)| (o, srcs.into_iter().collect()))
+        .collect()
 }
 
 /// Title-case a predicate key for display (`term-designation` -> `Term designation`).
@@ -443,7 +450,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // SPO filter over a flat triple store: which predicate (key) is being *viewed*
     // in the menu, and the **stacked** constraints (predicate → selected objects),
     // which AND together. Everything is a predicate now — `type` is not special.
-    let active_pred = use_state(|| "type".to_string());
+    let active_pred = use_state(|| "order".to_string());
     let spo_constraints = use_state(HashMap::<String, HashSet<String>>::new);
     // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
     let selected = use_state(HashSet::<String>::new);
@@ -767,9 +774,11 @@ fn table_view(ctx: TableCtx) -> Html {
             </button>
         }
     };
-    // …then pick its **objects** (values) — the SPO drill-down. Toggling a value
-    // updates only this predicate's slot in the stacked constraints.
-    let val_chip = |p: String, v: String| -> Html {
+    // …then pick its **objects** (values) — the SPO drill-down. Each object is shown
+    // with the **source(s)** that assert it (the quad), so multivalent objects
+    // (coherence: Relatedness·DU1 vs Dynamism·DU3) are disambiguated. Toggling a
+    // value updates only this predicate's slot in the stacked constraints.
+    let val_chip = |p: String, v: String, sources: Vec<String>| -> Html {
         let on = spo_constraints.get(&p).is_some_and(|s| s.contains(&v));
         let sc = spo_constraints.clone();
         let pc = p.clone();
@@ -783,9 +792,11 @@ fn table_view(ctx: TableCtx) -> Html {
             next.retain(|_, s| !s.is_empty()); // drop empty slots (no constraint)
             sc.set(next);
         });
+        let src = sources.join(", ");
         html! {
-            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
+            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick } title={ src.clone() }>
                 { v }
+                { if src.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" · {src}") }</span> } } }
             </button>
         }
     };
@@ -943,11 +954,11 @@ fn table_view(ctx: TableCtx) -> Html {
                             <div class="col-chips">
                                 { {
                                     let pred = (**active_pred).clone();
-                                    let vals = pred_objects(triples, &pred);
-                                    if vals.is_empty() {
+                                    let rows = pred_object_rows(triples, &pred);
+                                    if rows.is_empty() {
                                         html! { <span class="facet-hint">{ "no values in the current data" }</span> }
                                     } else {
-                                        html! { for vals.into_iter().map(|v| val_chip(pred.clone(), v)) }
+                                        html! { for rows.into_iter().map(|(v, srcs)| val_chip(pred.clone(), v, srcs)) }
                                     }
                                 } }
                             </div>
