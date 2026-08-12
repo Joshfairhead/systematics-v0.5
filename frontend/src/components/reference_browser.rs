@@ -452,6 +452,10 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // which AND together. Everything is a predicate now — `type` is not special.
     let active_pred = use_state(|| "order".to_string());
     let spo_constraints = use_state(HashMap::<String, HashSet<String>>::new);
+    // Reciprocal traversal: a **pinned subject** whose quads (predicate · object ·
+    // source) are shown — the S→(P,O,source) read, "a location advertising its
+    // values across sections".
+    let inspect = use_state(|| Option::<String>::None);
     // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
     let selected = use_state(HashSet::<String>::new);
     // Editor: author a new System from custom values (the app-authored path).
@@ -637,6 +641,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 active_pred: &active_pred,
                 spo_constraints: &spo_constraints,
                 triples: &triples,
+                inspect: &inspect,
                 selected: &selected,
                 new_btn,
                 elt_btns,
@@ -677,6 +682,8 @@ struct TableCtx<'a> {
     active_pred: &'a UseStateHandle<String>,
     spo_constraints: &'a UseStateHandle<HashMap<String, HashSet<String>>>,
     triples: &'a [Triple],
+    /// Reciprocal traversal: the pinned subject whose quads are shown.
+    inspect: &'a UseStateHandle<Option<String>>,
     /// Selected row addresses (row-select CRUD).
     selected: &'a UseStateHandle<HashSet<String>>,
     /// New toggle (placed left of Sort); ELT buttons (right of search); and the
@@ -705,6 +712,7 @@ fn table_view(ctx: TableCtx) -> Html {
         active_pred,
         spo_constraints,
         triples,
+        inspect,
         selected,
         new_btn,
         elt_btns,
@@ -808,10 +816,25 @@ fn table_view(ctx: TableCtx) -> Html {
         match (k, row) {
             (ColKey::Order, _) => order_cell(row.order()),
             (ColKey::Name, Row::Sys(s)) => {
-                let on_load = on_load.clone();
-                let id = s.id.clone();
-                let onclick = Callback::from(move |_: MouseEvent| on_load.emit(id.clone()));
-                html! { <button class="tag tag-system row-open" onclick={ onclick } title="View this system">{ &s.name }</button> }
+                let load = {
+                    let on_load = on_load.clone();
+                    let id = s.id.clone();
+                    Callback::from(move |_: MouseEvent| on_load.emit(id.clone()))
+                };
+                let insp = {
+                    let inspect = inspect.clone();
+                    let id = s.id.clone();
+                    Callback::from(move |e: MouseEvent| {
+                        e.stop_propagation();
+                        inspect.set(Some(id.clone()));
+                    })
+                };
+                html! {
+                    <span class="sys-cell">
+                        <button class="tag tag-system row-open" onclick={ load } title="View this system">{ &s.name }</button>
+                        <button class="row-inspect" onclick={ insp } title="Inspect its triples — predicate · object · source">{ "⌕" }</button>
+                    </span>
+                }
             }
             (ColKey::Name, Row::Ref(r)) => {
                 // A reference's cited system is clickable → load it into the graph
@@ -886,6 +909,51 @@ fn table_view(ctx: TableCtx) -> Html {
     let toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
     let toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
     let scoped = !spo_constraints.is_empty();
+
+    // Reciprocal traversal — a pinned SUBJECT advertising its values (S → P·O·source).
+    let inspect_panel = if let Some(sid) = (**inspect).clone() {
+        let name = systems
+            .iter()
+            .find(|s| s.id == sid)
+            .map(|s| s.name.clone())
+            .unwrap_or_else(|| sid.clone());
+        let mut by_pred: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
+        for t in triples.iter().filter(|t| t.subject == sid) {
+            by_pred
+                .entry(t.predicate.clone())
+                .or_default()
+                .push((t.object.clone(), t.source.clone()));
+        }
+        let close = {
+            let inspect = inspect.clone();
+            Callback::from(move |_: MouseEvent| inspect.set(None))
+        };
+        html! {
+            <div class="inspect-panel">
+                <div class="inspect-head">
+                    <span class="inspect-title">{ format!("⌕ {name}") }
+                        <span class="facet-src">{ "  — its triples (subject → predicate · object · source)" }</span>
+                    </span>
+                    <button class="row-delete" onclick={ close } title="Close">{ "✕" }</button>
+                </div>
+                { for by_pred.into_iter().map(|(p, objs)| html!{
+                    <div class="inspect-row">
+                        <span class="inspect-pred">{ pred_label(&p) }</span>
+                        <span class="tags">
+                            { for objs.into_iter().map(|(o, src)| html!{
+                                <span class="tag tag-coherence" title={ src.clone() }>
+                                    { o }
+                                    { if src.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" · {src}") }</span> } } }
+                                </span>
+                            }) }
+                        </span>
+                    </div>
+                }) }
+            </div>
+        }
+    } else {
+        html! {}
+    };
 
     // Row-select CRUD: delete the selected addresses, then clear the selection.
     let on_delete_selected = {
@@ -977,6 +1045,9 @@ fn table_view(ctx: TableCtx) -> Html {
 
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }
+
+            // Reciprocal traversal — the pinned subject's quads (S → P·O·source).
+            { inspect_panel }
 
             <div class="ref-table-wrap">
                 if cols.is_empty() {

@@ -886,6 +886,56 @@ button.row-open:hover {
     font-size: 0.72rem;
     font-weight: 400;
 }
+/* System name cell: the name tag with a small ⌕ inspect (reciprocal traversal). */
+.sys-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.row-inspect {
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.78rem;
+    padding: 0.1rem 0.25rem;
+    border-radius: 6px;
+    opacity: 0.6;
+}
+.row-inspect:hover {
+    opacity: 1;
+    background: rgba(37, 99, 235, 0.12);
+}
+/* Reciprocal-traversal panel: a pinned subject advertising its quads. */
+.inspect-panel {
+    margin: 0.5rem 0;
+    padding: 0.6rem 0.8rem;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    border-radius: 10px;
+}
+.inspect-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+.inspect-title {
+    font-weight: 600;
+    color: #047857;
+}
+.inspect-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.2rem 0;
+}
+.inspect-pred {
+    min-width: 8rem;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
 /* A monad row: the name tag with a small delete ✕ trailing it. */
 .monad-cell {
     display: inline-flex;
