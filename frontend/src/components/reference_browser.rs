@@ -129,7 +129,6 @@ pub struct ExtractRequest {
 enum ColKey {
     Order,
     Name,
-    Coherence,
     Perspective,
     Citation,
     Cites,
@@ -137,10 +136,9 @@ enum ColKey {
 }
 
 /// Canonical column order (independent of the order keys were toggled on).
-const ALL_COLS: [ColKey; 7] = [
+const ALL_COLS: [ColKey; 6] = [
     ColKey::Order,
     ColKey::Name,
-    ColKey::Coherence,
     ColKey::Perspective,
     ColKey::Citation,
     ColKey::Cites,
@@ -152,7 +150,6 @@ impl ColKey {
         match self {
             ColKey::Order => "Order",
             ColKey::Name => "Name",
-            ColKey::Coherence => "Coherence",
             ColKey::Perspective => "Perspective",
             ColKey::Citation => "Citation",
             ColKey::Cites => "Cites",
@@ -321,6 +318,99 @@ fn row_addr(row: &Row) -> Option<String> {
     }
 }
 
+/// The **predicate (key)** the Filter is currently querying. Filtering is an
+/// **SPO query**: pick a predicate, then pick its **objects (values)** — e.g.
+/// predicate `Coherence` surfaces `Relatedness`/`Dynamism`/… (never attached to a
+/// subject, discovered on selection). `Type` is the base predicate (row *kind*).
+#[derive(Clone, Copy, PartialEq)]
+enum FilterPred {
+    Type,
+    Order,
+    Coherence,
+    Source,
+}
+const ALL_PREDS: [FilterPred; 4] =
+    [FilterPred::Type, FilterPred::Order, FilterPred::Coherence, FilterPred::Source];
+impl FilterPred {
+    fn label(self) -> &'static str {
+        match self {
+            FilterPred::Type => "Type",
+            FilterPred::Order => "Order",
+            FilterPred::Coherence => "Coherence",
+            FilterPred::Source => "Source",
+        }
+    }
+}
+
+/// The distinct **object values** for a predicate across the data — the options a
+/// user picks from once they select the predicate (the SPO drill-down).
+fn pred_values(pred: FilterPred, systems: &[InstanceSystem], refs: &[ReferenceView]) -> Vec<String> {
+    let mut set: BTreeSet<String> = BTreeSet::new();
+    match pred {
+        FilterPred::Type => {}
+        FilterPred::Order => {
+            for s in systems {
+                set.insert(order_name(s.order));
+            }
+        }
+        FilterPred::Coherence => {
+            for r in refs {
+                if frag(r) == "coherence" {
+                    if let Some(o) = &r.object {
+                        set.insert(o.clone());
+                    }
+                }
+            }
+        }
+        FilterPred::Source => {
+            for r in refs {
+                if let Some(p) = &r.perspective_name {
+                    if !p.is_empty() {
+                        set.insert(p.clone());
+                    }
+                }
+            }
+        }
+    }
+    set.into_iter().collect()
+}
+
+/// Whether a **subject row** satisfies the SPO value-filter: it carries a
+/// `(predicate, value)` assertion for some selected value. Empty selection = no
+/// constraint (all pass). `Type` is handled by the kind filter, not here.
+fn spo_match(row: &Row, pred: FilterPred, vals: &HashSet<String>, refs: &[ReferenceView]) -> bool {
+    if vals.is_empty() {
+        return true;
+    }
+    match pred {
+        FilterPred::Type => true,
+        FilterPred::Order => row.order().is_some_and(|o| vals.contains(&order_name(o))),
+        FilterPred::Coherence => match row {
+            Row::Sys(s) => {
+                let want = format!("system:{}#coherence", s.id);
+                refs.iter().any(|r| {
+                    r.target == want && r.object.as_ref().is_some_and(|o| vals.contains(o))
+                })
+            }
+            Row::Ref(r) => {
+                frag(r) == "coherence" && r.object.as_ref().is_some_and(|o| vals.contains(o))
+            }
+            _ => false,
+        },
+        FilterPred::Source => match row {
+            Row::Ref(r) => r.perspective_name.as_ref().is_some_and(|p| vals.contains(p)),
+            Row::Sys(s) => {
+                let prefix = format!("system:{}", s.id);
+                refs.iter().any(|r| {
+                    (r.target == prefix || r.target.starts_with(&format!("{prefix}#")))
+                        && r.perspective_name.as_ref().is_some_and(|p| vals.contains(p))
+                })
+            }
+            _ => false,
+        },
+    }
+}
+
 /// All Nullad rows (every System + Sequence/Monad + Reference + focused raw
 /// node/edge), unfiltered.
 fn all_rows<'a>(
@@ -343,11 +433,15 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let search = use_state(String::new);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
-    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Coherence, ColKey::Citation]);
+    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Citation]);
     // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
     let active_kinds = use_state(|| vec![CiteKind::System, CiteKind::Sequence]);
+    // SPO filter: which predicate (key) is being queried, and the selected object
+    // values. `Type` uses `active_kinds`; other predicates use `spo_vals`.
+    let filter_pred = use_state(|| FilterPred::Type);
+    let spo_vals = use_state(HashSet::<String>::new);
     // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
     let selected = use_state(HashSet::<String>::new);
     // Editor: author a new System from custom values (the app-authored path).
@@ -374,6 +468,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, &active_kinds, &needle))
         .filter(|row| in_scope(row, scope))
+        .filter(|row| spo_match(row, *filter_pred, &spo_vals, refs))
         .filter_map(|row| row.system_addr())
         .filter(|m| seen.insert(m.clone()))
         .collect();
@@ -528,6 +623,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 visible_cols: &visible_cols,
                 filter_open: &filter_open,
                 active_kinds: &active_kinds,
+                filter_pred: &filter_pred,
+                spo_vals: &spo_vals,
                 selected: &selected,
                 new_btn,
                 elt_btns,
@@ -565,6 +662,9 @@ struct TableCtx<'a> {
     /// Filter (−) popover — scoping the data by cite-degree.
     filter_open: &'a UseStateHandle<bool>,
     active_kinds: &'a UseStateHandle<Vec<CiteKind>>,
+    /// SPO filter: the queried predicate + its selected object values.
+    filter_pred: &'a UseStateHandle<FilterPred>,
+    spo_vals: &'a UseStateHandle<HashSet<String>>,
     /// Selected row addresses (row-select CRUD).
     selected: &'a UseStateHandle<HashSet<String>>,
     /// New toggle (placed left of Sort); ELT buttons (right of search); and the
@@ -591,6 +691,8 @@ fn table_view(ctx: TableCtx) -> Html {
         visible_cols,
         filter_open,
         active_kinds,
+        filter_pred,
+        spo_vals,
         selected,
         new_btn,
         elt_btns,
@@ -604,6 +706,7 @@ fn table_view(ctx: TableCtx) -> Html {
         .into_iter()
         .filter(|row| passes_row(*row, filter_order, active_kinds, &needle))
         .filter(|row| in_scope(row, scope))
+        .filter(|row| spo_match(row, **filter_pred, spo_vals, refs))
         .collect();
     // A reference is **metadata on its subject system**, not a peer row. If the
     // system it cites is already shown, fold the reference away (this is what made
@@ -661,6 +764,39 @@ fn table_view(ctx: TableCtx) -> Html {
         html! {
             <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
                 { k.label() }
+            </button>
+        }
+    };
+    // Filter (−), SPO redesign — pick the **predicate** (key) to query…
+    let pred_tab = |p: FilterPred| -> Html {
+        let on = **filter_pred == p;
+        let fp = filter_pred.clone();
+        let sv = spo_vals.clone();
+        let onclick = Callback::from(move |_: MouseEvent| {
+            fp.set(p);
+            sv.set(HashSet::new()); // switching predicate resets the object selection
+        });
+        html! {
+            <button class={ classes!("facet-tab", on.then_some("active")) } onclick={ onclick }>
+                { p.label() }
+            </button>
+        }
+    };
+    // …then pick its **objects** (values) — the SPO drill-down.
+    let val_chip = |v: String| -> Html {
+        let on = spo_vals.contains(&v);
+        let sv = spo_vals.clone();
+        let vc = v.clone();
+        let onclick = Callback::from(move |_: MouseEvent| {
+            let mut next = (*sv).clone();
+            if !next.remove(&vc) {
+                next.insert(vc.clone());
+            }
+            sv.set(next);
+        });
+        html! {
+            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
+                { v }
             </button>
         }
     };
@@ -734,44 +870,6 @@ fn table_view(ctx: TableCtx) -> Html {
                 html! { <span title={ target_label }>{ cites }</span> }
             }
             (ColKey::Note, Row::Ref(r)) => html! { { r.note.clone().unwrap_or_default() } },
-            // A coherence assertion shown on its own (subject not present): its value.
-            (ColKey::Coherence, Row::Ref(r)) => {
-                if frag(r) == "coherence" {
-                    match &r.object {
-                        Some(o) => html! { <span class="tag tag-coherence">{ o }</span> },
-                        None => html! {},
-                    }
-                } else {
-                    html! {}
-                }
-            }
-            // Coherence-by-source: every perspective's coherence claim on THIS system,
-            // gathered from the references that target `system:<id>#coherence` (their
-            // SPO `object` is the value). This is the reference-tuple made visible.
-            (ColKey::Coherence, Row::Sys(s)) => {
-                let want = format!("system:{}#coherence", s.id);
-                let items: Vec<Html> = refs
-                    .iter()
-                    .filter(|r| r.target == want)
-                    .filter_map(|r| {
-                        r.object
-                            .clone()
-                            .map(|o| (o, r.perspective_name.clone().unwrap_or_default()))
-                    })
-                    .map(|(val, src)| {
-                        html! {
-                            <span class="tag tag-coherence" title={ src.clone() }>
-                                { if src.is_empty() { val } else { format!("{val} · {src}") } }
-                            </span>
-                        }
-                    })
-                    .collect();
-                if items.is_empty() {
-                    html! {}
-                } else {
-                    html! { <span class="tags">{ for items }</span> }
-                }
-            }
             // System rows carry no perspective/citation/cites/note — a whole system.
             (ColKey::Cites, Row::Sys(_)) => html! { { "whole system" } },
             (_, Row::Sys(_)) => html! {},
@@ -787,7 +885,7 @@ fn table_view(ctx: TableCtx) -> Html {
     };
     let toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
     let toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
-    let scoped = active_kinds.len() < ALL_KINDS.len();
+    let scoped = active_kinds.len() < ALL_KINDS.len() || !spo_vals.is_empty();
 
     // Row-select CRUD: delete the selected addresses, then clear the selection.
     let on_delete_selected = {
@@ -838,13 +936,30 @@ fn table_view(ctx: TableCtx) -> Html {
                     <button
                         class={ classes!("control-btn", (scoped || **filter_open).then_some("active")) }
                         onclick={ toggle_filter }
-                        title="Filter — scope the data returned, by cite degree (system / node / edge / …)"
+                        title="Filter — an SPO query: pick a predicate (key), then its objects (values)"
                     >{ if scoped { "Filter ● ▾" } else { "Filter ▾" } }</button>
                     if **filter_open {
                         <div class="control-menu">
-                            <span class="facet-label">{ "data · by cite degree" }</span>
+                            <span class="facet-label">{ "filter — predicate (key)" }</span>
+                            <div class="facet-tabs">
+                                { for ALL_PREDS.into_iter().map(pred_tab) }
+                            </div>
+                            <span class="facet-label">
+                                { format!("{} — objects (values)", (**filter_pred).label()) }
+                            </span>
                             <div class="col-chips">
-                                { for ALL_KINDS.into_iter().map(kind_chip) }
+                                {
+                                    if **filter_pred == FilterPred::Type {
+                                        html! { for ALL_KINDS.into_iter().map(kind_chip) }
+                                    } else {
+                                        let vals = pred_values(**filter_pred, systems, refs);
+                                        if vals.is_empty() {
+                                            html! { <span class="facet-hint">{ "no values in the current data" }</span> }
+                                        } else {
+                                            html! { for vals.into_iter().map(val_chip) }
+                                        }
+                                    }
+                                }
                             </div>
                         </div>
                     }

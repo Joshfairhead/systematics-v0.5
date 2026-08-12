@@ -850,10 +850,35 @@ button.row-open:hover {
     color: #1d4ed8;
     font-weight: 600;
 }
-/* Coherence-by-source: each perspective's coherence claim on a system (value · source). */
-.tag-coherence {
-    background: rgba(16, 185, 129, 0.14);
-    color: #047857;
+/* SPO filter: predicate tabs above the object-value chips. */
+.facet-tabs {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+    padding-bottom: 0.4rem;
+}
+.facet-tab {
+    border: 1px solid rgba(163, 177, 198, 0.35);
+    background: rgba(255, 255, 255, 0.6);
+    color: #4a5568;
+    border-radius: 8px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.facet-tab.active {
+    background: rgba(37, 99, 235, 0.16);
+    color: #1d4ed8;
+    border-color: rgba(37, 99, 235, 0.3);
+}
+.facet-hint {
+    color: #a0aec0;
+    font-size: 0.78rem;
+    font-style: italic;
 }
 /* A monad row: the name tag with a small delete ✕ trailing it. */
 .monad-cell {
