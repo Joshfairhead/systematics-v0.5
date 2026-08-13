@@ -393,6 +393,35 @@ Order + the three designations = a **tetrad** of dodecads; **+ terms** makes a *
 claim is firm: *a system is fully specified by a small system of dodecads plus its own
 characters*, i.e. the description is homoiconic (a system describing a system). [proposed.]
 
+**Resolved to an OCTAD — the systematics reference (user, 2026-08-13, "first port of call
+before a prototype").** Add **name** and **citation** and the self-description closes at
+**8** — an **octad**, and it maps onto the **Hodgson architecture octad** (the 8 systemic
+attributes), each component related to the others as that octad prescribes:
+
+| # | reference component | Hodgson octad term |
+|---|---|---|
+| 1 | **name** | Smallest Significant Holon (the unit's identity) |
+| 2 | **order** | Integrative Totality (the largest unit / whole) |
+| 3 | **coherence** | Intrinsic Nature |
+| 4 | **term-designation** | Critical Functions |
+| 5 | **connective-designation** | Organisational Modes |
+| 6 | **terms** | Inherent Values |
+| 7 | **connectives** | Supportive Platform |
+| 8 | **citation** (source · artefact · lookup) | Necessary Resourcing (what grounds/sources it) |
+
+This resolves the user's two open slots: **Organisational Modes = connective-designation**
+(how the relations are designated/organised) and **Necessary Resourcing = citation** (the
+provenance/resource the assertion draws on). So "codify a system" = express these 8 and
+their interconnections *as* the octad — the self-describing systematics reference. A
+single **term**'s relations are the same octad from the term's point of view (position =
+Smallest Holon, order = Integrative Totality, coherence = Intrinsic Nature, term-designation
+= Critical Functions, other terms = Inherent Values, connectives = Supportive Platform,
+citation/coords = Necessary Resourcing, connective-designation/perspective = Organisational
+Modes). [Proposed; the two resolved slots are the working guess.] **The hexad is the
+abstraction→instance transition** (per the user): above the hexad the reference stops being
+a generic template and becomes a concrete *instance* (name + citation pin it to a real
+artefact) — which is why the reference lands at order 8, past the hexad.
+
 **The metadata acts as a set of rules.** Once every system carries `{order, coherence,
 term-designation, connective-designation}` as dodecad-terms, you can **match over them**:
 
