@@ -276,11 +276,23 @@ struct Triple {
     subject: String,
     predicate: String,
     object: String,
-    source: String,
+    /// The **Citation** — the quad's 4th slot (source·artefact·lookup, formatted).
+    /// "" for base-space topology facts. Shown as provenance in the inspector.
+    citation: String,
+}
+
+/// Author·artefact·lookup formatted as one Citation string (the quad's provenance).
+fn ref_citation(r: &ReferenceView) -> String {
+    [src(r), art(r), loc(r)]
+        .into_iter()
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join(" · ")
 }
 
 /// Flatten all data into SPO triples. Base-space facts come from each system's own
-/// topology/characters (source ""); fiber assertions come from references' objects.
+/// topology/characters (no citation); fiber assertions come from references' objects,
+/// each carrying its Citation. A `source` predicate exposes the originator (author).
 fn build_triples(
     systems: &[InstanceSystem],
     refs: &[ReferenceView],
@@ -292,7 +304,7 @@ fn build_triples(
             subject: subject.to_string(),
             predicate: predicate.to_string(),
             object,
-            source: String::new(),
+            citation: String::new(),
         });
     };
     for s in systems {
@@ -309,7 +321,7 @@ fn build_triples(
     let _ = seqs; // monads carry no base-space triples yet (they show unfiltered)
     for r in refs {
         let Some(ts) = &r.target_system else { continue };
-        let src = r.perspective_name.clone().unwrap_or_default();
+        let cite = ref_citation(r);
         if let Some(obj) = &r.object {
             let pred = frag_pred(&frag(r));
             if !pred.is_empty() {
@@ -317,16 +329,22 @@ fn build_triples(
                     subject: ts.id.clone(),
                     predicate: pred.to_string(),
                     object: obj.clone(),
-                    source: src.clone(),
+                    citation: cite.clone(),
                 });
             }
         }
-        if !src.is_empty() {
+        // Provenance as a filterable predicate: `source` = the originator (author),
+        // falling back to the perspective when there is no named author.
+        let origin = {
+            let a = src(r);
+            if a.is_empty() { persp(r) } else { a }
+        };
+        if !origin.is_empty() {
             t.push(Triple {
                 subject: ts.id.clone(),
                 predicate: "source".to_string(),
-                object: src.clone(),
-                source: src,
+                object: origin,
+                citation: cite,
             });
         }
     }
@@ -350,23 +368,44 @@ fn all_predicates(triples: &[Triple]) -> Vec<String> {
     out
 }
 
-/// Distinct **objects** for a predicate, each with the **sources** that assert it.
-/// A bare object is ambiguous (triad·coherence·? is Relatedness *or* Dynamism); the
-/// source is what disambiguates — so the store is really a QUAD (S·P·O·source), and
-/// the objects are shown source-qualified. Base-space facts have no source.
-fn pred_object_rows(triples: &[Triple], pred: &str) -> Vec<(String, Vec<String>)> {
-    let mut map: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+/// Subjects that satisfy every constraint **except** `skip` — the current filter
+/// context for a drill-down (so picking `order=Triad` narrows the `term` options to
+/// triadic terms).
+fn subjects_passing_except(
+    triples: &[Triple],
+    constraints: &HashMap<String, HashSet<String>>,
+    skip: &str,
+) -> HashSet<String> {
+    let subjects: HashSet<String> = triples.iter().map(|t| t.subject.clone()).collect();
+    subjects
+        .into_iter()
+        .filter(|s| {
+            constraints.iter().all(|(p, vals)| {
+                p == skip
+                    || vals.is_empty()
+                    || triples
+                        .iter()
+                        .any(|t| &t.subject == s && &t.predicate == p && vals.contains(&t.object))
+            })
+        })
+        .collect()
+}
+
+/// Distinct **objects** for a predicate, **scoped** to the subjects that pass the
+/// other active constraints — the SPO drill-down that narrows as you go.
+fn pred_objects_scoped(
+    triples: &[Triple],
+    pred: &str,
+    constraints: &HashMap<String, HashSet<String>>,
+) -> Vec<String> {
+    let subs = subjects_passing_except(triples, constraints, pred);
+    let mut set: BTreeSet<String> = BTreeSet::new();
     for t in triples {
-        if t.predicate == pred {
-            let entry = map.entry(t.object.clone()).or_default();
-            if !t.source.is_empty() {
-                entry.insert(t.source.clone());
-            }
+        if t.predicate == pred && subs.contains(&t.subject) {
+            set.insert(t.object.clone());
         }
     }
-    map.into_iter()
-        .map(|(o, srcs)| (o, srcs.into_iter().collect()))
-        .collect()
+    set.into_iter().collect()
 }
 
 /// Title-case a predicate key for display (`term-designation` -> `Term designation`).
@@ -782,11 +821,10 @@ fn table_view(ctx: TableCtx) -> Html {
             </button>
         }
     };
-    // …then pick its **objects** (values) — the SPO drill-down. Each object is shown
-    // with the **source(s)** that assert it (the quad), so multivalent objects
-    // (coherence: Relatedness·DU1 vs Dynamism·DU3) are disambiguated. Toggling a
-    // value updates only this predicate's slot in the stacked constraints.
-    let val_chip = |p: String, v: String, sources: Vec<String>| -> Html {
+    // …then pick its **objects** (values) — the SPO drill-down, scoped to the current
+    // constraints. Chips show the bare object (provenance lives in the ⌕ inspector,
+    // not cluttering every chip). Toggling updates this predicate's constraint slot.
+    let val_chip = |p: String, v: String| -> Html {
         let on = spo_constraints.get(&p).is_some_and(|s| s.contains(&v));
         let sc = spo_constraints.clone();
         let pc = p.clone();
@@ -800,11 +838,9 @@ fn table_view(ctx: TableCtx) -> Html {
             next.retain(|_, s| !s.is_empty()); // drop empty slots (no constraint)
             sc.set(next);
         });
-        let src = sources.join(", ");
         html! {
-            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick } title={ src.clone() }>
+            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
                 { v }
-                { if src.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" · {src}") }</span> } } }
             </button>
         }
     };
@@ -917,12 +953,18 @@ fn table_view(ctx: TableCtx) -> Html {
             .find(|s| s.id == sid)
             .map(|s| s.name.clone())
             .unwrap_or_else(|| sid.clone());
-        let mut by_pred: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
+        // Group by predicate → object → the citation(s) that assert it (deduped, so a
+        // value that is both base-space and cited by DU1 appears once, with its source).
+        let mut by_pred: BTreeMap<String, BTreeMap<String, BTreeSet<String>>> = BTreeMap::new();
         for t in triples.iter().filter(|t| t.subject == sid) {
-            by_pred
+            let cites = by_pred
                 .entry(t.predicate.clone())
                 .or_default()
-                .push((t.object.clone(), t.source.clone()));
+                .entry(t.object.clone())
+                .or_default();
+            if !t.citation.is_empty() {
+                cites.insert(t.citation.clone());
+            }
         }
         let close = {
             let inspect = inspect.clone();
@@ -932,7 +974,7 @@ fn table_view(ctx: TableCtx) -> Html {
             <div class="inspect-panel">
                 <div class="inspect-head">
                     <span class="inspect-title">{ format!("⌕ {name}") }
-                        <span class="facet-src">{ "  — its triples (subject → predicate · object · source)" }</span>
+                        <span class="facet-src">{ "  — its quads (predicate · object · citation)" }</span>
                     </span>
                     <button class="row-delete" onclick={ close } title="Close">{ "✕" }</button>
                 </div>
@@ -940,11 +982,14 @@ fn table_view(ctx: TableCtx) -> Html {
                     <div class="inspect-row">
                         <span class="inspect-pred">{ pred_label(&p) }</span>
                         <span class="tags">
-                            { for objs.into_iter().map(|(o, src)| html!{
-                                <span class="tag tag-coherence" title={ src.clone() }>
-                                    { o }
-                                    { if src.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" · {src}") }</span> } } }
-                                </span>
+                            { for objs.into_iter().map(|(o, cites)| {
+                                let cite = cites.into_iter().collect::<Vec<_>>().join(" ; ");
+                                html!{
+                                    <span class="tag tag-coherence" title={ cite.clone() }>
+                                        { o }
+                                        { if cite.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" — {cite}") }</span> } } }
+                                    </span>
+                                }
                             }) }
                         </span>
                     </div>
@@ -1022,11 +1067,13 @@ fn table_view(ctx: TableCtx) -> Html {
                             <div class="col-chips">
                                 { {
                                     let pred = (**active_pred).clone();
-                                    let rows = pred_object_rows(triples, &pred);
-                                    if rows.is_empty() {
-                                        html! { <span class="facet-hint">{ "no values in the current data" }</span> }
+                                    // Scoped to the other active constraints, so the
+                                    // drill-down narrows (order=Triad ⇒ triadic terms).
+                                    let vals = pred_objects_scoped(triples, &pred, &spo_constraints);
+                                    if vals.is_empty() {
+                                        html! { <span class="facet-hint">{ "no values in the current scope" }</span> }
                                     } else {
-                                        html! { for rows.into_iter().map(|(v, srcs)| val_chip(pred.clone(), v, srcs)) }
+                                        html! { for vals.into_iter().map(|v| val_chip(pred.clone(), v)) }
                                     }
                                 } }
                             </div>
