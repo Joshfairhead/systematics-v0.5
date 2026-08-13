@@ -310,6 +310,7 @@ fn build_triples(
     for s in systems {
         // No `type` predicate — order designates the system; a bare System/Monad
         // "type" clashes with order=Monad and adds nothing.
+        base(&s.id, "name", s.name.clone()); // so you can scope to a *specific* system
         base(&s.id, "order", order_name(s.order));
         for term in &s.terms {
             base(&s.id, "term", term.clone());
@@ -359,7 +360,7 @@ fn all_predicates(triples: &[Triple]) -> Vec<String> {
         set.insert(t.predicate.clone());
     }
     let mut out: Vec<String> = Vec::new();
-    for lead in ["type", "order", "source"] {
+    for lead in ["name", "order", "source"] {
         if set.remove(lead) {
             out.push(lead.to_string());
         }
