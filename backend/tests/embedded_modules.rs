@@ -29,8 +29,8 @@ fn embedded_modules_are_complete_without_a_filesystem() {
     );
     assert_eq!(
         graph.references.len(),
-        64,
-        "all 64 references must be embedded in the binary"
+        59,
+        "all 59 references must be embedded in the binary"
     );
     assert_eq!(
         graph.perspectives().len(),

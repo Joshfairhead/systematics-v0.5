@@ -38,7 +38,7 @@ async fn all_references_exposes_resolved_browser_fields() {
     assert!(resp.errors.is_empty(), "query errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
     let refs = data["allReferences"].as_array().unwrap();
-    assert_eq!(refs.len(), 64, "all 64 references present");
+    assert_eq!(refs.len(), 59, "all 59 references present");
 
     // DU1 now asserts its heptad coherence onto the CANONICAL heptad, carrying the
     // value ("Structure") as the reference's SPO `object`.

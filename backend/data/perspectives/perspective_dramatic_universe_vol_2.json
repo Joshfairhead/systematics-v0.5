@@ -1,249 +1,114 @@
 {
-  "characters": [
-    {
-      "id": "char_word_fact",
-      "kind": "word",
-      "value": "Fact"
-    },
-    {
-      "id": "char_word_affirmation",
-      "kind": "word",
-      "value": "Affirmation"
-    },
-    {
-      "id": "char_word_receptivity",
-      "kind": "word",
-      "value": "Receptivity"
-    },
-    {
-      "id": "char_word_reconciliation",
-      "kind": "word",
-      "value": "Reconciliation"
-    }
-  ],
+  "characters": [],
   "coordinates": [],
-  "vocabularies": [
-    {
-      "id": "vocab_dramatic_universe_ii_dyad_2",
-      "name": "Dramatic Universe II Dyad",
-      "order": 2,
-      "terms": [
-        "char_word_fact",
-        "char_word_value"
-      ],
-      "connectives": []
-    },
-    {
-      "id": "vocab_dramatic_universe_ii_triad_3",
-      "name": "Dramatic Universe II Triad",
-      "order": 3,
-      "terms": [
-        "char_word_affirmation",
-        "char_word_receptivity",
-        "char_word_reconciliation"
-      ],
-      "connectives": []
-    },
-    {
-      "id": "vocab_dramatic_universe_ii_tetrad_4",
-      "name": "Dramatic Universe II Tetrad",
-      "order": 4,
-      "terms": [],
-      "connectives": []
-    }
-  ],
-  "systems": [
-    {
-      "id": "system_dramatic_universe_ii_dyad_2",
-      "name": "Dramatic Universe II Dyad",
-      "order": 2,
-      "coherence": "Fact and Value",
-      "term_designation": "",
-      "connective_designation": "",
-      "grammar_ref": "grammar_2",
-      "vocabulary_ref": "vocab_dramatic_universe_ii_dyad_2"
-    },
-    {
-      "id": "system_dramatic_universe_ii_triad_3",
-      "name": "Dramatic Universe II Triad",
-      "order": 3,
-      "coherence": "Will",
-      "term_designation": "",
-      "connective_designation": "",
-      "grammar_ref": "grammar_3",
-      "vocabulary_ref": "vocab_dramatic_universe_ii_triad_3"
-    },
-    {
-      "id": "system_dramatic_universe_ii_tetrad_4",
-      "name": "Dramatic Universe II Tetrad",
-      "order": 4,
-      "coherence": "Being",
-      "term_designation": "",
-      "connective_designation": "",
-      "grammar_ref": "grammar_4",
-      "vocabulary_ref": "vocab_dramatic_universe_ii_tetrad_4"
-    }
-  ],
+  "vocabularies": [],
+  "systems": [],
   "perspectives": [
     {
       "id": "perspective_dramatic_universe_vol_2",
       "name": "Dramatic Universe Vol 2",
       "links": [
         {
-          "id": "link_6aeeea204dc6263a",
-          "source": "system:system_dramatic_universe_ii_dyad_2",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_4b77b289949457d7",
+          "id": "link_du2_001",
           "source": "source:source_j_g__bennett",
           "predicate": "recordedIn",
           "target": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy"
         },
         {
-          "id": "link_09a7cfa64f0fe1b2",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_part_ten__ch_25_the_two_domains__p_15"
-        },
-        {
-          "id": "link_7f43290034d629d3",
-          "source": "system:system_dramatic_universe_ii_dyad_2#coherence",
+          "id": "link_du2_002",
+          "source": "system:system_canonical_dyad_2#coherence",
           "predicate": "cites",
           "target": "source:source_j_g__bennett"
         },
         {
-          "id": "link_01d201e8d58ba8af",
+          "id": "link_du2_003",
           "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
           "predicate": "atLocation",
           "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_ch_25_the_two_domains__p_15"
         },
         {
-          "id": "link_e2fb1f9f7302b021",
-          "source": "system:system_dramatic_universe_ii_dyad_2#term:1",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_83d576a2daffc998",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_6_the_domains__p_32"
-        },
-        {
-          "id": "link_840a8a969d9e3097",
-          "source": "system:system_dramatic_universe_ii_dyad_2#term:2",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_e4053fe8068e6bc6",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_2_the_irreducibility_of_value__p_19"
-        },
-        {
-          "id": "link_432d96fb6121abce",
-          "source": "system:system_dramatic_universe_ii_triad_3",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_d1775f08b8e960ba",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_part_eleven__ch_27_will_and_the_triads__p_69"
-        },
-        {
-          "id": "link_0df81ed4d8de1848",
-          "source": "system:system_dramatic_universe_ii_triad_3#coherence",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_75c7581dd1b30f69",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_4_will_and_the_triad__p_80"
-        },
-        {
-          "id": "link_3e189c636f1e33ae",
-          "source": "system:system_dramatic_universe_ii_triad_3#term:1",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_f5ff8af15a962c97",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_6_the_first_cosmic_impulse__p_85"
-        },
-        {
-          "id": "link_c48d2d44b30a0628",
-          "source": "system:system_dramatic_universe_ii_triad_3#term:2",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_b0b9ef5b202cc56e",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_7_the_second_cosmic_impulse__p_87"
-        },
-        {
-          "id": "link_c2917f7faa5b27c6",
-          "source": "system:system_dramatic_universe_ii_triad_3#term:3",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_ea88b4b7badfce21",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_8_the_third_cosmic_impulse__p_89"
-        },
-        {
-          "id": "link_5acccc9713382598",
-          "source": "system:system_dramatic_universe_ii_tetrad_4",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_7a9e22816d93d1f8",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_part_twelve__p_215"
-        },
-        {
-          "id": "link_fff1f15377099dd7",
-          "source": "system:system_dramatic_universe_ii_tetrad_4#coherence",
-          "predicate": "cites",
-          "target": "source:source_j_g__bennett"
-        },
-        {
-          "id": "link_18884f7ee4c1e61b",
-          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-          "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_12_33_1_the_interpretation_of_the_tetrad__p_243"
-        },
-        {
-          "id": "link_319ec8418bf88b0f",
+          "id": "link_du2_004",
           "source": "system:system_canonical_dyad_2#term:1",
           "predicate": "cites",
           "target": "source:source_j_g__bennett"
         },
         {
-          "id": "link_6cf439324cd93229",
+          "id": "link_du2_005",
           "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
           "predicate": "atLocation",
-          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_4_essence_and_existence__p_23"
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_6_the_domains__p_32"
         },
         {
-          "id": "link_58a685714ae8bb50",
+          "id": "link_du2_006",
           "source": "system:system_canonical_dyad_2#term:2",
           "predicate": "cites",
           "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_du2_007",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_2_the_irreducibility_of_value__p_19"
+        },
+        {
+          "id": "link_du2_008",
+          "source": "system:system_canonical_triad_3#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_du2_009",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_4_will_and_the_triad__p_80"
+        },
+        {
+          "id": "link_du2_010",
+          "source": "system:system_canonical_triad_3#term:1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_du2_011",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_6_the_first_cosmic_impulse__p_85"
+        },
+        {
+          "id": "link_du2_012",
+          "source": "system:system_canonical_triad_3#term:2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_du2_013",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_7_the_second_cosmic_impulse__p_87"
+        },
+        {
+          "id": "link_du2_014",
+          "source": "system:system_canonical_triad_3#term:3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_du2_015",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_8_the_third_cosmic_impulse__p_89"
+        },
+        {
+          "id": "link_du2_016",
+          "source": "system:system_canonical_tetrad_4#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_du2_017",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_12_33_1_the_interpretation_of_the_tetrad__p_243"
         }
       ]
     }
@@ -329,121 +194,84 @@
   ],
   "references": [
     {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_dyad_2_source_j_g__bennett",
+      "id": "reference_du2_dyad_2_coherence",
       "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_dyad_2",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_part_ten__ch_25_the_two_domains__p_15",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_dyad_2_coherence_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_dyad_2#coherence",
+      "target": "system:system_canonical_dyad_2#coherence",
       "source_ref": "source_j_g__bennett",
       "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
       "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_ch_25_the_two_domains__p_15",
-      "note": null
+      "note": null,
+      "object": "Fact and Value"
     },
     {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_dyad_2_term_1_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_dyad_2#term:1",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_6_the_domains__p_32",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_dyad_2_term_2_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_dyad_2#term:2",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_2_the_irreducibility_of_value__p_19",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_triad_3_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_triad_3",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_part_eleven__ch_27_will_and_the_triads__p_69",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_triad_3_coherence_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_triad_3#coherence",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_4_will_and_the_triad__p_80",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_triad_3_term_1_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_triad_3#term:1",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_6_the_first_cosmic_impulse__p_85",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_triad_3_term_2_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_triad_3#term:2",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_7_the_second_cosmic_impulse__p_87",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_triad_3_term_3_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_triad_3#term:3",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_8_the_third_cosmic_impulse__p_89",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_tetrad_4_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_tetrad_4",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_part_twelve__p_215",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_dramatic_universe_ii_tetrad_4_coherence_source_j_g__bennett",
-      "perspective_ref": "perspective_dramatic_universe_vol_2",
-      "target": "system:system_dramatic_universe_ii_tetrad_4#coherence",
-      "source_ref": "source_j_g__bennett",
-      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_12_33_1_the_interpretation_of_the_tetrad__p_243",
-      "note": null
-    },
-    {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_canonical_dyad_2_term_1_source_j_g__bennett",
+      "id": "reference_du2_dyad_2_term_1",
       "perspective_ref": "perspective_dramatic_universe_vol_2",
       "target": "system:system_canonical_dyad_2#term:1",
       "source_ref": "source_j_g__bennett",
       "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_4_essence_and_existence__p_23",
-      "note": null
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_6_the_domains__p_32",
+      "note": null,
+      "object": "Fact"
     },
     {
-      "id": "reference_perspective_dramatic_universe_vol_2_system_system_canonical_dyad_2_term_2_source_j_g__bennett",
+      "id": "reference_du2_dyad_2_term_2",
       "perspective_ref": "perspective_dramatic_universe_vol_2",
       "target": "system:system_canonical_dyad_2#term:2",
       "source_ref": "source_j_g__bennett",
       "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_4_essence_and_existence__p_23",
-      "note": null
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_10_25_2_the_irreducibility_of_value__p_19",
+      "note": null,
+      "object": "Value"
+    },
+    {
+      "id": "reference_du2_triad_3_coherence",
+      "perspective_ref": "perspective_dramatic_universe_vol_2",
+      "target": "system:system_canonical_triad_3#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_4_will_and_the_triad__p_80",
+      "note": null,
+      "object": "Will"
+    },
+    {
+      "id": "reference_du2_triad_3_term_1",
+      "perspective_ref": "perspective_dramatic_universe_vol_2",
+      "target": "system:system_canonical_triad_3#term:1",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_6_the_first_cosmic_impulse__p_85",
+      "note": null,
+      "object": "Affirmation"
+    },
+    {
+      "id": "reference_du2_triad_3_term_2",
+      "perspective_ref": "perspective_dramatic_universe_vol_2",
+      "target": "system:system_canonical_triad_3#term:2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_7_the_second_cosmic_impulse__p_87",
+      "note": null,
+      "object": "Receptivity"
+    },
+    {
+      "id": "reference_du2_triad_3_term_3",
+      "perspective_ref": "perspective_dramatic_universe_vol_2",
+      "target": "system:system_canonical_triad_3#term:3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_11_27_8_the_third_cosmic_impulse__p_89",
+      "note": null,
+      "object": "Reconciliation"
+    },
+    {
+      "id": "reference_du2_tetrad_4_coherence",
+      "perspective_ref": "perspective_dramatic_universe_vol_2",
+      "target": "system:system_canonical_tetrad_4#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__2__the_foundations_of_moral_philosophy_12_33_1_the_interpretation_of_the_tetrad__p_243",
+      "note": null,
+      "object": "Being"
     }
   ]
 }
