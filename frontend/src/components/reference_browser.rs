@@ -276,6 +276,12 @@ struct Triple {
     subject: String,
     predicate: String,
     object: String,
+    /// The **topological position** the object sits at — node index (`"1"`) for a
+    /// term, edge (`"1-2"`) for a connective, `""` for whole-system predicates
+    /// (order/coherence/name/source). This is what makes "everything at node 1"
+    /// queryable: `term`s at the same position across perspectives (Will · Function
+    /// · Affirmation) are the bijective semantic↔topological mapping.
+    position: String,
     /// The **Citation** — the quad's 4th slot (source·artefact·lookup, formatted).
     /// "" for base-space topology facts. Shown as provenance in the inspector.
     citation: String,
@@ -290,6 +296,18 @@ fn ref_citation(r: &ReferenceView) -> String {
         .join(" · ")
 }
 
+/// The topological position encoded in a reference `#fragment`: `term:1` → `1`,
+/// `conn:1-2` → `1-2`; whole-system fragments carry no position.
+fn frag_position(f: &str) -> String {
+    if let Some(n) = f.strip_prefix("term:") {
+        n.to_string()
+    } else if let Some(e) = f.strip_prefix("conn:") {
+        e.to_string()
+    } else {
+        String::new()
+    }
+}
+
 /// Flatten all data into SPO triples. Base-space facts come from each system's own
 /// topology/characters (no citation); fiber assertions come from references' objects,
 /// each carrying its Citation. A `source` predicate exposes the originator (author).
@@ -299,37 +317,39 @@ fn build_triples(
     seqs: &[SequenceView],
 ) -> Vec<Triple> {
     let mut t: Vec<Triple> = Vec::new();
-    let mut base = |subject: &str, predicate: &str, object: String| {
+    let mut base = |subject: &str, predicate: &str, object: String, position: String| {
         t.push(Triple {
             subject: subject.to_string(),
             predicate: predicate.to_string(),
             object,
+            position,
             citation: String::new(),
         });
     };
     for s in systems {
-        // No `type` predicate — order designates the system; a bare System/Monad
-        // "type" clashes with order=Monad and adds nothing.
-        base(&s.id, "name", s.name.clone()); // so you can scope to a *specific* system
-        base(&s.id, "order", order_name(s.order));
-        for term in &s.terms {
-            base(&s.id, "term", term.clone());
+        base(&s.id, "name", s.name.clone(), String::new()); // scope to a *specific* system
+        base(&s.id, "order", order_name(s.order), String::new());
+        // Terms/connectives carry their topological position (node index / edge).
+        for (i, term) in s.terms.iter().enumerate() {
+            base(&s.id, "term", term.clone(), (i + 1).to_string());
         }
-        for c in &s.connectives {
-            base(&s.id, "connective", c.clone());
+        for (j, c) in s.connectives.iter().enumerate() {
+            base(&s.id, "connective", c.clone(), (j + 1).to_string());
         }
     }
     let _ = seqs; // monads carry no base-space triples yet (they show unfiltered)
     for r in refs {
         let Some(ts) = &r.target_system else { continue };
         let cite = ref_citation(r);
+        let fragment = frag(r);
         if let Some(obj) = &r.object {
-            let pred = frag_pred(&frag(r));
+            let pred = frag_pred(&fragment);
             if !pred.is_empty() {
                 t.push(Triple {
                     subject: ts.id.clone(),
                     predicate: pred.to_string(),
                     object: obj.clone(),
+                    position: frag_position(&fragment),
                     citation: cite.clone(),
                 });
             }
@@ -345,6 +365,7 @@ fn build_triples(
                 subject: ts.id.clone(),
                 predicate: "source".to_string(),
                 object: origin,
+                position: String::new(),
                 citation: cite,
             });
         }
@@ -954,12 +975,16 @@ fn table_view(ctx: TableCtx) -> Html {
             .find(|s| s.id == sid)
             .map(|s| s.name.clone())
             .unwrap_or_else(|| sid.clone());
-        // Group by predicate → object → the citation(s) that assert it (deduped, so a
-        // value that is both base-space and cited by DU1 appears once, with its source).
-        let mut by_pred: BTreeMap<String, BTreeMap<String, BTreeSet<String>>> = BTreeMap::new();
+        // Group by predicate → **position** → object → citation(s). Grouping by
+        // position is the bijective mapping: every perspective's value at the SAME
+        // topological node lands together (node 1: Will · Function[DU1] · Affirmation[DU2]).
+        type ByPos = BTreeMap<String, BTreeMap<String, BTreeSet<String>>>;
+        let mut by_pred: BTreeMap<String, ByPos> = BTreeMap::new();
         for t in triples.iter().filter(|t| t.subject == sid) {
             let cites = by_pred
                 .entry(t.predicate.clone())
+                .or_default()
+                .entry(t.position.clone())
                 .or_default()
                 .entry(t.object.clone())
                 .or_default();
@@ -971,28 +996,40 @@ fn table_view(ctx: TableCtx) -> Html {
             let inspect = inspect.clone();
             Callback::from(move |_: MouseEvent| inspect.set(None))
         };
+        let obj_tags = |objs: BTreeMap<String, BTreeSet<String>>| -> Html {
+            html! {
+                <span class="tags">
+                    { for objs.into_iter().map(|(o, cites)| {
+                        let cite = cites.into_iter().collect::<Vec<_>>().join(" ; ");
+                        html!{
+                            <span class="tag tag-coherence" title={ cite.clone() }>
+                                { o }
+                                { if cite.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" — {cite}") }</span> } } }
+                            </span>
+                        }
+                    }) }
+                </span>
+            }
+        };
         html! {
             <div class="inspect-panel">
                 <div class="inspect-head">
                     <span class="inspect-title">{ format!("⌕ {name}") }
-                        <span class="facet-src">{ "  — its quads (predicate · object · citation)" }</span>
+                        <span class="facet-src">{ "  — its quads, grouped by node (predicate · position · object · citation)" }</span>
                     </span>
                     <button class="row-delete" onclick={ close } title="Close">{ "✕" }</button>
                 </div>
-                { for by_pred.into_iter().map(|(p, objs)| html!{
+                { for by_pred.into_iter().map(|(p, positions)| html!{
                     <div class="inspect-row">
                         <span class="inspect-pred">{ pred_label(&p) }</span>
-                        <span class="tags">
-                            { for objs.into_iter().map(|(o, cites)| {
-                                let cite = cites.into_iter().collect::<Vec<_>>().join(" ; ");
-                                html!{
-                                    <span class="tag tag-coherence" title={ cite.clone() }>
-                                        { o }
-                                        { if cite.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" — {cite}") }</span> } } }
-                                    </span>
-                                }
+                        <div class="inspect-positions">
+                            { for positions.into_iter().map(|(pos, objs)| html!{
+                                <div class="inspect-posrow">
+                                    { if pos.is_empty() { html!{} } else { html!{ <span class="inspect-pos">{ format!("node {pos}") }</span> } } }
+                                    { obj_tags(objs) }
+                                </div>
                             }) }
-                        </span>
+                        </div>
                     </div>
                 }) }
             </div>

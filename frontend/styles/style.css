@@ -936,6 +936,22 @@ button.row-open:hover {
     font-size: 0.8rem;
     font-weight: 600;
 }
+.inspect-positions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+}
+.inspect-posrow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+}
+.inspect-pos {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    min-width: 3.5rem;
+}
 /* A monad row: the name tag with a small delete ✕ trailing it. */
 .monad-cell {
     display: inline-flex;
