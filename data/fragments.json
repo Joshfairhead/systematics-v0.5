@@ -559,6 +559,331 @@
       "id": "char_word_ne_edge_3",
       "kind": "word",
       "value": "Ne Edge 3"
+    },
+    {
+      "id": "char_word_semantic_projection",
+      "kind": "word",
+      "value": "Semantic Projection"
+    },
+    {
+      "id": "char_word_structural_topology",
+      "kind": "word",
+      "value": "Structural Topology"
+    },
+    {
+      "id": "char_word_graph_template",
+      "kind": "word",
+      "value": "Graph Template"
+    },
+    {
+      "id": "char_word_gc_edge_1",
+      "kind": "word",
+      "value": "Gc Edge 1"
+    },
+    {
+      "id": "char_word_gc_edge_2",
+      "kind": "word",
+      "value": "Gc Edge 2"
+    },
+    {
+      "id": "char_word_gc_edge_3",
+      "kind": "word",
+      "value": "Gc Edge 3"
+    },
+    {
+      "id": "char_word_size",
+      "kind": "word",
+      "value": "Size"
+    },
+    {
+      "id": "char_word_os_edge_1",
+      "kind": "word",
+      "value": "Os Edge 1"
+    },
+    {
+      "id": "char_word_vertex",
+      "kind": "word",
+      "value": "Vertex"
+    },
+    {
+      "id": "char_word_edge",
+      "kind": "word",
+      "value": "Edge"
+    },
+    {
+      "id": "char_word_ve_edge_1",
+      "kind": "word",
+      "value": "Ve Edge 1"
+    },
+    {
+      "id": "char_word_term",
+      "kind": "word",
+      "value": "Term"
+    },
+    {
+      "id": "char_word_connective",
+      "kind": "word",
+      "value": "Connective"
+    },
+    {
+      "id": "char_word_tc_edge_1",
+      "kind": "word",
+      "value": "Tc Edge 1"
+    },
+    {
+      "id": "char_word_path",
+      "kind": "word",
+      "value": "Path"
+    },
+    {
+      "id": "char_word_distance",
+      "kind": "word",
+      "value": "Distance"
+    },
+    {
+      "id": "char_word_pd_edge_1",
+      "kind": "word",
+      "value": "Pd Edge 1"
+    },
+    {
+      "id": "char_word_degree",
+      "kind": "word",
+      "value": "Degree"
+    },
+    {
+      "id": "char_word_index",
+      "kind": "word",
+      "value": "Index"
+    },
+    {
+      "id": "char_word_adjacency",
+      "kind": "word",
+      "value": "Adjacency"
+    },
+    {
+      "id": "char_word_neighbourhood",
+      "kind": "word",
+      "value": "Neighbourhood"
+    },
+    {
+      "id": "char_word_gt_edge_1",
+      "kind": "word",
+      "value": "Gt Edge 1"
+    },
+    {
+      "id": "char_word_gt_edge_2",
+      "kind": "word",
+      "value": "Gt Edge 2"
+    },
+    {
+      "id": "char_word_gt_edge_3",
+      "kind": "word",
+      "value": "Gt Edge 3"
+    },
+    {
+      "id": "char_word_gt_edge_4",
+      "kind": "word",
+      "value": "Gt Edge 4"
+    },
+    {
+      "id": "char_word_gt_edge_5",
+      "kind": "word",
+      "value": "Gt Edge 5"
+    },
+    {
+      "id": "char_word_gt_edge_6",
+      "kind": "word",
+      "value": "Gt Edge 6"
+    },
+    {
+      "id": "char_word_gt_edge_7",
+      "kind": "word",
+      "value": "Gt Edge 7"
+    },
+    {
+      "id": "char_word_gt_edge_8",
+      "kind": "word",
+      "value": "Gt Edge 8"
+    },
+    {
+      "id": "char_word_gt_edge_9",
+      "kind": "word",
+      "value": "Gt Edge 9"
+    },
+    {
+      "id": "char_word_gt_edge_10",
+      "kind": "word",
+      "value": "Gt Edge 10"
+    },
+    {
+      "id": "char_word_gt_edge_11",
+      "kind": "word",
+      "value": "Gt Edge 11"
+    },
+    {
+      "id": "char_word_gt_edge_12",
+      "kind": "word",
+      "value": "Gt Edge 12"
+    },
+    {
+      "id": "char_word_gt_edge_13",
+      "kind": "word",
+      "value": "Gt Edge 13"
+    },
+    {
+      "id": "char_word_gt_edge_14",
+      "kind": "word",
+      "value": "Gt Edge 14"
+    },
+    {
+      "id": "char_word_gt_edge_15",
+      "kind": "word",
+      "value": "Gt Edge 15"
+    },
+    {
+      "id": "char_word_gt_edge_16",
+      "kind": "word",
+      "value": "Gt Edge 16"
+    },
+    {
+      "id": "char_word_gt_edge_17",
+      "kind": "word",
+      "value": "Gt Edge 17"
+    },
+    {
+      "id": "char_word_gt_edge_18",
+      "kind": "word",
+      "value": "Gt Edge 18"
+    },
+    {
+      "id": "char_word_gt_edge_19",
+      "kind": "word",
+      "value": "Gt Edge 19"
+    },
+    {
+      "id": "char_word_gt_edge_20",
+      "kind": "word",
+      "value": "Gt Edge 20"
+    },
+    {
+      "id": "char_word_gt_edge_21",
+      "kind": "word",
+      "value": "Gt Edge 21"
+    },
+    {
+      "id": "char_word_topology",
+      "kind": "word",
+      "value": "Topology"
+    },
+    {
+      "id": "char_word_geometry",
+      "kind": "word",
+      "value": "Geometry"
+    },
+    {
+      "id": "char_word_tg_edge_1",
+      "kind": "word",
+      "value": "Tg Edge 1"
+    },
+    {
+      "id": "char_word_tg_edge_2",
+      "kind": "word",
+      "value": "Tg Edge 2"
+    },
+    {
+      "id": "char_word_tg_edge_3",
+      "kind": "word",
+      "value": "Tg Edge 3"
+    },
+    {
+      "id": "char_word_tg_edge_4",
+      "kind": "word",
+      "value": "Tg Edge 4"
+    },
+    {
+      "id": "char_word_tg_edge_5",
+      "kind": "word",
+      "value": "Tg Edge 5"
+    },
+    {
+      "id": "char_word_tg_edge_6",
+      "kind": "word",
+      "value": "Tg Edge 6"
+    },
+    {
+      "id": "char_word_source",
+      "kind": "word",
+      "value": "Source"
+    },
+    {
+      "id": "char_word_distributer",
+      "kind": "word",
+      "value": "Distributer"
+    },
+    {
+      "id": "char_word_expression",
+      "kind": "word",
+      "value": "Expression"
+    },
+    {
+      "id": "char_word_artefact",
+      "kind": "word",
+      "value": "Artefact"
+    },
+    {
+      "id": "char_word_lookup",
+      "kind": "word",
+      "value": "Lookup"
+    },
+    {
+      "id": "char_word_prov_edge_1",
+      "kind": "word",
+      "value": "Prov Edge 1"
+    },
+    {
+      "id": "char_word_prov_edge_2",
+      "kind": "word",
+      "value": "Prov Edge 2"
+    },
+    {
+      "id": "char_word_prov_edge_3",
+      "kind": "word",
+      "value": "Prov Edge 3"
+    },
+    {
+      "id": "char_word_prov_edge_4",
+      "kind": "word",
+      "value": "Prov Edge 4"
+    },
+    {
+      "id": "char_word_prov_edge_5",
+      "kind": "word",
+      "value": "Prov Edge 5"
+    },
+    {
+      "id": "char_word_prov_edge_6",
+      "kind": "word",
+      "value": "Prov Edge 6"
+    },
+    {
+      "id": "char_word_prov_edge_7",
+      "kind": "word",
+      "value": "Prov Edge 7"
+    },
+    {
+      "id": "char_word_prov_edge_8",
+      "kind": "word",
+      "value": "Prov Edge 8"
+    },
+    {
+      "id": "char_word_prov_edge_9",
+      "kind": "word",
+      "value": "Prov Edge 9"
+    },
+    {
+      "id": "char_word_prov_edge_10",
+      "kind": "word",
+      "value": "Prov Edge 10"
     }
   ],
   "coordinates": [],
@@ -867,6 +1192,149 @@
         "char_word_ne_edge_2",
         "char_word_ne_edge_3"
       ]
+    },
+    {
+      "id": "vocab_graph_construction_3",
+      "name": "Graph Construction",
+      "order": 3,
+      "terms": [
+        "char_word_semantic_projection",
+        "char_word_structural_topology",
+        "char_word_graph_template"
+      ],
+      "connectives": [
+        "char_word_gc_edge_1",
+        "char_word_gc_edge_2",
+        "char_word_gc_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_order_size_2",
+      "name": "Order Size",
+      "order": 2,
+      "terms": [
+        "char_word_order",
+        "char_word_size"
+      ],
+      "connectives": [
+        "char_word_os_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_vertex_edge_2",
+      "name": "Vertex Edge",
+      "order": 2,
+      "terms": [
+        "char_word_vertex",
+        "char_word_edge"
+      ],
+      "connectives": [
+        "char_word_ve_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_term_connective_2",
+      "name": "Term Connective",
+      "order": 2,
+      "terms": [
+        "char_word_term",
+        "char_word_connective"
+      ],
+      "connectives": [
+        "char_word_tc_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_path_distance_2",
+      "name": "Path Distance",
+      "order": 2,
+      "terms": [
+        "char_word_path",
+        "char_word_distance"
+      ],
+      "connectives": [
+        "char_word_pd_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_graph_theory_7",
+      "name": "Graph Theory",
+      "order": 7,
+      "terms": [
+        "char_word_order",
+        "char_word_degree",
+        "char_word_index",
+        "char_word_adjacency",
+        "char_word_neighbourhood",
+        "char_word_location",
+        "char_word_position"
+      ],
+      "connectives": [
+        "char_word_gt_edge_1",
+        "char_word_gt_edge_2",
+        "char_word_gt_edge_3",
+        "char_word_gt_edge_4",
+        "char_word_gt_edge_5",
+        "char_word_gt_edge_6",
+        "char_word_gt_edge_7",
+        "char_word_gt_edge_8",
+        "char_word_gt_edge_9",
+        "char_word_gt_edge_10",
+        "char_word_gt_edge_11",
+        "char_word_gt_edge_12",
+        "char_word_gt_edge_13",
+        "char_word_gt_edge_14",
+        "char_word_gt_edge_15",
+        "char_word_gt_edge_16",
+        "char_word_gt_edge_17",
+        "char_word_gt_edge_18",
+        "char_word_gt_edge_19",
+        "char_word_gt_edge_20",
+        "char_word_gt_edge_21"
+      ]
+    },
+    {
+      "id": "vocab_topology_geometry_4",
+      "name": "Topology Geometry",
+      "order": 4,
+      "terms": [
+        "char_word_topology",
+        "char_word_geometry",
+        "char_word_position",
+        "char_word_location"
+      ],
+      "connectives": [
+        "char_word_tg_edge_1",
+        "char_word_tg_edge_2",
+        "char_word_tg_edge_3",
+        "char_word_tg_edge_4",
+        "char_word_tg_edge_5",
+        "char_word_tg_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_provenance_5",
+      "name": "Provenance",
+      "order": 5,
+      "terms": [
+        "char_word_source",
+        "char_word_distributer",
+        "char_word_expression",
+        "char_word_artefact",
+        "char_word_lookup"
+      ],
+      "connectives": [
+        "char_word_prov_edge_1",
+        "char_word_prov_edge_2",
+        "char_word_prov_edge_3",
+        "char_word_prov_edge_4",
+        "char_word_prov_edge_5",
+        "char_word_prov_edge_6",
+        "char_word_prov_edge_7",
+        "char_word_prov_edge_8",
+        "char_word_prov_edge_9",
+        "char_word_prov_edge_10"
+      ]
     }
   ],
   "systems": [
@@ -1079,6 +1547,86 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_negative_emotion_3"
+    },
+    {
+      "id": "system_graph_construction_3",
+      "name": "Graph Construction",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_graph_construction_3"
+    },
+    {
+      "id": "system_order_size_2",
+      "name": "Order Size",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_order_size_2"
+    },
+    {
+      "id": "system_vertex_edge_2",
+      "name": "Vertex Edge",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_vertex_edge_2"
+    },
+    {
+      "id": "system_term_connective_2",
+      "name": "Term Connective",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_term_connective_2"
+    },
+    {
+      "id": "system_path_distance_2",
+      "name": "Path Distance",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_path_distance_2"
+    },
+    {
+      "id": "system_graph_theory_7",
+      "name": "Graph Theory",
+      "order": 7,
+      "coherence": "Generation",
+      "term_designation": "States",
+      "connective_designation": "Intervals",
+      "grammar_ref": "grammar_7",
+      "vocabulary_ref": "vocab_graph_theory_7"
+    },
+    {
+      "id": "system_topology_geometry_4",
+      "name": "Topology Geometry",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_topology_geometry_4"
+    },
+    {
+      "id": "system_provenance_5",
+      "name": "Provenance",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_provenance_5"
     }
   ],
   "perspectives": [],

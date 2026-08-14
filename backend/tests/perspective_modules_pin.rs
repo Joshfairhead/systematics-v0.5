@@ -107,8 +107,8 @@ fn module_owned_systems_present() {
     // (DU1 → 1 Dodecad, DU2 → 0: module systems now 3).
     assert_eq!(
         graph.systems.len(),
-        37,
-        "expected 12 canonical + 1 citation + 21 fragment + 3 module systems"
+        45,
+        "expected 12 canonical + 1 citation + 29 fragment + 3 module systems"
     );
 }
 
@@ -162,14 +162,24 @@ fn architectural_monad_registry_loads() {
             "system:system_identity_associativity_composition_3",
             "system:system_architecture_pentad_5",
             "system:system_architecture_octad_8",
+            "system:system_graph_construction_3",
+            "system:system_order_size_2",
+            "system:system_vertex_edge_2",
+            "system:system_term_connective_2",
+            "system:system_path_distance_2",
+            "system:system_graph_theory_7",
+            "system:system_topology_geometry_4",
+            "system:system_provenance_5",
         ]
     );
     // Seeded members resolve; the architecture **octad** is documented but not yet
     // seeded — a *dangling* address (tracked, not yet assembled into a system).
     assert!(graph.resolves("system:system_data_2"));
-    assert!(graph.resolves("system:system_order_position_location_3"));
-    assert!(graph.resolves("system:system_citation_3"));
-    assert!(graph.resolves("system:system_identity_associativity_composition_3"));
     assert!(graph.resolves("system:system_architecture_pentad_5"));
     assert!(!graph.resolves("system:system_architecture_octad_8"));
+    // The graph-theory / topology scaffold (seeded fragments) resolves too.
+    assert!(graph.resolves("system:system_graph_construction_3"));
+    assert!(graph.resolves("system:system_graph_theory_7"));
+    assert!(graph.resolves("system:system_topology_geometry_4"));
+    assert!(graph.resolves("system:system_provenance_5"));
 }

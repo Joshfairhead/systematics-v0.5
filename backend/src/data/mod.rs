@@ -323,6 +323,13 @@ fn slugs(xs: &[&str]) -> Vec<String> {
     xs.iter().map(|s| s.to_string()).collect()
 }
 
+/// `C(order, 2)` placeholder edge slugs for a `K_order` whose connectives aren't
+/// yet named (used by the architecture/graph-theory scaffold systems).
+fn edge_slugs(prefix: &str, order: usize) -> Vec<String> {
+    let count = order * order.saturating_sub(1) / 2;
+    (1..=count).map(|i| format!("{prefix}_edge_{i}")).collect()
+}
+
 /// Build the author-contributed and systematics-core **fragments** as their own
 /// bundle (`data/fragments.json`). Source of the author triads: **Josh Fairhead**
 /// (see `docs/fragments.md`). Each is a real K_n system (terms + named/placeholder
@@ -565,6 +572,57 @@ pub fn build_fragments_from_tables() -> GraphContent {
         3,
         &slugs(&["negative_emotion", "identification", "imagination"]),
         &slugs(&["ne_edge_1", "ne_edge_2", "ne_edge_3"]),
+    );
+
+    // ---- Graph-theory / topology scaffold (user, 2026-08-13) [architecture] ----
+    // The construction triad — how we build a system for examining property graphs:
+    // Semantic Projection (+) · Structural Topology (−) · Graph Template (=). Alt
+    // graph-theory names: Incidence graph (+) · Adjacency graph (−) · Line graph (=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Graph Construction",
+        3,
+        &slugs(&["semantic_projection", "structural_topology", "graph_template"]),
+        &edge_slugs("gc", 3),
+    );
+    // The dyad on each construction node: what that impulse defines.
+    // Graph Template (=) → order · size.
+    push_triadic_system(&mut content, &mut have_char, "Order Size", 2, &slugs(&["order", "size"]), &edge_slugs("os", 2));
+    // Structural Topology (−) → vertex · edge (the adjacency pair).
+    push_triadic_system(&mut content, &mut have_char, "Vertex Edge", 2, &slugs(&["vertex", "edge"]), &edge_slugs("ve", 2));
+    // Semantic Projection (+) → term · connective (the characters).
+    push_triadic_system(&mut content, &mut have_char, "Term Connective", 2, &slugs(&["term", "connective"]), &edge_slugs("tc", 2));
+    // Navigation dyad [architecture / graph-theory monad]: path · distance.
+    push_triadic_system(&mut content, &mut have_char, "Path Distance", 2, &slugs(&["path", "distance"]), &edge_slugs("pd", 2));
+    // Graph-theory holding heptad — terms to sort later (order=#nodes, size=#edges).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Graph Theory",
+        7,
+        &slugs(&["order", "degree", "index", "adjacency", "neighbourhood", "location", "position"]),
+        &edge_slugs("gt", 7),
+    );
+    // Topology · Geometry · Position · Location tetrad — the topology/geometry split
+    // (position = combinatorial/topological adjacency; location = geometric).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Topology Geometry",
+        4,
+        &slugs(&["topology", "geometry", "position", "location"]),
+        &edge_slugs("tg", 4),
+    );
+    // Provenance pentad (generalises the citation triad): Source · Distributer ·
+    // Expression · Artefact · Lookup (user swapped artefact/expression order).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Provenance",
+        5,
+        &slugs(&["source", "distributer", "expression", "artefact", "lookup"]),
+        &edge_slugs("prov", 5),
     );
 
     content
