@@ -25,6 +25,7 @@ use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
+use crate::components::inspector::{Inspector, ObjCite, PosGroup, PredGroup};
 
 /// Standard order labels (the invariant systematics names), used to label the
 /// compare-matrix rows regardless of how each perspective names its systems.
@@ -976,11 +977,11 @@ fn table_view(ctx: TableCtx) -> Html {
             .find(|s| s.id == sid)
             .map(|s| s.name.clone())
             .unwrap_or_else(|| sid.clone());
-        // Group by predicate → **position** → object → citation(s). Grouping by
-        // position is the bijective mapping: every perspective's value at the SAME
-        // topological node lands together (node 1: Will · Function[DU1] · Affirmation[DU2]).
-        type ByPos = BTreeMap<String, BTreeMap<String, BTreeSet<String>>>;
-        let mut by_pred: BTreeMap<String, ByPos> = BTreeMap::new();
+        // Group the subject's triples: predicate → position → object → citation(s).
+        // Grouping by position is the bijective mapping — every perspective's value at
+        // the SAME node lands together (node 1: Will · Function[DU1] · Affirmation[DU2]).
+        let mut by_pred: BTreeMap<String, BTreeMap<String, BTreeMap<String, BTreeSet<String>>>> =
+            BTreeMap::new();
         for t in triples.iter().filter(|t| t.subject == sid) {
             let cites = by_pred
                 .entry(t.predicate.clone())
@@ -993,48 +994,49 @@ fn table_view(ctx: TableCtx) -> Html {
                 cites.insert(t.citation.clone());
             }
         }
-        let close = {
-            let inspect = inspect.clone();
-            Callback::from(move |_: MouseEvent| inspect.set(None))
-        };
-        let obj_tags = |objs: BTreeMap<String, BTreeSet<String>>| -> Html {
-            html! {
-                <span class="tags">
-                    { for objs.into_iter().map(|(o, cites)| {
-                        let cite = cites.into_iter().collect::<Vec<_>>().join(" ; ");
-                        html!{
-                            <span class="tag tag-coherence" title={ cite.clone() }>
-                                { o }
-                                { if cite.is_empty() { html!{} } else { html!{ <span class="facet-src">{ format!(" — {cite}") }</span> } } }
-                            </span>
-                        }
-                    }) }
-                </span>
+        // Systematics predicate order; any others appended after.
+        const ORDER: [&str; 8] = [
+            "name", "order", "coherence", "term-designation", "connective-designation",
+            "term", "connective", "source",
+        ];
+        let mut preds: Vec<String> = ORDER
+            .iter()
+            .map(|s| s.to_string())
+            .filter(|p| by_pred.contains_key(p))
+            .collect();
+        for p in by_pred.keys() {
+            if !preds.contains(p) {
+                preds.push(p.clone());
             }
-        };
-        html! {
-            <div class="inspect-panel">
-                <div class="inspect-head">
-                    <span class="inspect-title">{ format!("⌕ {name}") }
-                        <span class="facet-src">{ "  — its quads, grouped by node (predicate · position · object · citation)" }</span>
-                    </span>
-                    <button class="row-delete" onclick={ close } title="Close">{ "✕" }</button>
-                </div>
-                { for by_pred.into_iter().map(|(p, positions)| html!{
-                    <div class="inspect-row">
-                        <span class="inspect-pred">{ pred_label(&p) }</span>
-                        <div class="inspect-positions">
-                            { for positions.into_iter().map(|(pos, objs)| html!{
-                                <div class="inspect-posrow">
-                                    { if pos.is_empty() { html!{} } else { html!{ <span class="inspect-pos">{ format!("node {pos}") }</span> } } }
-                                    { obj_tags(objs) }
-                                </div>
-                            }) }
-                        </div>
-                    </div>
-                }) }
-            </div>
         }
+        let groups: Vec<PredGroup> = preds
+            .into_iter()
+            .map(|p| {
+                let positions = by_pred.remove(&p).unwrap_or_default();
+                PredGroup {
+                    label: pred_label(&p),
+                    is_edge: p == "connective",
+                    positions: positions
+                        .into_iter()
+                        .map(|(position, objs)| PosGroup {
+                            position,
+                            objects: objs
+                                .into_iter()
+                                .map(|(object, cites)| ObjCite {
+                                    object,
+                                    citations: cites.into_iter().collect(),
+                                })
+                                .collect(),
+                        })
+                        .collect(),
+                }
+            })
+            .collect();
+        let on_close = {
+            let inspect = inspect.clone();
+            Callback::from(move |_: ()| inspect.set(None))
+        };
+        html! { <Inspector subject_name={ name } groups={ groups } on_close={ on_close } /> }
     } else {
         html! {}
     };

@@ -951,6 +951,40 @@ button.row-open:hover {
     color: #94a3b8;
     font-size: 0.72rem;
     min-width: 3.5rem;
+    padding-top: 0.15rem;
+}
+.inspect-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.inspect-toggle {
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: transparent;
+    color: #047857;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+}
+.inspect-toggle:hover {
+    background: rgba(16, 185, 129, 0.1);
+}
+/* One object (+ its citation) per line. */
+.inspect-objs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+}
+.inspect-obj {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+.inspect-cite {
+    color: #94a3b8;
+    font-size: 0.72rem;
 }
 /* A monad row: the name tag with a small delete ✕ trailing it. */
 .monad-cell {
