@@ -517,9 +517,9 @@
       "target": "system:system_canonical_triad_3#term:1",
       "source_ref": "source_j_g__bennett",
       "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60",
       "note": null,
-      "object": "Function"
+      "object": "Will"
     },
     {
       "id": "reference_du1_triad_term_2",
@@ -527,9 +527,9 @@
       "target": "system:system_canonical_triad_3#term:2",
       "source_ref": "source_j_g__bennett",
       "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56",
       "note": null,
-      "object": "Being"
+      "object": "Function"
     },
     {
       "id": "reference_du1_triad_term_3",
@@ -537,9 +537,9 @@
       "target": "system:system_canonical_triad_3#term:3",
       "source_ref": "source_j_g__bennett",
       "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
-      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58",
       "note": null,
-      "object": "Will"
+      "object": "Being"
     },
     {
       "id": "reference_du1_coherence_dodecad",
