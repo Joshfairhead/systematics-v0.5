@@ -760,6 +760,32 @@ pub struct GqlGrammarConnective {
     pub character_value: String,
 }
 
+/// A term/connective character with its **topological position** — a node index
+/// (`"1"`) for a term, or an edge (`"1-2"`) for a connective. This is the
+/// graph-derived position the inspector/triple-store consumes so the frontend
+/// never guesses (terms→nodes, connectives→edges of the adjacency matrix).
+#[derive(SimpleObject)]
+pub struct GqlPositionedChar {
+    pub value: String,
+    pub position: String,
+}
+
+/// The `index`-th edge of a `K_order` in the canonical lexicographic order
+/// `(1,2),(1,3),…,(2,3),…` — matches the render path's line enumeration, so a
+/// connective at vocabulary index `i` sits on edge `i`.
+fn nth_edge(order: u8, index: usize) -> String {
+    let mut k = 0;
+    for p1 in 1..=order {
+        for p2 in (p1 + 1)..=order {
+            if k == index {
+                return format!("{p1}-{p2}");
+            }
+            k += 1;
+        }
+    }
+    String::new()
+}
+
 #[derive(Clone, Default)]
 pub struct MutationRoot;
 
@@ -1628,27 +1654,41 @@ impl GqlSystem {
     async fn vocabulary_ref(&self) -> &str {
         &self.inner.vocabulary_ref
     }
-    /// The system's **term-character values** (the vocabulary's nouns), resolved —
-    /// so the SPO filter can offer/match every system's terms (a base-space read).
-    async fn terms(&self, ctx: &Context<'_>) -> Vec<String> {
+    /// The system's **term characters with their node position** (1..n) — resolved
+    /// from the vocabulary in order, so the frontend anchors each term to its node.
+    async fn terms(&self, ctx: &Context<'_>) -> Vec<GqlPositionedChar> {
         let g = graph_snapshot(ctx).await;
         g.vocabulary(&self.inner.vocabulary_ref)
             .map(|v| {
                 v.terms
                     .iter()
-                    .filter_map(|c| g.character(c).map(|c| c.value.clone()))
+                    .enumerate()
+                    .filter_map(|(i, c)| {
+                        g.character(c).map(|c| GqlPositionedChar {
+                            value: c.value.clone(),
+                            position: (i + 1).to_string(),
+                        })
+                    })
                     .collect()
             })
             .unwrap_or_default()
     }
-    /// The system's **connective-character values** (the vocabulary's verbs), resolved.
-    async fn connectives(&self, ctx: &Context<'_>) -> Vec<String> {
+    /// The system's **connective characters with their edge** (`base-target`) — the
+    /// connective at vocabulary index `i` sits on the `i`-th canonical edge.
+    async fn connectives(&self, ctx: &Context<'_>) -> Vec<GqlPositionedChar> {
         let g = graph_snapshot(ctx).await;
+        let order = self.inner.order;
         g.vocabulary(&self.inner.vocabulary_ref)
             .map(|v| {
                 v.connectives
                     .iter()
-                    .filter_map(|c| g.character(c).map(|c| c.value.clone()))
+                    .enumerate()
+                    .filter_map(|(i, c)| {
+                        g.character(c).map(|c| GqlPositionedChar {
+                            value: c.value.clone(),
+                            position: nth_edge(order, i),
+                        })
+                    })
                     .collect()
             })
             .unwrap_or_default()

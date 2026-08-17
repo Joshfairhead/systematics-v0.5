@@ -118,18 +118,28 @@ struct AllReferencesResponse {
     all_references: Vec<ReferenceView>,
 }
 
+/// A term/connective character with its graph-derived **position** — node index
+/// (`"1"`) for a term, edge (`"1-2"`) for a connective. Supplied by the backend so
+/// the frontend anchors to the topology instead of guessing from a list index.
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct PositionedChar {
+    pub value: String,
+    #[serde(default)]
+    pub position: String,
+}
+
 /// A non-canonical System the Load control can browse (id, display name, order).
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct InstanceSystem {
     pub id: String,
     pub name: String,
     pub order: i32,
-    /// The system's term-character values (nouns) — for the SPO Term predicate.
+    /// Term characters at their node positions — for the SPO Term predicate.
     #[serde(default)]
-    pub terms: Vec<String>,
-    /// The system's connective-character values (verbs) — for the Connective predicate.
+    pub terms: Vec<PositionedChar>,
+    /// Connective characters at their edge positions — for the Connective predicate.
     #[serde(default)]
-    pub connectives: Vec<String>,
+    pub connectives: Vec<PositionedChar>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -356,7 +366,7 @@ impl GraphQLClient {
 
     /// The non-canonical instance systems the Load control browses.
     pub async fn fetch_instance_systems(&self) -> Result<Vec<InstanceSystem>, ApiError> {
-        let query = r#"query { instanceSystems { id name order terms connectives } }"#;
+        let query = r#"query { instanceSystems { id name order terms { value position } connectives { value position } } }"#;
         let response: GraphQLResponse<InstanceSystemsResponse> =
             self.execute_query(query, None).await?;
         if let Some(errors) = response.errors {

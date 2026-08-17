@@ -329,12 +329,13 @@ fn build_triples(
     for s in systems {
         base(&s.id, "name", s.name.clone(), String::new()); // scope to a *specific* system
         base(&s.id, "order", order_name(s.order), String::new());
-        // Terms/connectives carry their topological position (node index / edge).
-        for (i, term) in s.terms.iter().enumerate() {
-            base(&s.id, "term", term.clone(), (i + 1).to_string());
+        // Terms/connectives carry their GRAPH position (node index / base–target edge),
+        // supplied by the backend — terms anchor to nodes, connectives to edges.
+        for term in &s.terms {
+            base(&s.id, "term", term.value.clone(), term.position.clone());
         }
-        for (j, c) in s.connectives.iter().enumerate() {
-            base(&s.id, "connective", c.clone(), (j + 1).to_string());
+        for c in &s.connectives {
+            base(&s.id, "connective", c.value.clone(), c.position.clone());
         }
     }
     let _ = seqs; // monads carry no base-space triples yet (they show unfiltered)

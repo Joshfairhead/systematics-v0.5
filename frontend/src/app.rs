@@ -1,4 +1,4 @@
-use crate::api::client::{GraphQLClient, InstanceSystem, ReferenceView, SequenceView};
+use crate::api::client::{GraphQLClient, InstanceSystem, PositionedChar, ReferenceView, SequenceView};
 use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::{
     AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
@@ -720,8 +720,21 @@ impl Component for ApiApp {
                 id: s.system_id.clone(),
                 name: s.name.clone(),
                 order: s.order,
-                terms: s.terms.iter().map(|t| t.value.clone()).collect(),
-                connectives: s.connectives.iter().map(|c| c.character_value.clone()).collect(),
+                // Canonical systems carry graph positions: term.position (node) and
+                // connective base–target (edge) — the same source the graph view uses.
+                terms: s
+                    .terms
+                    .iter()
+                    .map(|t| PositionedChar { value: t.value.clone(), position: t.position.to_string() })
+                    .collect(),
+                connectives: s
+                    .connectives
+                    .iter()
+                    .map(|c| PositionedChar {
+                        value: c.character_value.clone(),
+                        position: format!("{}-{}", c.base_position, c.target_position),
+                    })
+                    .collect(),
             })
             .collect();
         all_systems.extend(self.instance_systems.iter().cloned());
