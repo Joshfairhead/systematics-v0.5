@@ -110,10 +110,14 @@ remodel. Naming the impulses (canonical: affirming **+**, receptive **−**, rec
 |---|---|---|---|
 | **Model** | **−** (receptive) | the **triadic base space** — the passive store of *what is* | backend data + the base-space triad below |
 | **View** | **+** (affirming) | the **interface** — what actively presents / initiates interaction | frontend (`browser_controls`, `inspector`, `graph_view`) |
-| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | middleware + the six laws of three (below) |
+| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | **not yet built as a layer** — see *Ground truth* below; NOT the `middleware` crate |
 
 This supersedes the earlier loose "middleware = controller, backend = model, frontend = view"
-gloss by giving each an **impulse** and naming what each *contains*.
+gloss by giving each an **impulse** and naming what each *contains*. **Correction (audit
+2026-08-18):** `middleware` is **not** the Controller — it is a **shared wire-format / DTO
+crate** (`middleware/src/types/*`) depended on by *both* backend and frontend, so it cannot
+mediate between them; it is the Model/View shared *vocabulary*. The Controller layer does not
+yet exist (see *Ground truth*).
 
 **Separate the concerns — the earlier remodel conflated them (user, 2026-08-18).** The
 base-space plan folded model, controller and view together. Pulled apart:
@@ -167,6 +171,40 @@ MVC base (View = **+**/1, Model = **−**/2, Controller = **=**/3), for sign-off
 working guess. Note: this six-over-MVC application is **distinct** from the six laws as the
 Controller's own **traversal algorithms** over the S·P·O impulse triad — same group S₃,
 different base.)*
+
+**Ground truth — audit before refactor (2026-08-18).** A registry-vs-code audit established
+what already exists, so the remodel *re-articulates* rather than builds from scratch:
+
+- **The Model's base-space triad already exists in embryo** (`backend/src/core/`):
+  - **Structural Topology (−)** ≈ **`TopologicalVocabulary`** — points + lines (adjacency,
+    per Order). The incidence join is `Graph::character_at_point` / `character_at_line`
+    (`graph.rs:706-730`): `topology.points[idx] ↔ vocab.terms[idx]`.
+  - **Graph Template (=)** ≈ **`Grammar`** (`grammar.rs`) — holds **order** and, via
+    `expected_terms()` (= order) and `expected_connectives()` (= C(order,2), the **size /
+    degree**), the arity rules. **`Grammar::validate` / `validate_with`** already perform the
+    structural validation (arity + topology/geometry/semantic reconciliation). *So the two
+    insights above — "order + degree live in the Graph Template" and "the Graph Template holds
+    the validation rules" — are already literally true in code.*
+  - **Semantic Projection (+)** ≈ **`Vocabulary`** — terms + connectives as `Character` refs
+    projected onto the points/lines (`vocab.validate_against(topology)`).
+  - `System` (`systems.rs`) is the metadata reconciling a `Grammar` with a `Vocabulary`;
+    `Graph::validate_system` resolves the whole triad. The **entries substrate**
+    (`entries.rs`: Order·Position·Point·Line·Coordinate·Segment·Character) + content-addressed
+    `Character` (`char_word_<slug>` dedup) + `canonical_ids`/`bundled_ids` is the nascent
+    **content-addressed heap** (the Nullad / DHT shape).
+  - *Gap the remodel adds:* explicit **adjacency** and **incidence matrices** (today topology
+    is point/line *lists*, implicit adjacency) reconciled by the template as a **line graph**.
+- **The Controller does NOT exist as a layer.** No code enumerates/applies the six laws
+  (S₃) as traversals — it is **doc-only** (one comment at `data/mod.rs:469`). The only real
+  S₃/permutation logic is **`core/functors.rs`** (a single same-grammar morphism, Model-side,
+  `impl` + tested), *not* a six-laws engine and *not* in `middleware`. Building the Controller
+  = **the six laws of three** is net-new remodel work; it should sit alongside `functors.rs`
+  in backend `core`, fed validation rules by the `Grammar` (Graph Template), **not** in the
+  `middleware` DTO crate.
+- **Stale statuses / task drift found:** the 9 QSM + 3 DU-vol perspective JSON files exist and
+  load, yet tasks #13 (Scrape Hodgson Qualsystems) and #14 (Scrape DU4) still read "pending".
+  *(Full frontend/graphql/status sweep deferred — the audit workflow hit a session limit;
+  resume for complete coverage.)*
 
 ## Monads, operations, and the six laws of three [proposed — potentially major]
 
