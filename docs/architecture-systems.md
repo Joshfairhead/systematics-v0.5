@@ -201,8 +201,11 @@ what already exists, so the remodel *re-articulates* rather than builds from scr
   = **the six laws of three** is net-new remodel work; it should sit alongside `functors.rs`
   in backend `core`, fed validation rules by the `Grammar` (Graph Template), **not** in the
   `middleware` DTO crate.
-- **Stale statuses / task drift found:** the 9 QSM + 3 DU-vol perspective JSON files exist and
-  load, yet tasks #13 (Scrape Hodgson Qualsystems) and #14 (Scrape DU4) still read "pending".
+- **Stale statuses / task drift found:** the 9 QSM perspective JSON files (qsm1–7 + workbook +
+  course = Hodgson Qualsystems) and DU vols 1–3 exist on disk in `backend/data/perspectives/`,
+  yet task #13 (Scrape Hodgson Qualsystems) still reads "pending" — **stale**. (Task #14 =
+  *DU vol 4*, which is genuinely absent — only vols 1–3 are present — so #14 stands. Whether
+  the QSM/DU files are actually *loaded at startup* is unverified — check `data/mod.rs`.)
   *(Full frontend/graphql/status sweep deferred — the audit workflow hit a session limit;
   resume for complete coverage.)*
 
