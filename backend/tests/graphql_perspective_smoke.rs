@@ -1,4 +1,4 @@
-//! End-to-end smoke test for the Perspective / Vocabulary / Character surface.
+//! End-to-end smoke test for the System / Vocabulary / Character surface.
 //!
 //! Verifies that a user can build a full Theology Triad from scratch and
 //! query it back through the schema.
@@ -33,11 +33,11 @@ async fn create_theology_triad_end_to_end() {
     assert_eq!(data["omn"]["id"], "char_word_omniscient");
     assert_eq!(data["trans"]["id"], "char_word_transcendental");
 
-    // Create the SemanticVocabulary, reusing canonical connective Characters
-    // (Generation / Decision / Consent are seeded).
+    // Create the Vocabulary (Vocabulary), reusing canonical connective
+    // Characters (Generation / Decision / Consent are seeded).
     let create_sv = r#"
         mutation {
-            createSemanticVocab(input: {
+            createVocabulary(input: {
                 name: "Theology Triad",
                 order: 3,
                 terms: [
@@ -56,52 +56,52 @@ async fn create_theology_triad_end_to_end() {
     let resp = schema.execute(create_sv).await;
     assert!(resp.errors.is_empty(), "create sv errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
-    let sv_id = data["createSemanticVocab"]["id"].as_str().unwrap().to_string();
-    assert_eq!(data["createSemanticVocab"]["name"], "Theology Triad");
-    assert_eq!(data["createSemanticVocab"]["terms"].as_array().unwrap().len(), 3);
-    assert!(data["createSemanticVocab"]["validationErrors"]
+    let sv_id = data["createVocabulary"]["id"].as_str().unwrap().to_string();
+    assert_eq!(data["createVocabulary"]["name"], "Theology Triad");
+    assert_eq!(data["createVocabulary"]["terms"].as_array().unwrap().len(), 3);
+    assert!(data["createVocabulary"]["validationErrors"]
         .as_array()
         .unwrap()
         .is_empty());
 
-    // Create the Perspective.
-    let create_perspective = r#"
+    // Create the System reconciling the canonical triad Grammar with the vocab.
+    let create_system = r#"
         mutation Create($sv: String!) {
-            createPerspective(input: {
+            createSystem(input: {
                 name: "Theology Triad",
                 order: 3,
                 coherence: "Trinity",
                 termDesignation: "Persons",
                 connectiveDesignation: "Perichoresis",
-                topologicalVocabRef: "topvocab_3",
-                geometricVocabRef: "geovocab_3",
-                semanticVocabRef: $sv
-            }) { id name coherence topologicalVocabRef }
+                grammarRef: "grammar_3",
+                vocabularyRef: $sv
+            }) { id name coherence grammarRef vocabularyRef }
         }
     "#;
-    let req = async_graphql::Request::new(create_perspective)
+    let req = async_graphql::Request::new(create_system)
         .variables(async_graphql::Variables::from_json(json!({ "sv": sv_id })));
     let resp = schema.execute(req).await;
-    assert!(resp.errors.is_empty(), "create perspective errors: {:?}", resp.errors);
+    assert!(resp.errors.is_empty(), "create system errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
-    let perspective_id = data["createPerspective"]["id"].as_str().unwrap().to_string();
-    assert_eq!(data["createPerspective"]["name"], "Theology Triad");
-    assert_eq!(data["createPerspective"]["coherence"], "Trinity");
+    let system_id = data["createSystem"]["id"].as_str().unwrap().to_string();
+    assert_eq!(data["createSystem"]["name"], "Theology Triad");
+    assert_eq!(data["createSystem"]["coherence"], "Trinity");
+    assert_eq!(data["createSystem"]["grammarRef"], "grammar_3");
 
     // Validate returns no errors.
-    let validate = r#"query Validate($id: String!) { validatePerspective(id: $id) }"#;
+    let validate = r#"query Validate($id: String!) { validateSystem(id: $id) }"#;
     let req = async_graphql::Request::new(validate)
-        .variables(async_graphql::Variables::from_json(json!({ "id": perspective_id })));
+        .variables(async_graphql::Variables::from_json(json!({ "id": system_id })));
     let resp = schema.execute(req).await;
     assert!(resp.errors.is_empty(), "validate errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
-    let errs = data["validatePerspective"].as_array().unwrap();
+    let errs = data["validateSystem"].as_array().unwrap();
     assert!(errs.is_empty(), "validation returned: {:?}", errs);
 
     // Character-at-point join uses the new vocabulary.
     let cap = r#"
         query Cap($sv: String!) {
-            characterAtPoint(semanticVocabId: $sv, pointId: "point_3_2") { id value }
+            characterAtPoint(vocabularyId: $sv, pointId: "point_3_2") { id value }
         }
     "#;
     let req = async_graphql::Request::new(cap)
@@ -112,13 +112,13 @@ async fn create_theology_triad_end_to_end() {
 
     // Clean up.
     let cleanup = r#"
-        mutation Cleanup($perspective: String!, $sv: String!) {
-            g: deletePerspective(id: $perspective)
-            s: deleteSemanticVocab(id: $sv)
+        mutation Cleanup($system: String!, $sv: String!) {
+            g: deleteSystem(id: $system)
+            s: deleteVocabulary(id: $sv)
         }
     "#;
     let req = async_graphql::Request::new(cleanup).variables(
-        async_graphql::Variables::from_json(json!({ "perspective": perspective_id, "sv": sv_id })),
+        async_graphql::Variables::from_json(json!({ "system": system_id, "sv": sv_id })),
     );
     let resp = schema.execute(req).await;
     let data = resp.data.into_json().unwrap();
@@ -142,12 +142,26 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
         .map(|f| f["name"].as_str().unwrap().to_string())
         .collect();
 
-    // Only Character / SemanticVocab / Perspective mutations exist.
-    let allowed = ["Character", "SemanticVocab", "Perspective"];
+    // Language-layer mutations (Character / Vocabulary / System) plus the
+    // referencing layer (Perspective / Link / Source / Artefact / Lookup /
+    // Reference). Structural anchors and grammars remain immutable.
+    let allowed = [
+        "Character",
+        "Vocabulary",
+        "System",
+        "Functor",
+        "Sequence",
+        "Perspective",
+        "Link",
+        "Source",
+        "Artefact",
+        "Lookup",
+        "Reference",
+    ];
     for f in &fields {
         assert!(
             allowed.iter().any(|a| f.contains(a)),
-            "unexpected mutation `{}` — structural anchors and metadata are immutable",
+            "unexpected mutation `{}` — structural anchors and grammars are immutable",
             f
         );
     }
@@ -155,12 +169,12 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
     for expected in [
         "createCharacter",
         "deleteCharacter",
-        "createSemanticVocab",
-        "updateSemanticVocab",
-        "deleteSemanticVocab",
-        "createPerspective",
-        "updatePerspective",
-        "deletePerspective",
+        "createVocabulary",
+        "updateVocabulary",
+        "deleteVocabulary",
+        "createSystem",
+        "updateSystem",
+        "deleteSystem",
     ] {
         assert!(
             fields.iter().any(|f| f == expected),

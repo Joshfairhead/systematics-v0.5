@@ -1,6 +1,41 @@
 use std::sync::Arc;
 
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+/// Self-contained GraphiQL page, pinned to a compatible GraphiQL 2.x + React 17
+/// (async-graphql's bundled `GraphiQLSource` loads an *unpinned* graphiql that
+/// now resolves to v3+, which is incompatible with the React 17 UMD globals it
+/// also loads — the page then spins forever). Pinning fixes that.
+const GRAPHIQL_HTML: &str = r#"<!DOCTYPE html>
+<html>
+  <head>
+    <title>Systematics GraphQL</title>
+    <style>body { height: 100%; margin: 0; width: 100%; overflow: hidden; } #graphiql { height: 100vh; }</style>
+    <link rel="stylesheet" href="https://unpkg.com/graphiql@2.4.7/graphiql.min.css" />
+  </head>
+  <body>
+    <div id="graphiql">Loading GraphiQL…</div>
+    <script crossorigin src="https://unpkg.com/react@17.0.2/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/graphiql@2.4.7/graphiql.min.js"></script>
+    <script>
+      const fetcher = GraphiQL.createFetcher({ url: '/graphql' });
+      const defaultQuery = `# Systematics GraphQL. Press the ▶ button to run.
+{
+  systemByName(name: "triad") {
+    name
+    coherence
+    termDesignation
+    connectiveDesignation
+    terms { position value }
+    connectives { basePosition targetPosition characterValue }
+  }
+}`;
+      ReactDOM.render(
+        React.createElement(GraphiQL, { fetcher, defaultQuery, defaultEditorToolsVisibility: true }),
+        document.getElementById('graphiql'),
+      );
+    </script>
+  </body>
+</html>"#;
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::State,
@@ -26,7 +61,7 @@ async fn graphql_handler(
 }
 
 async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+    Html(GRAPHIQL_HTML)
 }
 
 /// Initialize tracing subscriber
@@ -46,8 +81,17 @@ fn init_tracing() {
 /// so mutations (Functor CRUD, applyFunctor) persist across requests within
 /// a single process. Restarting the process resets to seed state.
 fn build_api_router() -> Router {
-    // Build the canonical graph, then merge the writable user store over it.
+    // Build the canonical graph, load durable perspective modules, then merge
+    // the writable user store over it.
     let mut graph = data::build_graph();
+    let modules = data::load_perspective_modules(&mut graph);
+    if modules > 0 {
+        // Perspective modules are durable (kept out of the user store) but not
+        // canonical archetypes — mark them bundled so they can still be edited
+        // and re-exported losslessly.
+        graph.mark_bundled();
+        tracing::info!("Loaded {} perspective module(s)", modules);
+    }
     let store_path = persistence::resolve_store_path();
     if let Err(e) = persistence::load_into(&mut graph, &store_path) {
         tracing::error!("failed to load user store from {}: {}", store_path.display(), e);

@@ -6,13 +6,15 @@ body {
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #e3e9f0 0%, #f0f4f8 50%, #e8ecf1 100%);
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .app {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
     background: linear-gradient(135deg, #e3e9f0 0%, #f0f4f8 50%, #e8ecf1 100%);
     color: #2c3e50;
 }
@@ -26,6 +28,9 @@ body {
 
 .sidebar {
     flex-shrink: 0;
+    /* Stack above .main-view so dropdowns aren't painted behind the canvas. */
+    position: relative;
+    z-index: 100;
 }
 
 /* Top Navigation Bar */
@@ -50,10 +55,9 @@ body {
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center; /* centre buttons, and centre them on wrap */
     flex: 1;
     padding: 0.75rem 1.5rem;
-    padding-right: 180px; /* Make room for the toggle switch */
 }
 
 .nav-controls {
@@ -214,17 +218,36 @@ body {
         0 4px 12px rgba(163, 177, 198, 0.25);
 }
 
+/* Order buttons unreachable in the current monad context — greyed, unclickable. */
+.nav-button.disabled,
+.nav-button:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    filter: grayscale(0.5);
+}
+.nav-button.disabled:hover,
+.nav-button:disabled:hover {
+    background: rgba(255, 255, 255, 0.5);
+    color: #4a5568;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transform: none;
+    box-shadow: none;
+}
+
 .main-view {
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 2rem;
-    overflow: hidden;
+    padding: 1rem 2rem;
+    overflow-y: auto;
     min-height: 0;
 }
 
 .graph-view {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -311,10 +334,13 @@ body {
         0 16px 48px rgba(163, 177, 198, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.9),
         inset 0 -1px 0 rgba(163, 177, 198, 0.1);
-    width: min(calc(100vw - 4rem), 90vw);
+    /* Width is also bounded by the viewport height (so the 16:9 box never grows
+       taller than the space under the nav) — keeps the whole page in view. */
+    width: min(calc(100vw - 4rem), 90vw, calc((100vh - 7rem) * 16 / 9));
     max-width: 1400px;
     height: auto;
     aspect-ratio: 16 / 9;
+    flex-shrink: 0;
 }
 
 .edge {
@@ -356,6 +382,771 @@ body {
     }
 
     .graph-svg {
-        width: min(calc(100vw - 2rem), 95vw);
+        width: min(calc(100vw - 2rem), 95vw, calc((100vh - 6rem) * 16 / 9));
     }
+}
+
+/* Read-only citations panel (references for a selected term) */
+.references-panel {
+    margin: 1rem auto 0;
+    max-width: 640px;
+    width: min(calc(100vw - 2rem), 640px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
+
+.references-panel h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.references-empty {
+    margin: 0;
+    opacity: 0.6;
+    font-size: 0.85rem;
+}
+
+.references-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.reference-item {
+    padding: 0.35rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.85rem;
+}
+
+.reference-source {
+    font-weight: 600;
+}
+
+.reference-lookup {
+    opacity: 0.8;
+}
+
+.reference-note {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* Graph header: overlay pinned inside the canvas (top-left) so it never
+   pushes the graph off-screen. One compact inline line — name + designations. */
+.graph-header {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.75rem;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.25;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+}
+
+.graph-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.designation {
+    opacity: 0.8;
+}
+
+.designation-term {
+    color: #4A90E2;
+}
+
+.designation-connective {
+    color: #E2A24A;
+}
+
+.designation-coherence {
+    font-style: italic;
+    opacity: 0.65;
+}
+
+/* A metadata item that carries a citation: re-enable hover (the header is
+   pointer-events:none) and mark it with a dotted amber underline. */
+.graph-header .designation.cited {
+    pointer-events: auto;
+    cursor: help;
+    text-decoration: underline dotted;
+    text-decoration-color: #E2A24A;
+    text-underline-offset: 3px;
+}
+
+/* Edge-labels toggle — overlay pinned inside the canvas, top-right */
+.edge-toggle-overlay {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Cited nodes get a subtle amber dashed ring; hover reveals the citation. */
+.node.cited .cited-ring {
+    opacity: 0.8;
+}
+
+/* ============================================================
+   Reference browser (References view)
+   ============================================================ */
+.main-view {
+    /* anchor absolutely-positioned overlays (e.g. the canonical toggle) */
+    position: relative;
+}
+
+/* Data · Graph · Table — a bare boolean "View" toggle, right of the system menu. */
+.view-switch {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0 0.75rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+.view-switch-label {
+    color: #718096;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.view-switch-track {
+    position: relative;
+    width: 2rem;
+    height: 1.05rem;
+    border-radius: 999px;
+    background: rgba(163, 177, 198, 0.45);
+    transition: background 0.15s ease;
+}
+.view-switch-track.on {
+    background: rgba(37, 99, 235, 0.55);
+}
+.view-switch-thumb {
+    position: absolute;
+    top: 0.12rem;
+    left: 0.12rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s ease;
+}
+.view-switch-track.on .view-switch-thumb {
+    transform: translateX(0.95rem);
+}
+
+/* Nullad — the order-0 button leading the sequence. Subtle accent. */
+.nav-nullad {
+    font-style: italic;
+}
+
+/* Nullad graph mode: a blank canvas placeholder. Stretch to fill the pane
+   (the .main-view is a flex row with align-items:flex-start). */
+.nullad-blank {
+    flex: 1;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    color: #a0aec0;
+    text-align: center;
+    user-select: none;
+}
+.nullad-blank-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #718096;
+    margin: 0;
+}
+.nullad-blank-hint {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.reference-browser {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 0;
+}
+
+/* ---- ELT triad (Extract · Load · Transform) — operation edge ---- */
+.elt-triad {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.elt-btn {
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.85rem;
+    color: #2c3e50;
+    cursor: pointer;
+}
+.elt-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+.elt-load {
+    position: relative;
+}
+/* Anchor the Load menu to the left (it lives on the Nullad page now). */
+.elt-load .load-menu {
+    left: 0;
+    right: auto;
+}
+.load-empty {
+    color: #a0aec0;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.6rem;
+}
+/* Editor form — author a system from custom values. */
+.editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.6rem;
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+}
+.editor-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.editor-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+}
+.ed-input {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.82rem;
+    color: #2c3e50;
+}
+.ed-name { flex: 1; min-width: 12rem; }
+.ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
+/* In-graph system editor. */
+.graph-with-editor { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.system-editor { width: 100%; }
+.edit-toggle {
+    align-self: flex-end;
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.7);
+    color: #4a5568;
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.edit-toggle.active {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.4);
+    color: #2563eb;
+    font-weight: 600;
+}
+.ed-order { width: 3.5rem; margin-left: 0.3rem; }
+.ed-label { font-size: 0.75rem; color: #718096; display: inline-flex; align-items: center; }
+/* Extract feedback (Nullad → Monad result). */
+.elt-note {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: #059669;
+}
+.ref-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.ref-tab {
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    color: #4a5568;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.ref-tab.active {
+    background: rgba(37, 99, 235, 0.15);
+    color: #2563eb;
+    font-weight: 600;
+}
+.ref-count {
+    color: #718096;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+/* Active header scope (which order the data view is filtered to). */
+.ref-scope {
+    margin-left: auto;
+    color: #2563eb;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ---- Controls: one line — Sort · Filter · Tags to the left of the search ---- */
+.ref-controlbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.ref-search {
+    flex: 1;
+    min-width: 140px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 8px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    color: #2c3e50;
+}
+
+/* Compact Sort/Filter/Tags controls (popovers for Sort & Filter). */
+.control-pop {
+    position: relative;
+}
+.control-btn {
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.7);
+    color: #4a5568;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.control-btn.active {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.4);
+    color: #2563eb;
+    font-weight: 600;
+}
+.control-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    padding: 0.5rem;
+    box-shadow: 0 8px 24px rgba(163, 177, 198, 0.4);
+}
+/* Column configurator: chips for each tag key (which columns are shown). */
+.col-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.35rem;
+    max-width: 22rem;
+}
+.ref-empty {
+    color: #a0aec0;
+    font-size: 0.85rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.facet-label {
+    color: #718096;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.facet-chip {
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    background: rgba(255, 255, 255, 0.6);
+    color: #4a5568;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+.facet-chip.active {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.4);
+    color: #2563eb;
+    font-weight: 600;
+}
+
+/* ---- Citation-triad tags (source · locator · artefact) ---- */
+.tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.tag {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+button.tag {
+    cursor: pointer;
+}
+.tag-system {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+    font-weight: 600;
+}
+/* Clickable system name → view the system in the graph. */
+button.row-open {
+    border: none;
+    cursor: pointer;
+}
+button.row-open:hover {
+    text-decoration: underline;
+    background: rgba(245, 158, 11, 0.28);
+}
+.tag-perspective {
+    background: rgba(139, 92, 246, 0.14);
+    color: #7c3aed;
+}
+.tag-monad {
+    background: rgba(37, 99, 235, 0.16);
+    color: #1d4ed8;
+    font-weight: 600;
+}
+/* SPO filter: predicate tabs above the object-value chips. */
+.facet-tabs {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+    padding-bottom: 0.4rem;
+}
+.facet-tab {
+    border: 1px solid rgba(163, 177, 198, 0.35);
+    background: rgba(255, 255, 255, 0.6);
+    color: #4a5568;
+    border-radius: 8px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.facet-tab.active {
+    background: rgba(37, 99, 235, 0.16);
+    color: #1d4ed8;
+    border-color: rgba(37, 99, 235, 0.3);
+}
+.facet-hint {
+    color: #a0aec0;
+    font-size: 0.78rem;
+    font-style: italic;
+}
+/* The source(s) that assert an object — the quad's provenance, shown on a chip. */
+.facet-src {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 400;
+}
+/* System name cell: the name tag with a small ⌕ inspect (reciprocal traversal). */
+.sys-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.row-inspect {
+    border: none;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.78rem;
+    padding: 0.1rem 0.25rem;
+    border-radius: 6px;
+    opacity: 0.6;
+}
+.row-inspect:hover {
+    opacity: 1;
+    background: rgba(37, 99, 235, 0.12);
+}
+/* Reciprocal-traversal panel: a pinned subject advertising its quads. */
+.inspect-panel {
+    margin: 0.5rem 0;
+    padding: 0.6rem 0.8rem;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    border-radius: 10px;
+}
+.inspect-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+.inspect-title {
+    font-weight: 600;
+    color: #047857;
+}
+.inspect-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.2rem 0;
+}
+.inspect-pred {
+    min-width: 8rem;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.inspect-positions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+}
+.inspect-posrow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+}
+.inspect-pos {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    min-width: 3.5rem;
+    padding-top: 0.15rem;
+}
+.inspect-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.inspect-toggle {
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: transparent;
+    color: #047857;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+}
+.inspect-toggle:hover {
+    background: rgba(16, 185, 129, 0.1);
+}
+/* One object (+ its citation) per line. */
+.inspect-objs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+}
+.inspect-obj {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+.inspect-cite {
+    color: #94a3b8;
+    font-size: 0.72rem;
+}
+/* A monad row: the name tag with a small delete ✕ trailing it. */
+.monad-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.row-delete {
+    border: none;
+    background: transparent;
+    color: #b0367a;
+    cursor: pointer;
+    font-size: 0.72rem;
+    line-height: 1;
+    padding: 0.15rem 0.3rem;
+    border-radius: 6px;
+    opacity: 0.55;
+}
+.row-delete:hover {
+    opacity: 1;
+    background: rgba(214, 40, 118, 0.14);
+}
+.tag-member {
+    background: rgba(163, 177, 198, 0.22);
+    color: #4a5568;
+    font-size: 0.72rem;
+}
+.tag-source {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563eb;
+}
+.tag-artefact {
+    background: rgba(16, 185, 129, 0.14);
+    color: #059669;
+}
+.tag-locator {
+    background: rgba(163, 177, 198, 0.2);
+    color: #4a5568;
+}
+
+.ref-table-wrap {
+    overflow: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    max-height: calc(100vh - 13rem);
+}
+.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+.ref-table th,
+.ref-table td {
+    text-align: left;
+    padding: 0.45rem 0.7rem;
+    border-bottom: 1px solid rgba(163, 177, 198, 0.25);
+    vertical-align: top;
+}
+.ref-table thead th {
+    position: sticky;
+    top: 0;
+    background: rgba(240, 244, 248, 0.95);
+    backdrop-filter: blur(8px);
+    color: #4a5568;
+    font-weight: 600;
+    z-index: 1;
+}
+.ref-th {
+    user-select: none;
+    white-space: nowrap;
+}
+.ref-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.35);
+}
+.ref-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.06);
+}
+/* Row-select CRUD: leading checkbox column, selected-row tint, delete button. */
+.row-select {
+    width: 1.6rem;
+    text-align: center !important;
+    padding-left: 0.4rem !important;
+    padding-right: 0.2rem !important;
+}
+.row-select input {
+    cursor: pointer;
+}
+.ref-table tbody tr.row-selected {
+    background: rgba(214, 40, 118, 0.10);
+}
+.row-delete-btn {
+    border: 1px solid rgba(214, 40, 118, 0.4);
+    background: rgba(214, 40, 118, 0.12);
+    color: #b0367a;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.row-delete-btn:hover {
+    background: rgba(214, 40, 118, 0.2);
+}
+
+.compare-matrix .compare-order {
+    font-weight: 600;
+    white-space: nowrap;
+}
+.compare-cell.empty {
+    color: #cbd5e0;
+    text-align: center;
+}
+
+/* ---- Load menu (shared: the ELT triad's Load edge on the Nullad page) ---- */
+.load-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0.5rem;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+    padding: 0.25rem;
+    min-width: 210px;
+    max-height: 70vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(163, 177, 198, 0.4);
+}
+.load-item {
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+    color: #2c3e50;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.load-item:hover {
+    background: rgba(37, 99, 235, 0.1);
+}
+.canonical-toggle-overlay {
+    position: absolute;
+    top: 2.7rem;
+    right: 0.75rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    cursor: pointer;
 }

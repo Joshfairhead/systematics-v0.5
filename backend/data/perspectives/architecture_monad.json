@@ -1,0 +1,24 @@
+{
+  "sequences": [
+    {
+      "id": "sequence_architectural_monad",
+      "name": "Architectural Monad",
+      "members": [
+        "system:system_data_2",
+        "system:system_order_position_location_3",
+        "system:system_citation_3",
+        "system:system_identity_associativity_composition_3",
+        "system:system_architecture_pentad_5",
+        "system:system_architecture_octad_8",
+        "system:system_graph_construction_3",
+        "system:system_order_size_2",
+        "system:system_vertex_edge_2",
+        "system:system_term_connective_2",
+        "system:system_path_distance_2",
+        "system:system_graph_theory_7",
+        "system:system_topology_geometry_4",
+        "system:system_provenance_5"
+      ]
+    }
+  ]
+}

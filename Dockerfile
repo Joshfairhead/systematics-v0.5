@@ -14,6 +14,10 @@ COPY Cargo.toml Cargo.lock ./
 COPY backend ./backend
 COPY frontend ./frontend
 COPY middleware ./middleware
+# Seed data (canonical.json / citation.json) is embedded via include_str! at
+# compile time; the perspective modules under backend/data are embedded via
+# include_dir!. The root data/ dir must be present for the backend to build.
+COPY data ./data
 
 # Create dummy wasm-opt to bypass optimization (compatibility issue)
 RUN mkdir -p /root/.cache/trunk/wasm-opt-version_116/bin && \
@@ -54,6 +58,10 @@ COPY Cargo.toml Cargo.lock ./
 COPY backend ./backend
 COPY frontend ./frontend
 COPY middleware ./middleware
+# Seed data (canonical.json / citation.json) is embedded via include_str! at
+# compile time; the perspective modules under backend/data are embedded via
+# include_dir!. The root data/ dir must be present for the backend to build.
+COPY data ./data
 
 # Build backend in release mode
 WORKDIR /app/backend

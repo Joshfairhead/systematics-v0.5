@@ -1,0 +1,218 @@
+{
+  "characters": [
+    {
+      "id": "char_word_affirming",
+      "kind": "word",
+      "value": "Affirming"
+    },
+    {
+      "id": "char_word_receptive",
+      "kind": "word",
+      "value": "Receptive"
+    },
+    {
+      "id": "char_word_reconciling",
+      "kind": "word",
+      "value": "Reconciling"
+    }
+  ],
+  "coordinates": [],
+  "vocabularies": [
+    {
+      "id": "vocab_elementary_systematics_triad_3",
+      "name": "Elementary Systematics Triad",
+      "order": 3,
+      "terms": [
+        "char_word_affirming",
+        "char_word_receptive",
+        "char_word_reconciling"
+      ],
+      "connectives": []
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_elementary_systematics_triad_3",
+      "name": "Elementary Systematics Triad",
+      "order": 3,
+      "coherence": "Relatedness",
+      "term_designation": "Impulses",
+      "connective_designation": "Relationships",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_elementary_systematics_triad_3"
+    }
+  ],
+  "perspectives": [
+    {
+      "id": "perspective_elementary_systematics",
+      "name": "Elementary Systematics",
+      "links": [
+        {
+          "id": "link_dfc7aa31f2ee0df6",
+          "source": "system:",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_59ad17d270e38ae1",
+          "source": "source:source_j_g__bennett",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_elementary_systematics__a_tool_for_understanding_wholes"
+        },
+        {
+          "id": "link_f1c4776cb41f5b86",
+          "source": "artefact:artefact_elementary_systematics__a_tool_for_understanding_wholes",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_ch__3__pp__36_62"
+        },
+        {
+          "id": "link_60b78c6f93b489e3",
+          "source": "system:#term:1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_65ac5e02de7e2f11",
+          "source": "artefact:artefact_elementary_systematics__a_tool_for_understanding_wholes",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_3_1__p__38"
+        },
+        {
+          "id": "link_4c7d2f95a6b03031",
+          "source": "system:#term:2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_116af6b134cb1255",
+          "source": "system:#term:3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_236428b2d235cb83",
+          "source": "system:#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_6fd27176b395e652",
+          "source": "artefact:artefact_elementary_systematics__a_tool_for_understanding_wholes",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_a__p__111"
+        },
+        {
+          "id": "link_fb80ccf8b3ee824c",
+          "source": "system:system_elementary_systematics_triad_3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_3afefc39d1c9acd3",
+          "source": "system:system_elementary_systematics_triad_3#term:1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_15812c2c34a3de42",
+          "source": "system:system_elementary_systematics_triad_3#term:2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_c605dfdbccace03d",
+          "source": "system:system_elementary_systematics_triad_3#term:3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_e3fe832ef4b03219",
+          "source": "system:system_elementary_systematics_triad_3#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source_j_g__bennett",
+      "name": "J.G. Bennett",
+      "kind": null,
+      "description": null
+    }
+  ],
+  "artefacts": [
+    {
+      "id": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "source_ref": "source_j_g__bennett",
+      "title": "Elementary Systematics: A Tool for Understanding Wholes",
+      "kind": null,
+      "url": null
+    }
+  ],
+  "lookups": [
+    {
+      "id": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_ch__3__pp__36_62",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "locator": "Ch. 3, pp. 36-62"
+    },
+    {
+      "id": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_3_1__p__38",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "locator": "Table 3.1, p. 38"
+    },
+    {
+      "id": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_a__p__111",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "locator": "Table A, p. 111"
+    }
+  ],
+  "references": [
+    {
+      "id": "reference_perspective_elementary_systematics_system_system_elementary_systematics_triad_3_source_j_g__bennett",
+      "perspective_ref": "perspective_elementary_systematics",
+      "target": "system:system_elementary_systematics_triad_3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "lookup_ref": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_ch__3__pp__36_62",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_elementary_systematics_system_system_elementary_systematics_triad_3_term_1_source_j_g__bennett",
+      "perspective_ref": "perspective_elementary_systematics",
+      "target": "system:system_elementary_systematics_triad_3#term:1",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "lookup_ref": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_3_1__p__38",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_elementary_systematics_system_system_elementary_systematics_triad_3_term_2_source_j_g__bennett",
+      "perspective_ref": "perspective_elementary_systematics",
+      "target": "system:system_elementary_systematics_triad_3#term:2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "lookup_ref": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_3_1__p__38",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_elementary_systematics_system_system_elementary_systematics_triad_3_term_3_source_j_g__bennett",
+      "perspective_ref": "perspective_elementary_systematics",
+      "target": "system:system_elementary_systematics_triad_3#term:3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "lookup_ref": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_3_1__p__38",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_elementary_systematics_system_system_elementary_systematics_triad_3_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_elementary_systematics",
+      "target": "system:system_elementary_systematics_triad_3#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_elementary_systematics__a_tool_for_understanding_wholes",
+      "lookup_ref": "lookup_artefact_elementary_systematics__a_tool_for_understanding_wholes_table_a__p__111",
+      "note": null
+    }
+  ]
+}

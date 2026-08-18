@@ -6,7 +6,7 @@
 //!
 //! - `TopologicalVocabulary` — ordered `points` and `lines` for one Order.
 //! - `GeometricVocabulary` — ordered `coordinates` and `segments`.
-//! - `SemanticVocabulary` — ordered `terms` and `connectives` (Character refs).
+//! - `Vocabulary` — ordered `terms` and `connectives` (Character refs).
 //!
 //! The recursive framing: Systematics is a *language*, Perspective is the *rules*,
 //! and every content layer — topology, geometry, semantics — is a Vocabulary.
@@ -139,18 +139,18 @@ impl GeometricVocabulary {
 }
 
 /// A vocabulary of semantic content — ordered term and connective Characters
-/// for one Order. Multiple SemanticVocabularies per Order coexist (Canonical
+/// for one Order. Multiple Vocabularies per Order coexist (Canonical
 /// Triad, Theology Triad, …).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SemanticVocabulary {
-    pub id: String,              // "semvocab_{slug}_{order}"
+pub struct Vocabulary {
+    pub id: String,              // "vocab_{slug}_{order}"
     pub name: String,            // e.g. "Canonical Triad", "Theology Triad"
     pub order: u8,               // K_n size
     pub terms: Vec<String>,      // ordered CharacterRef IDs, [i] inhabits topology.points[i]
     pub connectives: Vec<String>, // ordered CharacterRef IDs, [i] inhabits topology.lines[i]
 }
 
-impl SemanticVocabulary {
+impl Vocabulary {
     pub fn new(
         id: impl Into<String>,
         name: impl Into<String>,
@@ -177,7 +177,7 @@ impl SemanticVocabulary {
         let name = name.into();
         let slug = name.to_lowercase().replace(' ', "_");
         Self {
-            id: format!("semvocab_{}_{}", slug, order),
+            id: format!("vocab_{}_{}", slug, order),
             name,
             order,
             terms,
@@ -190,13 +190,13 @@ impl SemanticVocabulary {
         let mut errs = Vec::new();
         if self.order != topology.order {
             errs.push(format!(
-                "SemanticVocabulary {}: order {} doesn't match topology order {}",
+                "Vocabulary {}: order {} doesn't match topology order {}",
                 self.id, self.order, topology.order
             ));
         }
         if self.terms.len() != topology.points.len() {
             errs.push(format!(
-                "SemanticVocabulary {}: expected {} terms (topology.points), got {}",
+                "Vocabulary {}: expected {} terms (topology.points), got {}",
                 self.id,
                 topology.points.len(),
                 self.terms.len()
@@ -204,7 +204,7 @@ impl SemanticVocabulary {
         }
         if self.connectives.len() != topology.lines.len() {
             errs.push(format!(
-                "SemanticVocabulary {}: expected {} connectives (topology.lines), got {}",
+                "Vocabulary {}: expected {} connectives (topology.lines), got {}",
                 self.id,
                 topology.lines.len(),
                 self.connectives.len()
@@ -225,7 +225,7 @@ impl SemanticVocabulary {
         let expected_connectives = expected_terms * (expected_terms.saturating_sub(1)) / 2;
         if self.terms.len() != expected_terms {
             errs.push(format!(
-                "SemanticVocabulary {}: expected {} terms, got {}",
+                "Vocabulary {}: expected {} terms, got {}",
                 self.id,
                 expected_terms,
                 self.terms.len()
@@ -233,7 +233,7 @@ impl SemanticVocabulary {
         }
         if self.connectives.len() != expected_connectives {
             errs.push(format!(
-                "SemanticVocabulary {}: expected {} connectives, got {}",
+                "Vocabulary {}: expected {} connectives, got {}",
                 self.id,
                 expected_connectives,
                 self.connectives.len()
@@ -275,7 +275,7 @@ mod tests {
     #[test]
     fn test_semantic_validate_against_topology() {
         let t = TopologicalVocabulary::canonical_for(3);
-        let s = SemanticVocabulary::with_auto_id(
+        let s = Vocabulary::with_auto_id(
             "Canonical Triad",
             3,
             vec![
@@ -289,7 +289,7 @@ mod tests {
                 "char_word_decision".into(),
             ],
         );
-        assert_eq!(s.id, "semvocab_canonical_triad_3");
+        assert_eq!(s.id, "vocab_canonical_triad_3");
         assert!(s.validate().is_ok());
         assert!(s.validate_against(&t).is_ok());
     }
@@ -297,7 +297,7 @@ mod tests {
     #[test]
     fn test_semantic_validate_catches_arity_mismatch() {
         let t = TopologicalVocabulary::canonical_for(3);
-        let s = SemanticVocabulary::with_auto_id(
+        let s = Vocabulary::with_auto_id(
             "Bad Triad",
             3,
             vec!["char_a".into(), "char_b".into()], // only 2 terms — should be 3

@@ -1,0 +1,284 @@
+{
+  "characters": [],
+  "coordinates": [],
+  "vocabularies": [],
+  "systems": [],
+  "perspectives": [
+    {
+      "id": "perspective_dramatic_universe_vol_3",
+      "name": "Dramatic Universe Vol 3",
+      "links": [
+        {
+          "id": "link_37b67ee41e5167e2",
+          "source": "system:system_canonical_monad_1#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_8c179abfead27cfa",
+          "source": "source:source_j_g__bennett",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_the_dramatic_universe__vol__3__man_and_his_nature"
+        },
+        {
+          "id": "link_5990936c57c987b0",
+          "source": "artefact:artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39"
+        },
+        {
+          "id": "link_8f0ae838f1ff7f97",
+          "source": "system:system_canonical_dyad_2#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_fb25c8fdec2afb76",
+          "source": "system:system_canonical_triad_3#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_8c25a86ecc782730",
+          "source": "system:system_canonical_tetrad_4#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_7536ef3e5ecf5edc",
+          "source": "system:system_canonical_pentad_5#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_52ba6c097678fa70",
+          "source": "system:system_canonical_hexad_6#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_fb913fc08fb06fe0",
+          "source": "system:system_canonical_dodecad_12#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_880bb3c629aca998",
+          "source": "artefact:artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_13_the_dodecad__perfection_"
+        },
+        {
+          "id": "link_a9e7efe9056d55c8",
+          "source": "system:system_canonical_dyad_2#term-designation",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_98b38482d5c558dd",
+          "source": "system:system_canonical_triad_3#term-designation",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_3169c52b00c64cd9",
+          "source": "system:system_canonical_tetrad_4#term-designation",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_0795536320625a0d",
+          "source": "system:system_canonical_tetrad_4#term:1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_5048266149f71ff0",
+          "source": "artefact:artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_7_the_tetrad__p_29"
+        },
+        {
+          "id": "link_3034ebecd42995f6",
+          "source": "system:system_canonical_tetrad_4#term:2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_b705e7636bac0c9f",
+          "source": "system:system_canonical_tetrad_4#term:3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_bd540330ac609f51",
+          "source": "system:system_canonical_tetrad_4#term:4",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source_j_g__bennett",
+      "name": "J.G. Bennett",
+      "kind": null,
+      "description": null
+    }
+  ],
+  "artefacts": [
+    {
+      "id": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "source_ref": "source_j_g__bennett",
+      "title": "The Dramatic Universe, Vol. 3: Man and His Nature",
+      "kind": null,
+      "url": null
+    }
+  ],
+  "lookups": [
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_13_the_dodecad__perfection_",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "locator": "Ch.37 §14.37.13 The Dodecad (perfection)"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "locator": "Ch.37 §14.37.2 Structures and Systems, pp.38-39"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_7_the_tetrad__p_29",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "locator": "Ch.37 §14.37.7 The Tetrad, p.29"
+    }
+  ],
+  "references": [
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_monad_1_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_monad_1#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_dyad_2_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_dyad_2#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_triad_3_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_triad_3#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_tetrad_4_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_tetrad_4#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_pentad_5_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_pentad_5#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_hexad_6_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_hexad_6#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_dodecad_12_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_dodecad_12#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_13_the_dodecad__perfection_",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_dyad_2_term_designation_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_dyad_2#term-designation",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_triad_3_term_designation_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_triad_3#term-designation",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_tetrad_4_term_designation_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_tetrad_4#term-designation",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_2_structures_and_systems__pp_38_39",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_tetrad_4_term_1_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_tetrad_4#term:1",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_7_the_tetrad__p_29",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_tetrad_4_term_2_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_tetrad_4#term:2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_7_the_tetrad__p_29",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_tetrad_4_term_3_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_tetrad_4#term:3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_7_the_tetrad__p_29",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_vol_3_system_system_canonical_tetrad_4_term_4_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe_vol_3",
+      "target": "system:system_canonical_tetrad_4#term:4",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__3__man_and_his_nature",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__3__man_and_his_nature_ch_37__14_37_7_the_tetrad__p_29",
+      "note": null
+    }
+  ]
+}

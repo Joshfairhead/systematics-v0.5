@@ -1,0 +1,264 @@
+{
+  "characters": [],
+  "coordinates": [],
+  "vocabularies": [],
+  "systems": [],
+  "perspectives": [
+    {
+      "id": "perspective_dramatic_universe",
+      "name": "Dramatic Universe",
+      "links": [
+        {
+          "id": "link_6064b31c2c0d1181",
+          "source": "system:system_canonical_triad_3#term:1",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_0c6794710abcd617",
+          "source": "source:source_j_g__bennett",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_the_dramatic_universe__vol__1"
+        },
+        {
+          "id": "link_e4b2af8b7b40f793",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1_will"
+        },
+        {
+          "id": "link_f420d4e918d67065",
+          "source": "system:system_canonical_triad_3#term:2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_a73d06b9423a1e32",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1_function"
+        },
+        {
+          "id": "link_05e9c9ea011cbaed",
+          "source": "system:system_canonical_triad_3#term:3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_f3f803b08c801c5f",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1_being"
+        },
+        {
+          "id": "link_c5704a330d78fb7d",
+          "source": "system:system_canonical_triad_3#conn:1-2",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_9e692796ade2c92f",
+          "source": "source:source_j_g__bennett",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_the_dramatic_universe__vol__2"
+        },
+        {
+          "id": "link_c3f98db106013b76",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2_generation"
+        },
+        {
+          "id": "link_8dadbbff2b479c4e",
+          "source": "system:system_canonical_triad_3#conn:1-3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_c925fc5ac9187271",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2_decision"
+        },
+        {
+          "id": "link_8eb0f9ac65610f25",
+          "source": "system:system_canonical_triad_3#conn:2-3",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_2498d41337d3c22f",
+          "source": "artefact:artefact_the_dramatic_universe__vol__2",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__2_consent"
+        },
+        {
+          "id": "link_fb25c8fdec2afb76",
+          "source": "system:system_canonical_triad_3#coherence",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_98b38482d5c558dd",
+          "source": "system:system_canonical_triad_3#term-designation",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_24a364e54001ee26",
+          "source": "system:system_canonical_triad_3#connective-designation",
+          "predicate": "cites",
+          "target": "source:source_j_g__bennett"
+        },
+        {
+          "id": "link_7cd5f8f11a4998ad",
+          "source": "source:source_j_g__bennett",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy"
+        },
+        {
+          "id": "link_e6ce80e5a49c33a2",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60"
+        },
+        {
+          "id": "link_5c9e592595ada554",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56"
+        },
+        {
+          "id": "link_275be3b4032fe57f",
+          "source": "artefact:artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source_j_g__bennett",
+      "name": "J.G. Bennett",
+      "kind": null,
+      "description": null
+    }
+  ],
+  "artefacts": [
+    {
+      "id": "artefact_the_dramatic_universe__vol__2",
+      "source_ref": "source_j_g__bennett",
+      "title": "The Dramatic Universe, Vol. 2",
+      "kind": null,
+      "url": null
+    },
+    {
+      "id": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "source_ref": "source_j_g__bennett",
+      "title": "The Dramatic Universe, Vol. 1: The Foundations of Natural Philosophy",
+      "kind": null,
+      "url": null
+    }
+  ],
+  "lookups": [
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.3.3 Process and Function, p.56"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.3.4 Being as Togetherness, p.58"
+    },
+    {
+      "id": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "locator": "I.3.5 Will as the Active Element, p.60"
+    }
+  ],
+  "references": [
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_conn_1_2_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#conn:1-2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2",
+      "lookup_ref": null,
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_conn_1_3_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#conn:1-3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2",
+      "lookup_ref": null,
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_conn_2_3_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#conn:2-3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2",
+      "lookup_ref": null,
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_coherence_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#coherence",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2",
+      "lookup_ref": null,
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_term_designation_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#term-designation",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2",
+      "lookup_ref": null,
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_connective_designation_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#connective-designation",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__2",
+      "lookup_ref": null,
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_term_1_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#term:1",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_5_will_as_the_active_element__p_60",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_term_2_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#term:2",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_3_process_and_function__p_56",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_dramatic_universe_system_system_canonical_triad_3_term_3_source_j_g__bennett",
+      "perspective_ref": "perspective_dramatic_universe",
+      "target": "system:system_canonical_triad_3#term:3",
+      "source_ref": "source_j_g__bennett",
+      "artefact_ref": "artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy",
+      "lookup_ref": "lookup_artefact_the_dramatic_universe__vol__1__the_foundations_of_natural_philosophy_i_3_4_being_as_togetherness__p_58",
+      "note": null
+    }
+  ]
+}

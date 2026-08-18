@@ -22,6 +22,6 @@ pub struct Perspective {
     pub topological_vocab_ref: String,
     #[serde(rename = "geometricVocabRef")]
     pub geometric_vocab_ref: String,
-    #[serde(rename = "semanticVocabRef")]
-    pub semantic_vocab_ref: String,
+    #[serde(rename = "vocabularyRef")]
+    pub vocabulary_ref: String,
 }

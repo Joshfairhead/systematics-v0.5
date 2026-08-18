@@ -1,0 +1,17 @@
+{
+  "characters": [],
+  "coordinates": [],
+  "vocabularies": [],
+  "systems": [],
+  "perspectives": [
+    {
+      "id": "perspective_qsm_workbook",
+      "name": "QSM Workbook",
+      "links": []
+    }
+  ],
+  "sources": [],
+  "artefacts": [],
+  "lookups": [],
+  "references": []
+}

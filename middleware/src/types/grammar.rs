@@ -1,7 +1,7 @@
-//! Grammar — a Perspective resolved into a complete bound K-graph. The backend
-//! joins a Perspective with its topological / geometric / semantic / colour
-//! vocabularies to produce this. Kept as a wire type so the frontend renderer
-//! can consume a resolved system without walking the Perspective itself.
+//! RenderedSystem — a System resolved into a complete bound K-graph. The backend
+//! joins a System's Grammar (structure) with its Vocabulary (terms) and the
+//! canonical colour vocabulary to produce this. Kept as a wire type so the
+//! frontend renderer can consume a resolved system without walking the System.
 
 use serde::{Deserialize, Serialize};
 
@@ -55,8 +55,10 @@ pub struct GrammarConnective {
 /// A complete rendered view of a system at a given order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
-pub struct Grammar {
+pub struct RenderedSystem {
     pub order: i32,
+    #[serde(rename = "systemId")]
+    pub system_id: String,
     pub name: String,
     pub coherence: String,
     #[serde(rename = "termDesignation")]
@@ -68,9 +70,14 @@ pub struct Grammar {
     pub colours: Vec<GrammarColour>,
     pub lines: Vec<GrammarLine>,
     pub connectives: Vec<GrammarConnective>,
+    /// The canonical *class* this system instantiates (same order); `None` when
+    /// this system is itself canonical. Drives the "Canonical override" toggle —
+    /// terms/connectives pair with the instance's by position.
+    #[serde(default, rename = "canonicalClass")]
+    pub canonical_class: Option<Box<RenderedSystem>>,
 }
 
-impl Grammar {
+impl RenderedSystem {
     pub fn display_name(&self) -> String {
         self.name.clone()
     }

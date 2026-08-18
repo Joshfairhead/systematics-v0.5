@@ -1,0 +1,336 @@
+{
+  "characters": [
+    {
+      "id": "char_word_category_theory",
+      "kind": "word",
+      "value": "Category Theory"
+    },
+    {
+      "id": "char_word_coherence",
+      "kind": "word",
+      "value": "Coherence"
+    },
+    {
+      "id": "char_word_colour",
+      "kind": "word",
+      "value": "Associativity"
+    },
+    {
+      "id": "char_word_functor",
+      "kind": "word",
+      "value": "Functor"
+    },
+    {
+      "id": "char_word_geometry",
+      "kind": "word",
+      "value": "Geometry"
+    },
+    {
+      "id": "char_word_grammar",
+      "kind": "word",
+      "value": "Grammar"
+    },
+    {
+      "id": "char_word_meaning",
+      "kind": "word",
+      "value": "Meaning"
+    },
+    {
+      "id": "char_word_number",
+      "kind": "word",
+      "value": "Composition"
+    },
+    {
+      "id": "char_word_progression",
+      "kind": "word",
+      "value": "Progression"
+    },
+    {
+      "id": "char_word_render",
+      "kind": "word",
+      "value": "Render"
+    },
+    {
+      "id": "char_word_semantics",
+      "kind": "word",
+      "value": "Semantics"
+    },
+    {
+      "id": "char_word_sign",
+      "kind": "word",
+      "value": "Sign"
+    },
+    {
+      "id": "char_word_symbol",
+      "kind": "word",
+      "value": "Symbol"
+    },
+    {
+      "id": "char_word_syntax",
+      "kind": "word",
+      "value": "Syntax"
+    },
+    {
+      "id": "char_word_systematics",
+      "kind": "word",
+      "value": "Systematics"
+    }
+  ],
+  "coordinates": [],
+  "vocabularies": [
+    {
+      "id": "vocab_architecture_pentad_5",
+      "name": "Architecture Pentad",
+      "order": 5,
+      "terms": [
+        "char_word_grammar",
+        "char_word_sign",
+        "char_word_semantics",
+        "char_word_syntax",
+        "char_word_symbol"
+      ],
+      "connectives": [
+        "char_word_number",
+        "char_word_coherence",
+        "char_word_functor",
+        "char_word_colour",
+        "char_word_meaning",
+        "char_word_category_theory",
+        "char_word_geometry",
+        "char_word_progression",
+        "char_word_systematics",
+        "char_word_render"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_architecture_pentad_5",
+      "name": "Architecture Pentad",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_architecture_pentad_5"
+    }
+  ],
+  "perspectives": [
+    {
+      "id": "perspective_architecture_pentad",
+      "name": "Architecture Pentad",
+      "links": [
+        {
+          "id": "link_dea8eaa67e59b004",
+          "source": "system:system_architecture_pentad_5",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_f2fbfcc3aa19554b",
+          "source": "source:source_systematics_project",
+          "predicate": "recordedIn",
+          "target": "artefact:artefact_docs_architecture_pentad_md"
+        },
+        {
+          "id": "link_2bb7b11ea594f852",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_the_architecture_pentad"
+        },
+        {
+          "id": "link_5fedf892f0c49e38",
+          "source": "system:system_architecture_pentad_5#coherence",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_16c8b0231ee59333",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_thesis___the_architecture_is_the_canonical_pentad"
+        },
+        {
+          "id": "link_b71ea7ad8ef73d52",
+          "source": "system:system_architecture_pentad_5#term:1",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_d9cd65edc95196a4",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_limit_1__grammar"
+        },
+        {
+          "id": "link_43a90de1af538b84",
+          "source": "system:system_architecture_pentad_5#term:2",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_ad6b9fe70500e997",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_limit_2__sign"
+        },
+        {
+          "id": "link_ea97a9a62632bf55",
+          "source": "system:system_architecture_pentad_5#term:3",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_e4895900712e69f8",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_limit_3__semantics"
+        },
+        {
+          "id": "link_6da983660b675e6f",
+          "source": "system:system_architecture_pentad_5#term:4",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_2ded5e7b7fe7daba",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_limit_4__syntax"
+        },
+        {
+          "id": "link_d4de4861809b5d57",
+          "source": "system:system_architecture_pentad_5#term:5",
+          "predicate": "cites",
+          "target": "source:source_systematics_project"
+        },
+        {
+          "id": "link_cafca9b161b04002",
+          "source": "artefact:artefact_docs_architecture_pentad_md",
+          "predicate": "atLocation",
+          "target": "lookup:lookup_artefact_docs_architecture_pentad_md_limit_5__symbol"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "source_systematics_project",
+      "name": "Systematics Project",
+      "kind": null,
+      "description": null
+    }
+  ],
+  "artefacts": [
+    {
+      "id": "artefact_docs_architecture_pentad_md",
+      "source_ref": "source_systematics_project",
+      "title": "docs/architecture-pentad.md",
+      "kind": null,
+      "url": null
+    }
+  ],
+  "lookups": [
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_limit_1__grammar",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "Limit 1: Grammar"
+    },
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_limit_2__sign",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "Limit 2: Sign"
+    },
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_limit_3__semantics",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "Limit 3: Semantics"
+    },
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_limit_4__syntax",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "Limit 4: Syntax"
+    },
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_limit_5__symbol",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "Limit 5: Symbol"
+    },
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_the_architecture_pentad",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "The Architecture Pentad"
+    },
+    {
+      "id": "lookup_artefact_docs_architecture_pentad_md_thesis___the_architecture_is_the_canonical_pentad",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "locator": "Thesis \u2014 the architecture is the canonical Pentad"
+    }
+  ],
+  "references": [
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_coherence_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5#coherence",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_thesis___the_architecture_is_the_canonical_pentad",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_the_architecture_pentad",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_term_1_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5#term:1",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_limit_1__grammar",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_term_2_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5#term:2",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_limit_2__sign",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_term_3_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5#term:3",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_limit_3__semantics",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_term_4_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5#term:4",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_limit_4__syntax",
+      "note": null
+    },
+    {
+      "id": "reference_perspective_architecture_pentad_system_system_architecture_pentad_5_term_5_source_systematics_project",
+      "perspective_ref": "perspective_architecture_pentad",
+      "target": "system:system_architecture_pentad_5#term:5",
+      "source_ref": "source_systematics_project",
+      "artefact_ref": "artefact_docs_architecture_pentad_md",
+      "lookup_ref": "lookup_artefact_docs_architecture_pentad_md_limit_5__symbol",
+      "note": null
+    }
+  ],
+  "functors": []
+}

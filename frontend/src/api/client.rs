@@ -1,6 +1,6 @@
 use gloo_net::http::Request;
 use serde::{Deserialize, Serialize};
-use systematics_middleware::{ApiError, Coordinate, Grammar};
+use systematics_middleware::{ApiError, Coordinate, RenderedSystem};
 
 #[derive(Serialize)]
 struct GraphQLRequest {
@@ -23,19 +23,180 @@ struct GraphQLError {
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct SystemQueryResponse {
-    system: Option<Grammar>,
+    system: Option<RenderedSystem>,
 }
 
 #[derive(Deserialize, Debug)]
 struct SystemByNameQueryResponse {
     #[serde(rename = "systemByName")]
-    system_by_name: Option<Grammar>,
+    system_by_name: Option<RenderedSystem>,
 }
 
 #[derive(Deserialize, Debug)]
 struct AllSystemsQueryResponse {
     #[serde(rename = "allSystems")]
-    all_systems: Vec<Grammar>,
+    all_systems: Vec<RenderedSystem>,
+}
+
+// -------- referencing layer (read-only) --------
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefSource {
+    pub name: String,
+    pub kind: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefArtefact {
+    pub title: String,
+    pub url: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefLookup {
+    pub locator: String,
+}
+
+/// The System behind a reference's target address (resolved server-side): the
+/// grouping key (`order`) and the value each perspective gives it (`coherence`).
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct RefSystem {
+    pub id: String,
+    pub order: i32,
+    pub name: String,
+    pub coherence: String,
+    #[serde(rename = "termDesignation")]
+    pub term_designation: String,
+    #[serde(rename = "connectiveDesignation")]
+    pub connective_designation: String,
+}
+
+/// A resolved citation for display: source → artefact → lookup, plus the owning
+/// perspective and the resolved target system (for the reference browser).
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct ReferenceView {
+    pub id: String,
+    pub target: String,
+    pub note: Option<String>,
+    pub source: Option<RefSource>,
+    pub artefact: Option<RefArtefact>,
+    pub lookup: Option<RefLookup>,
+    /// Owning perspective name (the reference web). `None` on the older
+    /// per-system tooltip query, which doesn't select it.
+    #[serde(rename = "perspectiveName", default)]
+    pub perspective_name: Option<String>,
+    /// Fragment of the target after `#` (`coherence`, `term:2`, …; empty = whole
+    /// system). `None` unless selected.
+    #[serde(rename = "targetFragment", default)]
+    pub target_fragment: Option<String>,
+    /// The **object** of the SPO assertion — the value the source affixes to the
+    /// target predicate (e.g. `coherence` → `"Structure"` per DU1). #25.
+    #[serde(default)]
+    pub object: Option<String>,
+    /// Resolved target System (order/name/coherence/designations). `None` unless
+    /// selected or when the target system isn't loaded.
+    #[serde(rename = "targetSystem", default)]
+    pub target_system: Option<RefSystem>,
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
+struct ReferencesForResponse {
+    #[serde(rename = "referencesFor")]
+    references_for: Vec<ReferenceView>,
+}
+
+#[derive(Deserialize, Debug)]
+struct ReferencesForSystemResponse {
+    #[serde(rename = "referencesForSystem")]
+    references_for_system: Vec<ReferenceView>,
+}
+
+#[derive(Deserialize, Debug)]
+struct AllReferencesResponse {
+    #[serde(rename = "allReferences")]
+    all_references: Vec<ReferenceView>,
+}
+
+/// A term/connective character with its graph-derived **position** — node index
+/// (`"1"`) for a term, edge (`"1-2"`) for a connective. Supplied by the backend so
+/// the frontend anchors to the topology instead of guessing from a list index.
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct PositionedChar {
+    pub value: String,
+    #[serde(default)]
+    pub position: String,
+}
+
+/// A non-canonical System the Load control can browse (id, display name, order).
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct InstanceSystem {
+    pub id: String,
+    pub name: String,
+    pub order: i32,
+    /// Term characters at their node positions — for the SPO Term predicate.
+    #[serde(default)]
+    pub terms: Vec<PositionedChar>,
+    /// Connective characters at their edge positions — for the Connective predicate.
+    #[serde(default)]
+    pub connectives: Vec<PositionedChar>,
+}
+
+#[derive(Deserialize, Debug)]
+struct InstanceSystemsResponse {
+    #[serde(rename = "instanceSystems")]
+    instance_systems: Vec<InstanceSystem>,
+}
+
+/// A Sequence (e.g. a Monad extracted from the Nullad) as returned by
+/// `createSequence` — id, name, and member addresses.
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct SequenceView {
+    pub id: String,
+    pub name: String,
+    #[serde(default)]
+    pub members: Vec<String>,
+}
+
+#[derive(Deserialize, Debug)]
+struct CreateSequenceResponse {
+    #[serde(rename = "createSequence")]
+    create_sequence: Option<SequenceView>,
+}
+
+#[derive(Deserialize, Debug)]
+struct SequencesResponse {
+    sequences: Vec<SequenceView>,
+}
+
+#[derive(Deserialize, Debug)]
+struct DeleteSequenceResponse {
+    #[serde(rename = "deleteSequence")]
+    delete_sequence: bool,
+}
+
+#[derive(Deserialize, Debug)]
+struct DeleteSystemResponse {
+    #[serde(rename = "deleteSystem")]
+    delete_system: bool,
+}
+
+#[derive(Deserialize, Debug)]
+struct DeleteReferenceResponse {
+    #[serde(rename = "deleteReference")]
+    delete_reference: bool,
+}
+
+#[derive(Deserialize, Debug)]
+struct AuthorSystemResponse {
+    #[serde(rename = "authorSystem")]
+    author_system: Option<InstanceSystem>,
+}
+
+#[derive(Deserialize, Debug)]
+struct RenderSystemResponse {
+    #[serde(rename = "renderSystem")]
+    render_system: Option<RenderedSystem>,
 }
 
 #[derive(Clone)]
@@ -50,6 +211,7 @@ impl GraphQLClient {
 
     const SYSTEM_FIELDS: &'static str = r#"
         order
+        systemId
         name
         coherence
         termDesignation
@@ -86,7 +248,7 @@ impl GraphQLClient {
     "#;
 
     #[allow(dead_code)]
-    pub async fn fetch_system_by_order(&self, order: i32) -> Result<Grammar, ApiError> {
+    pub async fn fetch_system_by_order(&self, order: i32) -> Result<RenderedSystem, ApiError> {
         let query = format!(
             r#"
             query GetSystem($order: Int!) {{
@@ -121,7 +283,7 @@ impl GraphQLClient {
         Ok(self.transform_coordinates(system))
     }
 
-    pub async fn fetch_system(&self, system_name: &str) -> Result<Grammar, ApiError> {
+    pub async fn fetch_system(&self, system_name: &str) -> Result<RenderedSystem, ApiError> {
         let query = format!(
             r#"
             query GetSystemByName($name: String!) {{
@@ -156,7 +318,7 @@ impl GraphQLClient {
         Ok(self.transform_coordinates(system))
     }
 
-    pub async fn fetch_all_systems(&self) -> Result<Vec<Grammar>, ApiError> {
+    pub async fn fetch_all_systems(&self) -> Result<Vec<RenderedSystem>, ApiError> {
         let query = format!(
             r#"
             query GetAllSystems {{
@@ -193,13 +355,277 @@ impl GraphQLClient {
             .into(),
         );
 
-        let systems: Vec<Grammar> = data
+        let systems: Vec<RenderedSystem> = data
             .all_systems
             .into_iter()
             .map(|sys| self.transform_coordinates(sys))
             .collect();
 
         Ok(systems)
+    }
+
+    /// The non-canonical instance systems the Load control browses.
+    pub async fn fetch_instance_systems(&self) -> Result<Vec<InstanceSystem>, ApiError> {
+        let query = r#"query { instanceSystems { id name order terms { value position } connectives { value position } } }"#;
+        let response: GraphQLResponse<InstanceSystemsResponse> =
+            self.execute_query(query, None).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.instance_systems).unwrap_or_default())
+    }
+
+    /// Render any System by id (used to load instance systems into the canvas).
+    /// Also pulls the `canonicalClass` (the class this instance fills) so the
+    /// Canonical-override toggle can flip labels.
+    pub async fn fetch_rendered_by_id(&self, id: &str) -> Result<RenderedSystem, ApiError> {
+        let query = format!(
+            r#"
+            query Render($id: String!) {{
+                renderSystem(systemId: $id) {{
+                    {fields}
+                    canonicalClass {{ {fields} }}
+                }}
+            }}
+        "#,
+            fields = Self::SYSTEM_FIELDS
+        );
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<RenderSystemResponse> =
+            self.execute_query(&query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        let system = response
+            .data
+            .and_then(|d| d.render_system)
+            .ok_or_else(|| ApiError::NotFound(format!("System '{}' not found", id)))?;
+        Ok(self.transform_coordinates(system))
+    }
+
+    /// Fetch all citations for a single Expression address (retained for
+    /// direct lookups; the graph prefetches per-system for hover tooltips).
+    #[allow(dead_code)]
+    pub async fn fetch_references_for(
+        &self,
+        address: &str,
+    ) -> Result<Vec<ReferenceView>, ApiError> {
+        let query = r#"
+            query Refs($address: String!) {
+                referencesFor(address: $address) {
+                    id
+                    target
+                    note
+                    source { name kind }
+                    artefact { title url }
+                    lookup { locator }
+                }
+            }
+        "#;
+        let variables = serde_json::json!({ "address": address });
+        let response: GraphQLResponse<ReferencesForResponse> =
+            self.execute_query(query, Some(variables)).await?;
+
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
+            ));
+        }
+
+        Ok(response.data.map(|d| d.references_for).unwrap_or_default())
+    }
+
+    /// Fetch every citation within a System at once (for hover tooltips).
+    /// Each `ReferenceView.target` encodes the cited term/connective.
+    pub async fn fetch_references_for_system(
+        &self,
+        system_id: &str,
+    ) -> Result<Vec<ReferenceView>, ApiError> {
+        let query = r#"
+            query SysRefs($systemId: String!) {
+                referencesForSystem(systemId: $systemId) {
+                    id
+                    target
+                    note
+                    source { name kind }
+                    artefact { title url }
+                    lookup { locator }
+                }
+            }
+        "#;
+        let variables = serde_json::json!({ "systemId": system_id });
+        let response: GraphQLResponse<ReferencesForSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+
+        Ok(response.data.map(|d| d.references_for_system).unwrap_or_default())
+    }
+
+    /// Every citation in the graph, enriched with owning perspective + resolved
+    /// target system — the single query that powers the reference browser
+    /// (both the table and the compare-by-order matrix).
+    pub async fn fetch_all_references(&self) -> Result<Vec<ReferenceView>, ApiError> {
+        let query = r#"
+            query AllRefs {
+                allReferences {
+                    id
+                    target
+                    note
+                    perspectiveName
+                    targetFragment
+                    object
+                    source { name kind }
+                    artefact { title url }
+                    lookup { locator }
+                    targetSystem {
+                        id order name coherence termDesignation connectiveDesignation
+                    }
+                }
+            }
+        "#;
+        let response: GraphQLResponse<AllReferencesResponse> =
+            self.execute_query(query, None).await?;
+
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+
+        Ok(response.data.map(|d| d.all_references).unwrap_or_default())
+    }
+
+    /// Every Sequence (Monad / registry) in the graph — id, name, members.
+    pub async fn fetch_sequences(&self) -> Result<Vec<SequenceView>, ApiError> {
+        let query = r#"{ sequences { id name members } }"#;
+        let response: GraphQLResponse<SequencesResponse> =
+            self.execute_query(query, None).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.sequences).unwrap_or_default())
+    }
+
+    /// Extract (Nullad → Monad): materialize a selection as a persisted
+    /// `Sequence` (a Monad) via `createSequence`. `members` are addresses
+    /// (`system:<id>`, …). The backend auto-ids from the name and persists to
+    /// the user store — so the scope becomes a real graph object.
+    pub async fn create_sequence(
+        &self,
+        name: &str,
+        members: Vec<String>,
+    ) -> Result<SequenceView, ApiError> {
+        let query = r#"
+            mutation Extract($input: SequenceInput!) {
+                createSequence(input: $input) { id name members }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "name": name, "members": members }
+        });
+        let response: GraphQLResponse<CreateSequenceResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.create_sequence)
+            .ok_or_else(|| ApiError::ParseError("createSequence returned no data".to_string()))
+    }
+
+    /// Delete a Sequence (Monad) by id — removes it from the graph and the user
+    /// store. Used to clear stray Extract monads. Returns whether it existed.
+    pub async fn delete_sequence(&self, id: &str) -> Result<bool, ApiError> {
+        let query = r#"
+            mutation DeleteSequence($id: String!) {
+                deleteSequence(id: $id)
+            }
+        "#;
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<DeleteSequenceResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.delete_sequence).unwrap_or(false))
+    }
+
+    /// Delete a System by id (removes it + its vocabulary from graph and store).
+    pub async fn delete_system(&self, id: &str) -> Result<bool, ApiError> {
+        let query = r#"mutation Del($id: String!) { deleteSystem(id: $id) }"#;
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<DeleteSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.delete_system).unwrap_or(false))
+    }
+
+    /// Delete a Reference (citation) by id.
+    pub async fn delete_reference(&self, id: &str) -> Result<bool, ApiError> {
+        let query = r#"mutation Del($id: String!) { deleteReference(id: $id) }"#;
+        let variables = serde_json::json!({ "id": id });
+        let response: GraphQLResponse<DeleteReferenceResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.delete_reference).unwrap_or(false))
+    }
+
+    /// Author a System from custom term/connective **values** (the in-app editor
+    /// path — builds characters + vocabulary + system server-side, persisted).
+    pub async fn author_system(
+        &self,
+        name: &str,
+        order: i32,
+        terms: Vec<String>,
+        connectives: Vec<String>,
+    ) -> Result<InstanceSystem, ApiError> {
+        let query = r#"
+            mutation Author($input: AuthorSystemInput!) {
+                authorSystem(input: $input) { id name order }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "name": name, "order": order, "terms": terms, "connectives": connectives }
+        });
+        let response: GraphQLResponse<AuthorSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.author_system)
+            .ok_or_else(|| ApiError::ParseError("authorSystem returned no data".to_string()))
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(
@@ -233,7 +659,7 @@ impl GraphQLClient {
             .map_err(|e| ApiError::ParseError(e.to_string()))
     }
 
-    fn transform_coordinates(&self, mut system: Grammar) -> Grammar {
+    fn transform_coordinates(&self, mut system: RenderedSystem) -> RenderedSystem {
         let viewport_width = 800.0;
         let viewport_height = 800.0;
         let margin = 100.0;

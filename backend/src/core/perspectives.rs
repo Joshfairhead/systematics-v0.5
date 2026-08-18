@@ -1,155 +1,135 @@
-//! Perspective: the rules of a K_n system.
+//! Perspective: an AD4M-style directed web of Links.
 //!
-//! A `Perspective` is not a container of content — it's the *validator + inline
-//! metadata* for a system. It references the three parallel vocabularies
-//! (`TopologicalVocabulary`, `GeometricVocabulary`, `SemanticVocabulary`) and
-//! provides the human-readable metadata (name, coherence, term/connective
-//! designations).
+//! Unlike a `Grammar` (a complete, undirected K_n) a `Perspective` is a
+//! *not-necessarily-complete, directed* graph — a web of `Link`s. Each Link is
+//! an RDF-like `{ source, predicate, target }` triple whose endpoints are
+//! Expression *addresses* (URIs). Nodes can be anything addressable: a term, a
+//! connective, a whole System, a Vocabulary, a Grammar, a citation entity, or
+//! even another Perspective (webs of webs). See `address` for the URI scheme.
 //!
-//! Creating a Perspective with valid references *is* the join — there's no
-//! separate `apply` step. Queries walk the references to reconstruct
-//! populated views (see `Graph::perspective_view`).
+//! The referencing/citation system IS a Perspective (see `citations`).
+
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 use serde::{Deserialize, Serialize};
 
-use super::vocabularies::{GeometricVocabulary, SemanticVocabulary, TopologicalVocabulary};
+/// A directed edge in a Perspective: an AD4M `{ source, predicate, target }`
+/// triple over Expression addresses.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Link {
+    pub id: String,
+    pub source: String,
+    pub predicate: String,
+    pub target: String,
+}
 
-/// A Perspective over one Order.
+impl Link {
+    pub fn new(
+        source: impl Into<String>,
+        predicate: impl Into<String>,
+        target: impl Into<String>,
+    ) -> Self {
+        let source = source.into();
+        let predicate = predicate.into();
+        let target = target.into();
+        let id = Self::compute_id(&source, &predicate, &target);
+        Self { id, source, predicate, target }
+    }
+
+    /// Deterministic id from the triple, so the same link is idempotent and
+    /// removable without a separate handle.
+    fn compute_id(source: &str, predicate: &str, target: &str) -> String {
+        let mut h = DefaultHasher::new();
+        source.hash(&mut h);
+        predicate.hash(&mut h);
+        target.hash(&mut h);
+        format!("link_{:016x}", h.finish())
+    }
+}
+
+/// A Perspective: a named web of Links.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Perspective {
     pub id: String,
-    /// Same as SystemName in the old model — "Triad", "Tetrad", ...
     pub name: String,
-    /// The K_n size this Perspective dictates.
-    pub order: u8,
-    /// Inline metadata (formerly separate SystemName / CoherenceAttribute /
-    /// TermDesignation / ConnectiveDesignation entries).
-    pub coherence: String,
-    pub term_designation: String,
-    pub connective_designation: String,
-    /// References to the three vocabularies this Perspective reconciles.
-    pub topological_vocab_ref: String,
-    pub geometric_vocab_ref: String,
-    pub semantic_vocab_ref: String,
+    #[serde(default)]
+    pub links: Vec<Link>,
 }
 
 impl Perspective {
-    pub fn new(
-        id: impl Into<String>,
-        name: impl Into<String>,
-        order: u8,
-        coherence: impl Into<String>,
-        term_designation: impl Into<String>,
-        connective_designation: impl Into<String>,
-        topological_vocab_ref: impl Into<String>,
-        geometric_vocab_ref: impl Into<String>,
-        semantic_vocab_ref: impl Into<String>,
-    ) -> Self {
+    pub fn new(id: impl Into<String>, name: impl Into<String>, links: Vec<Link>) -> Self {
         Self {
             id: id.into(),
             name: name.into(),
-            order,
-            coherence: coherence.into(),
-            term_designation: term_designation.into(),
-            connective_designation: connective_designation.into(),
-            topological_vocab_ref: topological_vocab_ref.into(),
-            geometric_vocab_ref: geometric_vocab_ref.into(),
-            semantic_vocab_ref: semantic_vocab_ref.into(),
+            links,
         }
     }
 
-    /// Convenience: build an ID from name and order.
-    pub fn with_auto_id(
-        name: impl Into<String>,
-        order: u8,
-        coherence: impl Into<String>,
-        term_designation: impl Into<String>,
-        connective_designation: impl Into<String>,
-        topological_vocab_ref: impl Into<String>,
-        geometric_vocab_ref: impl Into<String>,
-        semantic_vocab_ref: impl Into<String>,
-    ) -> Self {
+    /// Build an id from the name: `perspective_{slug}`.
+    pub fn with_auto_id(name: impl Into<String>, links: Vec<Link>) -> Self {
         let name = name.into();
         let slug = name.to_lowercase().replace(' ', "_");
-        Self::new(
-            format!("perspective_{}_{}", slug, order),
-            name,
-            order,
-            coherence,
-            term_designation,
-            connective_designation,
-            topological_vocab_ref,
-            geometric_vocab_ref,
-            semantic_vocab_ref,
-        )
+        Self::new(format!("perspective_{}", slug), name, links)
     }
 
-    /// Validate against resolved vocabularies. Callers pass the three referenced
-    /// vocabularies; this checks order alignment and arity across the stack.
-    pub fn validate_with(
-        &self,
-        topology: &TopologicalVocabulary,
-        geometry: &GeometricVocabulary,
-        semantics: &SemanticVocabulary,
-    ) -> Result<(), Vec<String>> {
-        let mut errs = Vec::new();
+    /// Add a link (idempotent by triple identity).
+    pub fn add_link(&mut self, link: Link) {
+        if !self.links.iter().any(|l| l.id == link.id) {
+            self.links.push(link);
+        }
+    }
 
-        // Check refs match the passed vocabularies by ID.
-        if topology.id != self.topological_vocab_ref {
-            errs.push(format!(
-                "Perspective {}: topological_vocab_ref '{}' doesn't match passed topology '{}'",
-                self.id, self.topological_vocab_ref, topology.id
-            ));
-        }
-        if geometry.id != self.geometric_vocab_ref {
-            errs.push(format!(
-                "Perspective {}: geometric_vocab_ref '{}' doesn't match passed geometry '{}'",
-                self.id, self.geometric_vocab_ref, geometry.id
-            ));
-        }
-        if semantics.id != self.semantic_vocab_ref {
-            errs.push(format!(
-                "Perspective {}: semantic_vocab_ref '{}' doesn't match passed semantics '{}'",
-                self.id, self.semantic_vocab_ref, semantics.id
-            ));
-        }
+    /// Remove a link by its id. Returns true if one was removed.
+    pub fn remove_link(&mut self, link_id: &str) -> bool {
+        let before = self.links.len();
+        self.links.retain(|l| l.id != link_id);
+        self.links.len() != before
+    }
+}
 
-        // Order alignment.
-        if topology.order != self.order {
-            errs.push(format!(
-                "Perspective {}: order {} doesn't match topology order {}",
-                self.id, self.order, topology.order
-            ));
-        }
-        if geometry.order != self.order {
-            errs.push(format!(
-                "Perspective {}: order {} doesn't match geometry order {}",
-                self.id, self.order, geometry.order
-            ));
-        }
-        if semantics.order != self.order {
-            errs.push(format!(
-                "Perspective {}: order {} doesn't match semantics order {}",
-                self.id, self.order, semantics.order
-            ));
-        }
+/// Expression addressing — canonical URIs so every element is individually
+/// citable/linkable. Reuses the existing structured ids.
+pub mod address {
+    /// A whole System instance: `system:<system_id>`.
+    pub fn system(system_id: &str) -> String {
+        format!("system:{}", system_id)
+    }
 
-        // Delegate arity checks to the vocabularies themselves.
-        if let Err(e) = topology.validate() {
-            errs.extend(e);
-        }
-        if let Err(e) = geometry.validate() {
-            errs.extend(e);
-        }
-        if let Err(e) = semantics.validate_against(topology) {
-            errs.extend(e);
-        }
+    /// An individual term (node) within a System: `system:<system_id>#term:<position>`.
+    pub fn term(system_id: &str, position: u8) -> String {
+        format!("system:{}#term:{}", system_id, position)
+    }
 
-        if errs.is_empty() {
-            Ok(())
-        } else {
-            Err(errs)
-        }
+    /// A connective (edge) within a System: `system:<system_id>#conn:<p1>-<p2>`.
+    pub fn connective(system_id: &str, p1: u8, p2: u8) -> String {
+        format!("system:{}#conn:{}-{}", system_id, p1, p2)
+    }
+
+    /// A Grammar (structure): `grammar:<order>`.
+    pub fn grammar(order: u8) -> String {
+        format!("grammar:{}", order)
+    }
+
+    /// A Vocabulary: `vocab:<vocab_id>`.
+    pub fn vocabulary(vocab_id: &str) -> String {
+        format!("vocab:{}", vocab_id)
+    }
+
+    /// A citation Source / Artefact / Lookup node.
+    pub fn source(id: &str) -> String {
+        format!("source:{}", id)
+    }
+    pub fn artefact(id: &str) -> String {
+        format!("artefact:{}", id)
+    }
+    pub fn lookup(id: &str) -> String {
+        format!("lookup:{}", id)
+    }
+
+    /// A Perspective (a web — e.g. a named series of systems): `perspective:<id>`.
+    pub fn perspective(id: &str) -> String {
+        format!("perspective:{}", id)
     }
 }
 
@@ -157,103 +137,31 @@ impl Perspective {
 mod tests {
     use super::*;
 
-    fn triad_vocabs() -> (TopologicalVocabulary, GeometricVocabulary, SemanticVocabulary) {
-        let t = TopologicalVocabulary::canonical_for(3);
-        let g = GeometricVocabulary::canonical_for(3);
-        let s = SemanticVocabulary::with_auto_id(
-            "Canonical Triad",
-            3,
-            vec![
-                "char_word_will".into(),
-                "char_word_function".into(),
-                "char_word_being".into(),
-            ],
-            vec![
-                "char_word_generation".into(),
-                "char_word_consent".into(),
-                "char_word_decision".into(),
-            ],
-        );
-        (t, g, s)
+    #[test]
+    fn test_link_id_is_deterministic() {
+        let a = Link::new("system:s#term:1", "cites", "source:x");
+        let b = Link::new("system:s#term:1", "cites", "source:x");
+        assert_eq!(a.id, b.id);
+        let c = Link::new("system:s#term:2", "cites", "source:x");
+        assert_ne!(a.id, c.id);
     }
 
     #[test]
-    fn test_perspective_creation_with_auto_id() {
-        let (t, g, s) = triad_vocabs();
-        let gram = Perspective::with_auto_id(
-            "Triad",
-            3,
-            "Dynamism",
-            "Impulses",
-            "Acts",
-            &t.id,
-            &g.id,
-            &s.id,
-        );
-        assert_eq!(gram.id, "perspective_triad_3");
-        assert_eq!(gram.name, "Triad");
-        assert_eq!(gram.coherence, "Dynamism");
+    fn test_add_remove_link() {
+        let mut p = Perspective::with_auto_id("Sources", vec![]);
+        assert_eq!(p.id, "perspective_sources");
+        let l = Link::new("system:s", "cites", "source:x");
+        let lid = l.id.clone();
+        p.add_link(l.clone());
+        p.add_link(l); // idempotent
+        assert_eq!(p.links.len(), 1);
+        assert!(p.remove_link(&lid));
+        assert!(p.links.is_empty());
     }
 
     #[test]
-    fn test_perspective_validate_ok() {
-        let (t, g, s) = triad_vocabs();
-        let gram = Perspective::with_auto_id(
-            "Triad",
-            3,
-            "Dynamism",
-            "Impulses",
-            "Acts",
-            &t.id,
-            &g.id,
-            &s.id,
-        );
-        assert!(gram.validate_with(&t, &g, &s).is_ok());
-    }
-
-    #[test]
-    fn test_perspective_validate_catches_order_mismatch() {
-        let (t, g, _) = triad_vocabs();
-        let tetrad_sem = SemanticVocabulary::with_auto_id(
-            "Bad Sem",
-            4,
-            vec!["a".into(), "b".into(), "c".into(), "d".into()],
-            vec!["e".into(), "f".into(), "g".into(), "h".into(), "i".into(), "j".into()],
-        );
-        let gram = Perspective::with_auto_id(
-            "Confused",
-            3,
-            "?",
-            "?",
-            "?",
-            &t.id,
-            &g.id,
-            &tetrad_sem.id,
-        );
-        let errs = gram.validate_with(&t, &g, &tetrad_sem).unwrap_err();
-        assert!(errs.iter().any(|e| e.contains("order")));
-    }
-
-    #[test]
-    fn test_perspective_validate_catches_wrong_ref() {
-        let (t, g, s) = triad_vocabs();
-        let other_topology = TopologicalVocabulary::canonical_for(4);
-        let gram = Perspective::with_auto_id(
-            "Triad",
-            3,
-            "Dynamism",
-            "Impulses",
-            "Acts",
-            "topvocab_3",
-            &g.id,
-            &s.id,
-        );
-        // Passing the wrong topology object triggers a ref-mismatch error.
-        let errs = gram.validate_with(&other_topology, &g, &s).unwrap_err();
-        assert!(errs
-            .iter()
-            .any(|e| e.contains("topological_vocab_ref")));
-        // t is unused warning avoided:
-        drop(t);
+    fn test_addresses() {
+        assert_eq!(address::term("system_canonical_triad_3", 1), "system:system_canonical_triad_3#term:1");
+        assert_eq!(address::connective("s", 1, 3), "system:s#conn:1-3");
     }
 }

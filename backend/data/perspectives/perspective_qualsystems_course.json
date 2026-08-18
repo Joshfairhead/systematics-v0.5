@@ -1,0 +1,66 @@
+{
+  "characters": [],
+  "coordinates": [],
+  "vocabularies": [],
+  "systems": [],
+  "perspectives": [
+    {
+      "id": "perspective_qualsystems_course",
+      "name": "Qualsystems Course",
+      "links": [
+        {
+          "id": "link_c04243bda9a1f8bf",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm1_number_qualities_perception"
+        },
+        {
+          "id": "link_510d83a8affdcd11",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm2_the_basic_qualsystems"
+        },
+        {
+          "id": "link_ab0ff1e2175997b1",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm3_the_intermediate_qualsystems"
+        },
+        {
+          "id": "link_f60a6c64bf363448",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm4_developing_qualtum_unfolding_of_structure"
+        },
+        {
+          "id": "link_75390f8578465408",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm5_the_cosmic_laws_of_unfolding"
+        },
+        {
+          "id": "link_afdf9eff70f09a12",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm6_the_complex_qualsystems"
+        },
+        {
+          "id": "link_a6754ccc1104e432",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm7_praxis"
+        },
+        {
+          "id": "link_08087030ae125378",
+          "source": "perspective:perspective_qualsystems_course",
+          "predicate": "hasModule",
+          "target": "perspective:perspective_qsm_workbook"
+        }
+      ]
+    }
+  ],
+  "sources": [],
+  "artefacts": [],
+  "lookups": [],
+  "references": []
+}
