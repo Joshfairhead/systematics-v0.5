@@ -110,10 +110,20 @@ remodel. Naming the impulses (canonical: affirming **+**, receptive **−**, rec
 |---|---|---|---|
 | **Model** | **−** (receptive) | the **triadic base space** — the passive store of *what is* | backend data + the base-space triad below |
 | **View** | **+** (affirming) | the **interface** — what actively presents / initiates interaction | frontend (`browser_controls`, `inspector`, `graph_view`) |
-| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | middleware + the six laws of three (below) |
+| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | **target = the `middleware` crate**, elevated into a real controller (today only DTOs; the mediation is net-new — see *Ground truth*) |
 
 This supersedes the earlier loose "middleware = controller, backend = model, frontend = view"
-gloss by giving each an **impulse** and naming what each *contains*.
+gloss by giving each an **impulse** and naming what each *contains*. **MVC is more nuanced
+than the backend / middleware / frontend split** (user, 2026-08-18) — the roles are not a 1:1
+map onto the three crates. **The intent: `middleware` SHOULD BE the Controller** — a real
+mediating layer that works *with* the Model and the View. That mediating job is **what the
+GraphQL layer currently does, but too narrowly in scope**; the remodel elevates `middleware`
+from a shared type vocabulary into the controller that carries the six laws.
+
+**Present state (audit 2026-08-18), i.e. the gap to close:** `middleware` is *today* only a
+**shared wire-format / DTO crate** (`middleware/src/types/*`), depended on by both backend and
+frontend — it holds no mediating logic yet. GraphQL (`backend/src/graphql`) plays the limited
+controller role now. So "Controller = middleware" is the **target**, not the current fact.
 
 **Separate the concerns — the earlier remodel conflated them (user, 2026-08-18).** The
 base-space plan folded model, controller and view together. Pulled apart:
@@ -167,6 +177,70 @@ MVC base (View = **+**/1, Model = **−**/2, Controller = **=**/3), for sign-off
 working guess. Note: this six-over-MVC application is **distinct** from the six laws as the
 Controller's own **traversal algorithms** over the S·P·O impulse triad — same group S₃,
 different base.)*
+
+**Ground truth — audit before refactor (2026-08-18).** A registry-vs-code audit established
+what already exists, so the remodel *re-articulates* rather than builds from scratch:
+
+- **The Model's base-space triad already exists in embryo** (`backend/src/core/`):
+  - **Structural Topology (−)** ≈ **`TopologicalVocabulary`** — points + lines (adjacency,
+    per Order). The incidence join is `Graph::character_at_point` / `character_at_line`
+    (`graph.rs:706-730`): `topology.points[idx] ↔ vocab.terms[idx]`.
+  - **Graph Template (=)** ≈ **`Grammar`** (`grammar.rs`) — holds **order** and, via
+    `expected_terms()` (= order) and `expected_connectives()` (= C(order,2), the **size /
+    degree**), the arity rules. **`Grammar::validate` / `validate_with`** already perform the
+    structural validation (arity + topology/geometry/semantic reconciliation). *So the two
+    insights above — "order + degree live in the Graph Template" and "the Graph Template holds
+    the validation rules" — are already literally true in code.*
+  - **Semantic Projection (+)** ≈ **`Vocabulary`** — terms + connectives as `Character` refs
+    projected onto the points/lines (`vocab.validate_against(topology)`).
+  - `System` (`systems.rs`) is the metadata reconciling a `Grammar` with a `Vocabulary`;
+    `Graph::validate_system` resolves the whole triad. The **entries substrate**
+    (`entries.rs`: Order·Position·Point·Line·Coordinate·Segment·Character) + content-addressed
+    `Character` (`char_word_<slug>` dedup) + `canonical_ids`/`bundled_ids` is the nascent
+    **content-addressed heap** (the Nullad / DHT shape).
+  - *Gap the remodel adds:* explicit **adjacency** and **incidence matrices** (today topology
+    is point/line *lists*, implicit adjacency) reconciled by the template as a **line graph**.
+- **The Controller does NOT exist as a mediating layer yet.** No code enumerates/applies the
+  six laws (S₃) as traversals — it is **doc-only** (one comment at `data/mod.rs:469`). The
+  only real S₃/permutation logic is **`core/functors.rs`** (a single same-grammar morphism,
+  Model-side, `impl` + tested) — the seed to build on, not a six-laws engine. **Target home
+  (user 2026-08-18): elevate the `middleware` crate into the Controller** — the mediating
+  layer that works with Model and View and carries the six laws, absorbing and widening the
+  role **GraphQL** plays today (currently too limited). Fed its validation rules by the
+  `Grammar` (Graph Template). The `functors.rs` S₃ logic is reconciled into it. *(Where the
+  engine physically lives — the `middleware` crate vs `backend/core` — is a Stage-B decision;
+  the user's intent is `middleware` = Controller, so lean there and let `middleware` depend on
+  the model's grammar/topology types it already shares.)*
+- **Stale statuses / task drift found:** the 9 QSM perspective JSON files (qsm1–7 + workbook +
+  course = Hodgson Qualsystems) and DU vols 1–3 exist on disk in `backend/data/perspectives/`,
+  yet task #13 (Scrape Hodgson Qualsystems) still reads "pending" — **stale**. (Task #14 =
+  *DU vol 4*, which is genuinely absent — only vols 1–3 are present — so #14 stands. Whether
+  the QSM/DU files are actually *loaded at startup* is unverified — check `data/mod.rs`.)
+  *(Full frontend/graphql/status sweep deferred — the audit workflow hit a session limit;
+  resume for complete coverage.)*
+
+**The remodel plan [agreed, user 2026-08-18].** Develop the three MVC roles in balance (the
+six-laws rule), backend/Model first (the 321 discipline):
+
+- **Stage A — Model (−): re-articulate the existing base-space triad.** Rename the code to the
+  systematic names (`Grammar`→**Graph Template**, `TopologicalVocabulary`→**Structural
+  Topology**, `Vocabulary`→**Semantic Projection**), make **adjacency + incidence** explicit
+  (matrices, reconciled by the template as a **line graph**), and expose **order + degree as
+  first-class constraint-values** in the Graph Template (they already exist as
+  `expected_terms`/`expected_connectives`). Backend-first, verified against the untouched graph
+  view.
+- **Stage B — Controller (=): the six laws of three.** Build the six laws as a real layer
+  (target: elevate `middleware` per above). **`SPO` is retired as a name — it is just another
+  name for the *interaction* law (132); use "interaction".** Represent the **six laws as a
+  Hexad** (an order-6 system) laid out in a **specific arrangement**, so each of the six
+  vertices can carry **alternative names / aliases** for its law — e.g. *interaction* ← alias
+  `SPO`. (The primary names are Bennett's — expansion · identity · order · interaction ·
+  concentration · freedom; the S₃ structure is already tabulated below.) The six laws are the
+  Controller's **traversal algorithms** over the S·P·O impulse triad; interaction is one.
+- **Stage C — View (+): the two-line sort/filter redesign**, consuming the Controller's
+  queries (the `browser_controls` module is already the decoupled seam).
+- **Stage D — the shared k₃ + semantic product.** Anchor all semantic triads to one shared
+  topological k₃ (bijective mapping) → the north-star **semantic product**.
 
 ## Monads, operations, and the six laws of three [proposed — potentially major]
 
