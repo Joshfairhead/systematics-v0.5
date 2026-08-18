@@ -1,3 +1,4 @@
+pub mod browser_controls;
 pub mod graph_view;
 pub mod inspector;
 pub mod reference_browser;

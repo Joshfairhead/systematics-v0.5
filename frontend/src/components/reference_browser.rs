@@ -25,6 +25,7 @@ use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
+use crate::components::browser_controls::{BrowserControls, ChipItem, PredItem};
 use crate::components::inspector::{Inspector, ObjCite, PosGroup, PredGroup};
 // The SPO triple store + query API live in their own module (swappable spike).
 use crate::components::spo::{
@@ -147,6 +148,11 @@ impl ColKey {
             ColKey::Cites => "Cites",
             ColKey::Note => "Note",
         }
+    }
+    /// Round-trip a column via its (unique) label — the key the decoupled control
+    /// view emits, so it never needs to know the `ColKey` enum.
+    fn from_label(s: &str) -> Option<ColKey> {
+        ALL_COLS.into_iter().find(|c| c.label() == s)
     }
 }
 
@@ -581,62 +587,67 @@ fn table_view(ctx: TableCtx) -> Html {
     // Default row order: by systematic order (the header axis).
     rows.sort_by_key(|row| row.order());
 
-    // Sort (=) — select which tag keys are the columns (the header tags).
-    let col_chip = |k: ColKey| -> Html {
+    // ---- Control-bar display data + callbacks (for the decoupled BrowserControls
+    // view). The controller computes chips/predicates via spo::; the view only renders
+    // them and emits keyed events (columns by label, objects by value). ----
+    let columns: Vec<ChipItem> = ALL_COLS
+        .into_iter()
+        .map(|k| ChipItem {
+            key: k.label().to_string(),
+            label: k.label().to_string(),
+            on: visible_cols.contains(&k),
+        })
+        .collect();
+    let on_toggle_column = {
         let visible_cols = visible_cols.clone();
-        let on = visible_cols.contains(&k);
-        let onclick = Callback::from(move |_: MouseEvent| {
-            let mut next = (*visible_cols).clone();
-            if let Some(i) = next.iter().position(|c| *c == k) {
-                next.remove(i);
-            } else {
-                next.push(k);
+        Callback::from(move |key: String| {
+            if let Some(k) = ColKey::from_label(&key) {
+                let mut next = (*visible_cols).clone();
+                if let Some(i) = next.iter().position(|c| *c == k) {
+                    next.remove(i);
+                } else {
+                    next.push(k);
+                }
+                visible_cols.set(next);
             }
-            visible_cols.set(next);
-        });
-        html! {
-            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
-                { k.label() }
-            </button>
-        }
+        })
     };
-    // Filter (−), SPO query — pick the **predicate** (key). Switching predicate keeps
-    // the other constraints (they stack). A dot marks a predicate with active values.
-    let pred_tab = |p: String| -> Html {
-        let on = *(*active_pred) == p;
-        let active = spo_constraints.get(&p).is_some_and(|v| !v.is_empty());
-        let ap = active_pred.clone();
-        let pc = p.clone();
-        let onclick = Callback::from(move |_: MouseEvent| ap.set(pc.clone()));
-        html! {
-            <button class={ classes!("facet-tab", on.then_some("active")) } onclick={ onclick }>
-                { pred_label(&p) }{ if active { " ●" } else { "" } }
-            </button>
-        }
+    let active_pred_key = (**active_pred).clone();
+    let predicates: Vec<PredItem> = all_predicates(triples)
+        .into_iter()
+        .map(|p| PredItem {
+            label: pred_label(&p),
+            active: p == active_pred_key,
+            dotted: spo_constraints.get(&p).is_some_and(|v| !v.is_empty()),
+            key: p,
+        })
+        .collect();
+    let on_select_pred = {
+        let active_pred = active_pred.clone();
+        Callback::from(move |key: String| active_pred.set(key))
     };
-    // …then pick its **objects** (values) — the SPO drill-down, scoped to the current
-    // constraints. Chips show the bare object (provenance lives in the ⌕ inspector,
-    // not cluttering every chip). Toggling updates this predicate's constraint slot.
-    let val_chip = |p: String, v: String| -> Html {
-        let on = spo_constraints.get(&p).is_some_and(|s| s.contains(&v));
-        let sc = spo_constraints.clone();
-        let pc = p.clone();
-        let vc = v.clone();
-        let onclick = Callback::from(move |_: MouseEvent| {
-            let mut next = (*sc).clone();
-            let slot = next.entry(pc.clone()).or_default();
-            if !slot.remove(&vc) {
-                slot.insert(vc.clone());
+    let objects: Vec<ChipItem> = pred_objects_scoped(triples, &active_pred_key, spo_constraints)
+        .into_iter()
+        .map(|v| ChipItem {
+            on: spo_constraints.get(&active_pred_key).is_some_and(|s| s.contains(&v)),
+            key: v.clone(),
+            label: v,
+        })
+        .collect();
+    let on_toggle_value = {
+        let spo_constraints = spo_constraints.clone();
+        let pred = active_pred_key.clone();
+        Callback::from(move |v: String| {
+            let mut next = (*spo_constraints).clone();
+            let slot = next.entry(pred.clone()).or_default();
+            if !slot.remove(&v) {
+                slot.insert(v);
             }
-            next.retain(|_, s| !s.is_empty()); // drop empty slots (no constraint)
-            sc.set(next);
-        });
-        html! {
-            <button class={ classes!("facet-chip", on.then_some("active")) } onclick={ onclick }>
-                { v }
-            </button>
-        }
+            next.retain(|_, s| !s.is_empty());
+            spo_constraints.set(next);
+        })
     };
+    let active_pred_label = pred_label(&active_pred_key);
     // Visible columns in canonical order (independent of toggle order).
     let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
 
@@ -728,15 +739,13 @@ fn table_view(ctx: TableCtx) -> Html {
         }
     };
 
+    // Callbacks for the decoupled control view (plain values, not DOM events).
     let on_search = {
         let search = search.clone();
-        Callback::from(move |e: InputEvent| {
-            let v = e.target_unchecked_into::<HtmlInputElement>().value();
-            search.set(v);
-        })
+        Callback::from(move |v: String| search.set(v))
     };
-    let toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
-    let toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: MouseEvent| s.set(!*s)) };
+    let on_toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: ()| s.set(!*s)) };
+    let on_toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: ()| s.set(!*s)) };
     let scoped = !spo_constraints.is_empty();
 
     // Reciprocal traversal — a pinned SUBJECT advertising its values (S → P·O·source).
@@ -814,7 +823,7 @@ fn table_view(ctx: TableCtx) -> Html {
     let on_delete_selected = {
         let selected = selected.clone();
         let on_delete_rows = on_delete_rows.clone();
-        Callback::from(move |_: MouseEvent| {
+        Callback::from(move |_: ()| {
             let addrs: Vec<String> = selected.iter().cloned().collect();
             if !addrs.is_empty() {
                 on_delete_rows.emit(addrs);
@@ -826,79 +835,30 @@ fn table_view(ctx: TableCtx) -> Html {
 
     html! {
         <>
-            // Control bar (single line): Extract·Load·Transform (left) · search ·
-            // New · Sort (=) · Filter (−) (right). ELT is the operation edge; Sort
-            // selects header tags (columns); Filter scopes the data (by cite-degree).
-            <div class="ref-controlbar">
-                { elt_btns }
-                <input
-                    class="ref-search"
-                    type="text"
-                    placeholder="Search…"
-                    value={ (**search).clone() }
-                    oninput={ on_search }
-                />
-                { new_btn }
-                <div class="control-pop">
-                    <button
-                        class={ classes!("control-btn", (**sort_open).then_some("active")) }
-                        onclick={ toggle_sort }
-                        title="Sort — select the header tags (which tag keys are columns)"
-                    >{ format!("Sort ({}) ▾", cols.len()) }</button>
-                    if **sort_open {
-                        <div class="control-menu">
-                            <span class="facet-label">{ "header tags · columns" }</span>
-                            <div class="col-chips">
-                                { for ALL_COLS.into_iter().map(col_chip) }
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <div class="control-pop">
-                    <button
-                        class={ classes!("control-btn", (scoped || **filter_open).then_some("active")) }
-                        onclick={ toggle_filter }
-                        title="Filter — an SPO query: pick a predicate (key), then its objects (values)"
-                    >{ if scoped { "Filter ● ▾" } else { "Filter ▾" } }</button>
-                    if **filter_open {
-                        <div class="control-menu">
-                            <span class="facet-label">{ "filter — predicate (key), stackable" }</span>
-                            <div class="facet-tabs">
-                                {
-                                    // Every predicate present in the SPO triples is picked up
-                                    // automatically — zero per-predicate code.
-                                    for all_predicates(triples).into_iter().map(pred_tab)
-                                }
-                            </div>
-                            <span class="facet-label">
-                                { format!("{} — objects (values)", pred_label(active_pred)) }
-                            </span>
-                            <div class="col-chips">
-                                { {
-                                    let pred = (**active_pred).clone();
-                                    // Scoped to the other active constraints, so the
-                                    // drill-down narrows (order=Triad ⇒ triadic terms).
-                                    let vals = pred_objects_scoped(triples, &pred, &spo_constraints);
-                                    if vals.is_empty() {
-                                        html! { <span class="facet-hint">{ "no values in the current scope" }</span> }
-                                    } else {
-                                        html! { for vals.into_iter().map(|v| val_chip(pred.clone(), v)) }
-                                    }
-                                } }
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <span class="ref-count">{ format!("{} shown", rows.len()) }</span>
-                if sel_count > 0 {
-                    <button class="row-delete-btn" onclick={ on_delete_selected }
-                        title="Delete the selected systems / monads / references">
-                        { format!("🗑 Delete {sel_count} selected") }
-                    </button>
-                }
-            </div>
+            // Search / sort / filter live in their own decoupled view module
+            // (BrowserControls) — it renders from plain display data and emits keyed
+            // events; the model (spo::) + state stay here in the controller.
+            <BrowserControls
+                elt_btns={ elt_btns }
+                new_btn={ new_btn }
+                search={ (**search).clone() }
+                on_search={ on_search }
+                sort_open={ **sort_open }
+                on_toggle_sort={ on_toggle_sort }
+                columns={ columns }
+                on_toggle_column={ on_toggle_column }
+                filter_open={ **filter_open }
+                filter_active={ scoped }
+                on_toggle_filter={ on_toggle_filter }
+                predicates={ predicates }
+                on_select_pred={ on_select_pred }
+                active_pred_label={ active_pred_label }
+                objects={ objects }
+                on_toggle_value={ on_toggle_value }
+                shown={ rows.len() }
+                sel_count={ sel_count }
+                on_delete_selected={ on_delete_selected }
+            />
 
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }
