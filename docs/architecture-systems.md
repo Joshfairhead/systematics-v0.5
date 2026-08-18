@@ -60,6 +60,10 @@ the graph · `proposed` = named but not built/settled.
 ## At a glance — settled vs open (review map)
 
 **Settled (load-bearing):**
+- **The architecture IS an MVC triad — Model (−, the base space) · View (+, the interface) ·
+  Controller (=, the six laws of three).** Separate the concerns; the base-space remodel is
+  the **Model**; the Controller is the *six laws*, not bare SPO (which is only the 132 /
+  interaction law). See *The architecture is an MVC triad*. (user, 2026-08-18)
 - The **Architecture Pentad** (Sign·Symbol·Syntax·Semantics·Grammar + 10 Mutualities) — seeded.
 - **Everything is a tag** = the predicate:object of an **SPO** triple; a Perspective is a web of SPO links.
 - **Nullad** (all elements) → **Extract** → **Monad** (a scoped subset, a real `Sequence`) → **core sequence** (articulates the monad).
@@ -96,6 +100,73 @@ the graph · `proposed` = named but not built/settled.
   and appears in the Nullad table). Remaining cleanup: migrate the code-defined
   seeds (fragments first, canonical last) to app/JSON-authored data. (User data —
   Monads from Extract — already takes the app→`store.json` path.)
+
+## The architecture is an MVC triad — Model (−) · View (+) · Controller (=) [user, 2026-08-18]
+
+The whole architecture **is** a triad, and it is now the lens that organises the base-space
+remodel. Naming the impulses (canonical: affirming **+**, receptive **−**, reconciling **=**):
+
+| MVC role | impulse | what it is | in this codebase |
+|---|---|---|---|
+| **Model** | **−** (receptive) | the **triadic base space** — the passive store of *what is* | backend data + the base-space triad below |
+| **View** | **+** (affirming) | the **interface** — what actively presents / initiates interaction | frontend (`browser_controls`, `inspector`, `graph_view`) |
+| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | middleware + the six laws of three (below) |
+
+This supersedes the earlier loose "middleware = controller, backend = model, frontend = view"
+gloss by giving each an **impulse** and naming what each *contains*.
+
+**Separate the concerns — the earlier remodel conflated them (user, 2026-08-18).** The
+base-space plan folded model, controller and view together. Pulled apart:
+
+- **Model (−) — the triadic base space (decoupled).** A system is defined triadically:
+  **Structural Topology (−)** (vertices + edge-pairs → adjacency matrix) · **Graph Template
+  (=)** (order + size = the grammar; reconciles adjacency ↔ incidence as a line graph) ·
+  **Semantic Projection (+)** (term + connective characters → incidence matrix). *This is the
+  model only* — it holds no algorithms and no interface.
+- **Controller (=) — the six laws of three, not bare SPO.** The algorithm side is what we
+  have called **SPO, extended** — but **SPO is only one of the laws.** Reading
+  Subject·Predicate·Object as impulses — **subject = affirming (Will, +)** · **predicate =
+  reconciling (Being, =)** · **object = receptive (Function, −)** — gives the ordering
+  **1-3-2 = interaction**. There are **six laws** over the triad (the S₃ permutations, table
+  under *Monads, operations, and the six laws of three*); **SPO is just the *interaction*
+  one** (consistent with the prior "SPO ≈ interaction (132)" note). **Graph traversal,
+  storage and the semantic product want the full six**, not the single 132 reading — so the
+  controller **is the six laws of three**, and SPO is retired as *the* model, kept only as
+  one traversal.
+- **View (+) — the interface.** The two-line **sort/filter** redesign lives here (the
+  `browser_controls` module); it is the affirming face, decoupled from model and controller.
+
+**The Graph Template holds the Controller's validation rules [insight — note, user 2026-08-18].**
+The base space's reconciler is the **Graph Template (=)** (order + size = the grammar). The
+Model as a whole is the **receptive (−)** pole of MVC, yet its *internal* reconciler (the
+Graph Template =) **corresponds to the Controller (=) one level up** — the reconciling role
+recurs **holonically**, and the two should be connected. Concretely: **order and degree are
+Model data, held in the Graph Template**, and the Graph Template is where **validation rules
+for the Controller** belong — the grammar prescribes which topologies/projections are legal
+(how many terms, which edges), so it *is* the constraint the controller checks. So the Graph
+Template feeds the Controller its validation rules. *(This gives the deferred item "order +
+degree as constraint-values" a home: the Graph Template.)*
+
+**Balanced development via the six laws [RULE — user, 2026-08-18].** The six laws (S₃
+permutations of the impulse triad) are the six ways three impulses interact. **Use them as
+the development lens on any triadic base, including MVC:** don't build only the one
+interaction we default to (132 / SPO) — check the work across **all six** permutations so
+that Model, Controller and View develop in balance. A proposed reading of the six over the
+MVC base (View = **+**/1, Model = **−**/2, Controller = **=**/3), for sign-off:
+
+| law (order) | reading over MVC (positions View=1 · Model=2 · Controller=3) |
+|---|---|
+| expansion (123) | View → Model → Controller |
+| identity (231) | Model → Controller → View |
+| order (312) | Controller → View → Model |
+| interaction (132) | View → Controller → Model  ← the SPO / request reading |
+| concentration (213) | Model → View → Controller |
+| freedom (321) | Controller → Model → View |
+
+*(The **rule** "check all six for balance" is settled; each row's concrete meaning is a
+working guess. Note: this six-over-MVC application is **distinct** from the six laws as the
+Controller's own **traversal algorithms** over the S·P·O impulse triad — same group S₃,
+different base.)*
 
 ## Monads, operations, and the six laws of three [proposed — potentially major]
 
@@ -683,6 +754,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |
 | **Class · Instantiation · Instance** | e.g. **K₄ (class) · Tetrad (instantiation) · Canonical Tetrad (instance)**. The abstract complete graph → its systematic instantiation → a concrete instance. Also the table's own structure: header/keys (class) · data types/keys (instantiation) · data/values (instance). | node-typed (nouns) | (documented; extends the existing Class/Instance dyad) | proposed |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
+| **Architecture MVC** ⭐ | **Model (−)** · **View (+)** · **Controller (=)** (nouns) — base-space store · interface · six-laws algo layer. The **organising frame for the base-space remodel**: separate the concerns; Controller = the six laws of three (SPO = only the 132/interaction law). The Graph Template (Model's inner =) holds the Controller's validation rules. | node-typed (nouns) | model = backend data + base-space triad · view = `frontend/components/{browser_controls,inspector,graph_view}` · controller = middleware + six laws | proposed (user 2026-08-18) — see *The architecture is an MVC triad* |
 
 ## Tetrad (order 4 — Sources / Interplays)
 
