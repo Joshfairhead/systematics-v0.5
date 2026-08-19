@@ -15,15 +15,12 @@ use super::grammar::GraphTemplate;
 use super::sequences::Sequence;
 use super::perspectives::Perspective;
 use super::systems::System;
-use super::links::{Link, LinkType};
 use super::vocabularies::{Geometry, Vocabulary, Topology};
 
-/// The primary container. Holds substrate entries, edge Links, and the four
-/// higher-level tables.
+/// The primary container. Holds substrate entries and the four higher-level tables.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Graph {
     pub entries: Vec<Entry>,
-    pub links: Vec<Link>,
     #[serde(default)]
     pub topological_vocabs: Vec<Topology>,
     #[serde(default)]
@@ -80,16 +77,8 @@ impl Graph {
         self.entries.push(entry);
     }
 
-    pub fn add_link(&mut self, link: Link) {
-        self.links.push(link);
-    }
-
     pub fn get_entry(&self, id: &str) -> Option<&Entry> {
         self.entries.iter().find(|e| e.id() == id)
-    }
-
-    pub fn get_link(&self, id: &str) -> Option<&Link> {
-        self.links.iter().find(|l| l.id == id)
     }
 
     // ==========================================================================
@@ -947,30 +936,6 @@ impl Graph {
                 .collect(),
             manifest: Vec::new(),
         }
-    }
-
-    // ==========================================================================
-    // Line-link queries (rendering shim; `Line` here means the edge Link
-    // between coordinates, retained until frontend consumes `Segment`).
-    // ==========================================================================
-
-    pub fn lines(&self, order: u8) -> Vec<&Link> {
-        self.links
-            .iter()
-            .filter(|l| {
-                if !matches!(l.link_type, LinkType::Line) {
-                    return false;
-                }
-                let base_id = match l.base_single() {
-                    Some(id) => id,
-                    None => return false,
-                };
-                self.entries.iter().any(|e| match e {
-                    Entry::Coordinate(c) if c.id == base_id => c.order_value() == Some(order),
-                    _ => false,
-                })
-            })
-            .collect()
     }
 }
 

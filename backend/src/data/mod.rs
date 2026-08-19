@@ -5,7 +5,7 @@
 //! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
-    Entry, Geometry, GraphTemplate, GraphContent, Graph, Line, Link, Order, Point, Position,
+    Entry, Geometry, GraphTemplate, GraphContent, Graph, Line, Order, Point, Position,
     Segment, Topology,
 };
 
@@ -128,7 +128,6 @@ pub fn build_graph() -> Graph {
     add_orders(&mut graph);
     add_positions(&mut graph);
     add_substrate_combinatorics(&mut graph);
-    add_rendering_line_links(&mut graph);
 
     graph.apply_content(&canonical_content());
     // The Citation triad ships as its own bundle, applied before marking
@@ -184,20 +183,6 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
     }
 }
 
-/// Emit `Link::line` edges between coordinates (rendering shim; retained
-/// until the frontend consumes `Segment` entries directly).
-fn add_rendering_line_links(graph: &mut Graph) {
-    for order in 1..=12u8 {
-        for p1 in 1..=order {
-            for p2 in (p1 + 1)..=order {
-                graph.add_link(Link::line(
-                    format!("coord_{}_{}", order, p1),
-                    format!("coord_{}_{}", order, p2),
-                ));
-            }
-        }
-    }
-}
 
 // =============================================================================
 // Canonical content generator + data tables (test-only).
@@ -1052,15 +1037,6 @@ mod tests {
                 .value,
             "Generation"
         );
-    }
-
-    #[test]
-    fn test_rendering_line_links_exist() {
-        let g = build_graph();
-        // Triad has 3 rendering lines.
-        assert_eq!(g.lines(3).len(), 3);
-        // Dodecad has C(12,2) = 66.
-        assert_eq!(g.lines(12).len(), 66);
     }
 
     /// Regenerate `data/canonical.json` from the Rust tables. Ignored by

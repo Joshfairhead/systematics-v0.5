@@ -3,8 +3,6 @@
 //! Layered ontology:
 //! - `entries` — the substrate (Order, Position, Point, Line, Coordinate,
 //!   Segment, Character) plus the `Entry` sum type.
-//! - `links` — Link entries (currently `Line` for coordinate-to-coordinate
-//!   rendering; `Connective` shim retained during frontend migration).
 //! - `vocabularies` — `Topology`, `Geometry`,
 //!   `Vocabulary` — ordered per-Order references into the substrate.
 //! - `grammar` — `GraphTemplate`: the K_n structure + arity validation rules.
@@ -19,7 +17,6 @@ pub mod entries;
 pub mod functors;
 pub mod grammar;
 pub mod graph;
-pub mod links;
 pub mod perspectives;
 pub mod sequences;
 pub mod systems;
@@ -28,8 +25,6 @@ pub mod vocabularies;
 pub use entries::{
     Character, Coordinate, Entry, Line, Order, Point, Point3d, Position, Segment,
 };
-
-pub use links::{Link, LinkType};
 
 pub use vocabularies::{Geometry, Vocabulary, Topology};
 
