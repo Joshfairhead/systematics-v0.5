@@ -283,8 +283,12 @@ fn push_triadic_system(
 }
 
 /// Build the Citation triad as its own content bundle (`data/citation.json`):
-/// Source / Artefact / Lookup as the three impulses of a K3, with placeholder
-/// acts (names TBD). Metadata inherits order 3 (Dynamism / Impulses / Acts).
+/// **Source / Artefact / Lookup** as the three impulses of a K3, with the
+/// **citation-query** edges (user, 2026-08-18): the three connectives are
+/// **Search · Sort · Filter**, in canonical edge order over nodes
+/// 1=source · 2=artefact · 3=lookup — (1,2) source–artefact = **Sort**,
+/// (1,3) source–lookup = **Search**, (2,3) artefact–lookup = **Filter**.
+/// Metadata inherits order 3 (Dynamism / Impulses / Acts).
 pub fn build_citation_from_tables() -> GraphContent {
     let mut content = GraphContent::default();
     let mut have_char = std::collections::HashSet::new();
@@ -294,11 +298,7 @@ pub fn build_citation_from_tables() -> GraphContent {
         "Citation",
         3,
         &["source".to_string(), "artefact".to_string(), "lookup".to_string()],
-        &[
-            "citation_act_1_needs_research".to_string(),
-            "citation_act_2_needs_research".to_string(),
-            "citation_act_3_needs_research".to_string(),
-        ],
+        &["sort".to_string(), "search".to_string(), "filter".to_string()],
     );
     content
 }
