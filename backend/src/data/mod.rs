@@ -179,7 +179,7 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
         graph.add_topological_vocab(Topology::canonical_for(order));
         graph.add_geometric_vocab(Geometry::canonical_for(order));
         // The complete-graph structure for this Order (deterministic).
-        graph.add_grammar(Template::for_order(order));
+        graph.add_template(Template::for_order(order));
     }
 }
 
@@ -997,9 +997,9 @@ mod tests {
     fn test_build_graph_canonical_systems() {
         let g = build_graph();
         for order in 1..=12u8 {
-            assert!(g.topological_vocab_for_order(order).is_some());
-            assert!(g.geometric_vocab_for_order(order).is_some());
-            assert!(g.grammar_for_order(order).is_some());
+            assert!(g.topology_for_order(order).is_some());
+            assert!(g.geometry_for_order(order).is_some());
+            assert!(g.template_for_order(order).is_some());
             let name = format!("Canonical {}", canonical_system_name(order));
             let vocab_id = format!(
                 "vocab_{}_{}",
@@ -1064,7 +1064,7 @@ mod tests {
     #[test]
     fn test_citation_triad_seeded() {
         let g = build_graph();
-        assert!(g.grammar_for_order(3).is_some());
+        assert!(g.template_for_order(3).is_some());
         assert!(g.vocabulary("vocab_citation_3").is_some());
         assert!(g.system("system_citation_3").is_some());
         assert!(

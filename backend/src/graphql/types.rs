@@ -159,43 +159,43 @@ impl QueryRoot {
 
     // -------- vocabularies and perspective --------
 
-    async fn topological_vocab(
+    async fn topology(
         &self,
         ctx: &Context<'_>,
         id: String,
     ) -> Option<GqlTopology> {
         let g = graph_snapshot(ctx).await;
-        g.topological_vocab(&id)
+        g.topology(&id)
             .map(|v| GqlTopology::new(v.clone()))
     }
 
-    async fn topological_vocab_for_order(
+    async fn topology_for_order(
         &self,
         ctx: &Context<'_>,
         order: i32,
     ) -> Option<GqlTopology> {
         let g = graph_snapshot(ctx).await;
-        g.topological_vocab_for_order(order as u8)
+        g.topology_for_order(order as u8)
             .map(|v| GqlTopology::new(v.clone()))
     }
 
-    async fn geometric_vocab(
+    async fn geometry(
         &self,
         ctx: &Context<'_>,
         id: String,
     ) -> Option<GqlGeometry> {
         let g = graph_snapshot(ctx).await;
-        g.geometric_vocab(&id)
+        g.geometry(&id)
             .map(|v| GqlGeometry::new(v.clone()))
     }
 
-    async fn geometric_vocab_for_order(
+    async fn geometry_for_order(
         &self,
         ctx: &Context<'_>,
         order: i32,
     ) -> Option<GqlGeometry> {
         let g = graph_snapshot(ctx).await;
-        g.geometric_vocab_for_order(order as u8)
+        g.geometry_for_order(order as u8)
             .map(|v| GqlGeometry::new(v.clone()))
     }
 
@@ -221,11 +221,11 @@ impl QueryRoot {
             .collect()
     }
 
-    // -------- grammars (structure) and systems (reconcilers) --------
+    // -------- templates (structure) and systems (reconcilers) --------
 
-    async fn grammar_for_order(&self, ctx: &Context<'_>, order: i32) -> Option<GqlTemplate> {
+    async fn template_for_order(&self, ctx: &Context<'_>, order: i32) -> Option<GqlTemplate> {
         let g = graph_snapshot(ctx).await;
-        g.grammar_for_order(order as u8).map(|gr| GqlTemplate::new(gr.clone()))
+        g.template_for_order(order as u8).map(|gr| GqlTemplate::new(gr.clone()))
     }
 
     async fn system_by_id(&self, ctx: &Context<'_>, id: String) -> Option<GqlSystem> {
@@ -541,8 +541,8 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
     // (systemByName expects "triad", not "canonical triad").
     let name = canonical_system_name(order).to_string();
     let system_name = system.name.clone();
-    let grammar = graph.grammar(&system.grammar_ref)?;
-    let topology = graph.topological_vocab(&grammar.topological_vocab_ref)?;
+    let grammar = graph.template(&system.grammar_ref)?;
+    let topology = graph.topology(&grammar.topological_vocab_ref)?;
     let semantic = graph.vocabulary(&system.vocabulary_ref)?;
     let colour_vocab = graph.canonical_colour_vocab_for_order(order);
 

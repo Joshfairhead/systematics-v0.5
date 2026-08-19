@@ -30,7 +30,7 @@ pub struct Graph {
     /// Complete-graph structures, one per Order. Seeded in code (deterministic),
     /// never persisted as content.
     #[serde(default)]
-    pub grammars: Vec<Template>,
+    pub templates: Vec<Template>,
     /// Systems: metadata reconciling a Template with a Vocabulary.
     #[serde(default)]
     pub systems: Vec<System>,
@@ -213,19 +213,19 @@ impl Graph {
     // Vocabulary and Perspective queries + mutations
     // ==========================================================================
 
-    pub fn topological_vocab(&self, id: &str) -> Option<&Topology> {
+    pub fn topology(&self, id: &str) -> Option<&Topology> {
         self.topological_vocabs.iter().find(|v| v.id == id)
     }
 
-    pub fn topological_vocab_for_order(&self, order: u8) -> Option<&Topology> {
+    pub fn topology_for_order(&self, order: u8) -> Option<&Topology> {
         self.topological_vocabs.iter().find(|v| v.order == order)
     }
 
-    pub fn geometric_vocab(&self, id: &str) -> Option<&Geometry> {
+    pub fn geometry(&self, id: &str) -> Option<&Geometry> {
         self.geometric_vocabs.iter().find(|v| v.id == id)
     }
 
-    pub fn geometric_vocab_for_order(&self, order: u8) -> Option<&Geometry> {
+    pub fn geometry_for_order(&self, order: u8) -> Option<&Geometry> {
         self.geometric_vocabs.iter().find(|v| v.order == order)
     }
 
@@ -267,16 +267,16 @@ impl Graph {
 
     // -------- Grammars (K_n structure; code-seeded, deterministic) --------
 
-    pub fn grammar(&self, id: &str) -> Option<&Template> {
-        self.grammars.iter().find(|g| g.id == id)
+    pub fn template(&self, id: &str) -> Option<&Template> {
+        self.templates.iter().find(|g| g.id == id)
     }
 
-    pub fn grammar_for_order(&self, order: u8) -> Option<&Template> {
-        self.grammars.iter().find(|g| g.order == order)
+    pub fn template_for_order(&self, order: u8) -> Option<&Template> {
+        self.templates.iter().find(|g| g.order == order)
     }
 
-    pub fn add_grammar(&mut self, grammar: Template) {
-        self.grammars.push(grammar);
+    pub fn add_template(&mut self, grammar: Template) {
+        self.templates.push(grammar);
     }
 
     // -------- Systems (metadata + Template/Vocabulary reconciliation) --------
@@ -450,7 +450,7 @@ impl Graph {
             "grammar" => id
                 .parse::<u8>()
                 .ok()
-                .is_some_and(|o| self.grammar_for_order(o).is_some()),
+                .is_some_and(|o| self.template_for_order(o).is_some()),
             _ => false,
         }
     }
@@ -698,7 +698,7 @@ impl Graph {
         point_id: &str,
     ) -> Option<&Character> {
         let sv = self.vocabulary(vocabulary_id)?;
-        let topology = self.topological_vocab_for_order(sv.order)?;
+        let topology = self.topology_for_order(sv.order)?;
         let idx = topology.points.iter().position(|p| p == point_id)?;
         let char_id = sv.terms.get(idx)?;
         self.character(char_id)
@@ -712,7 +712,7 @@ impl Graph {
         line_id: &str,
     ) -> Option<&Character> {
         let sv = self.vocabulary(vocabulary_id)?;
-        let topology = self.topological_vocab_for_order(sv.order)?;
+        let topology = self.topology_for_order(sv.order)?;
         let idx = topology.lines.iter().position(|l| l == line_id)?;
         let char_id = sv.connectives.get(idx)?;
         self.character(char_id)
@@ -725,10 +725,10 @@ impl Graph {
             .system(system_id)
             .ok_or_else(|| vec![format!("System '{}' not found", system_id)])?;
         let grammar = self
-            .grammar(&sys.grammar_ref)
+            .template(&sys.grammar_ref)
             .ok_or_else(|| vec![format!("Template '{}' not found", sys.grammar_ref)])?;
         let t = self
-            .topological_vocab(&grammar.topological_vocab_ref)
+            .topology(&grammar.topological_vocab_ref)
             .ok_or_else(|| {
                 vec![format!(
                     "Topology '{}' not found",
@@ -736,7 +736,7 @@ impl Graph {
                 )]
             })?;
         let geo = self
-            .geometric_vocab(&grammar.geometric_vocab_ref)
+            .geometry(&grammar.geometric_vocab_ref)
             .ok_or_else(|| {
                 vec![format!(
                     "Geometry '{}' not found",
@@ -979,7 +979,7 @@ mod tests {
                 "char_word_consent".into(),
             ],
         ));
-        g.add_grammar(Template::for_order(3));
+        g.add_template(Template::for_order(3));
         g.add_system(System::with_auto_id(
             "Canonical Triad",
             3,
