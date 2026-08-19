@@ -168,11 +168,29 @@ shared type vocabulary to join it and carry the six laws.
 **six morphisms — one per law of three**. Today `core/functors.rs` implements exactly *one*
 morphism (a single same-grammar permutation); the remodel generalises it to the **six** (the
 six laws / S₃ = six functorial readings). So "build the six laws" = build the six morphisms.
-**BUILT — `backend/src/core/laws.rs` (Stage B, 2026-08-18):** `enum Law` with the Hexad
-layout + colours, `permutation()` (verified vs the S₃ table), `read()` (the directed reading
-of an undirected triad — interaction = SPO), `compose()` (the S₃ group op), and `as_functor()`
-(each law bridges to the `Functor` machinery — one of the six morphisms). Not yet wired to
-traversal/GraphQL or seeded in-graph as a Hexad system.
+**BUILT — `backend/src/core/laws.rs` (Stage B, 2026-08-18):** the Hexad layout + colours,
+`permutation()` (verified vs the S₃ table), `read()` (the directed reading of an undirected
+triad — interaction = SPO), `compose()` (the S₃ group op), and a bridge to the `Functor`
+machinery. Not yet wired to traversal/GraphQL or seeded in-graph as a Hexad system.
+
+**Morphism orders + the laws as data [user, 2026-08-18 — refinements].**
+- **First-order morphisms = the links themselves.** *Every link in the system is a morphism* —
+  a triad's edges *generation · consent · decision* (and *search · sort · filter*, …) are
+  **first-order** morphisms.
+- **Second-order morphisms = the six laws.** The six laws (S₃) operate *over* a triad's
+  structure — they are **second-order** morphisms, and the **primary means of operating the
+  system**: adapting to circumstance and composing data. **Run any triad *through* the six laws
+  to understand its context** — e.g. analyse the Model·View·Controller relations by reading MVC
+  under each law. (Do this early — it yields understanding.)
+- **The laws are DATA (Hexad nodes), not a code enum.** `enum Law` is **interim**: the six laws
+  should live as the **nodes of a seeded Hexad** — *nodes hold data*, and here the data is the
+  laws. `core/laws.rs` is the seed-source + morphism logic; the graph holds the laws. (This
+  "nodes hold data" move is the same one the shared substrate needs — see Stage D.)
+- **read = 132 = interaction = a sort / sequence** (of will · being · function).
+- **compose = the generative version of read.** The S₃ ops look **CRUD-ish**: *create = 123
+  (expansion) · read = 132 (interaction) · update = 213 (concentration)* · … (rest TBD; *delete*
+  may not apply; CRUD-as-a-tetrad is probably not the right four). These are the operations the
+  Controller offers over the Model.
 
 **Direction of travel for links [user, 2026-08-18].** The `perspectives::Link`
 (subject·predicate·object, AD4M) is kept **for now** and is foundational in a way, but the
@@ -338,9 +356,10 @@ six-laws rule), backend/Model first (the 321 discipline):
   `SPO`. (The primary names are Bennett's — expansion · identity · order · interaction ·
   concentration · freedom; the S₃ structure is already tabulated below.) The six laws are the
   Controller's **traversal algorithms** over the S·P·O impulse triad; interaction is one.
-- **Stage C — View (+): the two-line sort/filter redesign**, consuming the Controller's
-  queries (the `browser_controls` module is already the decoupled seam).
-- **Stage D — decoupled projection space, then the shared k₃ + semantic product.**
+**Stage C and D are SWAPPED (user, 2026-08-18): do the shared substrate (was D) BEFORE the
+view (was C)** — the substrate is what makes the generative view work, so it comes first.
+
+- **Stage D (now before C) — decoupled projection space, then the shared k₃ + semantic product.**
   *Clarified (user, 2026-08-18):* the **Semantic Projection lives in its OWN space, decoupled
   from the k₃ topology.** A semantic triad — e.g. *Function · Being · Will*, or *Affirming ·
   Receptive · Reconciling* — must **stand on its own as a micro-model** in the graph: its
@@ -356,6 +375,9 @@ six-laws rule), backend/Model first (the 321 discipline):
   topological k₃** via the bijective semantic↔topological mapping — which unblocks the
   north-star **semantic product** (node-1-of-X × node-1-of-Y → a derived term).
   Projection-in-its-own-space **first**, the shared-k₃ anchor **second**.
+- **Stage C (now after D) — View (+): the generative view** — the two-line **Search · Sort ·
+  Filter** redesign, consuming the Controller's queries/laws over the shared substrate (the
+  `browser_controls` module is already the decoupled seam). Comes **after** the substrate.
 
 **The six laws as a Hexad — layout [user, 2026-08-18].** Stage B **also records the six laws
 as a Hexad** (order-6). Provisional vertex assignment by the hexad's numbered/coloured
