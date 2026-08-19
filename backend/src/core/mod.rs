@@ -17,6 +17,7 @@ pub mod entries;
 pub mod functors;
 pub mod grammar;
 pub mod graph;
+pub mod laws;
 pub mod perspectives;
 pub mod sequences;
 pub mod systems;
@@ -33,6 +34,8 @@ pub use grammar::Template;
 pub use systems::System;
 
 pub use functors::Functor;
+
+pub use laws::Law;
 
 pub use sequences::Sequence;
 
