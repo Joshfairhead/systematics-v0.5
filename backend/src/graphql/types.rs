@@ -1617,6 +1617,33 @@ impl GqlGrammar {
     async fn expected_connectives(&self) -> i32 {
         self.inner.expected_connectives() as i32
     }
+    /// Degree — the connectivity of every vertex in K_n (`n − 1`); a constraint-value.
+    async fn degree(&self) -> i32 {
+        self.inner.degree() as i32
+    }
+    /// Size — the number of edges, `C(order, 2)`; a constraint-value.
+    async fn size(&self) -> i32 {
+        self.inner.size() as i32
+    }
+    /// Adjacency matrix (n × n) — the Structural Topology as a matrix.
+    async fn adjacency_matrix(&self) -> Vec<Vec<i32>> {
+        to_i32_matrix(self.inner.adjacency_matrix())
+    }
+    /// Incidence matrix (n × size) — vertices × edges (the Semantic Projection's anchoring).
+    async fn incidence_matrix(&self) -> Vec<Vec<i32>> {
+        to_i32_matrix(self.inner.incidence_matrix())
+    }
+    /// Line-graph adjacency (size × size) — reconciles adjacency and incidence.
+    async fn line_graph_adjacency(&self) -> Vec<Vec<i32>> {
+        to_i32_matrix(self.inner.line_graph_adjacency())
+    }
+}
+
+/// Widen a `u8` matrix to `i32` for GraphQL (`[[Int!]!]`).
+fn to_i32_matrix(m: Vec<Vec<u8>>) -> Vec<Vec<i32>> {
+    m.into_iter()
+        .map(|row| row.into_iter().map(|v| v as i32).collect())
+        .collect()
 }
 
 /// System wrapper (metadata + GraphTemplate/Vocabulary reconciliation).
