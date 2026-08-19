@@ -884,6 +884,101 @@
       "id": "char_word_prov_edge_10",
       "kind": "word",
       "value": "Prov Edge 10"
+    },
+    {
+      "id": "char_word_expansion",
+      "kind": "word",
+      "value": "Expansion"
+    },
+    {
+      "id": "char_word_freedom",
+      "kind": "word",
+      "value": "Freedom"
+    },
+    {
+      "id": "char_word_interaction",
+      "kind": "word",
+      "value": "Interaction"
+    },
+    {
+      "id": "char_word_concentration",
+      "kind": "word",
+      "value": "Concentration"
+    },
+    {
+      "id": "char_word_law_edge_1",
+      "kind": "word",
+      "value": "Law Edge 1"
+    },
+    {
+      "id": "char_word_law_edge_2",
+      "kind": "word",
+      "value": "Law Edge 2"
+    },
+    {
+      "id": "char_word_law_edge_3",
+      "kind": "word",
+      "value": "Law Edge 3"
+    },
+    {
+      "id": "char_word_law_edge_4",
+      "kind": "word",
+      "value": "Law Edge 4"
+    },
+    {
+      "id": "char_word_law_edge_5",
+      "kind": "word",
+      "value": "Law Edge 5"
+    },
+    {
+      "id": "char_word_law_edge_6",
+      "kind": "word",
+      "value": "Law Edge 6"
+    },
+    {
+      "id": "char_word_law_edge_7",
+      "kind": "word",
+      "value": "Law Edge 7"
+    },
+    {
+      "id": "char_word_law_edge_8",
+      "kind": "word",
+      "value": "Law Edge 8"
+    },
+    {
+      "id": "char_word_law_edge_9",
+      "kind": "word",
+      "value": "Law Edge 9"
+    },
+    {
+      "id": "char_word_law_edge_10",
+      "kind": "word",
+      "value": "Law Edge 10"
+    },
+    {
+      "id": "char_word_law_edge_11",
+      "kind": "word",
+      "value": "Law Edge 11"
+    },
+    {
+      "id": "char_word_law_edge_12",
+      "kind": "word",
+      "value": "Law Edge 12"
+    },
+    {
+      "id": "char_word_law_edge_13",
+      "kind": "word",
+      "value": "Law Edge 13"
+    },
+    {
+      "id": "char_word_law_edge_14",
+      "kind": "word",
+      "value": "Law Edge 14"
+    },
+    {
+      "id": "char_word_law_edge_15",
+      "kind": "word",
+      "value": "Law Edge 15"
     }
   ],
   "coordinates": [],
@@ -1335,6 +1430,36 @@
         "char_word_prov_edge_9",
         "char_word_prov_edge_10"
       ]
+    },
+    {
+      "id": "vocab_six_laws_of_three_6",
+      "name": "Six Laws of Three",
+      "order": 6,
+      "terms": [
+        "char_word_identity",
+        "char_word_expansion",
+        "char_word_order",
+        "char_word_freedom",
+        "char_word_interaction",
+        "char_word_concentration"
+      ],
+      "connectives": [
+        "char_word_law_edge_1",
+        "char_word_law_edge_2",
+        "char_word_law_edge_3",
+        "char_word_law_edge_4",
+        "char_word_law_edge_5",
+        "char_word_law_edge_6",
+        "char_word_law_edge_7",
+        "char_word_law_edge_8",
+        "char_word_law_edge_9",
+        "char_word_law_edge_10",
+        "char_word_law_edge_11",
+        "char_word_law_edge_12",
+        "char_word_law_edge_13",
+        "char_word_law_edge_14",
+        "char_word_law_edge_15"
+      ]
     }
   ],
   "systems": [
@@ -1627,6 +1752,16 @@
       "connective_designation": "Mutualities",
       "grammar_ref": "grammar_5",
       "vocabulary_ref": "vocab_provenance_5"
+    },
+    {
+      "id": "system_six_laws_of_three_6",
+      "name": "Six Laws of Three",
+      "order": 6,
+      "coherence": "Coalescence",
+      "term_designation": "Laws",
+      "connective_designation": "Steps",
+      "grammar_ref": "grammar_6",
+      "vocabulary_ref": "vocab_six_laws_of_three_6"
     }
   ],
   "perspectives": [],

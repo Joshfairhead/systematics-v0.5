@@ -610,6 +610,28 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("prov", 5),
     );
 
+    // The six laws of three as a Hexad — the Controller laid out as DATA (the laws
+    // named as nodes). Terms in Hexad-position order (1 identity · 2 expansion ·
+    // 3 order · 4 freedom · 5 interaction[SPO] · 6 concentration), matching
+    // `core::laws::Law::HEXAD`. Edges = the S₃ group relations between laws, TBD →
+    // placeholder for now. The morphism logic (permutation/read/compose) lives in
+    // `core/laws.rs`; this seed is the in-graph, addressable form of the same six.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Six Laws of Three",
+        6,
+        &slugs(&[
+            "identity",
+            "expansion",
+            "order",
+            "freedom",
+            "interaction",
+            "concentration",
+        ]),
+        &edge_slugs("law", 6),
+    );
+
     content
 }
 
