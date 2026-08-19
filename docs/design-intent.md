@@ -1,9 +1,15 @@
-# Systematic architecture registry
+# Design intent — the systematic architecture record
 
-The codebase's language follows a **systematic schema**: every dyad, triad,
-tetrad, … we implement *is* a system, and is documented here as one. This is the
-map for auditing and refactoring the code back toward its systematic description
-(dynamic homoiconicity) — when the codebase becomes a mess, come here.
+**What this document is (and is not).** This is a **record of design intent**, not a data
+store. It is the hand-written map of *what the architecture means to be*: every dyad, triad,
+tetrad, … the codebase implements *is* a system, documented here as one, tagged with its
+status (`impl` / `seeded` / `proposed`) and its code location — plus, now, the audited ground
+truth of what the code actually does. The **system data** itself lives elsewhere (the
+canonical / citation / fragments seed, the perspective modules loaded at startup, and the user
+store). So "registry" was a misnomer (it read like a data catalogue); this is the **design
+intent** the code is refactored toward (dynamic homoiconicity — the app should eventually *be*
+its own documentation, retiring this file). When the codebase becomes a mess, come here.
+*(Renamed from `architecture-systems.md`, 2026-08-18.)*
 
 **The typing rule** (the Dyad's force): a **term (vertex) is a noun**; a
 **connective (edge) is a verb**. So a triad of *nouns* is node-typed (containers,
@@ -110,20 +116,26 @@ remodel. Naming the impulses (canonical: affirming **+**, receptive **−**, rec
 |---|---|---|---|
 | **Model** | **−** (receptive) | the **triadic base space** — the passive store of *what is* | backend data + the base-space triad below |
 | **View** | **+** (affirming) | the **interface** — what actively presents / initiates interaction | frontend (`browser_controls`, `inspector`, `graph_view`) |
-| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | **target = the `middleware` crate**, elevated into a real controller (today only DTOs; the mediation is net-new — see *Ground truth*) |
+| **Controller** | **=** (reconciling) | the **reconciling layer** mediating View ↔ Model — **includes GraphQL** as the reconciler, with `middleware` elevated to join it | today GraphQL reconciles (limited); `middleware` holds only shared data types. The six laws = **six morphisms**. See *Ground truth* |
 
 This supersedes the earlier loose "middleware = controller, backend = model, frontend = view"
 gloss by giving each an **impulse** and naming what each *contains*. **MVC is more nuanced
 than the backend / middleware / frontend split** (user, 2026-08-18) — the roles are not a 1:1
-map onto the three crates. **The intent: `middleware` SHOULD BE the Controller** — a real
-mediating layer that works *with* the Model and the View. That mediating job is **what the
-GraphQL layer currently does, but too narrowly in scope**; the remodel elevates `middleware`
-from a shared type vocabulary into the controller that carries the six laws.
+map onto the three crates. **The Controller (=) is the reconciler, and it should include
+GraphQL** (user, 2026-08-18): GraphQL already does the mediating job, just too narrowly. So
+the Controller = **GraphQL as the reconciler**, with the `middleware` crate **elevated** from a
+shared type vocabulary to join it and carry the six laws.
 
-**Present state (audit 2026-08-18), i.e. the gap to close:** `middleware` is *today* only a
-**shared wire-format / DTO crate** (`middleware/src/types/*`), depended on by both backend and
-frontend — it holds no mediating logic yet. GraphQL (`backend/src/graphql`) plays the limited
-controller role now. So "Controller = middleware" is the **target**, not the current fact.
+**The six laws are six morphisms [user, 2026-08-18].** The Controller's S₃ logic should be
+**six morphisms — one per law of three**. Today `core/functors.rs` implements exactly *one*
+morphism (a single same-grammar permutation); the remodel generalises it to the **six** (the
+six laws / S₃ = six functorial readings). So "build the six laws" = build the six morphisms.
+
+**Present state (audit 2026-08-18), i.e. the gap to close:** the `middleware` crate is *today*
+only a **shared data-types crate** (`middleware/src/types/*`), used by both backend and
+frontend — it holds no mediating logic yet. **GraphQL** (`backend/src/graphql`) is the
+reconciler that works today (limited scope). So "Controller = GraphQL + an elevated
+`middleware`" is the **target**; only the shared-types part exists now.
 
 **Separate the concerns — the earlier remodel conflated them (user, 2026-08-18).** The
 base-space plan folded model, controller and view together. Pulled apart:
@@ -219,16 +231,44 @@ what already exists, so the remodel *re-articulates* rather than builds from scr
   *(Full frontend/graphql/status sweep deferred — the audit workflow hit a session limit;
   resume for complete coverage.)*
 
+**The Model is an Architectural Tetrad [user, 2026-08-18].** MVC is the **architectural
+triad**; its **Model (−)** node expands into an **Architectural Tetrad** — the four base-space
+types the code already has, with the tetrad's four impulse-combinations:
+
+| tetrad pole | term | code type | role |
+|---|---|---|---|
+| **++** | **Graph Template** | `Grammar` | the **source** — order + size = the K_n rules |
+| **−−** | **Topology** | `TopologicalVocabulary` | adjacency (points + lines) |
+| **+−** (left) | **Geometry** | `GeometricVocabulary` | coordinates / spatial layout |
+| **−+** (right) | **Vocabulary** | `Vocabulary` | the **semantic projection** (term/connective characters) |
+
+The earlier "base-space triad" (Topology · Template · Projection) was the same thing seen too
+small — adding **Grammar as the source** makes it a **tetrad** (topology · geometry · vocabulary
+reconciled by the graph template). **Links:** this Architectural Tetrad *is* the Model node of
+the **MVC triad** (above) and extends into the **Architecture Pentad** (Sign · Symbol · Syntax ·
+Semantics · Grammar) — a further blending/linking step (as the old pentad linked grammar ·
+semantics · syntax) that would complete the pentad; **deferred** ("good for now"). See
+`docs/architecture-pentad.md`, [[architecture-pentad]].
+
 **The remodel plan [agreed, user 2026-08-18].** Develop the three MVC roles in balance (the
 six-laws rule), backend/Model first (the 321 discipline):
 
-- **Stage A — Model (−): re-articulate the existing base-space triad.** Rename the code to the
-  systematic names (`Grammar`→**Graph Template**, `TopologicalVocabulary`→**Structural
-  Topology**, `Vocabulary`→**Semantic Projection**), make **adjacency + incidence** explicit
-  (matrices, reconciled by the template as a **line graph**), and expose **order + degree as
-  first-class constraint-values** in the Graph Template (they already exist as
-  `expected_terms`/`expected_connectives`). Backend-first, verified against the untouched graph
-  view.
+- **Stage A — Model (−): re-articulate the base-space as the Architectural Tetrad.** The Model
+  is a **tetrad** (see *The Model is an Architectural Tetrad*), so rename the four existing code
+  types to the systematic names: `Grammar`→**Graph Template** (++), `TopologicalVocabulary`→
+  **Topology** (−−), `GeometricVocabulary`→**Geometry** (+−), `Vocabulary`→**Vocabulary** (−+,
+  the semantic projection). Then:
+  - Make **adjacency + incidence** explicit **matrices**, reconciled by the Graph Template as a
+    **line graph**. These are **links in the Architecture Pentad** (edges between Grammar,
+    Syntax, Semantics), **not nodes** (user, 2026-08-18).
+  - **Retire the two colliding `Link` types** (`core/links.rs` shim vs `perspectives::Link`),
+    **grounding both in the Topology**. Keep in mind **Holochain's core types are *elements* and
+    *links*** — so our topological links should translate to those (the content-addressed heap
+    direction). See [[reference-tuple-store]].
+  - Expose **order + degree as first-class constraint-values** in the Graph Template (they exist
+    as `expected_terms`/`expected_connectives`); the Template should eventually hold the **other
+    systematics variables** too (coherence, designations, …) as a full template — extend later.
+  - Backend-first, **verified against the untouched graph view at each step.**
 - **Stage B — Controller (=): the six laws of three.** Build the six laws as a real layer
   (target: elevate `middleware` per above). **`SPO` is retired as a name — it is just another
   name for the *interaction* law (132); use "interaction".** Represent the **six laws as a
@@ -273,11 +313,12 @@ A registry-vs-code audit ran before the remodel (a fan-out workflow for backend-
 middleware; the frontend/graphql/status auditors hit a session limit, so those rows are from
 direct inspection). Confirmed findings, most remodel-relevant first:
 
-1. **"Controller = middleware" is a TARGET, not the current fact** [high]. `middleware/src/
-   types/*` is a pure DTO crate imported by *both* backend and frontend; **GraphQL**
-   (`backend/src/graphql`, ~50 `QueryRoot` resolvers + mutations) is today's limited
-   controller. No six-laws engine exists; the only S₃ logic is `core/functors.rs` (one
-   morphism, `impl`+tested). → **Stage B builds the Controller.**
+1. **The Controller is GraphQL (the reconciler) + an elevated `middleware`** [high]. The
+   `middleware/src/types/*` crate holds only **shared data types** used by both backend and
+   frontend — no mediating logic. **GraphQL** (`backend/src/graphql`, ~50 `QueryRoot` resolvers
+   + mutations) is the reconciler that works today (limited scope). No six-laws engine exists;
+   the only S₃ logic is `core/functors.rs` — **one** morphism (`impl`+tested), and the six laws
+   want **six** morphisms. → **Stage B builds the six morphisms into the Controller.**
 2. **The Model base-space triad exists in embryo** [confirmed]. `Grammar` (Graph Template —
    `order`, `expected_terms`/`expected_connectives`, `validate`/`validate_with`) ·
    `TopologicalVocabulary` (Structural Topology, points+lines) · `Vocabulary` (Semantic
@@ -297,12 +338,13 @@ direct inspection). Confirmed findings, most remodel-relevant first:
    validates, but its connectives are `char_word_citation_act_{1,2,3}_needs_research`, **not**
    cites·recordedIn·atLocation (those verbs live only on `Reference`/`Perspective` links). Two
    co-existing citation representations; the remodel should pick the canonical one.
-6. **Stale — the "Query (Sort · Tag · Filter)" triad row** [medium]. The Triads-table entry
-   (still "reconciler-typed", `ColKey`/`CiteKind`, "Tag (=) reconciles…", Filter = cite-degree)
-   is superseded: Sort/Filter now live in `frontend/components/browser_controls.rs` (decoupled
-   view) + `spo.rs` (query API); Filter is an **SPO predicate→object drill-down**; the
-   reconciler was revised to **Data / Perspective**. It contradicts the later reference-tuple
-   section (which already records the SPO filter as BUILT).
+6. **Stale — the Query triad is now Search · Sort · Filter** [medium]. The old Triads-table
+   entry ("Sort · **Tag** · Filter", "reconciler-typed", `ColKey`/`CiteKind`, Filter =
+   cite-degree) is superseded. **Rename: the Query triad = Search · Sort · Filter** (user,
+   2026-08-18) — Tag is dropped, Search is the third term. Sort/Filter/Search now live in
+   `frontend/components/browser_controls.rs` (decoupled view) + `spo.rs` (query interface);
+   Filter is a predicate→object drill-down (the *interaction* traversal). It contradicts the
+   later reference-tuple section (which already records the filter as BUILT).
 7. **Undocumented persistence** [low]. `core/content.rs` `GraphContent` is the portable slice
    (seed JSON + user store); **Grammars are code-seeded, not persisted** — so exposing order +
    degree as first-class Graph Template *data* (Stage A) is a deliberate choice.
@@ -895,7 +937,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
 | **Operations (ELT ≅ RAG)** | Extract · Load · Transform — **renamed from ELT to "Operations"** (not "compose"). **ELT ≅ RAG** (data-warehouse ↔ generative-AI): the same isomorphic triangle, both **composition**. The six permutations of the triad = the **six laws of three** (see below). Wired: `createSequence` · file-picker · `applyFunctor` + author (`authorSystem`), surfaced by the in-app **Editor**. **SPO = the *Perspective* triad** (Subject·Predicate·Object as edges). **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
-| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**, mapping to **class / instantiation / instance**. **Sort = selecting the header tags** — which tag keys are the columns (the *class*: header/keys; `ColKey`; default Order + Citation). **Filter = scoping the data returned** in those columns (the *instances*: values), by **cite-degree** — the data categorised by number per the schema **1 term-designation · 2 connective-designation · 3 coherence · 4 term · 5 connective · 6 system** (their coalescence). So you can view only systems (*manifolds* = systems not yet placed), only terms, only connectives, etc. | reconciler-typed | UI: `components/reference_browser.rs` (`CiteKind`; Sort = column selector, Filter = degree scoper) | impl v1. Citation column in **Source · Artefact · Lookup** order |
+| **Query (Search · Sort · Filter)** | **Renamed (user, 2026-08-18): the Query triad is Search · Sort · Filter** (Tag is dropped; Search is the third term). **Sort** selects which columns show; **Filter** is a predicate→object drill-down (the *interaction* traversal); **Search** is free-text over the rows. The old "Tag (=) reconciles Sort/Filter by cite-degree" reading is **superseded**. Now decoupled: the view is `components/browser_controls.rs`, the query interface is `components/spo.rs`. | edge-typed (Search·Sort·Filter are verbs/operations) | UI: `components/browser_controls.rs` + `components/spo.rs` (query interface); `reference_browser.rs` is the controller | impl (v2 — decoupled). Superseded the `CiteKind`/`ColKey` cite-degree design |
 | **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |
 | **Class · Instantiation · Instance** | e.g. **K₄ (class) · Tetrad (instantiation) · Canonical Tetrad (instance)**. The abstract complete graph → its systematic instantiation → a concrete instance. Also the table's own structure: header/keys (class) · data types/keys (instantiation) · data/values (instance). | node-typed (nouns) | (documented; extends the existing Class/Instance dyad) | proposed |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
@@ -906,6 +948,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | system | terms / edges | typing | status |
 |---|---|---|---|
 | **Determining Conditions** ⭐ | nodes **Time (Chronos) · Hyparxis · Eternity (Aionios) · Space** (the four "dimensions"); the **six laws as its six K₄ edges** — *statistical · correspondence · classification · conservation · irreversibility · coexistence*. **This is what the whole system is trying to codify** as a representational medium. | nodes=nouns, edges (laws)=the determining conditions | seeded `system_determining_conditions_4`; `docs/fragments.md`; [[determining-conditions]] | seeded (edge→law assignment TBD; may *also* be a hexad of the laws as nodes) |
+| **Architectural Tetrad (the Model)** ⭐ | **Graph Template (++)** · **Topology (−−)** · **Geometry (+−)** · **Vocabulary (−+)** — the four base-space types (code: `Grammar` · `TopologicalVocabulary` · `GeometricVocabulary` · `Vocabulary`). Graph Template = the source (order + size); the other three reconciled by it. **This is the Model node of the MVC triad**, and extends into the Architecture Pentad. | nodes=nouns (four base-space types) | code: `backend/src/core/{grammar,vocabularies}.rs`; `System` reconciles them | impl (types exist; **Stage A** renames + makes adjacency/incidence explicit). Links: *The architecture is an MVC triad*, [[architecture-pentad]] |
 | ~~Organise~~ | four *sources* (nouns) — TBD; operations *sort · tag · filter · search* | **superseded** — the operations are now the **Sort · Tag · Filter triad** (below); *search* is a separate free-text mechanism, not a fourth term | discarded |
 
 ## Pentad (order 5 — Limits / Mutualities) — settled

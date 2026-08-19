@@ -1,7 +1,7 @@
 //! Sequence: an ordered series of member addresses.
 //!
 //! The `+` pole of the container triad **System · Sequence · Perspective** (see
-//! `docs/architecture-systems.md`). A System is one `K_n`; a Perspective is the
+//! `docs/design-intent.md`). A System is one `K_n`; a Perspective is the
 //! reconciling web; a Sequence is the bare *ordered skeleton* — an ordered list
 //! of member **addresses** (`system:<id>`, `perspective:<id>`, or `sequence:<id>`
 //! so sequences nest). Pure structure: it carries no references or excerpts of
