@@ -134,6 +134,17 @@ Model tetrad, and the Architecture Pentad are *the same architecture at successi
 resolutions*. Links: [[architecture-pentad]]; *The architecture is an MVC triad*; *The Model is
 an Architectural Tetrad*. *(To be seeded as a real order-navigable sequence in-graph.)*
 
+**Pentad edges [user, 2026-08-18].** Within the Pentad, three of the links (mutualities) among
+Grammar · Semantics · Syntax read as:
+- **Grammar ↔ Semantics = terms** (the vertex characters projected),
+- **Grammar ↔ Syntax = connectives** (the edge characters),
+- **Syntax ↔ Semantics = interface / complete graphs** (the assembled K_n — the system as a
+  graph).
+
+So the base-space matrices/graphs are these pentad edges, made concrete: terms + connectives
+projected by the grammar, reconciled into the complete graph at the syntax↔semantics interface.
+[Proposed placement of 3 of the 10 mutualities.]
+
 ## The architecture is an MVC triad — Model (−) · View (+) · Controller (=) [user, 2026-08-18]
 
 The whole architecture **is** a triad, and it is now the lens that organises the base-space
@@ -167,6 +178,14 @@ and graphs** (the adjacency / incidence / line-graph now on the Template): they 
 key: a link/matrix is **undirected**; **direction is broken by the six laws** (the Controller),
 not stored in the base. So the target substrate is **Holochain elements + links**, with the
 structural matrices/graphs as the link content; SPO is a stepping-stone.
+
+**Holochain elements + links [user, 2026-08-18].** AD4M is probably more about *traversing*
+Holochain, but fell short on the SPO. The systems that are graphs (the semantics/syntax
+*interfaces* — see *Pentad edges*) are best expressed as graphs via **Holochain's core types:
+elements (entries) + links `(base, type, target)`**. **Open concern:** a Holochain link may be
+**directed** — if so it conflicts with our undirected base (direction should come only from the
+six laws), and we must **consider our options** (e.g. store both directions, or a symmetric
+link type). Flagged, unresolved.
 
 **Present state (audit 2026-08-18), i.e. the gap to close:** the `middleware` crate is *today*
 only a **shared data-types crate** (`middleware/src/types/*`), used by both backend and
@@ -976,10 +995,10 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 
 | system | terms / role | node- or edge-typed | code | status |
 |---|---|---|---|---|
-| **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
+| **Citation** ⭐ | nodes **Source · Artefact · Lookup**; **edges = the citation-query (user, 2026-08-18): Source–Lookup = Search · Source–Artefact = Sort · Artefact–Lookup = Filter**. These are the triad's real connectives — they **replace the placeholder `_needs_research` edges** the audit flagged, and supersede the earlier *recordedIn·atLocation·cites* AD4M-predicate naming as the triad's canonical edges. | nouns=nodes, verbs (Search·Sort·Filter)=edges | `core/citations.rs`; seeded `system_citation_3` (connectives → search/sort/filter) | impl + seeded (edges being corrected in the seed) |
 | **Operations (ELT ≅ RAG)** | Extract · Load · Transform — **renamed from ELT to "Operations"** (not "compose"). **ELT ≅ RAG** (data-warehouse ↔ generative-AI): the same isomorphic triangle, both **composition**. The six permutations of the triad = the **six laws of three** (see below). Wired: `createSequence` · file-picker · `applyFunctor` + author (`authorSystem`), surfaced by the in-app **Editor**. **SPO = the *Perspective* triad** (Subject·Predicate·Object as edges). **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
-| **Query (Search · Sort · Filter)** | **Renamed (user, 2026-08-18): the Query triad is Search · Sort · Filter** (Tag is dropped; Search is the third term). **Sort** selects which columns show; **Filter** is a predicate→object drill-down (the *interaction* traversal); **Search** is free-text over the rows. The old "Tag (=) reconciles Sort/Filter by cite-degree" reading is **superseded**. Now decoupled: the view is `components/browser_controls.rs`, the query interface is `components/spo.rs`. | edge-typed (Search·Sort·Filter are verbs/operations) | UI: `components/browser_controls.rs` + `components/spo.rs` (query interface); `reference_browser.rs` is the controller | impl (v2 — decoupled). **To be seeded as a real triad system in-graph (user, 2026-08-18): name = "Query"; features/terms = Search · Sort · Filter** — so the seed JSON that migrates in-system assembles it correctly. Superseded the `CiteKind`/`ColKey` cite-degree design |
+| **Citation query** (Search · Sort · Filter) | **NOT a standalone triad (user, 2026-08-18): Search · Sort · Filter are the EDGES of the Citation triad** (Source·Artefact·Lookup) — see the Citation row. So there is no separate "Query" system; it is the **citation query** — the *edge view* of Citation. The view/query interface realises these operations. | edge-typed (verbs = the Citation triad's edges) | UI: `components/browser_controls.rs` + `components/spo.rs`; the edges live on `system_citation_3` | folded into **Citation** (no separate seed). Superseded the `CiteKind`/`ColKey` cite-degree design |
 | **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |
 | **Class · Instantiation · Instance** | e.g. **K₄ (class) · Tetrad (instantiation) · Canonical Tetrad (instance)**. The abstract complete graph → its systematic instantiation → a concrete instance. Also the table's own structure: header/keys (class) · data types/keys (instantiation) · data/values (instance). | node-typed (nouns) | (documented; extends the existing Class/Instance dyad) | proposed |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
