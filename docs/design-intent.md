@@ -11,6 +11,11 @@ intent** the code is refactored toward (dynamic homoiconicity — the app should
 its own documentation, retiring this file). When the codebase becomes a mess, come here.
 *(Renamed from `architecture-systems.md`, 2026-08-18.)*
 
+**The use case (user, 2026-08-18).** At bottom this project is about **representing intent in a
+coherent way**. Every part of the architecture — the base-space Model, the six-laws Controller,
+the views — exists to let a person express intent and have it hang together coherently. When
+weighing a design choice, favour the option that represents intent more coherently.
+
 **The typing rule** (the Dyad's force): a **term (vertex) is a noun**; a
 **connective (edge) is a verb**. So a triad of *nouns* is node-typed (containers,
 things); a triad of *verbs* is edge-typed (operations). Every entry below is
