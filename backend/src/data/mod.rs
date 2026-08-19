@@ -5,8 +5,8 @@
 //! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
-    Entry, GeometricVocabulary, Grammar, GraphContent, Graph, Line, Link, Order, Point, Position,
-    Segment, TopologicalVocabulary,
+    Entry, Geometry, GraphTemplate, GraphContent, Graph, Line, Link, Order, Point, Position,
+    Segment, Topology,
 };
 
 /// The canonical seed content (coordinates, characters, semantic vocabularies,
@@ -177,10 +177,10 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
                 graph.add_entry(Entry::Segment(Segment::new(order, p1, p2)));
             }
         }
-        graph.add_topological_vocab(TopologicalVocabulary::canonical_for(order));
-        graph.add_geometric_vocab(GeometricVocabulary::canonical_for(order));
+        graph.add_topological_vocab(Topology::canonical_for(order));
+        graph.add_geometric_vocab(Geometry::canonical_for(order));
         // The complete-graph structure for this Order (deterministic).
-        graph.add_grammar(Grammar::for_order(order));
+        graph.add_grammar(GraphTemplate::for_order(order));
     }
 }
 

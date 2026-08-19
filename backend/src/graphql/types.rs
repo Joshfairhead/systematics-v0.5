@@ -7,9 +7,9 @@ use async_graphql::*;
 use tokio::sync::RwLock;
 
 use crate::core::{
-    Artefact, Character, Coordinate, Entry, Functor, GeometricVocabulary, Grammar, Graph, Line,
+    Artefact, Character, Coordinate, Entry, Functor, Geometry, GraphTemplate, Graph, Line,
     Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Sequence, Vocabulary,
-    Segment, Source, System, TopologicalVocabulary,
+    Segment, Source, System, Topology,
 };
 
 /// Shared, mutable graph passed to the GraphQL schema as context data.
@@ -459,7 +459,7 @@ impl QueryRoot {
 }
 
 // ============================================================================
-// Compat: computed Grammar for the current SVG frontend renderer.
+// Compat: computed GraphTemplate for the current SVG frontend renderer.
 // ============================================================================
 
 fn canonical_system_name(order: u8) -> &'static str {
@@ -898,7 +898,7 @@ impl MutationRoot {
         if !(1..=12).contains(&order) {
             return Err(Error::new(format!("order {order} out of range 1..=12")));
         }
-        let grammar = Grammar::for_order(order);
+        let grammar = GraphTemplate::for_order(order);
         let expected_conn = grammar.expected_connectives();
         if input.terms.len() != order as usize {
             return Err(Error::new(format!(
@@ -1505,10 +1505,10 @@ impl GqlCharacter {
 }
 
 pub struct GqlTopologicalVocabulary {
-    inner: TopologicalVocabulary,
+    inner: Topology,
 }
 impl GqlTopologicalVocabulary {
-    pub fn new(inner: TopologicalVocabulary) -> Self {
+    pub fn new(inner: Topology) -> Self {
         Self { inner }
     }
 }
@@ -1532,10 +1532,10 @@ impl GqlTopologicalVocabulary {
 }
 
 pub struct GqlGeometricVocabulary {
-    inner: GeometricVocabulary,
+    inner: Geometry,
 }
 impl GqlGeometricVocabulary {
-    pub fn new(inner: GeometricVocabulary) -> Self {
+    pub fn new(inner: Geometry) -> Self {
         Self { inner }
     }
 }
@@ -1588,12 +1588,12 @@ impl GqlVocabulary {
     }
 }
 
-/// Structural Grammar wrapper (the K_n graph + arity rules for an Order).
+/// Structural GraphTemplate wrapper (the K_n graph + arity rules for an Order).
 pub struct GqlGrammar {
-    inner: Grammar,
+    inner: GraphTemplate,
 }
 impl GqlGrammar {
-    pub fn new(inner: Grammar) -> Self {
+    pub fn new(inner: GraphTemplate) -> Self {
         Self { inner }
     }
 }
@@ -1619,7 +1619,7 @@ impl GqlGrammar {
     }
 }
 
-/// System wrapper (metadata + Grammar/Vocabulary reconciliation).
+/// System wrapper (metadata + GraphTemplate/Vocabulary reconciliation).
 pub struct GqlSystem {
     inner: System,
 }

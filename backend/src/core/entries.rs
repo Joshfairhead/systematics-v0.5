@@ -12,7 +12,7 @@
 //! The `Entry` sum type stores all of these heterogeneously in one collection,
 //! enabling unified iteration and queries across all entry kinds.
 //!
-//! Vocabulary layer (`TopologicalVocabulary`, `GeometricVocabulary`,
+//! Vocabulary layer (`Topology`, `Geometry`,
 //! `Vocabulary`) and Perspective live in their own modules and hold
 //! *references* into this substrate.
 

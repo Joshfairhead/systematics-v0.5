@@ -4,8 +4,8 @@
 //! align by index: a term-shape slot at index `i` in one vocabulary
 //! corresponds to the term-shape slot at index `i` in another.
 //!
-//! - `TopologicalVocabulary` — ordered `points` and `lines` for one Order.
-//! - `GeometricVocabulary` — ordered `coordinates` and `segments`.
+//! - `Topology` — ordered `points` and `lines` for one Order.
+//! - `Geometry` — ordered `coordinates` and `segments`.
 //! - `Vocabulary` — ordered `terms` and `connectives` (Character refs).
 //!
 //! The recursive framing: Systematics is a *language*, Perspective is the *rules*,
@@ -15,14 +15,14 @@ use serde::{Deserialize, Serialize};
 
 /// A vocabulary of topological anchors for one Order (K_n).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct TopologicalVocabulary {
+pub struct Topology {
     pub id: String,          // "topvocab_{order}"
     pub order: u8,           // K_n size
     pub points: Vec<String>, // ordered PointRef IDs, len == order
     pub lines: Vec<String>,  // ordered LineRef IDs, len == C(order, 2)
 }
 
-impl TopologicalVocabulary {
+impl Topology {
     pub fn new(order: u8, points: Vec<String>, lines: Vec<String>) -> Self {
         Self {
             id: format!("topvocab_{}", order),
@@ -54,7 +54,7 @@ impl TopologicalVocabulary {
         let expected_lines = expected_points * (expected_points.saturating_sub(1)) / 2;
         if self.points.len() != expected_points {
             errs.push(format!(
-                "TopologicalVocabulary {}: expected {} points, got {}",
+                "Topology {}: expected {} points, got {}",
                 self.id,
                 expected_points,
                 self.points.len()
@@ -62,7 +62,7 @@ impl TopologicalVocabulary {
         }
         if self.lines.len() != expected_lines {
             errs.push(format!(
-                "TopologicalVocabulary {}: expected {} lines, got {}",
+                "Topology {}: expected {} lines, got {}",
                 self.id,
                 expected_lines,
                 self.lines.len()
@@ -78,14 +78,14 @@ impl TopologicalVocabulary {
 
 /// A vocabulary of geometric anchors for one Order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct GeometricVocabulary {
+pub struct Geometry {
     pub id: String,               // "geovocab_{order}"
     pub order: u8,                // K_n size
     pub coordinates: Vec<String>, // ordered CoordinateRef IDs, len == order
     pub segments: Vec<String>,    // ordered SegmentRef IDs, len == C(order, 2)
 }
 
-impl GeometricVocabulary {
+impl Geometry {
     pub fn new(order: u8, coordinates: Vec<String>, segments: Vec<String>) -> Self {
         Self {
             id: format!("geovocab_{}", order),
@@ -116,7 +116,7 @@ impl GeometricVocabulary {
         let expected_segments = expected_coords * (expected_coords.saturating_sub(1)) / 2;
         if self.coordinates.len() != expected_coords {
             errs.push(format!(
-                "GeometricVocabulary {}: expected {} coordinates, got {}",
+                "Geometry {}: expected {} coordinates, got {}",
                 self.id,
                 expected_coords,
                 self.coordinates.len()
@@ -124,7 +124,7 @@ impl GeometricVocabulary {
         }
         if self.segments.len() != expected_segments {
             errs.push(format!(
-                "GeometricVocabulary {}: expected {} segments, got {}",
+                "Geometry {}: expected {} segments, got {}",
                 self.id,
                 expected_segments,
                 self.segments.len()
@@ -185,8 +185,8 @@ impl Vocabulary {
         }
     }
 
-    /// Arity check against a paired TopologicalVocabulary.
-    pub fn validate_against(&self, topology: &TopologicalVocabulary) -> Result<(), Vec<String>> {
+    /// Arity check against a paired Topology.
+    pub fn validate_against(&self, topology: &Topology) -> Result<(), Vec<String>> {
         let mut errs = Vec::new();
         if self.order != topology.order {
             errs.push(format!(
@@ -253,7 +253,7 @@ mod tests {
 
     #[test]
     fn test_topological_canonical_triad() {
-        let t = TopologicalVocabulary::canonical_for(3);
+        let t = Topology::canonical_for(3);
         assert_eq!(t.id, "topvocab_3");
         assert_eq!(t.points, vec!["point_3_1", "point_3_2", "point_3_3"]);
         assert_eq!(
@@ -265,7 +265,7 @@ mod tests {
 
     #[test]
     fn test_geometric_canonical_triad() {
-        let g = GeometricVocabulary::canonical_for(3);
+        let g = Geometry::canonical_for(3);
         assert_eq!(g.id, "geovocab_3");
         assert_eq!(g.coordinates, vec!["coord_3_1", "coord_3_2", "coord_3_3"]);
         assert_eq!(g.segments, vec!["seg_3_1_2", "seg_3_1_3", "seg_3_2_3"]);
@@ -274,7 +274,7 @@ mod tests {
 
     #[test]
     fn test_semantic_validate_against_topology() {
-        let t = TopologicalVocabulary::canonical_for(3);
+        let t = Topology::canonical_for(3);
         let s = Vocabulary::with_auto_id(
             "Canonical Triad",
             3,
@@ -296,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_semantic_validate_catches_arity_mismatch() {
-        let t = TopologicalVocabulary::canonical_for(3);
+        let t = Topology::canonical_for(3);
         let s = Vocabulary::with_auto_id(
             "Bad Triad",
             3,
@@ -313,7 +313,7 @@ mod tests {
 
     #[test]
     fn test_topological_arity_by_order() {
-        let dodecad = TopologicalVocabulary::canonical_for(12);
+        let dodecad = Topology::canonical_for(12);
         assert_eq!(dodecad.points.len(), 12);
         assert_eq!(dodecad.lines.len(), 66); // C(12,2)
         assert!(dodecad.validate().is_ok());

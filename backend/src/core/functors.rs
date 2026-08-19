@@ -73,7 +73,7 @@ impl Functor {
         self.permutation.get((position - 1) as usize).copied()
     }
 
-    /// Validate the functor laws (advisory — mirrors `System`/`Grammar`
+    /// Validate the functor laws (advisory — mirrors `System`/`GraphTemplate`
     /// validation; nothing is rejected at write time):
     ///  * totality — one target per source position (`permutation.len() == order`),
     ///  * sort/type preservation and invertibility — the permutation is a

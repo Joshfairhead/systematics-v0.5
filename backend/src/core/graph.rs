@@ -11,12 +11,12 @@ use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
 use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
 use super::functors::Functor;
-use super::grammar::Grammar;
+use super::grammar::GraphTemplate;
 use super::sequences::Sequence;
 use super::perspectives::Perspective;
 use super::systems::System;
 use super::links::{Link, LinkType};
-use super::vocabularies::{GeometricVocabulary, Vocabulary, TopologicalVocabulary};
+use super::vocabularies::{Geometry, Vocabulary, Topology};
 
 /// The primary container. Holds substrate entries, edge Links, and the four
 /// higher-level tables.
@@ -25,16 +25,16 @@ pub struct Graph {
     pub entries: Vec<Entry>,
     pub links: Vec<Link>,
     #[serde(default)]
-    pub topological_vocabs: Vec<TopologicalVocabulary>,
+    pub topological_vocabs: Vec<Topology>,
     #[serde(default)]
-    pub geometric_vocabs: Vec<GeometricVocabulary>,
+    pub geometric_vocabs: Vec<Geometry>,
     #[serde(default)]
     pub vocabularies: Vec<Vocabulary>,
     /// Complete-graph structures, one per Order. Seeded in code (deterministic),
     /// never persisted as content.
     #[serde(default)]
-    pub grammars: Vec<Grammar>,
-    /// Systems: metadata reconciling a Grammar with a Vocabulary.
+    pub grammars: Vec<GraphTemplate>,
+    /// Systems: metadata reconciling a GraphTemplate with a Vocabulary.
     #[serde(default)]
     pub systems: Vec<System>,
     /// Referencing layer: AD4M-style directed webs of Links.
@@ -224,19 +224,19 @@ impl Graph {
     // Vocabulary and Perspective queries + mutations
     // ==========================================================================
 
-    pub fn topological_vocab(&self, id: &str) -> Option<&TopologicalVocabulary> {
+    pub fn topological_vocab(&self, id: &str) -> Option<&Topology> {
         self.topological_vocabs.iter().find(|v| v.id == id)
     }
 
-    pub fn topological_vocab_for_order(&self, order: u8) -> Option<&TopologicalVocabulary> {
+    pub fn topological_vocab_for_order(&self, order: u8) -> Option<&Topology> {
         self.topological_vocabs.iter().find(|v| v.order == order)
     }
 
-    pub fn geometric_vocab(&self, id: &str) -> Option<&GeometricVocabulary> {
+    pub fn geometric_vocab(&self, id: &str) -> Option<&Geometry> {
         self.geometric_vocabs.iter().find(|v| v.id == id)
     }
 
-    pub fn geometric_vocab_for_order(&self, order: u8) -> Option<&GeometricVocabulary> {
+    pub fn geometric_vocab_for_order(&self, order: u8) -> Option<&Geometry> {
         self.geometric_vocabs.iter().find(|v| v.order == order)
     }
 
@@ -251,11 +251,11 @@ impl Graph {
             .collect()
     }
 
-    pub fn add_topological_vocab(&mut self, vocab: TopologicalVocabulary) {
+    pub fn add_topological_vocab(&mut self, vocab: Topology) {
         self.topological_vocabs.push(vocab);
     }
 
-    pub fn add_geometric_vocab(&mut self, vocab: GeometricVocabulary) {
+    pub fn add_geometric_vocab(&mut self, vocab: Geometry) {
         self.geometric_vocabs.push(vocab);
     }
 
@@ -278,19 +278,19 @@ impl Graph {
 
     // -------- Grammars (K_n structure; code-seeded, deterministic) --------
 
-    pub fn grammar(&self, id: &str) -> Option<&Grammar> {
+    pub fn grammar(&self, id: &str) -> Option<&GraphTemplate> {
         self.grammars.iter().find(|g| g.id == id)
     }
 
-    pub fn grammar_for_order(&self, order: u8) -> Option<&Grammar> {
+    pub fn grammar_for_order(&self, order: u8) -> Option<&GraphTemplate> {
         self.grammars.iter().find(|g| g.order == order)
     }
 
-    pub fn add_grammar(&mut self, grammar: Grammar) {
+    pub fn add_grammar(&mut self, grammar: GraphTemplate) {
         self.grammars.push(grammar);
     }
 
-    // -------- Systems (metadata + Grammar/Vocabulary reconciliation) --------
+    // -------- Systems (metadata + GraphTemplate/Vocabulary reconciliation) --------
 
     pub fn system(&self, id: &str) -> Option<&System> {
         self.systems.iter().find(|s| s.id == id)
@@ -702,7 +702,7 @@ impl Graph {
     }
 
     /// Look up which Character inhabits a given Point through a
-    /// Vocabulary's paired TopologicalVocabulary.
+    /// Vocabulary's paired Topology.
     pub fn character_at_point(
         &self,
         vocabulary_id: &str,
@@ -716,7 +716,7 @@ impl Graph {
     }
 
     /// Look up which Character inhabits a given Line through a
-    /// Vocabulary's paired TopologicalVocabulary.
+    /// Vocabulary's paired Topology.
     pub fn character_at_line(
         &self,
         vocabulary_id: &str,
@@ -729,20 +729,20 @@ impl Graph {
         self.character(char_id)
     }
 
-    /// Validate a System by resolving its Grammar + Vocabulary and the
-    /// Grammar's referenced substrate vocabularies.
+    /// Validate a System by resolving its GraphTemplate + Vocabulary and the
+    /// GraphTemplate's referenced substrate vocabularies.
     pub fn validate_system(&self, system_id: &str) -> Result<(), Vec<String>> {
         let sys = self
             .system(system_id)
             .ok_or_else(|| vec![format!("System '{}' not found", system_id)])?;
         let grammar = self
             .grammar(&sys.grammar_ref)
-            .ok_or_else(|| vec![format!("Grammar '{}' not found", sys.grammar_ref)])?;
+            .ok_or_else(|| vec![format!("GraphTemplate '{}' not found", sys.grammar_ref)])?;
         let t = self
             .topological_vocab(&grammar.topological_vocab_ref)
             .ok_or_else(|| {
                 vec![format!(
-                    "TopologicalVocabulary '{}' not found",
+                    "Topology '{}' not found",
                     grammar.topological_vocab_ref
                 )]
             })?;
@@ -750,7 +750,7 @@ impl Graph {
             .geometric_vocab(&grammar.geometric_vocab_ref)
             .ok_or_else(|| {
                 vec![format!(
-                    "GeometricVocabulary '{}' not found",
+                    "Geometry '{}' not found",
                     grammar.geometric_vocab_ref
                 )]
             })?;
@@ -978,7 +978,7 @@ impl Graph {
 mod tests {
     use super::*;
     use crate::core::vocabularies::{
-        GeometricVocabulary, Vocabulary, TopologicalVocabulary,
+        Geometry, Vocabulary, Topology,
     };
 
     fn triad_test_graph() -> Graph {
@@ -998,8 +998,8 @@ mod tests {
         for value in ["Will", "Function", "Being", "Generation", "Decision", "Consent"] {
             g.add_entry(Entry::Character(Character::with_auto_id("word", value)));
         }
-        g.add_topological_vocab(TopologicalVocabulary::canonical_for(3));
-        g.add_geometric_vocab(GeometricVocabulary::canonical_for(3));
+        g.add_topological_vocab(Topology::canonical_for(3));
+        g.add_geometric_vocab(Geometry::canonical_for(3));
         g.add_vocabulary(Vocabulary::with_auto_id(
             "Canonical Triad",
             3,
@@ -1014,7 +1014,7 @@ mod tests {
                 "char_word_consent".into(),
             ],
         ));
-        g.add_grammar(Grammar::for_order(3));
+        g.add_grammar(GraphTemplate::for_order(3));
         g.add_system(System::with_auto_id(
             "Canonical Triad",
             3,

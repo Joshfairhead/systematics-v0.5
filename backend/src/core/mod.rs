@@ -5,10 +5,10 @@
 //!   Segment, Character) plus the `Entry` sum type.
 //! - `links` — Link entries (currently `Line` for coordinate-to-coordinate
 //!   rendering; `Connective` shim retained during frontend migration).
-//! - `vocabularies` — `TopologicalVocabulary`, `GeometricVocabulary`,
+//! - `vocabularies` — `Topology`, `Geometry`,
 //!   `Vocabulary` — ordered per-Order references into the substrate.
-//! - `grammar` — `Grammar`: the K_n structure + arity validation rules.
-//! - `systems` — `System`: metadata reconciling a Grammar with a Vocabulary.
+//! - `grammar` — `GraphTemplate`: the K_n structure + arity validation rules.
+//! - `systems` — `System`: metadata reconciling a GraphTemplate with a Vocabulary.
 //! - `perspectives` — `Perspective`/`Link`: AD4M-style directed webs.
 //! - `citations` — `Source`/`Artefact`/`Lookup`/`Reference`: the citation triad.
 //! - `graph` — the container plus queries and mutations.
@@ -31,9 +31,9 @@ pub use entries::{
 
 pub use links::{Link, LinkType};
 
-pub use vocabularies::{GeometricVocabulary, Vocabulary, TopologicalVocabulary};
+pub use vocabularies::{Geometry, Vocabulary, Topology};
 
-pub use grammar::Grammar;
+pub use grammar::GraphTemplate;
 
 pub use systems::System;
 
