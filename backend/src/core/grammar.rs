@@ -1,6 +1,6 @@
-//! GraphTemplate: the complete graph `K_n` — structural skeleton + validation rules.
+//! Template: the complete graph `K_n` — structural skeleton + validation rules.
 //!
-//! A `GraphTemplate` is the *syntax* of a system: the invariant complete-graph
+//! A `Template` is the *syntax* of a system: the invariant complete-graph
 //! structure for one Order (it references the topological + geometric
 //! substrate vocabularies) plus the arity rules a Vocabulary must satisfy to
 //! fill it — a triad (`K_3`) has `order` terms and `C(order,2)` connectives
@@ -13,14 +13,14 @@ use super::vocabularies::{Geometry, Vocabulary, Topology};
 
 /// The complete graph `K_n` for one Order.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct GraphTemplate {
+pub struct Template {
     pub id: String,
     pub order: u8,
     pub topological_vocab_ref: String,
     pub geometric_vocab_ref: String,
 }
 
-impl GraphTemplate {
+impl Template {
     pub fn new(
         id: impl Into<String>,
         order: u8,
@@ -35,7 +35,7 @@ impl GraphTemplate {
         }
     }
 
-    /// The canonical GraphTemplate for an Order: `grammar_{order}`, wired to the
+    /// The canonical Template for an Order: `grammar_{order}`, wired to the
     /// canonical `topvocab_{order}` / `geovocab_{order}` substrate.
     pub fn for_order(order: u8) -> Self {
         Self::new(
@@ -143,18 +143,18 @@ impl GraphTemplate {
         l
     }
 
-    /// Validate that a Vocabulary satisfies this GraphTemplate's rules (order + arity).
+    /// Validate that a Vocabulary satisfies this Template's rules (order + arity).
     pub fn validate(&self, vocab: &Vocabulary) -> Result<(), Vec<String>> {
         let mut errs = Vec::new();
         if vocab.order != self.order {
             errs.push(format!(
-                "GraphTemplate {}: vocabulary '{}' order {} doesn't match grammar order {}",
+                "Template {}: vocabulary '{}' order {} doesn't match grammar order {}",
                 self.id, vocab.id, vocab.order, self.order
             ));
         }
         if vocab.terms.len() != self.expected_terms() {
             errs.push(format!(
-                "GraphTemplate {}: vocabulary '{}' has {} terms, expected {}",
+                "Template {}: vocabulary '{}' has {} terms, expected {}",
                 self.id,
                 vocab.id,
                 vocab.terms.len(),
@@ -163,7 +163,7 @@ impl GraphTemplate {
         }
         if vocab.connectives.len() != self.expected_connectives() {
             errs.push(format!(
-                "GraphTemplate {}: vocabulary '{}' has {} connectives, expected {}",
+                "Template {}: vocabulary '{}' has {} connectives, expected {}",
                 self.id,
                 vocab.id,
                 vocab.connectives.len(),
@@ -179,7 +179,7 @@ impl GraphTemplate {
 
     /// Full structural validation against the resolved substrate + a Vocabulary:
     /// checks the referenced substrate matches by id/order and delegates arity
-    /// to the substrate vocabularies and this GraphTemplate's rules.
+    /// to the substrate vocabularies and this Template's rules.
     pub fn validate_with(
         &self,
         topology: &Topology,
@@ -190,25 +190,25 @@ impl GraphTemplate {
 
         if topology.id != self.topological_vocab_ref {
             errs.push(format!(
-                "GraphTemplate {}: topological_vocab_ref '{}' doesn't match passed topology '{}'",
+                "Template {}: topological_vocab_ref '{}' doesn't match passed topology '{}'",
                 self.id, self.topological_vocab_ref, topology.id
             ));
         }
         if geometry.id != self.geometric_vocab_ref {
             errs.push(format!(
-                "GraphTemplate {}: geometric_vocab_ref '{}' doesn't match passed geometry '{}'",
+                "Template {}: geometric_vocab_ref '{}' doesn't match passed geometry '{}'",
                 self.id, self.geometric_vocab_ref, geometry.id
             ));
         }
         if topology.order != self.order {
             errs.push(format!(
-                "GraphTemplate {}: order {} doesn't match topology order {}",
+                "Template {}: order {} doesn't match topology order {}",
                 self.id, self.order, topology.order
             ));
         }
         if geometry.order != self.order {
             errs.push(format!(
-                "GraphTemplate {}: order {} doesn't match geometry order {}",
+                "Template {}: order {} doesn't match geometry order {}",
                 self.id, self.order, geometry.order
             ));
         }
@@ -240,17 +240,17 @@ mod tests {
 
     #[test]
     fn test_for_order_arity() {
-        let g = GraphTemplate::for_order(3);
+        let g = Template::for_order(3);
         assert_eq!(g.id, "grammar_3");
         assert_eq!(g.expected_terms(), 3);
         assert_eq!(g.expected_connectives(), 3);
-        let tetrad = GraphTemplate::for_order(4);
+        let tetrad = Template::for_order(4);
         assert_eq!(tetrad.expected_connectives(), 6);
     }
 
     #[test]
     fn test_validate_arity() {
-        let g = GraphTemplate::for_order(3);
+        let g = Template::for_order(3);
         let ok = Vocabulary::new(
             "vocab_x_3",
             "X",
@@ -265,12 +265,12 @@ mod tests {
 
     #[test]
     fn test_constraint_values() {
-        let t = GraphTemplate::for_order(4); // a tetrad, K_4
+        let t = Template::for_order(4); // a tetrad, K_4
         assert_eq!(t.order(), 4); // vertices
         assert_eq!(t.degree(), 3); // each vertex joins the other 3
         assert_eq!(t.size(), 6); // C(4,2) edges
         // the monad edge-cases: no edges, degree 0
-        let m = GraphTemplate::for_order(1);
+        let m = Template::for_order(1);
         assert_eq!(m.degree(), 0);
         assert_eq!(m.size(), 0);
     }
@@ -278,7 +278,7 @@ mod tests {
     #[test]
     fn test_edges_canonical_order() {
         // K_4 edges in lexicographic order, matching the render path / nth_edge.
-        let t = GraphTemplate::for_order(4);
+        let t = Template::for_order(4);
         assert_eq!(
             t.edges(),
             vec![(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
@@ -288,7 +288,7 @@ mod tests {
     #[test]
     fn test_adjacency_matrix_is_complete() {
         // K_3: all-1s off the diagonal, 0 on it.
-        let a = GraphTemplate::for_order(3).adjacency_matrix();
+        let a = Template::for_order(3).adjacency_matrix();
         assert_eq!(
             a,
             vec![vec![0, 1, 1], vec![1, 0, 1], vec![1, 1, 0]]
@@ -298,7 +298,7 @@ mod tests {
     #[test]
     fn test_incidence_matrix() {
         // K_3, edges (1,2),(1,3),(2,3): each column has exactly two 1s (its endpoints).
-        let b = GraphTemplate::for_order(3).incidence_matrix();
+        let b = Template::for_order(3).incidence_matrix();
         assert_eq!(
             b,
             vec![
@@ -308,7 +308,7 @@ mod tests {
             ]
         );
         // every edge column sums to 2 (two endpoints), for any order.
-        let b4 = GraphTemplate::for_order(4).incidence_matrix();
+        let b4 = Template::for_order(4).incidence_matrix();
         for e in 0..6 {
             let col_sum: u8 = b4.iter().map(|row| row[e]).sum();
             assert_eq!(col_sum, 2);
@@ -318,10 +318,10 @@ mod tests {
     #[test]
     fn test_line_graph_reconciles_incidence() {
         // In K_3 every pair of edges shares a vertex, so L(K_3) = K_3 (all adjacent).
-        let l = GraphTemplate::for_order(3).line_graph_adjacency();
+        let l = Template::for_order(3).line_graph_adjacency();
         assert_eq!(l, vec![vec![0, 1, 1], vec![1, 0, 1], vec![1, 1, 0]]);
         // K_4: edge (1,2) and edge (3,4) are disjoint → not adjacent in the line graph.
-        let t = GraphTemplate::for_order(4);
+        let t = Template::for_order(4);
         let edges = t.edges();
         let l4 = t.line_graph_adjacency();
         let i12 = edges.iter().position(|&e| e == (1, 2)).unwrap();

@@ -7,7 +7,7 @@ use async_graphql::*;
 use tokio::sync::RwLock;
 
 use crate::core::{
-    Artefact, Character, Coordinate, Entry, Functor, Geometry, GraphTemplate, Graph, Line,
+    Artefact, Character, Coordinate, Entry, Functor, Geometry, Template, Graph, Line,
     Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Sequence, Vocabulary,
     Segment, Source, System, Topology,
 };
@@ -163,40 +163,40 @@ impl QueryRoot {
         &self,
         ctx: &Context<'_>,
         id: String,
-    ) -> Option<GqlTopologicalVocabulary> {
+    ) -> Option<GqlTopology> {
         let g = graph_snapshot(ctx).await;
         g.topological_vocab(&id)
-            .map(|v| GqlTopologicalVocabulary::new(v.clone()))
+            .map(|v| GqlTopology::new(v.clone()))
     }
 
     async fn topological_vocab_for_order(
         &self,
         ctx: &Context<'_>,
         order: i32,
-    ) -> Option<GqlTopologicalVocabulary> {
+    ) -> Option<GqlTopology> {
         let g = graph_snapshot(ctx).await;
         g.topological_vocab_for_order(order as u8)
-            .map(|v| GqlTopologicalVocabulary::new(v.clone()))
+            .map(|v| GqlTopology::new(v.clone()))
     }
 
     async fn geometric_vocab(
         &self,
         ctx: &Context<'_>,
         id: String,
-    ) -> Option<GqlGeometricVocabulary> {
+    ) -> Option<GqlGeometry> {
         let g = graph_snapshot(ctx).await;
         g.geometric_vocab(&id)
-            .map(|v| GqlGeometricVocabulary::new(v.clone()))
+            .map(|v| GqlGeometry::new(v.clone()))
     }
 
     async fn geometric_vocab_for_order(
         &self,
         ctx: &Context<'_>,
         order: i32,
-    ) -> Option<GqlGeometricVocabulary> {
+    ) -> Option<GqlGeometry> {
         let g = graph_snapshot(ctx).await;
         g.geometric_vocab_for_order(order as u8)
-            .map(|v| GqlGeometricVocabulary::new(v.clone()))
+            .map(|v| GqlGeometry::new(v.clone()))
     }
 
     async fn vocabulary(
@@ -223,9 +223,9 @@ impl QueryRoot {
 
     // -------- grammars (structure) and systems (reconcilers) --------
 
-    async fn grammar_for_order(&self, ctx: &Context<'_>, order: i32) -> Option<GqlGrammar> {
+    async fn grammar_for_order(&self, ctx: &Context<'_>, order: i32) -> Option<GqlTemplate> {
         let g = graph_snapshot(ctx).await;
-        g.grammar_for_order(order as u8).map(|gr| GqlGrammar::new(gr.clone()))
+        g.grammar_for_order(order as u8).map(|gr| GqlTemplate::new(gr.clone()))
     }
 
     async fn system_by_id(&self, ctx: &Context<'_>, id: String) -> Option<GqlSystem> {
@@ -459,7 +459,7 @@ impl QueryRoot {
 }
 
 // ============================================================================
-// Compat: computed GraphTemplate for the current SVG frontend renderer.
+// Compat: computed Template for the current SVG frontend renderer.
 // ============================================================================
 
 fn canonical_system_name(order: u8) -> &'static str {
@@ -898,7 +898,7 @@ impl MutationRoot {
         if !(1..=12).contains(&order) {
             return Err(Error::new(format!("order {order} out of range 1..=12")));
         }
-        let grammar = GraphTemplate::for_order(order);
+        let grammar = Template::for_order(order);
         let expected_conn = grammar.expected_connectives();
         if input.terms.len() != order as usize {
             return Err(Error::new(format!(
@@ -1504,16 +1504,16 @@ impl GqlCharacter {
     }
 }
 
-pub struct GqlTopologicalVocabulary {
+pub struct GqlTopology {
     inner: Topology,
 }
-impl GqlTopologicalVocabulary {
+impl GqlTopology {
     pub fn new(inner: Topology) -> Self {
         Self { inner }
     }
 }
 #[Object]
-impl GqlTopologicalVocabulary {
+impl GqlTopology {
     async fn id(&self) -> &str {
         &self.inner.id
     }
@@ -1531,16 +1531,16 @@ impl GqlTopologicalVocabulary {
     }
 }
 
-pub struct GqlGeometricVocabulary {
+pub struct GqlGeometry {
     inner: Geometry,
 }
-impl GqlGeometricVocabulary {
+impl GqlGeometry {
     pub fn new(inner: Geometry) -> Self {
         Self { inner }
     }
 }
 #[Object]
-impl GqlGeometricVocabulary {
+impl GqlGeometry {
     async fn id(&self) -> &str {
         &self.inner.id
     }
@@ -1588,17 +1588,17 @@ impl GqlVocabulary {
     }
 }
 
-/// Structural GraphTemplate wrapper (the K_n graph + arity rules for an Order).
-pub struct GqlGrammar {
-    inner: GraphTemplate,
+/// Structural Template wrapper (the K_n graph + arity rules for an Order).
+pub struct GqlTemplate {
+    inner: Template,
 }
-impl GqlGrammar {
-    pub fn new(inner: GraphTemplate) -> Self {
+impl GqlTemplate {
+    pub fn new(inner: Template) -> Self {
         Self { inner }
     }
 }
 #[Object]
-impl GqlGrammar {
+impl GqlTemplate {
     async fn id(&self) -> &str {
         &self.inner.id
     }
@@ -1646,7 +1646,7 @@ fn to_i32_matrix(m: Vec<Vec<u8>>) -> Vec<Vec<i32>> {
         .collect()
 }
 
-/// System wrapper (metadata + GraphTemplate/Vocabulary reconciliation).
+/// System wrapper (metadata + Template/Vocabulary reconciliation).
 pub struct GqlSystem {
     inner: System,
 }

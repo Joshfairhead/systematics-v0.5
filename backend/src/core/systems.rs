@@ -1,7 +1,7 @@
-//! System: the reconciler of a GraphTemplate and a Vocabulary.
+//! System: the reconciler of a Template and a Vocabulary.
 //!
 //! A `System` holds the system-relevant metadata (name, order, coherence,
-//! term/connective designations) and reconciles one `GraphTemplate` (the K_n
+//! term/connective designations) and reconciles one `Template` (the K_n
 //! structure/rules) with one Vocabulary (`Vocabulary` — a particular
 //! set of terms). "The triad of XYZ" is a System. Conceptually a System is a
 //! *constrained* perspective: a reconciling association bound by the grammar's
@@ -9,7 +9,7 @@
 
 use serde::{Deserialize, Serialize};
 
-/// A System over one Order: metadata + refs to a GraphTemplate and a Vocabulary.
+/// A System over one Order: metadata + refs to a Template and a Vocabulary.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct System {
     pub id: String,
@@ -18,7 +18,7 @@ pub struct System {
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
-    /// Reference to the `GraphTemplate` (structure) this System reconciles.
+    /// Reference to the `Template` (structure) this System reconciles.
     pub grammar_ref: String,
     /// Reference to the Vocabulary (`Vocabulary`) filling the grammar.
     pub vocabulary_ref: String,

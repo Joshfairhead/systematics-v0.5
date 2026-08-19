@@ -5,7 +5,7 @@
 //! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
-    Entry, Geometry, GraphTemplate, GraphContent, Graph, Line, Order, Point, Position,
+    Entry, Geometry, Template, GraphContent, Graph, Line, Order, Point, Position,
     Segment, Topology,
 };
 
@@ -179,7 +179,7 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
         graph.add_topological_vocab(Topology::canonical_for(order));
         graph.add_geometric_vocab(Geometry::canonical_for(order));
         // The complete-graph structure for this Order (deterministic).
-        graph.add_grammar(GraphTemplate::for_order(order));
+        graph.add_grammar(Template::for_order(order));
     }
 }
 

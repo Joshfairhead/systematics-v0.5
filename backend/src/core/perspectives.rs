@@ -1,10 +1,10 @@
 //! Perspective: an AD4M-style directed web of Links.
 //!
-//! Unlike a `GraphTemplate` (a complete, undirected K_n) a `Perspective` is a
+//! Unlike a `Template` (a complete, undirected K_n) a `Perspective` is a
 //! *not-necessarily-complete, directed* graph — a web of `Link`s. Each Link is
 //! an RDF-like `{ source, predicate, target }` triple whose endpoints are
 //! Expression *addresses* (URIs). Nodes can be anything addressable: a term, a
-//! connective, a whole System, a Vocabulary, a GraphTemplate, a citation entity, or
+//! connective, a whole System, a Vocabulary, a Template, a citation entity, or
 //! even another Perspective (webs of webs). See `address` for the URI scheme.
 //!
 //! The referencing/citation system IS a Perspective (see `citations`).
@@ -106,7 +106,7 @@ pub mod address {
         format!("system:{}#conn:{}-{}", system_id, p1, p2)
     }
 
-    /// A GraphTemplate (structure): `grammar:<order>`.
+    /// A Template (structure): `grammar:<order>`.
     pub fn grammar(order: u8) -> String {
         format!("grammar:{}", order)
     }

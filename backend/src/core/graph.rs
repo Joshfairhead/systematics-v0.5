@@ -11,7 +11,7 @@ use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
 use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
 use super::functors::Functor;
-use super::grammar::GraphTemplate;
+use super::grammar::Template;
 use super::sequences::Sequence;
 use super::perspectives::Perspective;
 use super::systems::System;
@@ -30,8 +30,8 @@ pub struct Graph {
     /// Complete-graph structures, one per Order. Seeded in code (deterministic),
     /// never persisted as content.
     #[serde(default)]
-    pub grammars: Vec<GraphTemplate>,
-    /// Systems: metadata reconciling a GraphTemplate with a Vocabulary.
+    pub grammars: Vec<Template>,
+    /// Systems: metadata reconciling a Template with a Vocabulary.
     #[serde(default)]
     pub systems: Vec<System>,
     /// Referencing layer: AD4M-style directed webs of Links.
@@ -267,19 +267,19 @@ impl Graph {
 
     // -------- Grammars (K_n structure; code-seeded, deterministic) --------
 
-    pub fn grammar(&self, id: &str) -> Option<&GraphTemplate> {
+    pub fn grammar(&self, id: &str) -> Option<&Template> {
         self.grammars.iter().find(|g| g.id == id)
     }
 
-    pub fn grammar_for_order(&self, order: u8) -> Option<&GraphTemplate> {
+    pub fn grammar_for_order(&self, order: u8) -> Option<&Template> {
         self.grammars.iter().find(|g| g.order == order)
     }
 
-    pub fn add_grammar(&mut self, grammar: GraphTemplate) {
+    pub fn add_grammar(&mut self, grammar: Template) {
         self.grammars.push(grammar);
     }
 
-    // -------- Systems (metadata + GraphTemplate/Vocabulary reconciliation) --------
+    // -------- Systems (metadata + Template/Vocabulary reconciliation) --------
 
     pub fn system(&self, id: &str) -> Option<&System> {
         self.systems.iter().find(|s| s.id == id)
@@ -718,15 +718,15 @@ impl Graph {
         self.character(char_id)
     }
 
-    /// Validate a System by resolving its GraphTemplate + Vocabulary and the
-    /// GraphTemplate's referenced substrate vocabularies.
+    /// Validate a System by resolving its Template + Vocabulary and the
+    /// Template's referenced substrate vocabularies.
     pub fn validate_system(&self, system_id: &str) -> Result<(), Vec<String>> {
         let sys = self
             .system(system_id)
             .ok_or_else(|| vec![format!("System '{}' not found", system_id)])?;
         let grammar = self
             .grammar(&sys.grammar_ref)
-            .ok_or_else(|| vec![format!("GraphTemplate '{}' not found", sys.grammar_ref)])?;
+            .ok_or_else(|| vec![format!("Template '{}' not found", sys.grammar_ref)])?;
         let t = self
             .topological_vocab(&grammar.topological_vocab_ref)
             .ok_or_else(|| {
@@ -979,7 +979,7 @@ mod tests {
                 "char_word_consent".into(),
             ],
         ));
-        g.add_grammar(GraphTemplate::for_order(3));
+        g.add_grammar(Template::for_order(3));
         g.add_system(System::with_auto_id(
             "Canonical Triad",
             3,
