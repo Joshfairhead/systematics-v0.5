@@ -239,8 +239,79 @@ six-laws rule), backend/Model first (the 321 discipline):
   Controller's **traversal algorithms** over the S·P·O impulse triad; interaction is one.
 - **Stage C — View (+): the two-line sort/filter redesign**, consuming the Controller's
   queries (the `browser_controls` module is already the decoupled seam).
-- **Stage D — the shared k₃ + semantic product.** Anchor all semantic triads to one shared
-  topological k₃ (bijective mapping) → the north-star **semantic product**.
+- **Stage D — decoupled projection space, then the shared k₃ + semantic product.**
+  *Clarified (user, 2026-08-18):* the **Semantic Projection lives in its OWN space, decoupled
+  from the k₃ topology.** A semantic triad — e.g. *Function · Being · Will*, or *Affirming ·
+  Receptive · Reconciling* — must **stand on its own as a micro-model** in the graph: its
+  nodes and edges related to each other by an **incidence matrix**, i.e. a closed
+  **node–edge chain** that composes the triad —
+  *affirming —generation→ receptive —consent→ being —decision→ affirming*. That decoupled
+  projection can *then* be anchored to **one shared topological k₃** via the bijective
+  semantic↔topological mapping — which unblocks the north-star **semantic product**
+  (node-1-of-X × node-1-of-Y → a derived term). Projection-in-its-own-space **first**, the
+  shared-k₃ anchor **second**.
+
+**The six laws as a Hexad — layout [user, 2026-08-18].** Stage B **also records the six laws
+as a Hexad** (order-6). Provisional vertex assignment by the hexad's numbered/coloured
+positions (the layout itself may still flip — separate inquiry):
+
+| # | colour | law | S₃ permutation | aliases |
+|---|---|---|---|---|
+| 1 | red | identity | 231 | |
+| 2 | blue | expansion | 123 | |
+| 3 | yellow | order | 312 | |
+| 4 | green | freedom | 321 | |
+| 5 | purple | interaction | 132 | **SPO** |
+| 6 | orange | concentration | 213 | |
+
+Each law-vertex carries **aliases** (interaction ← `SPO`); the S₃-permutation column ties each
+hexad position to the traversal signature tabulated below.
+
+## Pre-remodel audit — drift report (2026-08-18)
+
+A registry-vs-code audit ran before the remodel (a fan-out workflow for backend-core +
+middleware; the frontend/graphql/status auditors hit a session limit, so those rows are from
+direct inspection). Confirmed findings, most remodel-relevant first:
+
+1. **"Controller = middleware" is a TARGET, not the current fact** [high]. `middleware/src/
+   types/*` is a pure DTO crate imported by *both* backend and frontend; **GraphQL**
+   (`backend/src/graphql`, ~50 `QueryRoot` resolvers + mutations) is today's limited
+   controller. No six-laws engine exists; the only S₃ logic is `core/functors.rs` (one
+   morphism, `impl`+tested). → **Stage B builds the Controller.**
+2. **The Model base-space triad exists in embryo** [confirmed]. `Grammar` (Graph Template —
+   `order`, `expected_terms`/`expected_connectives`, `validate`/`validate_with`) ·
+   `TopologicalVocabulary` (Structural Topology, points+lines) · `Vocabulary` (Semantic
+   Projection). `System` reconciles them; `Graph::validate_system` runs the triad. → **Stage A
+   renames + makes matrices explicit.**
+3. **Adjacency + incidence are IMPLICIT** [medium]. `core/entries.rs` (Point·Line·Coordinate·
+   Segment·Character) + the positional index-join `graph.rs:706-730`
+   (`character_at_point`/`_line`, `topology.points[idx] ↔ vocab.terms[idx]`) *are* the
+   topology/incidence — there is **no explicit matrix** anywhere (grep `adjacen|incidence|
+   matrix` → only a `functors.rs` doc-comment). → **Stage A's core gap.**
+4. **Two colliding `Link` types** [medium]. `core/links.rs` `Link{base,target,link_type,tag}`
+   + `LinkType::{Line,Connective}` — a **legacy geometric-adjacency shim** ("retained during
+   frontend migration", used by `Graph::add_link`) — vs `core/perspectives.rs` `Link`
+   (subject·predicate·object, the AD4M SPO triple the registry's "Link/triple" row documents).
+   → **Stage A should retire/rename the shim.**
+5. **Seeded Citation triad has placeholder edges** [medium]. `system_citation_3` is seeded and
+   validates, but its connectives are `char_word_citation_act_{1,2,3}_needs_research`, **not**
+   cites·recordedIn·atLocation (those verbs live only on `Reference`/`Perspective` links). Two
+   co-existing citation representations; the remodel should pick the canonical one.
+6. **Stale — the "Query (Sort · Tag · Filter)" triad row** [medium]. The Triads-table entry
+   (still "reconciler-typed", `ColKey`/`CiteKind`, "Tag (=) reconciles…", Filter = cite-degree)
+   is superseded: Sort/Filter now live in `frontend/components/browser_controls.rs` (decoupled
+   view) + `spo.rs` (query API); Filter is an **SPO predicate→object drill-down**; the
+   reconciler was revised to **Data / Perspective**. It contradicts the later reference-tuple
+   section (which already records the SPO filter as BUILT).
+7. **Undocumented persistence** [low]. `core/content.rs` `GraphContent` is the portable slice
+   (seed JSON + user store); **Grammars are code-seeded, not persisted** — so exposing order +
+   degree as first-class Graph Template *data* (Stage A) is a deliberate choice.
+8. **Task drift — #13 is done** [confirmed]. `main.rs:87` calls `load_perspective_modules`,
+   which `read_dir`s the `*.json` perspective modules at startup — the 9 QSM + DU vols 1–3
+   **load**. Task #13 (Scrape Hodgson Qualsystems) is done+loaded. (#14 = DU vol 4, absent.)
+
+*(Undocumented backend files now surfaced: `core/{entries,graph,content,links}.rs` — to be
+folded into the registry as the base-space Model is re-articulated in Stage A.)*
 
 ## Monads, operations, and the six laws of three [proposed — potentially major]
 
