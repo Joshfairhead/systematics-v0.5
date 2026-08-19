@@ -168,6 +168,11 @@ shared type vocabulary to join it and carry the six laws.
 **six morphisms — one per law of three**. Today `core/functors.rs` implements exactly *one*
 morphism (a single same-grammar permutation); the remodel generalises it to the **six** (the
 six laws / S₃ = six functorial readings). So "build the six laws" = build the six morphisms.
+**BUILT — `backend/src/core/laws.rs` (Stage B, 2026-08-18):** `enum Law` with the Hexad
+layout + colours, `permutation()` (verified vs the S₃ table), `read()` (the directed reading
+of an undirected triad — interaction = SPO), `compose()` (the S₃ group op), and `as_functor()`
+(each law bridges to the `Functor` machinery — one of the six morphisms). Not yet wired to
+traversal/GraphQL or seeded in-graph as a Hexad system.
 
 **Direction of travel for links [user, 2026-08-18].** The `perspectives::Link`
 (subject·predicate·object, AD4M) is kept **for now** and is foundational in a way, but the
