@@ -208,7 +208,16 @@ Holochain, but fell short on the SPO. The systems that are graphs (the semantics
 elements (entries) + links `(base, type, target)`**. **Open concern:** a Holochain link may be
 **directed** — if so it conflicts with our undirected base (direction should come only from the
 six laws), and we must **consider our options** (e.g. store both directions, or a symmetric
-link type). Flagged, unresolved.
+link type).
+
+**RESOLVED — substrate is explicitly undirected; port later (user, 2026-08-20).** Build the
+shared substrate **explicitly undirected** now, with **the six laws supplying direction at
+read time** (undirected base + six-law reading = a directed walk). If/when we port to a
+substrate whose links are directed (e.g. Holochain), represent an undirected link as **two
+opposite directed links treated as ONE** (an *orbit* — the equivalence class under the
+direction-flip). So: do it undirected in-graph now, and remodel at port time — no need to
+pre-pay Holochain's directedness. *(This matches the "content-addressing in-graph now, swap
+the backend later" discipline in [[reference-tuple-store]].)*
 
 **Present state (audit 2026-08-18), i.e. the gap to close:** the `middleware` crate is *today*
 only a **shared data-types crate** (`middleware/src/types/*`), used by both backend and

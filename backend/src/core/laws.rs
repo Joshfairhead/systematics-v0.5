@@ -104,12 +104,32 @@ impl Law {
     /// its three terms by the permutation. `read[i] = triad[permutation[i] − 1]`.
     /// e.g. `interaction` on `[Will, Function, Being]` → `[Will, Being, Function]`
     /// = subject · predicate · object (affirming · reconciling · receptive) — SPO.
-    pub fn read<'a, T: Copy>(&self, triad: &[T; 3]) -> [T; 3] {
+    pub fn read<T: Copy>(&self, triad: &[T; 3]) -> [T; 3] {
         let p = self.permutation();
         [
             triad[(p[0] - 1) as usize],
             triad[(p[1] - 1) as usize],
             triad[(p[2] - 1) as usize],
+        ]
+    }
+
+    /// Read an **undirected** triad as a **directed closed walk** under this law —
+    /// the substrate move: the base holds no direction; the *law supplies it at read
+    /// time*. Threads the three nodes (in law order) through the undirected edges
+    /// between consecutive nodes, closing the loop:
+    /// `[node, edge, node, edge, node, edge]` (the last edge returns to the first).
+    /// `edges` are in canonical order `[(1,2), (1,3), (2,3)]`. e.g. `interaction`
+    /// over nodes `[Will, Function, Being]`, edges `[generation, decision, consent]`
+    /// → `[Will, decision, Being, consent, Function, generation]`.
+    pub fn read_walk<T: Copy>(&self, nodes: &[T; 3], edges: &[T; 3]) -> [T; 6] {
+        let [a, b, c] = self.permutation();
+        [
+            nodes[(a - 1) as usize],
+            edges[triad_edge_index(a, b)],
+            nodes[(b - 1) as usize],
+            edges[triad_edge_index(b, c)],
+            nodes[(c - 1) as usize],
+            edges[triad_edge_index(c, a)],
         ]
     }
 
@@ -140,6 +160,19 @@ impl Law {
         target_ref: impl Into<String>,
     ) -> Functor {
         Functor::new(id, self.name(), 3, source_ref, target_ref, self.permutation_vec())
+    }
+}
+
+/// The canonical index of the undirected edge `{a, b}` (positions `1..=3`) in a
+/// triad's edge list `[(1,2), (1,3), (2,3)]`. Order-independent (the base is
+/// undirected): `{a,b}` and `{b,a}` return the same index.
+fn triad_edge_index(a: u8, b: u8) -> usize {
+    let (lo, hi) = if a < b { (a, b) } else { (b, a) };
+    match (lo, hi) {
+        (1, 2) => 0,
+        (1, 3) => 1,
+        (2, 3) => 2,
+        _ => unreachable!("triad positions are 1..=3, a != b"),
     }
 }
 
@@ -202,5 +235,49 @@ mod tests {
         assert_eq!(f.order, 3);
         assert_eq!(f.permutation, vec![1, 3, 2]);
         assert!(f.validate().is_ok()); // a genuine S₃ bijection
+    }
+
+    #[test]
+    fn test_read_walk_supplies_direction() {
+        // Undirected canonical triad: nodes Will·Function·Being, edges (in canonical
+        // order (1,2)(1,3)(2,3)) generation·decision·consent.
+        let nodes = ["Will", "Function", "Being"];
+        let edges = ["generation", "decision", "consent"];
+        // expansion (1-2-3): the natural loop 1→2→3→1.
+        assert_eq!(
+            Law::Expansion.read_walk(&nodes, &edges),
+            ["Will", "generation", "Function", "consent", "Being", "decision"]
+        );
+        // interaction (1-3-2 = SPO): Will→Being→Function→Will.
+        assert_eq!(
+            Law::Interaction.read_walk(&nodes, &edges),
+            ["Will", "decision", "Being", "consent", "Function", "generation"]
+        );
+        // the walk is a closed loop: last edge joins the 3rd node back to the 1st.
+        for law in Law::HEXAD {
+            let w = law.read_walk(&nodes, &edges);
+            let (n0, n1, n2) = (w[0], w[2], w[4]);
+            // all three distinct nodes are present (a genuine triad traversal).
+            assert!(n0 != n1 && n1 != n2 && n0 != n2);
+        }
+    }
+
+    #[test]
+    fn test_run_mvc_triad_through_the_six_laws() {
+        // Run the architecture's own triad through the six laws (the "analysis" —
+        // undirected base, direction supplied per law). Node-level ordering only
+        // (MVC edges are unnamed): Model(−,pos2) · View(+,pos1) · Controller(=,pos3).
+        // Positions: 1 = View (+), 2 = Model (−), 3 = Controller (=).
+        let mvc = ["View", "Model", "Controller"];
+        assert_eq!(Law::Expansion.read(&mvc), ["View", "Model", "Controller"]); // 123
+        assert_eq!(Law::Interaction.read(&mvc), ["View", "Controller", "Model"]); // 132 (SPO)
+        assert_eq!(Law::Freedom.read(&mvc), ["Controller", "Model", "View"]); // 321
+        // all six give distinct orderings (S₃ acts freely on the 3 positions).
+        let readings: Vec<[&str; 3]> = Law::HEXAD.iter().map(|l| l.read(&mvc)).collect();
+        for i in 0..6 {
+            for j in (i + 1)..6 {
+                assert_ne!(readings[i], readings[j]);
+            }
+        }
     }
 }
