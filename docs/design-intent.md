@@ -171,7 +171,11 @@ six laws / S₃ = six functorial readings). So "build the six laws" = build the 
 **BUILT — `backend/src/core/laws.rs` (Stage B, 2026-08-18):** the Hexad layout + colours,
 `permutation()` (verified vs the S₃ table), `read()` (the directed reading of an undirected
 triad — interaction = SPO), `compose()` (the S₃ group op), and a bridge to the `Functor`
-machinery. Not yet wired to traversal/GraphQL or seeded in-graph as a Hexad system.
+machinery. **Seeded** in-graph as `system_six_laws_of_three_6`. **VISIBLE (2026-08-20):** the
+GraphQL query `runSixLaws(systemId, positions)` runs any system through the six laws
+(interpret a 3-node selection as a triad — an octad via `positions: [4,6,1]`), and the
+`SixLaws` frontend panel shows the six coloured readings when a system is selected in the graph
+view. Still the **mimic** (ordering, not the tensor-product operation).
 
 **Morphism orders + the laws as data [user, 2026-08-18 — refinements].**
 - **First-order morphisms = the links themselves.** *Every link in the system is a morphism* —
