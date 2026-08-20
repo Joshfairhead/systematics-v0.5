@@ -7,7 +7,7 @@ use async_graphql::*;
 use tokio::sync::RwLock;
 
 use crate::core::{
-    Artefact, Character, Coordinate, Entry, Functor, Geometry, Template, Graph, Line,
+    Artefact, Character, Coordinate, Entry, Functor, Geometry, Template, Graph, Law, Line,
     Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Sequence, Vocabulary,
     Segment, Source, System, Topology,
 };
@@ -305,6 +305,61 @@ impl QueryRoot {
     async fn validate_functor(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
         let g = graph_snapshot(ctx).await;
         g.validate_functor(&id).err().unwrap_or_default()
+    }
+
+    // -------- Controller: run a system through the six laws of three --------
+
+    /// Run a system's terms through the **six laws of three** (the Controller,
+    /// mimic form): returns the six readings — each law reorders the chosen triad.
+    /// `positions` selects three 1-based term positions to interpret as a triad
+    /// (default `[1,2,3]`), so any system (e.g. an octad, positions `[4,6,1]`) can
+    /// be read as a triad. Empty if the system/positions don't resolve to a triad.
+    async fn run_six_laws(
+        &self,
+        ctx: &Context<'_>,
+        system_id: String,
+        positions: Option<Vec<i32>>,
+    ) -> Vec<GqlLawReading> {
+        let g = graph_snapshot(ctx).await;
+        let Some(sys) = g.system(&system_id) else {
+            return Vec::new();
+        };
+        let Some(vocab) = g.vocabulary(&sys.vocabulary_ref) else {
+            return Vec::new();
+        };
+        // Term *values* in position order (fall back to the char id if unresolved).
+        let term_values: Vec<String> = vocab
+            .terms
+            .iter()
+            .map(|cid| {
+                g.character(cid)
+                    .map(|c| c.value.clone())
+                    .unwrap_or_else(|| cid.clone())
+            })
+            .collect();
+        let pos = positions.unwrap_or_else(|| vec![1, 2, 3]);
+        if pos.len() != 3 {
+            return Vec::new();
+        }
+        let pick = |p: i32| term_values.get((p - 1) as usize).map(|s| s.as_str());
+        let (Some(a), Some(b), Some(c)) = (pick(pos[0]), pick(pos[1]), pick(pos[2])) else {
+            return Vec::new();
+        };
+        let triad = [a, b, c];
+        Law::HEXAD
+            .iter()
+            .map(|law| {
+                let r = law.read(&triad);
+                GqlLawReading {
+                    law: law.name().to_string(),
+                    hexad_position: law.hexad_position() as i32,
+                    colour: law.colour().to_string(),
+                    permutation: law.permutation().iter().map(|&x| x as i32).collect(),
+                    aliases: law.aliases().iter().map(|s| s.to_string()).collect(),
+                    reading: r.iter().map(|s| s.to_string()).collect(),
+                }
+            })
+            .collect()
     }
 
     // -------- Sequences (ordered series of member addresses) --------
@@ -2198,4 +2253,21 @@ pub fn create_schema_with_store(graph: SharedGraph, store: Option<PathBuf>) -> S
         .data(graph)
         .data(StorePath(store))
         .finish()
+}
+
+/// One law's reading of a triad — the Controller (mimic form) applied to a system.
+#[derive(SimpleObject)]
+pub struct GqlLawReading {
+    /// Bennett's name for the law (expansion / identity / order / interaction / …).
+    pub law: String,
+    /// Hexad position 1..=6 (1 red identity … 5 purple interaction … 6 orange concentration).
+    pub hexad_position: i32,
+    /// The law's Hexad colour.
+    pub colour: String,
+    /// The law's S₃ permutation in one-line notation.
+    pub permutation: Vec<i32>,
+    /// Alternative names (e.g. interaction ← "SPO").
+    pub aliases: Vec<String>,
+    /// The three term values reordered by this law (the directed reading).
+    pub reading: Vec<String>,
 }

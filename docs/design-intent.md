@@ -303,6 +303,15 @@ laws it **needs a Model**; and because we want **homoiconicity**, we **mimic the
   the **target is laws-as-operations (tensor products)**, to be designed once the data model is
   right and the Controller can self-articulate. [Direction; the tensor-product form is not yet
   specified — do not fabricate it.]
+- **The Model is the TETRAD** (Template · Topology · Geometry · Vocabulary) — geometry was only
+  elided for brevity earlier. The **Template encapsulates** topology/geometry/vocabulary but
+  *complicates the engine*, which is a **triadic process that traverses the tetrad**.
+- **The Controller operates over ALL graphs — "semantic maths" [user, 2026-08-20].** It should
+  run the triadic algo on *any* system by **interpreting a selection of nodes as a triad**
+  (e.g. in an octad, read node 4 → node 6 → node 1 as a triad and run the laws). Higher example:
+  **DU2 interprets the dodecad through the lens of the pentad → eight cosmoses** — a system
+  operated on by another system. So the Controller does **various operations *between* systems**
+  ("semantic maths") — the same family as the tensor-product target above.
 
 *(The **rule** "check all six for balance" is settled; each row's concrete meaning is a
 working guess. Note: this six-over-MVC application is **distinct** from the six laws as the
