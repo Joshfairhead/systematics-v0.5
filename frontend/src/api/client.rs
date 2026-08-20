@@ -148,6 +148,24 @@ struct InstanceSystemsResponse {
     instance_systems: Vec<InstanceSystem>,
 }
 
+/// One law's reading of a system's triad — the Controller (mimic form) output.
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct LawReading {
+    pub law: String,
+    #[serde(rename = "hexadPosition")]
+    pub hexad_position: i32,
+    pub colour: String,
+    #[serde(default)]
+    pub aliases: Vec<String>,
+    pub reading: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct RunSixLawsResponse {
+    #[serde(rename = "runSixLaws")]
+    run_six_laws: Vec<LawReading>,
+}
+
 /// A Sequence (e.g. a Monad extracted from the Nullad) as returned by
 /// `createSequence` — id, name, and member addresses.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -375,6 +393,23 @@ impl GraphQLClient {
             ));
         }
         Ok(response.data.map(|d| d.instance_systems).unwrap_or_default())
+    }
+
+    /// Run a system through the six laws of three (the Controller, mimic form):
+    /// six readings of the system's triad (default positions 1,2,3).
+    pub async fn run_six_laws(&self, system_id: &str) -> Result<Vec<LawReading>, ApiError> {
+        let query = r#"query R($id: String!) {
+            runSixLaws(systemId: $id) { law hexadPosition colour aliases reading }
+        }"#;
+        let variables = serde_json::json!({ "id": system_id });
+        let response: GraphQLResponse<RunSixLawsResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.map(|d| d.run_six_laws).unwrap_or_default())
     }
 
     /// Render any System by id (used to load instance systems into the canvas).

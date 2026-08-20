@@ -3,6 +3,7 @@ use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::{
     AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
 };
+use crate::components::six_laws::SixLaws;
 use crate::components::system_editor::SystemEditor;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
@@ -49,7 +50,7 @@ fn key_for_order(order: i32) -> String {
 /// Detect GraphQL endpoint based on current browser location
 /// - Development (localhost:8080): Points to http://localhost:8000/graphql
 /// - Production (any other domain): Uses relative /graphql (same origin)
-fn get_graphql_endpoint() -> String {
+pub fn get_graphql_endpoint() -> String {
     use web_sys::window;
 
     // In WASM, access the browser's location
@@ -880,6 +881,7 @@ impl Component for ApiApp {
                                             show_canonical={ self.show_canonical }
                                             on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
                                         />
+                                        <SixLaws system_id={ system.system_id.clone() } />
                                     </div>
                                 }
                             } else {

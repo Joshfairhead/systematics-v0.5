@@ -1150,3 +1150,36 @@ button.row-open:hover {
     border-radius: 10px;
     cursor: pointer;
 }
+
+/* Controller — the six-laws readout (SixLaws component) */
+.six-laws {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border, #2a2a3a);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.15);
+    font-size: 13px;
+}
+.six-laws-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    opacity: 0.85;
+}
+.six-laws-table { width: 100%; border-collapse: collapse; }
+.six-laws-row td { padding: 3px 6px; vertical-align: middle; }
+.six-laws-dot { width: 16px; }
+.six-laws-name { white-space: nowrap; opacity: 0.9; }
+.six-laws-reading { font-family: monospace; opacity: 0.95; }
+.law-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+}
+.law-red { background: #e5484d; }
+.law-blue { background: #3e63dd; }
+.law-yellow { background: #f5d90a; }
+.law-green { background: #46a758; }
+.law-purple { background: #8e4ec6; }
+.law-orange { background: #f76b15; }
