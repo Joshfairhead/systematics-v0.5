@@ -10,6 +10,12 @@
 //!
 //! This generalises `functors.rs` (which implements a single `Sₙ` morphism) to the
 //! full six for a triad: `Law::as_functor` hands each law to that same machinery.
+//!
+//! NOTE (user, 2026-08-20): `read`/`read_walk` here merely **order** a triad into a
+//! sequence (a permutation) — this is the **homoiconic *mimic*** of the laws, not the
+//! real operation. The target is **laws-as-operations (possibly tensor products)**,
+//! to be designed once the data model is right and the Controller can self-articulate.
+//! Do not mistake the ordering for the operation.
 
 use super::functors::Functor;
 

@@ -210,14 +210,19 @@ elements (entries) + links `(base, type, target)`**. **Open concern:** a Holocha
 six laws), and we must **consider our options** (e.g. store both directions, or a symmetric
 link type).
 
-**RESOLVED — substrate is explicitly undirected; port later (user, 2026-08-20).** Build the
-shared substrate **explicitly undirected** now, with **the six laws supplying direction at
-read time** (undirected base + six-law reading = a directed walk). If/when we port to a
-substrate whose links are directed (e.g. Holochain), represent an undirected link as **two
-opposite directed links treated as ONE** (an *orbit* — the equivalence class under the
-direction-flip). So: do it undirected in-graph now, and remodel at port time — no need to
-pre-pay Holochain's directedness. *(This matches the "content-addressing in-graph now, swap
-the backend later" discipline in [[reference-tuple-store]].)*
+**REVISED — use directed (bidirectional) links; `perspectives::Link` IS the Holochain link
+(user, 2026-08-20).** Superseding the "store undirected, derive direction" idea: since we will
+port to Holochain and **`perspectives::Link {source·predicate·target}` already mimics a
+Holochain link `(base, type, target)`**, just **use that** — directed. **Abandon the undirected
+symmetry in favour of bidirectional linking:** an undirected edge is **two opposite directed
+links treated as one**, so a **triad has SIX directed links** (3 edges × 2 directions). Those
+six links are **NOT the six laws** — don't conflate them. A law's *reading* is "three nodes
+connected by two edges, directed" (a directed path).
+
+**We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
+triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
+imposes direction, generating directed relationships (links) — the hypergraph is what the
+Controller *generates* by applying the six laws to a semantically-assigned triad.
 
 **Present state (audit 2026-08-18), i.e. the gap to close:** the `middleware` crate is *today*
 only a **shared data-types crate** (`middleware/src/types/*`), used by both backend and
@@ -264,14 +269,40 @@ interaction we default to (132 / SPO) — check the work across **all six** perm
 that Model, Controller and View develop in balance. A proposed reading of the six over the
 MVC base (View = **+**/1, Model = **−**/2, Controller = **=**/3), for sign-off:
 
-| law (order) | reading over MVC (positions View=1 · Model=2 · Controller=3) |
+Read semantically (user, 2026-08-20 — edge verbs: **generates · acts · consents/conforms ·
+decides**; positions View=1 · Model=2 · Controller=3):
+
+| law (order) | reading over MVC (View=1 · Model=2 · Controller=3) |
 |---|---|
-| expansion (123) | View → Model → Controller |
-| identity (231) | Model → Controller → View |
-| order (312) | Controller → View → Model |
-| interaction (132) | View → Controller → Model  ← the SPO / request reading |
-| concentration (213) | Model → View → Controller |
-| freedom (321) | Controller → Model → View |
+| expansion (123) | **view generates models which consent to the controller** |
+| interaction (132) | **view acts on controller which consents to the model** (SPO) |
+| concentration (213) | **models generate a view that decides the controller design** |
+| identity (231) | **models consent to the controller's constraints which act on the view** |
+| order (312) | **controller acts on the view to generate models** |
+| freedom (321) | **controller consents to a model to generate a view** |
+
+*(consent ≈ conforms.)* These are the six ways Model·View·Controller relate — the balance check.
+
+**The Controller is the generative goal [user, 2026-08-20].** The Controller is the *goal*: it
+should ideally sit where it **generates the rest** — by **assigning semantics to a triad** and
+then **using the six laws to build the relationships** (the hypergraph). But to apply the six
+laws it **needs a Model**; and because we want **homoiconicity**, we **mimic the laws of three**
+(in code) **until the Controller can use the primitives we are designing to self-articulate**.
+
+- **We've built the Model and the View but under-built the Controller** — which is *probably why
+  things feel unbalanced* (cf. the balance rule). The Controller needs models to run, so we must
+  **express models in a way the Controller understands**, then use it. Getting the **data model
+  correct** is the current work.
+- **Topology · Template · Semantics** still need working out, and **each must be triadically
+  modelled**. A working Controller would **relate the three by anchoring the semantic terms on
+  the topological graph** (the bijective semantic↔topological anchoring — see Stage D).
+- **Critique — the laws are not yet operations [user, 2026-08-20].** The way `core/laws.rs`
+  uses the laws today (`read`/`read_walk`) merely **orders data into a sequence** (a
+  permutation). That is the **homoiconic mimic**, not the real thing. The laws should perform
+  **operations** — **possibly tensor products**. So: keep the ordering as the interim mimic;
+  the **target is laws-as-operations (tensor products)**, to be designed once the data model is
+  right and the Controller can self-articulate. [Direction; the tensor-product form is not yet
+  specified — do not fabricate it.]
 
 *(The **rule** "check all six for balance" is settled; each row's concrete meaning is a
 working guess. Note: this six-over-MVC application is **distinct** from the six laws as the
