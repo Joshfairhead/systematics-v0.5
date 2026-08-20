@@ -171,11 +171,18 @@ six laws / S₃ = six functorial readings). So "build the six laws" = build the 
 **BUILT — `backend/src/core/laws.rs` (Stage B, 2026-08-18):** the Hexad layout + colours,
 `permutation()` (verified vs the S₃ table), `read()` (the directed reading of an undirected
 triad — interaction = SPO), `compose()` (the S₃ group op), and a bridge to the `Functor`
-machinery. **Seeded** in-graph as `system_six_laws_of_three_6`. **VISIBLE (2026-08-20):** the
-GraphQL query `runSixLaws(systemId, positions)` runs any system through the six laws
-(interpret a 3-node selection as a triad — an octad via `positions: [4,6,1]`), and the
-`SixLaws` frontend panel shows the six coloured readings when a system is selected in the graph
-view. Still the **mimic** (ordering, not the tensor-product operation).
+machinery. **Seeded** in-graph as `system_six_laws_of_three_6`. The GraphQL query
+`runSixLaws(systemId, positions)` runs any system through the six laws (interpret a 3-node
+selection as a triad — an octad via `positions: [4,6,1]`).
+
+**The Controller is a MODULE / HARNESS — hidden, to be redesigned [user, 2026-08-20].** The
+`SixLaws` frontend panel was a quick "make it visible" spike; **it's not correct by a long
+shot, so it's turned OFF** (the panel, `client.run_six_laws`, and the CSS are removed). Treat
+the Controller as a **composable module** (a *harness*) that plugs into the others — kept as
+the backend `core/laws.rs` + `runSixLaws` (queryable, not shown) for the **redesign**. The
+current `read`/`read_walk` are only the ordering **mimic**; the real operation is the
+tensor-product / "semantic maths" over the substrate. **Next: the substrate**, so the laws can
+become real operations rather than orderings.
 
 **Morphism orders + the laws as data [user, 2026-08-18 — refinements].**
 - **First-order morphisms = the links themselves.** *Every link in the system is a morphism* —
