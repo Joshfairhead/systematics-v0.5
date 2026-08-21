@@ -221,14 +221,29 @@ elements (entries) + links `(base, type, target)`**. **Open concern:** a Holocha
 six laws), and we must **consider our options** (e.g. store both directions, or a symmetric
 link type).
 
-**REVISED — use directed (bidirectional) links; `perspectives::Link` IS the Holochain link
-(user, 2026-08-20).** Superseding the "store undirected, derive direction" idea: since we will
-port to Holochain and **`perspectives::Link {source·predicate·target}` already mimics a
-Holochain link `(base, type, target)`**, just **use that** — directed. **Abandon the undirected
-symmetry in favour of bidirectional linking:** an undirected edge is **two opposite directed
-links treated as one**, so a **triad has SIX directed links** (3 edges × 2 directions). Those
-six links are **NOT the six laws** — don't conflate them. A law's *reading* is "three nodes
-connected by two edges, directed" (a directed path).
+**RE-REVISED — the substrate is Holochain elements + links; work UNDIRECTED (user, 2026-08-20).**
+**Retire `perspectives::Link` and all AD4M 'perspective'/'Link' language** — it was just a
+rehash of Holochain. The substrate is **Holochain-style elements + links** (placeholders until a
+real Holochain backend):
+- **Elements** (nodes) and **links** (edges) are each a **function-monad** — a *container with a
+  boundary + a set of actions* (functional-composition sense). **NB: this is the FP monad, NOT
+  our systematics *Monad* (the order-1 system) — do not conflate the two.**
+- **Articulate our systems on top:** a topological **vertex → an element**, a topological
+  **edge → a link**. Vertices/edges **link to data** — **term characters** (on vertices) and
+  **connective characters** (on edges) — which may themselves **link to further data**.
+- **Work UNDIRECTED.** A triad = **3 nodes + 6 directed links**, but the six simplify to **3
+  bidirectional 'orbits'** (an orbit = the two opposite directed links treated as one) — we
+  want to stay in undirected territory. The 6 directed links are **NOT the six laws**.
+- A **system materialises as a hypergraph** — a **constructed set of links** (this is what
+  'perspective' loosely meant; drop the word and the type).
+- The **Controller / harness operates over these links** (triad or decad). It **holds space for
+  three terms** (which will be **tensor products**). Scoped **within a single graph** for now;
+  later the tensor products will **transcend graph boundaries** (products *across* graphs).
+- **Derived → stored.** Materialisation is **derived** at first; if useful, **stored** — landing
+  in the **DHT**.
+- **MVC are three aspects of one thing** (different emphasis on each) — so the *whole* system is
+  essentially a controller/harness; the earlier `SixLaws` module is just a loose piece, to be
+  articulated as a system later (deferred).
 
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law

@@ -20,6 +20,7 @@ pub mod graph;
 pub mod laws;
 pub mod perspectives;
 pub mod sequences;
+pub mod substrate;
 pub mod systems;
 pub mod vocabularies;
 
