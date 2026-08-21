@@ -245,6 +245,50 @@ real Holochain backend):
   essentially a controller/harness; the earlier `SixLaws` module is just a loose piece, to be
   articulated as a system later (deferred).
 
+**CORRECTED — materialisation is a Functor of morphisms over the semantic Pentad [user,
+2026-08-20].** (Supersedes the first `core/substrate.rs::materialize`, which wrongly took
+coordinates/colours as inputs and *embedded* data — see the shape correction below.)
+
+- **The mapping's shape is a Pentad** (the system's semantic core), NOT order/size/coords/colours:
+  **coherence** (centre-left) · **term-designation** (lower-mid) · **connective-designation**
+  (upper-mid) · **terms** (lower-right) · **connectives** (upper-right); **Type** = the system
+  name. **Order + size are GRAPH RULES** (the Template). **Coordinates + colours are SEPARATE
+  mappings** — the *same form* as terms→vertices (a parallel mapping onto the complete graph),
+  not part of the pentad. (Transitivity between these mappings: later.)
+- **A Functor composed of individual morphisms.** The full-system map is a **functor**, built
+  from **morphisms** that map term/connective ↔ vertex/edge, term ↔ term, and term → connective →
+  term. The **valid morphism combinatorics** — mapping **horizontally / vertically / orthogonally**
+  — *is* the **incidence + adjacency matrix combined as a line graph** (the Stage-A matrices,
+  reused as the morphism grammar).
+- **Everything is Holochain elements + links.** Vertices, edges, term characters, connective
+  characters (and coordinates, colours) are all **elements/links**. Both the **K₃ topology**
+  (vertex–edge–vertex = the *lateral topology* domain) and the **triad** (term–connective–term =
+  the *lateral system* domain) are elements/links, joined **orthogonally**: **vertex-element
+  ──link──▶ term-character-element** (edge ▶ connective-character). **Shape correction:** the
+  `Element` must **link to** its data elements, not embed `term`/`coordinate`/`colour`.
+
+**Build approach — generate, don't read [user, 2026-08-20].** Reading an existing system to
+materialise it is **blunt/backwards** — systems are **composed then stored**, so if a system is in
+the graph, composition already happened. Instead build a **model for the Controller to functionally
+articulate parameters into the DHT** (generation):
+1. **Graph rules** — **order + size** define the limits of complete graphs; **incidence + adjacency
+   matrices** express the graph's shape → **generate a Template/topology** (K₃ = 3 nodes · 3
+   connectives · triangle; K₄ = the tetrad's diamond-with-central-cross; …).
+2. **Store the topology in the DHT** and use it to **anchor** terms/connectives.
+3. **Anchor via individual morphisms** (term→vertex is possibly a **monomorphism / bimorphism**);
+   or target a whole system via a **functor**. **Template rules** (incidence+adjacency as a line
+   graph) constrain **both** topology and system shape — and since K₃ ≡ triad, they **match exactly**.
+
+**Homoiconic Controller — systems ARE the morphisms [user, 2026-08-20].** The Controller uses
+**each system as a functor**: a **Monad** (order-1) = a **monomorphism** (vertex↔term,
+vertex↔vertex); … up to a **Pentad** (order-5) = a **full-system functor** bundling morphism types
+to map the five core elements (coherence · term-designation · connective-designation · terms ·
+connectives). So the Controller **composes** system models (functional composition of
+systems-as-functors), **derives/generates** them for **DHT storage**, and **consumes them again** to
+make **remixes** (tensor products): the self-construction loop **compose → derive → store → consume →
+remix**. (NB: the Monad here is our systematics order-1 system; the FP function-monad is Holochain's
+element — distinct, see above.)
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
@@ -1105,6 +1149,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | **Class · Instantiation · Instance** | e.g. **K₄ (class) · Tetrad (instantiation) · Canonical Tetrad (instance)**. The abstract complete graph → its systematic instantiation → a concrete instance. Also the table's own structure: header/keys (class) · data types/keys (instantiation) · data/values (instance). | node-typed (nouns) | (documented; extends the existing Class/Instance dyad) | proposed |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 | **Architecture MVC** ⭐ | **Model (−)** · **View (+)** · **Controller (=)** (nouns) — base-space store · interface · six-laws algo layer. The **organising frame for the base-space remodel**: separate the concerns; Controller = the six laws of three (SPO = only the 132/interaction law). The Graph Template (Model's inner =) holds the Controller's validation rules. | node-typed (nouns) | model = backend data + base-space triad · view = `frontend/components/{browser_controls,inspector,graph_view}` · controller = middleware + six laws | proposed (user 2026-08-18) — see *The architecture is an MVC triad* |
+| **Harness** ⭐ | **Tools (+)** · **Constraints (−)** · **Environment (=)** (nouns) — what a harness *is*: the tools it affords, the constraints it imposes, reconciled by the environment it operates in. The Controller-as-harness is described by this triad. | node-typed (nouns) | seeded `system_harness_3` (`data/mod.rs`) | seeded (user, 2026-08-20; edges TBD) |
 
 ## Tetrad (order 4 — Sources / Interplays)
 

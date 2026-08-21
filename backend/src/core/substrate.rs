@@ -11,6 +11,15 @@
 //! 'orbits'** (an orbit = the two opposite directed links treated as one), so a link
 //! here holds an *unordered* endpoint pair. Materialisation is **derived** now;
 //! storable in the **DHT** later. (Retires the AD4M 'perspective'/'Link' language.)
+//!
+//! SUPERSEDED-IN-SHAPE (user, 2026-08-20): `materialize` here embeds `term`/
+//! `coordinate`/`colour` and takes coords/colours as inputs — the corrected model
+//! makes those SEPARATE mappings and has elements **link to** their data elements
+//! (vertex-element ──link──▶ term-character-element), with the mapping a **functor of
+//! morphisms over the semantic pentad** (coherence · term-designation ·
+//! connective-designation · terms · connectives), generated topology-first into the
+//! DHT. See `docs/design-intent.md` → *CORRECTED — materialisation is a Functor…*.
+//! Kept as a placeholder for the derived hypergraph until that rework.
 
 use serde::{Deserialize, Serialize};
 

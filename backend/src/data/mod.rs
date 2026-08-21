@@ -632,6 +632,18 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("law", 6),
     );
 
+    // Harness triad — what a harness *is* (the Controller-as-harness). Impulse →
+    // position: pos1 = + (tools), pos2 = − (constraints), pos3 = = (environment).
+    // Edges TBD → placeholder.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Harness",
+        3,
+        &slugs(&["tools", "constraints", "environment"]),
+        &edge_slugs("harness", 3),
+    );
+
     content
 }
 
