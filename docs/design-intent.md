@@ -361,6 +361,29 @@ mutually-anchorable faces (colour sits within the Geometry/render aspect). The c
 functions anchor onto topology *by convention*; the isomorphism means **any face could anchor any
 other**. See *The Model is an Architectural Tetrad*.
 
+**Scope check — what the Controller actually composes (honest) [user, 2026-08-20].** Distrust the
+grand phrasing. `compose_system` / `compose_render` are **pure derived functions** that each bundle
+**simple positional monomorphisms** (term `i` → vertex `i`, coordinate `i` → vertex `i`, …) over one
+order's K_n, composing **topology + one layer** (semantics *or* render), validated against the
+Template (topology) and the seeded triad (assignments). They do **NOT** compose everything at once,
+store anything (no DHT), run in the app, or perform any six-laws / tensor-product / remix operation.
+Real but modest — the **fine** level of the build. (Fix, 2026-08-20: the geometric `line` and
+`colour-line` now **anchor to their topological orbit**, so edge ↔ line ↔ colour-line correspond,
+mirroring the connective.)
+
+**Morphism scale — monomorphism · bimorphism · holomorphism [user, 2026-08-20].** The morphism kinds
+form a scale:
+- **monomorphism** — *fine*: a single positional map (vertex↔term, edge↔connective, …) — what exists.
+- **bimorphism** — the **dyadic remap** of a *decoupled* triad onto a topology (term→vertex +
+  connective→edge).
+- **holomorphism** — *coarse / whole*: the **six laws**, usable at **multiple scales** — build an
+  individual system (topology from order/vertex/edge; likewise semantics), *and* larger actions like
+  composing **Vocabulary · Topology · Geometry** as a triad, or composing a whole system from the
+  **Model · View · Controller** triad (much more complex). This coarse level is **not** happening via
+  the Controller yet.
+- **Stretch goal — autopoiesis:** one *completed* system builds another (the fully self-constructing
+  loop). The holomorphism is the hook.
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the

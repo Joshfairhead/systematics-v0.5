@@ -321,11 +321,20 @@ impl Morphism for CoordinateLine {
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        let line_id = format!("line_{}_{}_{}", self.order, a, b);
+        // lateral: coordinate → coordinate.
         hg.links.push(HyperLink {
-            id: format!("line_{}_{}_{}", self.order, a, b),
+            id: line_id.clone(),
             base: format!("coord_{}_{}", self.order, a),
             target: format!("coord_{}_{}", self.order, b),
             link_type: "line".to_string(),
+        });
+        // orthogonal: the line anchors to its topological orbit (edge ↔ line).
+        hg.links.push(HyperLink {
+            id: format!("anchor_line_{}_{}_{}", self.order, a, b),
+            base: format!("lk_{}_{}_{}", self.order, a, b),
+            target: line_id,
+            link_type: "anchor".to_string(),
         });
     }
 }
@@ -343,11 +352,20 @@ impl Morphism for ColourLine {
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        let colline_id = format!("colline_{}_{}_{}", self.order, a, b);
+        // lateral: colour → colour.
         hg.links.push(HyperLink {
-            id: format!("colline_{}_{}_{}", self.order, a, b),
+            id: colline_id.clone(),
             base: format!("colour_{}_{}", self.order, a),
             target: format!("colour_{}_{}", self.order, b),
             link_type: "colour".to_string(),
+        });
+        // orthogonal: the colour-line anchors to its topological orbit (edge ↔ colour-line).
+        hg.links.push(HyperLink {
+            id: format!("anchor_colline_{}_{}_{}", self.order, a, b),
+            base: format!("lk_{}_{}_{}", self.order, a, b),
+            target: colline_id,
+            link_type: "anchor".to_string(),
         });
     }
 }
@@ -586,5 +604,13 @@ mod tests {
         let line = hg.links.iter().find(|l| l.id == "line_3_1_2").unwrap();
         assert_eq!(line.base, "coord_3_1");
         assert_eq!(line.target, "coord_3_2");
+        // and each line / colour-line ANCHORS to its topological orbit (edge ↔ line).
+        let anchor_line = hg.links.iter().find(|l| l.id == "anchor_line_3_1_2").unwrap();
+        assert_eq!(anchor_line.base, "lk_3_1_2"); // the orbit
+        assert_eq!(anchor_line.target, "line_3_1_2");
+        assert!(hg
+            .links
+            .iter()
+            .any(|l| l.id == "anchor_colline_3_1_2" && l.base == "lk_3_1_2"));
     }
 }
