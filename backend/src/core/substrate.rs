@@ -254,6 +254,104 @@ impl Morphism for ConnectiveToOrbit {
     }
 }
 
+/// `coordinate ↦ vertex` — a monomorphism: the geometry mapping (orthogonal anchor
+/// vertex ▶ coordinate). One of the *separate* mappings (parallel to terms).
+pub struct CoordinateToVertex {
+    pub order: u8,
+    pub position: u8,
+    pub coordinate: [f64; 3],
+}
+impl Morphism for CoordinateToVertex {
+    fn kind(&self) -> MorphismKind {
+        MorphismKind::Monomorphism
+    }
+    fn apply(&self, hg: &mut Hypergraph) {
+        let coord_id = format!("coord_{}_{}", self.order, self.position);
+        hg.data.push(DataElement {
+            id: coord_id.clone(),
+            kind: "coordinate".to_string(),
+            character: format!("{},{},{}", self.coordinate[0], self.coordinate[1], self.coordinate[2]),
+        });
+        hg.links.push(HyperLink {
+            id: format!("anchor_g_{}_{}", self.order, self.position),
+            base: format!("el_{}_{}", self.order, self.position),
+            target: coord_id,
+            link_type: "anchor".to_string(),
+        });
+    }
+}
+
+/// `colour ↦ vertex` — a monomorphism: the colour mapping (orthogonal anchor
+/// vertex ▶ colour).
+pub struct ColourToVertex {
+    pub order: u8,
+    pub position: u8,
+    pub colour: String,
+}
+impl Morphism for ColourToVertex {
+    fn kind(&self) -> MorphismKind {
+        MorphismKind::Monomorphism
+    }
+    fn apply(&self, hg: &mut Hypergraph) {
+        let colour_id = format!("colour_{}_{}", self.order, self.position);
+        hg.data.push(DataElement {
+            id: colour_id.clone(),
+            kind: "colour".to_string(),
+            character: self.colour.clone(),
+        });
+        hg.links.push(HyperLink {
+            id: format!("anchor_c_{}_{}", self.order, self.position),
+            base: format!("el_{}_{}", self.order, self.position),
+            target: colour_id,
+            link_type: "anchor".to_string(),
+        });
+    }
+}
+
+/// `coordinate ↦ coordinate` — the geometry **lateral**: a **line** between the two
+/// endpoint coordinates of an edge (the transitivity partner of coordinate→vertex).
+pub struct CoordinateLine {
+    pub order: u8,
+    pub a: u8,
+    pub b: u8,
+}
+impl Morphism for CoordinateLine {
+    fn kind(&self) -> MorphismKind {
+        MorphismKind::Monomorphism
+    }
+    fn apply(&self, hg: &mut Hypergraph) {
+        let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        hg.links.push(HyperLink {
+            id: format!("line_{}_{}_{}", self.order, a, b),
+            base: format!("coord_{}_{}", self.order, a),
+            target: format!("coord_{}_{}", self.order, b),
+            link_type: "line".to_string(),
+        });
+    }
+}
+
+/// `colour ↦ colour` — the colour **lateral** (the transitivity partner of
+/// colour→vertex), relating the two endpoint colours of an edge.
+pub struct ColourLine {
+    pub order: u8,
+    pub a: u8,
+    pub b: u8,
+}
+impl Morphism for ColourLine {
+    fn kind(&self) -> MorphismKind {
+        MorphismKind::Monomorphism
+    }
+    fn apply(&self, hg: &mut Hypergraph) {
+        let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        hg.links.push(HyperLink {
+            id: format!("colline_{}_{}_{}", self.order, a, b),
+            base: format!("colour_{}_{}", self.order, a),
+            target: format!("colour_{}_{}", self.order, b),
+            link_type: "colour".to_string(),
+        });
+    }
+}
+
 /// The **bundle** of monomorphisms that composes a K_n topology from its graph rules
 /// (the `Template`): a `Position→Vertex` per vertex, an `Edge→Orbit` per edge.
 pub fn topology_morphisms(order: u8) -> Vec<Box<dyn Morphism>> {
@@ -319,6 +417,43 @@ pub fn compose_system(order: u8, terms: &[String], connectives: &[String]) -> Hy
             character: character.clone(),
         }
         .apply(&mut hg);
+    }
+    hg
+}
+
+/// **Compose the render** for an order — topology + **geometry + colour**, on the
+/// system's *own terms* (no metadata). `coordinates`/`colours` are per-position
+/// (`1..=order`). Adds each vertex's coordinate + colour (orthogonal `→vertex`), then
+/// the **lateral** lines (`coordinate→coordinate`) and colour-lines (`colour→colour`)
+/// per edge — the transitivity partners.
+pub fn compose_render(order: u8, coordinates: &[[f64; 3]], colours: &[String]) -> Hypergraph {
+    let mut hg = Hypergraph::default();
+    hg.topology.order = order;
+    for morphism in topology_morphisms(order) {
+        morphism.apply(&mut hg);
+    }
+    for position in 1..=order {
+        let idx = (position - 1) as usize;
+        if let Some(coordinate) = coordinates.get(idx) {
+            CoordinateToVertex {
+                order,
+                position,
+                coordinate: *coordinate,
+            }
+            .apply(&mut hg);
+        }
+        if let Some(colour) = colours.get(idx) {
+            ColourToVertex {
+                order,
+                position,
+                colour: colour.clone(),
+            }
+            .apply(&mut hg);
+        }
+    }
+    for (a, b) in Template::for_order(order).edges() {
+        CoordinateLine { order, a, b }.apply(&mut hg);
+        ColourLine { order, a, b }.apply(&mut hg);
     }
     hg
 }
@@ -427,5 +562,29 @@ mod tests {
             assert!(l.base.starts_with("term_") && l.target.starts_with("term_"));
             assert!(l.link_type.starts_with("conn_")); // linked BY a connective character
         }
+    }
+
+    #[test]
+    fn compose_render_places_geometry_and_colour_with_laterals() {
+        let hg = compose_render(
+            3,
+            &[[0.0, 1.0, 0.0], [-1.0, -1.0, 0.0], [1.0, -1.0, 0.0]],
+            &["red".into(), "green".into(), "blue".into()],
+        );
+        // topology intact + 3 coordinate + 3 colour data elements (own terms, no metadata).
+        assert_eq!(hg.topology.elements.len(), 3);
+        assert_eq!(hg.data.iter().filter(|d| d.kind == "coordinate").count(), 3);
+        assert_eq!(hg.data.iter().filter(|d| d.kind == "colour").count(), 3);
+        // orthogonal anchors: vertex el_3_1 ▶ coord_3_1 and ▶ colour_3_1.
+        assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == "coord_3_1"));
+        assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == "colour_3_1"));
+        assert_eq!(hg.data.iter().find(|d| d.id == "colour_3_3").unwrap().character, "blue");
+        assert_eq!(hg.data.iter().find(|d| d.id == "coord_3_1").unwrap().character, "0,1,0");
+        // laterals: 3 coordinate→coordinate lines + 3 colour→colour lines per edge.
+        assert_eq!(hg.links.iter().filter(|l| l.link_type == "line").count(), 3);
+        assert_eq!(hg.links.iter().filter(|l| l.link_type == "colour").count(), 3);
+        let line = hg.links.iter().find(|l| l.id == "line_3_1_2").unwrap();
+        assert_eq!(line.base, "coord_3_1");
+        assert_eq!(line.target, "coord_3_2");
     }
 }

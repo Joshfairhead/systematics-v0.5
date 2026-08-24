@@ -337,6 +337,30 @@ elements+links joined **orthogonally**, the semantic triad **stays decoupled if 
 (just the two orthogonal maps *term→vertex* and *connective→edge*), since the triad's internal
 term–connective–term structure is already there.
 
+**Render layer + transitivity; metadata dodecads [user, 2026-08-20].**
+- **`compose_system` stays K_n** (order → size = C(n,2)). Non-complete graphs would need order
+  **and** size plus **edge/orbit-placement rules** — deferred (best left for now).
+- **Validation to extend beyond the triad:** the rebuild check currently verifies triadic
+  assignments; it must grow to check positions for higher orders too.
+- **Geometry + colour = the render layer**, each with the **same transitivity as semantics**:
+  **coordinate→vertex** (orthogonal) *and* **coordinate→coordinate = a line** (lateral);
+  **colour→vertex** (orthogonal) *and* **colour→colour** (lateral). This renders a system **on
+  its own terms** (topology + geometry + colour) **without its metadata**.
+- **Next-beyond — metadata dodecads:** build order-12 systems of **coherence attributes**,
+  **term designations**, and **connective designations** to fill each system's **metadata**
+  sections in the view — plausibly the **first stage of the systemic product** (later,
+  multiplying terms with terms, etc.).
+
+**All four base-space types are mutually isomorphic — the Architectural Tetrad [user, 2026-08-20].**
+Topology is *an* anchor, but not the *only* one: **Template · Topology · Geometry · Vocabulary are
+all mutually transitive/isomorphic**, because each shares the same **hyperparameter** structure
+(positions 1…12). So the mappings are symmetric — **geometry↔colour, geometry↔vocabulary,
+vocabulary↔colour**, etc., not only topology↔X. This *is* the **Architectural Tetrad** (Graph
+Template ++ · Topology −− · Geometry +− · Vocabulary −+): the four are one system's four
+mutually-anchorable faces (colour sits within the Geometry/render aspect). The current `compose_*`
+functions anchor onto topology *by convention*; the isomorphism means **any face could anchor any
+other**. See *The Model is an Architectural Tetrad*.
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
