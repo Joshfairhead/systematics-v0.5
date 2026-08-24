@@ -280,14 +280,30 @@ articulate parameters into the DHT** (generation):
    graph) constrain **both** topology and system shape — and since K₃ ≡ triad, they **match exactly**.
 
 **Homoiconic Controller — systems ARE the morphisms [user, 2026-08-20].** The Controller uses
-**each system as a functor**: a **Monad** (order-1) = a **monomorphism** (vertex↔term,
-vertex↔vertex); … up to a **Pentad** (order-5) = a **full-system functor** bundling morphism types
-to map the five core elements (coherence · term-designation · connective-designation · terms ·
-connectives). So the Controller **composes** system models (functional composition of
-systems-as-functors), **derives/generates** them for **DHT storage**, and **consumes them again** to
-make **remixes** (tensor products): the self-construction loop **compose → derive → store → consume →
-remix**. (NB: the Monad here is our systematics order-1 system; the FP function-monad is Holochain's
-element — distinct, see above.)
+**each system as a functor**: a **Monad** (order-1) is the *type* of the simple mappings and a
+**monomorphism is an INSTANCE of that Monad** (user, 2026-08-20 — *the monad is not the
+monomorphism; the monomorphism instantiates it*) — e.g. vertex↔term, vertex↔vertex; … up to a
+**Pentad** (order-5) = a **full-system functor** bundling morphism types to map the five core
+elements (coherence · term-designation · connective-designation · terms · connectives). So the
+Controller **composes** system models (functional composition of systems-as-functors),
+**derives/generates** them for **DHT storage**, and **consumes them again** to make **remixes**
+(tensor products): the self-construction loop **compose → derive → store → consume → remix**.
+(NB: this Monad is our systematics order-1 system; the FP function-monad is Holochain's element —
+distinct, see above.)
+
+**Numbers are hyperparameters [user, 2026-08-20].** A number is dual: **`3` defines K₃** (a whole
+graph) **and** names **a node** (position 3) within K₃ and higher graphs. So order and position
+are the *same* hyperparameter seen at two scales — the fractal/holonic hook (a node of one system
+is itself a system).
+
+**Build the graph, then let the Controller rebuild it — validation [user, 2026-08-20].** Preferred
+path: build the system **bottom-up by functional composition**, starting from a **kernel /
+controller / harness** that composes the rest (hack around blockers as needed). The **existing
+working models** (the visualisation + correct assignments) are the **ground truth**: build the
+graph, then **validate the Controller by checking it can rebuild the same graphs**. First rung
+(implemented): `generate_topology(n)` (the controller's topology generator) must reproduce the
+seeded graph's topology for every order — see `backend/tests/controller_rebuilds_graph.rs`. As
+anchoring (terms/geometry/colour) is added, the rebuild is checked against more of the graph.
 
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
