@@ -5,7 +5,7 @@
 //! the graph rules alone. As anchoring (terms / geometry / colour) is added, this
 //! rebuild check extends to more of the graph.
 
-use systematics_backend::core::substrate::generate_topology;
+use systematics_backend::core::substrate::{compose_system, generate_topology};
 use systematics_backend::data;
 
 /// The trailing integer of an id like `point_3_1` → 1 (the position).
@@ -47,5 +47,46 @@ fn controller_rebuilds_the_topology_of_every_seeded_order() {
 
         assert_eq!(rb_positions, gt_positions, "order {order}: vertices must match");
         assert_eq!(rb_edges, gt_edges, "order {order}: edges must match");
+    }
+}
+
+/// The Controller must also rebuild the graph's **semantics** — the term/connective
+/// assignments at their canonical positions. Pull the seeded canonical triad's terms
+/// (in position order) as ground truth, `compose_system` from them, and check the
+/// anchoring lands each term on its canonical vertex.
+#[test]
+fn controller_rebuilds_canonical_triad_term_assignments() {
+    let graph = data::build_graph();
+    let sys = graph
+        .system("system_canonical_triad_3")
+        .expect("seeded canonical triad");
+    let vocab = graph.vocabulary(&sys.vocabulary_ref).expect("its vocabulary");
+
+    let char_value = |cid: &String| {
+        graph
+            .character(cid)
+            .map(|c| c.value.clone())
+            .unwrap_or_default()
+    };
+    let terms: Vec<String> = vocab.terms.iter().map(&char_value).collect();
+    let connectives: Vec<String> = vocab.connectives.iter().map(&char_value).collect();
+
+    let hg = compose_system(3, &terms, &connectives);
+
+    for (i, term) in terms.iter().enumerate() {
+        let pos = i + 1;
+        let anchored = hg
+            .data
+            .iter()
+            .find(|d| d.id == format!("term_3_{pos}"))
+            .unwrap_or_else(|| panic!("term at position {pos}"));
+        assert_eq!(&anchored.character, term, "canonical term at vertex {pos}");
+        // and it is orthogonally anchored to that exact vertex element.
+        assert!(
+            hg.links.iter().any(|l| {
+                l.base == format!("el_3_{pos}") && l.target == format!("term_3_{pos}")
+            }),
+            "term_3_{pos} must anchor to vertex el_3_{pos}"
+        );
     }
 }
