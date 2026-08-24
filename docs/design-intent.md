@@ -305,6 +305,26 @@ graph, then **validate the Controller by checking it can rebuild the same graphs
 seeded graph's topology for every order — see `backend/tests/controller_rebuilds_graph.rs`. As
 anchoring (terms/geometry/colour) is added, the rebuild is checked against more of the graph.
 
+**How the Controller builds a system — imperative build-up + micro-monads [user, 2026-08-20].**
+The Controller composes a system **bottom-up** by bundling **monomorphisms**, each a **micro-monad**
+(an FP function-monad — a container with a *single function point*). Imperative build of the topology:
+1. **Order → graph rules.** From the hyperparameter `n`, instantiate the **`Template`** (order `n`,
+   size `C(n,2)`, adjacency/incidence/line-graph) — the constraints.
+2. **Assign vertices.** For each position `p ∈ 1..=n`, apply the monomorphism `p ↦ vertex-element`
+   (`el_n_p`) — `n` micro-monads.
+3. **Assign orbits.** For each template edge `(a,b)`, apply `(a,b) ↦ orbit-link` between the two
+   vertex-elements — `C(n,2)` micro-monads (undirected orbits; each names existing vertices →
+   referential integrity).
+4. **Assemble + validate against the Template.** order → exactly `n` vertices; size → exactly
+   `C(n,2)` orbits; shape → every orbit is a legal edge of the **adjacency matrix**. This *is*
+   `Template::validate` — **the Graph Template holding the Controller's validation rules** (the
+   Stage-A insight, operationalised): the correct topology is **guaranteed** by the constraints.
+Semantic anchoring adds more monomorphism **types** (term→vertex, connective→orbit,
+coordinate→vertex, colour→vertex), each a micro-monad; **a system = the specific bundle of these
+that composes it** (up to a Pentad-functor over the five semantic elements). Since **numbers are
+hyperparameters** (order = position at another scale), the build **recurses** — a node is itself a
+system. Homoiconic: **the model is a bundled set of monomorphisms** (user, 2026-08-20).
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
