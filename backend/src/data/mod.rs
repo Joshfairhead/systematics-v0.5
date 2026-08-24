@@ -644,6 +644,18 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("harness", 3),
     );
 
+    // Interface triad — how the Controller's morphisms are expressed in Rust:
+    // struct (+, instance) · enum (−, kinds) · trait (=, interface/behaviour).
+    // Edges TBD → placeholder. (Impulse assignment tentative.)
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Interface",
+        3,
+        &slugs(&["struct", "enum", "trait"]),
+        &edge_slugs("interface", 3),
+    );
+
     content
 }
 

@@ -325,6 +325,18 @@ that composes it** (up to a Pentad-functor over the five semantic elements). Sin
 hyperparameters** (order = position at another scale), the build **recurses** — a node is itself a
 system. Homoiconic: **the model is a bundled set of monomorphisms** (user, 2026-08-20).
 
+**Semantic anchoring — decoupled triad + dyadic remap [user, 2026-08-20].** Extend the bundle with
+**semantic monomorphisms**: **term character → vertex**, **connective character → orbit**, and
+**term character → term character *linked by* a connective character** (the *lateral system* domain
+`term–connective–term`, parallel to the *lateral topology* `vertex–edge–vertex`). The **topology is
+the anchor** — terms have **canonical positions that must not be missed** (same for geometry;
+today topology · geometry · colours · semantics all correspond). Because the two domains are
+elements+links joined **orthogonally**, the semantic triad **stays decoupled if desired**: you can
+**detach** a triad (it is already internally connected through its terms + connectives) and later
+**remap** it onto a topology with an **appropriate mapping** — likely a **dyadic / 2-morphism**
+(just the two orthogonal maps *term→vertex* and *connective→edge*), since the triad's internal
+term–connective–term structure is already there.
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
@@ -1186,6 +1198,7 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 | **Architecture MVC** ⭐ | **Model (−)** · **View (+)** · **Controller (=)** (nouns) — base-space store · interface · six-laws algo layer. The **organising frame for the base-space remodel**: separate the concerns; Controller = the six laws of three (SPO = only the 132/interaction law). The Graph Template (Model's inner =) holds the Controller's validation rules. | node-typed (nouns) | model = backend data + base-space triad · view = `frontend/components/{browser_controls,inspector,graph_view}` · controller = middleware + six laws | proposed (user 2026-08-18) — see *The architecture is an MVC triad* |
 | **Harness** ⭐ | **Tools (+)** · **Constraints (−)** · **Environment (=)** (nouns) — what a harness *is*: the tools it affords, the constraints it imposes, reconciled by the environment it operates in. The Controller-as-harness is described by this triad. | node-typed (nouns) | seeded `system_harness_3` (`data/mod.rs`) | seeded (user, 2026-08-20; edges TBD) |
+| **Interface** ⭐ | **Struct (+)** · **Enum (−)** · **Trait (=)** (nouns) — how the Controller's morphisms are expressed in Rust: a **Struct** is a concrete *instance*, an **Enum** is the *kinds*/taxonomy, and a **Trait** is the *interface* (behaviour) that reconciles instances with kinds. (Impulse assignment tentative.) | node-typed (nouns) | seeded `system_interface_3`; `core/substrate.rs` (`MorphismKind` enum · `Morphism` trait · `PositionToVertex`/… structs) | seeded (user, 2026-08-20; edges TBD) |
 
 ## Tetrad (order 4 — Sources / Interplays)
 
