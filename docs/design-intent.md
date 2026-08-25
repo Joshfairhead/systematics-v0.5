@@ -449,6 +449,32 @@ starting with **`triad → monad`**. Relates to the **semantic product** (Stage 
   Flourishing** (and back, monad → triad) — a semantic composition of strong interest (extends the
   DU2 dodecad→tetrad / tensor-product intent). Not now.
 
+**Cardinality as the reconciling concept; canonical systems as hyperparameters [user, 2026-08-20].**
+**Cardinality** is a central/reconciling term — many cardinalities all stem from the number `n`:
+**order cardinality** `|V|` (vertices), **size / edge cardinality** `|E| = C(n,2)` (edges),
+**neighbourhood cardinality** (a vertex's adjacent-node count, `n−1` in `K_n`), and more. For a
+**triad**, order cardinality = 3 *and* edge cardinality = 3 (they coincide — part of what makes the
+triad special). This is exactly Bennett's theme, the **qualitative/concrete significance of number**,
+so lean on **cardinality** as core vocabulary.
+- **Canonical systems are effectively hyperparameters** — fixed values that don't change/update, all
+  determined by cardinality.
+- **CS-word question:** there's no clean CS term for "a fixed, interrelated grouping of parameters"
+  (a triad = 3 terms + 3 connectives). But the intuition that drew you to *hyperparameter* is right if
+  located precisely: **the hyperparameter is the cardinality `n`** — the single number that configures
+  the whole structure; the system is the fixed structure it *generates* (a `K_n`). Nearby precise
+  terms for the structure: **canonical form / schema / fixture / algebraic structure**; for its
+  fixedness: **constant / immutable / canonical**. So: *n* (cardinality) = the hyperparameter; the
+  triad = the `K_n` it parameterises.
+- **View metadata from cardinality:** a system's **metadata** (coherence attribute · term designation
+  · connective designation) should be *derived* by indexing the seeded **metadata dodecads** at the
+  system's cardinality — so cardinality 3 ⇒ "triad" + its three metadata values. (To wire.)
+
+**Line graph composed from the incidence matrix [user, 2026-08-20].** `Template::line_graph_adjacency`
+is now `L = Bᵀ·B` (diagonal zeroed) — **adjacency + incidence are the standalone primitives; the line
+graph is derived from them**, not a parallel definition (making the matrices load-bearing). Same K₃/K₄
+output, tests green. Next: **wire the line graph in as the morphism grammar** (the valid
+horizontal/vertical/orthogonal morphism combinatorics).
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the

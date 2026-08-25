@@ -127,17 +127,23 @@ impl Template {
     /// Template uses to **reconcile** the adjacency (vertex) and incidence
     /// (vertex×edge) views — edge-adjacency derived from shared incidence.
     pub fn line_graph_adjacency(&self) -> Vec<Vec<u8>> {
-        let edges = self.edges();
-        let m = edges.len();
+        // COMPOSED from the incidence matrix `B` (which stands on its own): the
+        // line graph is `L = Bᵀ·B` with the diagonal zeroed. `(Bᵀ·B)[i][j]` counts
+        // the shared endpoints of edges `i, j` — 0 or 1 in a simple graph — so off
+        // the diagonal it *is* the line-graph adjacency (two edges are adjacent iff
+        // they share a vertex). Adjacency and incidence are the primitives; the line
+        // graph is derived, not a parallel definition.
+        let b = self.incidence_matrix(); // n × size
+        let n = b.len();
+        let m = b.first().map_or(0, |row| row.len());
         let mut l = vec![vec![0u8; m]; m];
         for i in 0..m {
-            for j in (i + 1)..m {
-                let (a1, a2) = edges[i];
-                let (b1, b2) = edges[j];
-                if a1 == b1 || a1 == b2 || a2 == b1 || a2 == b2 {
-                    l[i][j] = 1;
-                    l[j][i] = 1;
+            for j in 0..m {
+                if i == j {
+                    continue; // zero the diagonal (Bᵀ·B has 2 there — each edge's 2 ends)
                 }
+                let shared: u8 = (0..n).map(|v| b[v][i] & b[v][j]).sum();
+                l[i][j] = shared.min(1);
             }
         }
         l
