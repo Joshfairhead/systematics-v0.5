@@ -406,20 +406,22 @@ pub fn generate_topology(cardinality: u8) -> TopologyGraph {
 /// `terms` are in index cardinality (`1..=cardinality`); `connectives` in canonical edge cardinality
 /// (`(1,2),(1,3),…`). Topology is composed first so the semantic anchors reference
 /// existing vertex/orbit elements.
-pub fn compose_system(cardinality: u8, terms: &[String], connectives: &[String]) -> Hypergraph {
-    let mut hg = Hypergraph::default();
-    hg.topology.cardinality = cardinality;
-    for morphism in topology_morphisms(cardinality) {
-        morphism.apply(&mut hg);
-    }
+/// The **vocabulary morphisms** — the semantic bundle: a `TermToVertex` per index +
+/// a `ConnectiveToOrbit` per edge. `terms` in index order (`1..=cardinality`);
+/// `connectives` in canonical edge order.
+pub fn vocabulary_morphisms(
+    cardinality: u8,
+    terms: &[String],
+    connectives: &[String],
+) -> Vec<Box<dyn Morphism>> {
+    let mut bundle: Vec<Box<dyn Morphism>> = Vec::new();
     for index in 1..=cardinality {
         if let Some(character) = terms.get((index - 1) as usize) {
-            TermToVertex {
+            bundle.push(Box::new(TermToVertex {
                 cardinality,
                 index,
                 character: character.clone(),
-            }
-            .apply(&mut hg);
+            }));
         }
     }
     for ((a, b), character) in Template::for_order(cardinality)
@@ -427,13 +429,24 @@ pub fn compose_system(cardinality: u8, terms: &[String], connectives: &[String])
         .into_iter()
         .zip(connectives.iter())
     {
-        ConnectiveToOrbit {
+        bundle.push(Box::new(ConnectiveToOrbit {
             cardinality,
             a,
             b,
             character: character.clone(),
-        }
-        .apply(&mut hg);
+        }));
+    }
+    bundle
+}
+
+pub fn compose_system(cardinality: u8, terms: &[String], connectives: &[String]) -> Hypergraph {
+    let mut hg = Hypergraph::default();
+    hg.topology.cardinality = cardinality;
+    for morphism in topology_morphisms(cardinality) {
+        morphism.apply(&mut hg);
+    }
+    for morphism in vocabulary_morphisms(cardinality, terms, connectives) {
+        morphism.apply(&mut hg);
     }
     hg
 }
@@ -443,34 +456,46 @@ pub fn compose_system(cardinality: u8, terms: &[String], connectives: &[String])
 /// (`1..=cardinality`). Adds each vertex's coordinate + colour (orthogonal `→vertex`), then
 /// the **lateral** lines (`coordinate→coordinate`) and colour-lines (`colour→colour`)
 /// per edge — the transitivity partners.
+/// The **geometry morphisms** — the render bundle (view): a `CoordinateToVertex` +
+/// `ColourToVertex` per index, and a `CoordinateLine` + `ColourLine` per edge.
+pub fn geometry_morphisms(
+    cardinality: u8,
+    coordinates: &[[f64; 3]],
+    colours: &[String],
+) -> Vec<Box<dyn Morphism>> {
+    let mut bundle: Vec<Box<dyn Morphism>> = Vec::new();
+    for index in 1..=cardinality {
+        let idx = (index - 1) as usize;
+        if let Some(coordinate) = coordinates.get(idx) {
+            bundle.push(Box::new(CoordinateToVertex {
+                cardinality,
+                index,
+                coordinate: *coordinate,
+            }));
+        }
+        if let Some(colour) = colours.get(idx) {
+            bundle.push(Box::new(ColourToVertex {
+                cardinality,
+                index,
+                colour: colour.clone(),
+            }));
+        }
+    }
+    for (a, b) in Template::for_order(cardinality).edges() {
+        bundle.push(Box::new(CoordinateLine { cardinality, a, b }));
+        bundle.push(Box::new(ColourLine { cardinality, a, b }));
+    }
+    bundle
+}
+
 pub fn compose_render(cardinality: u8, coordinates: &[[f64; 3]], colours: &[String]) -> Hypergraph {
     let mut hg = Hypergraph::default();
     hg.topology.cardinality = cardinality;
     for morphism in topology_morphisms(cardinality) {
         morphism.apply(&mut hg);
     }
-    for index in 1..=cardinality {
-        let idx = (index - 1) as usize;
-        if let Some(coordinate) = coordinates.get(idx) {
-            CoordinateToVertex {
-                cardinality,
-                index,
-                coordinate: *coordinate,
-            }
-            .apply(&mut hg);
-        }
-        if let Some(colour) = colours.get(idx) {
-            ColourToVertex {
-                cardinality,
-                index,
-                colour: colour.clone(),
-            }
-            .apply(&mut hg);
-        }
-    }
-    for (a, b) in Template::for_order(cardinality).edges() {
-        CoordinateLine { cardinality, a, b }.apply(&mut hg);
-        ColourLine { cardinality, a, b }.apply(&mut hg);
+    for morphism in geometry_morphisms(cardinality, coordinates, colours) {
+        morphism.apply(&mut hg);
     }
     hg
 }
