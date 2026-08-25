@@ -384,6 +384,37 @@ form a scale:
 - **Stretch goal — autopoiesis:** one *completed* system builds another (the fully self-constructing
   loop). The holomorphism is the hook.
 
+**The six laws of assembly — Vocabulary · Topology · Geometry [user, 2026-08-20].** The six laws
+should run at **any scale** if the system is built from triangles (up to limits); a **discontinuity
+means we built something wrong**. A concrete **near-term holomorphism target** (should be possible
+now; MVC is too much): the triad **Vocabulary (+) · Topology (−) · Geometry (=)** (positions 1·2·3),
+read the six ways (edge verbs: *generates · configures · decides · positions*):
+
+| law | reading (assembly) |
+|---|---|
+| 123 | vocabulary **generates** the topology which **configures** the geometry |
+| 132 | vocabulary **decides** the geometry which **configures** the topology |
+| 213 | topology **generates** the positioning of the vocabulary which **decides** the geometry |
+| 231 | topology **configures** the geometry which **decides** the vocabulary |
+| 312 | geometry **decides** the vocabulary which **generates** the topology |
+| 321 | geometry **configures** the topology which **generates** the vocabulary |
+
+**Colour + geometry are a special case of Vocabulary** used for the *view* — technically somewhat
+superfluous; the core is **language (vocabulary) + topology**. So the fundamental base is the
+**Vocabulary ↔ Topology** duality, with geometry/colour as view-specialisations. (NB: this assembly
+triad's impulses — Vocabulary + · Topology − · Geometry = — differ from the *Model tetrad*'s
+`Template ++ · Topology −− · Geometry +− · Vocabulary −+`; different systems, both valid.)
+
+**Tensor-product / coalescence operations — DU2 dodecad → tetrad [user, 2026-08-20; recorded intent,
+not now].** A target class of *coarse* operations (the systemic/semantic product; a **holomorphism**):
+**collapse a triad into a monad** — coalesce three values into one. The worked example from **DU2**:
+a **dodecad** (12 values) splits into **three sets of four**; taking one value from each set (aligned
+by index) forms a **triad**, giving **four triads**; each triad is **coalesced into a single value**,
+and the four results form a **tetrad**. So **dodecad → tetrad** via four `triad → monad`
+coalescences — *"basically a kind of tensor product."* **Intent:** perform such operations in-system,
+starting with **`triad → monad`**. Relates to the **semantic product** (Stage D) and the
+**holomorphism** level. Not now — recorded.
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
