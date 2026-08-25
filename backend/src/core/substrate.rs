@@ -6,7 +6,7 @@
 //!
 //! **Generate, don't read (user, 2026-08-20).** Systems are *composed then stored*,
 //! so the substrate is built by **generating** structure, not by materialising an
-//! already-composed system. Step 1 (here): from the **graph rules** — order + size
+//! already-composed system. Step 1 (here): from the **graph rules** — cardinality + size
 //! (the `Template`) and its adjacency/incidence — **generate a topology**: the K_n
 //! shape as bare elements (vertices) + undirected links (edges). We work
 //! **UNDIRECTED**: a triad's six directed links simplify to **3 bidirectional
@@ -24,20 +24,20 @@ use serde::{Deserialize, Serialize};
 use super::grammar::Template;
 
 /// A vertex of the topology — a Holochain-style **element** (a function-monad:
-/// container + actions). Bare: it holds only its topological anchor `(order,
-/// position)`. Data (term character, geometry, colour) is **linked on** later, not
+/// container + actions). Bare: it holds only its topological anchor `(cardinality,
+/// index)`. Data (term character, geometry, colour) is **linked on** later, not
 /// embedded.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Element {
     pub id: String,
-    pub order: u8,
-    /// The topological anchor: position `1..=order`.
-    pub position: u8,
+    pub cardinality: u8,
+    /// The topological anchor: index `1..=cardinality`.
+    pub index: u8,
 }
 
 /// An edge of the topology — a Holochain-style **link** (also a function-monad).
 /// One **undirected 'orbit'** (the two opposite directed links treated as one):
-/// an unordered vertex-position pair `{a, b}` with `a < b`. The connective character
+/// an unordered vertex-index pair `{a, b}` with `a < b`. The connective character
 /// is **linked on** later, not embedded.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Link {
@@ -48,13 +48,13 @@ pub struct Link {
 /// A generated topology (a K_n) as a hypergraph of bare elements + undirected links.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct TopologyGraph {
-    pub order: u8,
+    pub cardinality: u8,
     pub elements: Vec<Element>,
     pub links: Vec<Link>,
 }
 
 impl TopologyGraph {
-    /// **Validate against the graph rules** (the `Template`): order (vertex count),
+    /// **Validate against the graph rules** (the `Template`): cardinality (vertex count),
     /// size (orbit count), and shape (every orbit is a legal, undirected template
     /// edge). This is the Controller's guarantee — the Graph Template holds the
     /// validation rules, so a correct topology is *enforced*, not hoped for.
@@ -63,7 +63,7 @@ impl TopologyGraph {
         let n = template.order();
         if self.elements.len() != n as usize {
             errs.push(format!(
-                "order: {} vertices, expected {n}",
+                "cardinality: {} vertices, expected {n}",
                 self.elements.len()
             ));
         }
@@ -125,7 +125,7 @@ pub struct Hypergraph {
     pub links: Vec<HyperLink>,
 }
 
-// ---- The Controller's morphisms: micro-monads that compose a system ----
+// ---- The Controller's morphisms that compose a system ----
 
 /// The **kind** of a morphism — the taxonomy. Topology + semantic anchoring use
 /// `Monomorphism`; a decoupled-triad remap is a **`Bimorphism`** (two orthogonal
@@ -138,8 +138,7 @@ pub enum MorphismKind {
     Homomorphism,
 }
 
-/// A **morphism** — a **micro-monad** (a container with a *single function point*,
-/// `apply`). Concrete morphisms (structs) implement this and declare their `kind`.
+/// A **morphism** — a container with a *single function point* (`apply`). Concrete morphisms (structs) implement this and declare their `kind`.
 /// A system is composed by **bundling** morphisms and applying them to build up the
 /// hypergraph — "the model is a bundled set of monomorphisms".
 pub trait Morphism {
@@ -150,27 +149,27 @@ pub trait Morphism {
     fn apply(&self, hg: &mut Hypergraph);
 }
 
-/// `position ↦ vertex-element` — a monomorphism (one vertex per position).
-pub struct PositionToVertex {
-    pub order: u8,
-    pub position: u8,
+/// `index ↦ vertex-element` — a monomorphism (one vertex per index).
+pub struct IndexToVertex {
+    pub cardinality: u8,
+    pub index: u8,
 }
-impl Morphism for PositionToVertex {
+impl Morphism for IndexToVertex {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
     }
     fn apply(&self, hg: &mut Hypergraph) {
         hg.topology.elements.push(Element {
-            id: format!("el_{}_{}", self.order, self.position),
-            order: self.order,
-            position: self.position,
+            id: format!("el_{}_{}", self.cardinality, self.index),
+            cardinality: self.cardinality,
+            index: self.index,
         });
     }
 }
 
 /// `edge ↦ orbit-link` — a monomorphism (one undirected orbit per edge).
 pub struct EdgeToOrbit {
-    pub order: u8,
+    pub cardinality: u8,
     pub a: u8,
     pub b: u8,
 }
@@ -181,18 +180,18 @@ impl Morphism for EdgeToOrbit {
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
         hg.topology.links.push(Link {
-            id: format!("lk_{}_{}_{}", self.order, a, b),
+            id: format!("lk_{}_{}_{}", self.cardinality, a, b),
             endpoints: (a, b),
         });
     }
 }
 
 /// `term character ↦ vertex` — a monomorphism: adds the term as a data element and an
-/// **orthogonal anchor** from its canonical vertex to it (the position must not be
+/// **orthogonal anchor** from its canonical vertex to it (the index must not be
 /// missed — the topology is the anchor).
 pub struct TermToVertex {
-    pub order: u8,
-    pub position: u8,
+    pub cardinality: u8,
+    pub index: u8,
     pub character: String,
 }
 impl Morphism for TermToVertex {
@@ -200,15 +199,15 @@ impl Morphism for TermToVertex {
         MorphismKind::Monomorphism
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let term_id = format!("term_{}_{}", self.order, self.position);
+        let term_id = format!("term_{}_{}", self.cardinality, self.index);
         hg.data.push(DataElement {
             id: term_id.clone(),
             kind: "term".to_string(),
             character: self.character.clone(),
         });
         hg.links.push(HyperLink {
-            id: format!("anchor_v_{}_{}", self.order, self.position),
-            base: format!("el_{}_{}", self.order, self.position),
+            id: format!("anchor_v_{}_{}", self.cardinality, self.index),
+            base: format!("el_{}_{}", self.cardinality, self.index),
             target: term_id,
             link_type: "anchor".to_string(),
         });
@@ -219,7 +218,7 @@ impl Morphism for TermToVertex {
 /// element, an **orthogonal anchor** from its orbit to it, and the **lateral**
 /// `term ──connective── term` link between the orbit's two endpoint terms.
 pub struct ConnectiveToOrbit {
-    pub order: u8,
+    pub cardinality: u8,
     pub a: u8,
     pub b: u8,
     pub character: String,
@@ -230,7 +229,7 @@ impl Morphism for ConnectiveToOrbit {
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
-        let conn_id = format!("conn_{}_{}_{}", self.order, a, b);
+        let conn_id = format!("conn_{}_{}_{}", self.cardinality, a, b);
         hg.data.push(DataElement {
             id: conn_id.clone(),
             kind: "connective".to_string(),
@@ -238,17 +237,17 @@ impl Morphism for ConnectiveToOrbit {
         });
         // orthogonal anchor: orbit ▶ connective character.
         hg.links.push(HyperLink {
-            id: format!("anchor_e_{}_{}_{}", self.order, a, b),
-            base: format!("lk_{}_{}_{}", self.order, a, b),
+            id: format!("anchor_e_{}_{}_{}", self.cardinality, a, b),
+            base: format!("lk_{}_{}_{}", self.cardinality, a, b),
             target: conn_id.clone(),
             link_type: "anchor".to_string(),
         });
         // lateral system link: term_a ──connective── term_b (the link type is the
         // connective element, so the triad stands alone even without the topology).
         hg.links.push(HyperLink {
-            id: format!("lat_{}_{}_{}", self.order, a, b),
-            base: format!("term_{}_{}", self.order, a),
-            target: format!("term_{}_{}", self.order, b),
+            id: format!("lat_{}_{}_{}", self.cardinality, a, b),
+            base: format!("term_{}_{}", self.cardinality, a),
+            target: format!("term_{}_{}", self.cardinality, b),
             link_type: conn_id,
         });
     }
@@ -257,8 +256,8 @@ impl Morphism for ConnectiveToOrbit {
 /// `coordinate ↦ vertex` — a monomorphism: the geometry mapping (orthogonal anchor
 /// vertex ▶ coordinate). One of the *separate* mappings (parallel to terms).
 pub struct CoordinateToVertex {
-    pub order: u8,
-    pub position: u8,
+    pub cardinality: u8,
+    pub index: u8,
     pub coordinate: [f64; 3],
 }
 impl Morphism for CoordinateToVertex {
@@ -266,15 +265,15 @@ impl Morphism for CoordinateToVertex {
         MorphismKind::Monomorphism
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let coord_id = format!("coord_{}_{}", self.order, self.position);
+        let coord_id = format!("coord_{}_{}", self.cardinality, self.index);
         hg.data.push(DataElement {
             id: coord_id.clone(),
             kind: "coordinate".to_string(),
             character: format!("{},{},{}", self.coordinate[0], self.coordinate[1], self.coordinate[2]),
         });
         hg.links.push(HyperLink {
-            id: format!("anchor_g_{}_{}", self.order, self.position),
-            base: format!("el_{}_{}", self.order, self.position),
+            id: format!("anchor_g_{}_{}", self.cardinality, self.index),
+            base: format!("el_{}_{}", self.cardinality, self.index),
             target: coord_id,
             link_type: "anchor".to_string(),
         });
@@ -284,8 +283,8 @@ impl Morphism for CoordinateToVertex {
 /// `colour ↦ vertex` — a monomorphism: the colour mapping (orthogonal anchor
 /// vertex ▶ colour).
 pub struct ColourToVertex {
-    pub order: u8,
-    pub position: u8,
+    pub cardinality: u8,
+    pub index: u8,
     pub colour: String,
 }
 impl Morphism for ColourToVertex {
@@ -293,15 +292,15 @@ impl Morphism for ColourToVertex {
         MorphismKind::Monomorphism
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let colour_id = format!("colour_{}_{}", self.order, self.position);
+        let colour_id = format!("colour_{}_{}", self.cardinality, self.index);
         hg.data.push(DataElement {
             id: colour_id.clone(),
             kind: "colour".to_string(),
             character: self.colour.clone(),
         });
         hg.links.push(HyperLink {
-            id: format!("anchor_c_{}_{}", self.order, self.position),
-            base: format!("el_{}_{}", self.order, self.position),
+            id: format!("anchor_c_{}_{}", self.cardinality, self.index),
+            base: format!("el_{}_{}", self.cardinality, self.index),
             target: colour_id,
             link_type: "anchor".to_string(),
         });
@@ -311,7 +310,7 @@ impl Morphism for ColourToVertex {
 /// `coordinate ↦ coordinate` — the geometry **lateral**: a **line** between the two
 /// endpoint coordinates of an edge (the transitivity partner of coordinate→vertex).
 pub struct CoordinateLine {
-    pub order: u8,
+    pub cardinality: u8,
     pub a: u8,
     pub b: u8,
 }
@@ -321,18 +320,18 @@ impl Morphism for CoordinateLine {
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
-        let line_id = format!("line_{}_{}_{}", self.order, a, b);
+        let line_id = format!("line_{}_{}_{}", self.cardinality, a, b);
         // lateral: coordinate → coordinate.
         hg.links.push(HyperLink {
             id: line_id.clone(),
-            base: format!("coord_{}_{}", self.order, a),
-            target: format!("coord_{}_{}", self.order, b),
+            base: format!("coord_{}_{}", self.cardinality, a),
+            target: format!("coord_{}_{}", self.cardinality, b),
             link_type: "line".to_string(),
         });
         // orthogonal: the line anchors to its topological orbit (edge ↔ line).
         hg.links.push(HyperLink {
-            id: format!("anchor_line_{}_{}_{}", self.order, a, b),
-            base: format!("lk_{}_{}_{}", self.order, a, b),
+            id: format!("anchor_line_{}_{}_{}", self.cardinality, a, b),
+            base: format!("lk_{}_{}_{}", self.cardinality, a, b),
             target: line_id,
             link_type: "anchor".to_string(),
         });
@@ -342,7 +341,7 @@ impl Morphism for CoordinateLine {
 /// `colour ↦ colour` — the colour **lateral** (the transitivity partner of
 /// colour→vertex), relating the two endpoint colours of an edge.
 pub struct ColourLine {
-    pub order: u8,
+    pub cardinality: u8,
     pub a: u8,
     pub b: u8,
 }
@@ -352,18 +351,18 @@ impl Morphism for ColourLine {
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
-        let colline_id = format!("colline_{}_{}_{}", self.order, a, b);
+        let colline_id = format!("colline_{}_{}_{}", self.cardinality, a, b);
         // lateral: colour → colour.
         hg.links.push(HyperLink {
             id: colline_id.clone(),
-            base: format!("colour_{}_{}", self.order, a),
-            target: format!("colour_{}_{}", self.order, b),
+            base: format!("colour_{}_{}", self.cardinality, a),
+            target: format!("colour_{}_{}", self.cardinality, b),
             link_type: "colour".to_string(),
         });
         // orthogonal: the colour-line anchors to its topological orbit (edge ↔ colour-line).
         hg.links.push(HyperLink {
-            id: format!("anchor_colline_{}_{}_{}", self.order, a, b),
-            base: format!("lk_{}_{}_{}", self.order, a, b),
+            id: format!("anchor_colline_{}_{}_{}", self.cardinality, a, b),
+            base: format!("lk_{}_{}_{}", self.cardinality, a, b),
             target: colline_id,
             link_type: "anchor".to_string(),
         });
@@ -372,64 +371,64 @@ impl Morphism for ColourLine {
 
 /// The **bundle** of monomorphisms that composes a K_n topology from its graph rules
 /// (the `Template`): a `Position→Vertex` per vertex, an `Edge→Orbit` per edge.
-pub fn topology_morphisms(order: u8) -> Vec<Box<dyn Morphism>> {
+pub fn topology_morphisms(cardinality: u8) -> Vec<Box<dyn Morphism>> {
     let mut bundle: Vec<Box<dyn Morphism>> = Vec::new();
-    for position in 1..=order {
-        bundle.push(Box::new(PositionToVertex { order, position }));
+    for index in 1..=cardinality {
+        bundle.push(Box::new(IndexToVertex { cardinality, index }));
     }
-    for (a, b) in Template::for_order(order).edges() {
-        bundle.push(Box::new(EdgeToOrbit { order, a, b }));
+    for (a, b) in Template::for_order(cardinality).edges() {
+        bundle.push(Box::new(EdgeToOrbit { cardinality, a, b }));
     }
     bundle
 }
 
-/// **Generate the topology** for an order by **composing the monomorphism bundle**
-/// (applying each micro-monad to build up the graph), then **validating** the result
+/// **Generate the topology** for an cardinality by **composing the monomorphism bundle**
+/// (applying each morphism to build up the graph), then **validating** the result
 /// against the graph rules (the `Template`). Correct topology is guaranteed by the
 /// constraints. No semantics — those are anchored on by `compose_system`.
-pub fn generate_topology(order: u8) -> TopologyGraph {
+pub fn generate_topology(cardinality: u8) -> TopologyGraph {
     let mut hg = Hypergraph::default();
-    hg.topology.order = order;
-    for morphism in topology_morphisms(order) {
+    hg.topology.cardinality = cardinality;
+    for morphism in topology_morphisms(cardinality) {
         morphism.apply(&mut hg);
     }
     debug_assert!(
         hg.topology
-            .validate_against(&Template::for_order(order))
+            .validate_against(&Template::for_order(cardinality))
             .is_ok(),
         "generated topology must satisfy the template"
     );
     hg.topology
 }
 
-/// **Compose a full system hypergraph** for an order: the topology bundle, then the
-/// semantic bundle — a `TermToVertex` per position, a `ConnectiveToOrbit` per edge.
-/// `terms` are in position order (`1..=order`); `connectives` in canonical edge order
+/// **Compose a full system hypergraph** for an cardinality: the topology bundle, then the
+/// semantic bundle — a `TermToVertex` per index, a `ConnectiveToOrbit` per edge.
+/// `terms` are in index cardinality (`1..=cardinality`); `connectives` in canonical edge cardinality
 /// (`(1,2),(1,3),…`). Topology is composed first so the semantic anchors reference
 /// existing vertex/orbit elements.
-pub fn compose_system(order: u8, terms: &[String], connectives: &[String]) -> Hypergraph {
+pub fn compose_system(cardinality: u8, terms: &[String], connectives: &[String]) -> Hypergraph {
     let mut hg = Hypergraph::default();
-    hg.topology.order = order;
-    for morphism in topology_morphisms(order) {
+    hg.topology.cardinality = cardinality;
+    for morphism in topology_morphisms(cardinality) {
         morphism.apply(&mut hg);
     }
-    for position in 1..=order {
-        if let Some(character) = terms.get((position - 1) as usize) {
+    for index in 1..=cardinality {
+        if let Some(character) = terms.get((index - 1) as usize) {
             TermToVertex {
-                order,
-                position,
+                cardinality,
+                index,
                 character: character.clone(),
             }
             .apply(&mut hg);
         }
     }
-    for ((a, b), character) in Template::for_order(order)
+    for ((a, b), character) in Template::for_order(cardinality)
         .edges()
         .into_iter()
         .zip(connectives.iter())
     {
         ConnectiveToOrbit {
-            order,
+            cardinality,
             a,
             b,
             character: character.clone(),
@@ -439,39 +438,39 @@ pub fn compose_system(order: u8, terms: &[String], connectives: &[String]) -> Hy
     hg
 }
 
-/// **Compose the render** for an order — topology + **geometry + colour**, on the
-/// system's *own terms* (no metadata). `coordinates`/`colours` are per-position
-/// (`1..=order`). Adds each vertex's coordinate + colour (orthogonal `→vertex`), then
+/// **Compose the render** for an cardinality — topology + **geometry + colour**, on the
+/// system's *own terms* (no metadata). `coordinates`/`colours` are per-index
+/// (`1..=cardinality`). Adds each vertex's coordinate + colour (orthogonal `→vertex`), then
 /// the **lateral** lines (`coordinate→coordinate`) and colour-lines (`colour→colour`)
 /// per edge — the transitivity partners.
-pub fn compose_render(order: u8, coordinates: &[[f64; 3]], colours: &[String]) -> Hypergraph {
+pub fn compose_render(cardinality: u8, coordinates: &[[f64; 3]], colours: &[String]) -> Hypergraph {
     let mut hg = Hypergraph::default();
-    hg.topology.order = order;
-    for morphism in topology_morphisms(order) {
+    hg.topology.cardinality = cardinality;
+    for morphism in topology_morphisms(cardinality) {
         morphism.apply(&mut hg);
     }
-    for position in 1..=order {
-        let idx = (position - 1) as usize;
+    for index in 1..=cardinality {
+        let idx = (index - 1) as usize;
         if let Some(coordinate) = coordinates.get(idx) {
             CoordinateToVertex {
-                order,
-                position,
+                cardinality,
+                index,
                 coordinate: *coordinate,
             }
             .apply(&mut hg);
         }
         if let Some(colour) = colours.get(idx) {
             ColourToVertex {
-                order,
-                position,
+                cardinality,
+                index,
                 colour: colour.clone(),
             }
             .apply(&mut hg);
         }
     }
-    for (a, b) in Template::for_order(order).edges() {
-        CoordinateLine { order, a, b }.apply(&mut hg);
-        ColourLine { order, a, b }.apply(&mut hg);
+    for (a, b) in Template::for_order(cardinality).edges() {
+        CoordinateLine { cardinality, a, b }.apply(&mut hg);
+        ColourLine { cardinality, a, b }.apply(&mut hg);
     }
     hg
 }
@@ -486,8 +485,8 @@ mod tests {
         assert_eq!(t.elements.len(), 3);
         assert_eq!(t.links.len(), 3); // C(3,2) undirected orbits (not 6)
         assert_eq!(t.elements[0].id, "el_3_1");
-        assert_eq!(t.elements[0].position, 1);
-        // edges in canonical order, undirected (a < b).
+        assert_eq!(t.elements[0].index, 1);
+        // edges in canonical cardinality, undirected (a < b).
         assert_eq!(t.links[0].endpoints, (1, 2));
         assert_eq!(t.links[1].endpoints, (1, 3));
         assert_eq!(t.links[2].endpoints, (2, 3));
@@ -496,11 +495,11 @@ mod tests {
 
     #[test]
     fn edge_count_matches_the_template_size_for_any_order() {
-        for (order, size) in [(1u8, 0usize), (2, 1), (4, 6), (6, 15), (8, 28)] {
-            let t = generate_topology(order);
-            assert_eq!(t.elements.len(), order as usize);
+        for (cardinality, size) in [(1u8, 0usize), (2, 1), (4, 6), (6, 15), (8, 28)] {
+            let t = generate_topology(cardinality);
+            assert_eq!(t.elements.len(), cardinality as usize);
             assert_eq!(t.links.len(), size);
-            assert_eq!(t.links.len(), Template::for_order(order).size());
+            assert_eq!(t.links.len(), Template::for_order(cardinality).size());
         }
     }
 
@@ -514,7 +513,7 @@ mod tests {
     #[test]
     fn topology_morphisms_are_monomorphisms_one_per_vertex_and_edge() {
         let bundle = topology_morphisms(4);
-        // 4 vertices + C(4,2)=6 edges = 10 micro-monads, all monomorphisms.
+        // 4 vertices + C(4,2)=6 edges = 10 morphisms, all monomorphisms.
         assert_eq!(bundle.len(), 10);
         for m in &bundle {
             assert_eq!(m.kind(), MorphismKind::Monomorphism);
@@ -532,7 +531,7 @@ mod tests {
         bad.links[0].endpoints = (1, 1);
         assert!(bad.validate_against(&template).is_err());
 
-        // Break the size: drop a vertex → wrong order.
+        // Break the size: drop a vertex → wrong cardinality.
         let mut short = good;
         short.elements.pop();
         assert!(short.validate_against(&template).is_err());
@@ -551,7 +550,7 @@ mod tests {
         // 3 term + 3 connective data elements, LINKED on (not embedded).
         assert_eq!(hg.data.iter().filter(|d| d.kind == "term").count(), 3);
         assert_eq!(hg.data.iter().filter(|d| d.kind == "connective").count(), 3);
-        // canonical position: term_3_1 = Will, anchored orthogonally to vertex el_3_1.
+        // canonical index: term_3_1 = Will, anchored orthogonally to vertex el_3_1.
         assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
         let anchor = hg.links.iter().find(|l| l.id == "anchor_v_3_1").unwrap();
         assert_eq!(anchor.base, "el_3_1");

@@ -40,7 +40,7 @@ fn controller_rebuilds_the_topology_of_every_seeded_order() {
 
         // The controller's rebuild, generated from the graph rules (the Template).
         let rebuilt = generate_topology(order);
-        let mut rb_positions: Vec<u8> = rebuilt.elements.iter().map(|e| e.position).collect();
+        let mut rb_positions: Vec<u8> = rebuilt.elements.iter().map(|e| e.index).collect();
         rb_positions.sort_unstable();
         let mut rb_edges: Vec<(u8, u8)> = rebuilt.links.iter().map(|l| l.endpoints).collect();
         rb_edges.sort_unstable();

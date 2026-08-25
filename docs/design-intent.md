@@ -415,6 +415,32 @@ coalescences — *"basically a kind of tensor product."* **Intent:** perform suc
 starting with **`triad → monad`**. Relates to the **semantic product** (Stage D) and the
 **holomorphism** level. Not now — recorded.
 
+**Terminology, organisation, and the CT-monad link [user, 2026-08-20].**
+- **Retire `order`/`position` in the substrate** → **cardinality** (`|V|`, the vertex count that
+  locks the graph to `K_n`) and **index** (the 1-based vertex index). Precise terms:
+  *vertex cardinality* `|V|=n` · *vertex indexing* `v₁` · *isomorphism* `≅ K_n` · *canonical
+  ordering*. Done — `Element { id, cardinality, index }`. (The systematics **order** —
+  Monad…Dodecad — is retained *elsewhere*; for a `K_n` system it equals the cardinality.) And
+  **don't call morphisms "micro-monads"** (confusing) — just **morphisms**.
+- **`EdgeToOrbit { cardinality: 3, a: 1, b: 2 }` joins vertex 1 to vertex 2** in a 3-vertex graph —
+  the `3` is the *cardinality* (`|V|`), **not** a third vertex; 1 and 2 are the edge's two endpoints,
+  joined to *each other* (an undirected orbit). The old `order` field made this read like "anchor
+  1,2 → 3" — hence the rename.
+- **Organisation intent:** `topology_morphisms` returns a box of morphisms; with geometry +
+  semantics there are vertex-makers + edge-makers *per domain*, so we will need a **box-within-a-box**
+  (grouped by domain) and to rename `topology_morphisms` → **`morphisms`**. Needs its own
+  organisation (not yet).
+- **Controller ≈ a CT monad containing the triad `identity · composition · associativity`
+  [user, 2026-08-20; link to make].** The **composer** (`compose_system`/`compose_render`) *is* the
+  Controller's composition function; broadly the Controller is the composing layer, which looks like
+  a category-theory **monad** whose three laws form a **triad**. Open question: **are the six laws the
+  *associativity* rules?** — plausibly they are the *associative* readings/traversals (chained
+  compositions land unambiguously). Ties to the earlier note *content-addressing = identity; the six
+  laws (S₃) = the associative-lookup traversals*. Record and pursue.
+- **Coalescence example (intent):** collapse the triad **Wisdom · Health · Wealth → the monad
+  Flourishing** (and back, monad → triad) — a semantic composition of strong interest (extends the
+  DU2 dodecad→tetrad / tensor-product intent). Not now.
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
