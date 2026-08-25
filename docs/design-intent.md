@@ -346,10 +346,12 @@ term–connective–term structure is already there.
   **coordinate→vertex** (orthogonal) *and* **coordinate→coordinate = a line** (lateral);
   **colour→vertex** (orthogonal) *and* **colour→colour** (lateral). This renders a system **on
   its own terms** (topology + geometry + colour) **without its metadata**.
-- **Next-beyond — metadata dodecads:** build order-12 systems of **coherence attributes**,
-  **term designations**, and **connective designations** to fill each system's **metadata**
-  sections in the view — plausibly the **first stage of the systemic product** (later,
-  multiplying terms with terms, etc.).
+- **Metadata dodecads — SEEDED (2026-08-20):** order-12 systems `system_coherence_attributes_12`,
+  `system_term_designations_12`, `system_connective_designations_12` — the 12 values per metadata
+  dimension made explicit (from the canonical metadata; designations 9–12 still "needs research").
+  These fill each system's **metadata** sections in the view — the **first stage of the systemic
+  product** (later, multiplying terms with terms, etc.). Remaining: wire them into the view's
+  metadata sections; fill the designation 9–12 gaps.
 
 **All four base-space types are mutually isomorphic — the Architectural Tetrad [user, 2026-08-20].**
 Topology is *an* anchor, but not the *only* one: **Template · Topology · Geometry · Vocabulary are
@@ -437,6 +439,12 @@ starting with **`triad → monad`**. Relates to the **semantic product** (Stage 
   *associativity* rules?** — plausibly they are the *associative* readings/traversals (chained
   compositions land unambiguously). Ties to the earlier note *content-addressing = identity; the six
   laws (S₃) = the associative-lookup traversals*. Record and pursue.
+  - **Extension [user, 2026-08-20]:** the Controller's CT triad may be **nodes = Theorem · Lemma ·
+    Proof** (the seeded **Maths** sub-triad — theorems=1 · lemmas=2 · proofs=3, see `fragments.md`)
+    with **edges = identity · composition · associativity**. Then the **six laws** may be **lemmas
+    that compose — via identity/composition/associativity — into a theorem**. So "the Controller
+    *has* these three nodes/edges." [Proposed; the compose-check (do theorem·lemma·proof +
+    identity·composition·associativity sit cleanly on a K₃, and which edge is which?) is pending.]
 - **Coalescence example (intent):** collapse the triad **Wisdom · Health · Wealth → the monad
   Flourishing** (and back, monad → triad) — a semantic composition of strong interest (extends the
   DU2 dodecad→tetrad / tensor-product intent). Not now.

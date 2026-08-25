@@ -656,6 +656,49 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("interface", 3),
     );
 
+    // Metadata dodecads (user, 2026-08-20) — the 12 values per metadata dimension made
+    // explicit as order-12 systems, to fill the view's metadata sections (the first
+    // stage of the systemic product). Values are the canonical metadata per order
+    // (cf. `canonical_coherence` / `_term_designation` / `_connective_designation`);
+    // designations 9–12 are still "needs research". Edges TBD → placeholder.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Coherence Attributes",
+        12,
+        &slugs(&[
+            "universality", "complementarity", "dynamism", "activity_field",
+            "significance_and_potential", "coalescence", "generation", "self_sufficiency",
+            "transformation", "intrinsic_harmony", "articulate_symmetry", "perfection",
+        ]),
+        &edge_slugs("coh", 12),
+    );
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Term Designations",
+        12,
+        &slugs(&[
+            "totality", "poles", "impulses", "sources", "limits", "laws", "states", "elements",
+            "term_designation_9_needs_research", "term_designation_10_needs_research",
+            "term_designation_11_needs_research", "term_designation_12_needs_research",
+        ]),
+        &edge_slugs("tdes", 12),
+    );
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Connective Designations",
+        12,
+        &slugs(&[
+            "unity", "force", "acts", "interplays", "mutualities", "steps", "intervals",
+            "components", "connective_designation_9_needs_research",
+            "connective_designation_10_needs_research", "connective_designation_11_needs_research",
+            "connective_designation_12_needs_research",
+        ]),
+        &edge_slugs("cdes", 12),
+    );
+
     content
 }
 

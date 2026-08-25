@@ -1039,6 +1039,1171 @@
       "id": "char_word_interface_edge_3",
       "kind": "word",
       "value": "Interface Edge 3"
+    },
+    {
+      "id": "char_word_universality",
+      "kind": "word",
+      "value": "Universality"
+    },
+    {
+      "id": "char_word_complementarity",
+      "kind": "word",
+      "value": "Complementarity"
+    },
+    {
+      "id": "char_word_dynamism",
+      "kind": "word",
+      "value": "Dynamism"
+    },
+    {
+      "id": "char_word_activity_field",
+      "kind": "word",
+      "value": "Activity Field"
+    },
+    {
+      "id": "char_word_significance_and_potential",
+      "kind": "word",
+      "value": "Significance And Potential"
+    },
+    {
+      "id": "char_word_coalescence",
+      "kind": "word",
+      "value": "Coalescence"
+    },
+    {
+      "id": "char_word_generation",
+      "kind": "word",
+      "value": "Generation"
+    },
+    {
+      "id": "char_word_self_sufficiency",
+      "kind": "word",
+      "value": "Self Sufficiency"
+    },
+    {
+      "id": "char_word_transformation",
+      "kind": "word",
+      "value": "Transformation"
+    },
+    {
+      "id": "char_word_intrinsic_harmony",
+      "kind": "word",
+      "value": "Intrinsic Harmony"
+    },
+    {
+      "id": "char_word_articulate_symmetry",
+      "kind": "word",
+      "value": "Articulate Symmetry"
+    },
+    {
+      "id": "char_word_perfection",
+      "kind": "word",
+      "value": "Perfection"
+    },
+    {
+      "id": "char_word_coh_edge_1",
+      "kind": "word",
+      "value": "Coh Edge 1"
+    },
+    {
+      "id": "char_word_coh_edge_2",
+      "kind": "word",
+      "value": "Coh Edge 2"
+    },
+    {
+      "id": "char_word_coh_edge_3",
+      "kind": "word",
+      "value": "Coh Edge 3"
+    },
+    {
+      "id": "char_word_coh_edge_4",
+      "kind": "word",
+      "value": "Coh Edge 4"
+    },
+    {
+      "id": "char_word_coh_edge_5",
+      "kind": "word",
+      "value": "Coh Edge 5"
+    },
+    {
+      "id": "char_word_coh_edge_6",
+      "kind": "word",
+      "value": "Coh Edge 6"
+    },
+    {
+      "id": "char_word_coh_edge_7",
+      "kind": "word",
+      "value": "Coh Edge 7"
+    },
+    {
+      "id": "char_word_coh_edge_8",
+      "kind": "word",
+      "value": "Coh Edge 8"
+    },
+    {
+      "id": "char_word_coh_edge_9",
+      "kind": "word",
+      "value": "Coh Edge 9"
+    },
+    {
+      "id": "char_word_coh_edge_10",
+      "kind": "word",
+      "value": "Coh Edge 10"
+    },
+    {
+      "id": "char_word_coh_edge_11",
+      "kind": "word",
+      "value": "Coh Edge 11"
+    },
+    {
+      "id": "char_word_coh_edge_12",
+      "kind": "word",
+      "value": "Coh Edge 12"
+    },
+    {
+      "id": "char_word_coh_edge_13",
+      "kind": "word",
+      "value": "Coh Edge 13"
+    },
+    {
+      "id": "char_word_coh_edge_14",
+      "kind": "word",
+      "value": "Coh Edge 14"
+    },
+    {
+      "id": "char_word_coh_edge_15",
+      "kind": "word",
+      "value": "Coh Edge 15"
+    },
+    {
+      "id": "char_word_coh_edge_16",
+      "kind": "word",
+      "value": "Coh Edge 16"
+    },
+    {
+      "id": "char_word_coh_edge_17",
+      "kind": "word",
+      "value": "Coh Edge 17"
+    },
+    {
+      "id": "char_word_coh_edge_18",
+      "kind": "word",
+      "value": "Coh Edge 18"
+    },
+    {
+      "id": "char_word_coh_edge_19",
+      "kind": "word",
+      "value": "Coh Edge 19"
+    },
+    {
+      "id": "char_word_coh_edge_20",
+      "kind": "word",
+      "value": "Coh Edge 20"
+    },
+    {
+      "id": "char_word_coh_edge_21",
+      "kind": "word",
+      "value": "Coh Edge 21"
+    },
+    {
+      "id": "char_word_coh_edge_22",
+      "kind": "word",
+      "value": "Coh Edge 22"
+    },
+    {
+      "id": "char_word_coh_edge_23",
+      "kind": "word",
+      "value": "Coh Edge 23"
+    },
+    {
+      "id": "char_word_coh_edge_24",
+      "kind": "word",
+      "value": "Coh Edge 24"
+    },
+    {
+      "id": "char_word_coh_edge_25",
+      "kind": "word",
+      "value": "Coh Edge 25"
+    },
+    {
+      "id": "char_word_coh_edge_26",
+      "kind": "word",
+      "value": "Coh Edge 26"
+    },
+    {
+      "id": "char_word_coh_edge_27",
+      "kind": "word",
+      "value": "Coh Edge 27"
+    },
+    {
+      "id": "char_word_coh_edge_28",
+      "kind": "word",
+      "value": "Coh Edge 28"
+    },
+    {
+      "id": "char_word_coh_edge_29",
+      "kind": "word",
+      "value": "Coh Edge 29"
+    },
+    {
+      "id": "char_word_coh_edge_30",
+      "kind": "word",
+      "value": "Coh Edge 30"
+    },
+    {
+      "id": "char_word_coh_edge_31",
+      "kind": "word",
+      "value": "Coh Edge 31"
+    },
+    {
+      "id": "char_word_coh_edge_32",
+      "kind": "word",
+      "value": "Coh Edge 32"
+    },
+    {
+      "id": "char_word_coh_edge_33",
+      "kind": "word",
+      "value": "Coh Edge 33"
+    },
+    {
+      "id": "char_word_coh_edge_34",
+      "kind": "word",
+      "value": "Coh Edge 34"
+    },
+    {
+      "id": "char_word_coh_edge_35",
+      "kind": "word",
+      "value": "Coh Edge 35"
+    },
+    {
+      "id": "char_word_coh_edge_36",
+      "kind": "word",
+      "value": "Coh Edge 36"
+    },
+    {
+      "id": "char_word_coh_edge_37",
+      "kind": "word",
+      "value": "Coh Edge 37"
+    },
+    {
+      "id": "char_word_coh_edge_38",
+      "kind": "word",
+      "value": "Coh Edge 38"
+    },
+    {
+      "id": "char_word_coh_edge_39",
+      "kind": "word",
+      "value": "Coh Edge 39"
+    },
+    {
+      "id": "char_word_coh_edge_40",
+      "kind": "word",
+      "value": "Coh Edge 40"
+    },
+    {
+      "id": "char_word_coh_edge_41",
+      "kind": "word",
+      "value": "Coh Edge 41"
+    },
+    {
+      "id": "char_word_coh_edge_42",
+      "kind": "word",
+      "value": "Coh Edge 42"
+    },
+    {
+      "id": "char_word_coh_edge_43",
+      "kind": "word",
+      "value": "Coh Edge 43"
+    },
+    {
+      "id": "char_word_coh_edge_44",
+      "kind": "word",
+      "value": "Coh Edge 44"
+    },
+    {
+      "id": "char_word_coh_edge_45",
+      "kind": "word",
+      "value": "Coh Edge 45"
+    },
+    {
+      "id": "char_word_coh_edge_46",
+      "kind": "word",
+      "value": "Coh Edge 46"
+    },
+    {
+      "id": "char_word_coh_edge_47",
+      "kind": "word",
+      "value": "Coh Edge 47"
+    },
+    {
+      "id": "char_word_coh_edge_48",
+      "kind": "word",
+      "value": "Coh Edge 48"
+    },
+    {
+      "id": "char_word_coh_edge_49",
+      "kind": "word",
+      "value": "Coh Edge 49"
+    },
+    {
+      "id": "char_word_coh_edge_50",
+      "kind": "word",
+      "value": "Coh Edge 50"
+    },
+    {
+      "id": "char_word_coh_edge_51",
+      "kind": "word",
+      "value": "Coh Edge 51"
+    },
+    {
+      "id": "char_word_coh_edge_52",
+      "kind": "word",
+      "value": "Coh Edge 52"
+    },
+    {
+      "id": "char_word_coh_edge_53",
+      "kind": "word",
+      "value": "Coh Edge 53"
+    },
+    {
+      "id": "char_word_coh_edge_54",
+      "kind": "word",
+      "value": "Coh Edge 54"
+    },
+    {
+      "id": "char_word_coh_edge_55",
+      "kind": "word",
+      "value": "Coh Edge 55"
+    },
+    {
+      "id": "char_word_coh_edge_56",
+      "kind": "word",
+      "value": "Coh Edge 56"
+    },
+    {
+      "id": "char_word_coh_edge_57",
+      "kind": "word",
+      "value": "Coh Edge 57"
+    },
+    {
+      "id": "char_word_coh_edge_58",
+      "kind": "word",
+      "value": "Coh Edge 58"
+    },
+    {
+      "id": "char_word_coh_edge_59",
+      "kind": "word",
+      "value": "Coh Edge 59"
+    },
+    {
+      "id": "char_word_coh_edge_60",
+      "kind": "word",
+      "value": "Coh Edge 60"
+    },
+    {
+      "id": "char_word_coh_edge_61",
+      "kind": "word",
+      "value": "Coh Edge 61"
+    },
+    {
+      "id": "char_word_coh_edge_62",
+      "kind": "word",
+      "value": "Coh Edge 62"
+    },
+    {
+      "id": "char_word_coh_edge_63",
+      "kind": "word",
+      "value": "Coh Edge 63"
+    },
+    {
+      "id": "char_word_coh_edge_64",
+      "kind": "word",
+      "value": "Coh Edge 64"
+    },
+    {
+      "id": "char_word_coh_edge_65",
+      "kind": "word",
+      "value": "Coh Edge 65"
+    },
+    {
+      "id": "char_word_coh_edge_66",
+      "kind": "word",
+      "value": "Coh Edge 66"
+    },
+    {
+      "id": "char_word_totality",
+      "kind": "word",
+      "value": "Totality"
+    },
+    {
+      "id": "char_word_poles",
+      "kind": "word",
+      "value": "Poles"
+    },
+    {
+      "id": "char_word_impulses",
+      "kind": "word",
+      "value": "Impulses"
+    },
+    {
+      "id": "char_word_sources",
+      "kind": "word",
+      "value": "Sources"
+    },
+    {
+      "id": "char_word_limits",
+      "kind": "word",
+      "value": "Limits"
+    },
+    {
+      "id": "char_word_laws",
+      "kind": "word",
+      "value": "Laws"
+    },
+    {
+      "id": "char_word_states",
+      "kind": "word",
+      "value": "States"
+    },
+    {
+      "id": "char_word_elements",
+      "kind": "word",
+      "value": "Elements"
+    },
+    {
+      "id": "char_word_term_designation_9_needs_research",
+      "kind": "word",
+      "value": "Term Designation 9 Needs Research"
+    },
+    {
+      "id": "char_word_term_designation_10_needs_research",
+      "kind": "word",
+      "value": "Term Designation 10 Needs Research"
+    },
+    {
+      "id": "char_word_term_designation_11_needs_research",
+      "kind": "word",
+      "value": "Term Designation 11 Needs Research"
+    },
+    {
+      "id": "char_word_term_designation_12_needs_research",
+      "kind": "word",
+      "value": "Term Designation 12 Needs Research"
+    },
+    {
+      "id": "char_word_tdes_edge_1",
+      "kind": "word",
+      "value": "Tdes Edge 1"
+    },
+    {
+      "id": "char_word_tdes_edge_2",
+      "kind": "word",
+      "value": "Tdes Edge 2"
+    },
+    {
+      "id": "char_word_tdes_edge_3",
+      "kind": "word",
+      "value": "Tdes Edge 3"
+    },
+    {
+      "id": "char_word_tdes_edge_4",
+      "kind": "word",
+      "value": "Tdes Edge 4"
+    },
+    {
+      "id": "char_word_tdes_edge_5",
+      "kind": "word",
+      "value": "Tdes Edge 5"
+    },
+    {
+      "id": "char_word_tdes_edge_6",
+      "kind": "word",
+      "value": "Tdes Edge 6"
+    },
+    {
+      "id": "char_word_tdes_edge_7",
+      "kind": "word",
+      "value": "Tdes Edge 7"
+    },
+    {
+      "id": "char_word_tdes_edge_8",
+      "kind": "word",
+      "value": "Tdes Edge 8"
+    },
+    {
+      "id": "char_word_tdes_edge_9",
+      "kind": "word",
+      "value": "Tdes Edge 9"
+    },
+    {
+      "id": "char_word_tdes_edge_10",
+      "kind": "word",
+      "value": "Tdes Edge 10"
+    },
+    {
+      "id": "char_word_tdes_edge_11",
+      "kind": "word",
+      "value": "Tdes Edge 11"
+    },
+    {
+      "id": "char_word_tdes_edge_12",
+      "kind": "word",
+      "value": "Tdes Edge 12"
+    },
+    {
+      "id": "char_word_tdes_edge_13",
+      "kind": "word",
+      "value": "Tdes Edge 13"
+    },
+    {
+      "id": "char_word_tdes_edge_14",
+      "kind": "word",
+      "value": "Tdes Edge 14"
+    },
+    {
+      "id": "char_word_tdes_edge_15",
+      "kind": "word",
+      "value": "Tdes Edge 15"
+    },
+    {
+      "id": "char_word_tdes_edge_16",
+      "kind": "word",
+      "value": "Tdes Edge 16"
+    },
+    {
+      "id": "char_word_tdes_edge_17",
+      "kind": "word",
+      "value": "Tdes Edge 17"
+    },
+    {
+      "id": "char_word_tdes_edge_18",
+      "kind": "word",
+      "value": "Tdes Edge 18"
+    },
+    {
+      "id": "char_word_tdes_edge_19",
+      "kind": "word",
+      "value": "Tdes Edge 19"
+    },
+    {
+      "id": "char_word_tdes_edge_20",
+      "kind": "word",
+      "value": "Tdes Edge 20"
+    },
+    {
+      "id": "char_word_tdes_edge_21",
+      "kind": "word",
+      "value": "Tdes Edge 21"
+    },
+    {
+      "id": "char_word_tdes_edge_22",
+      "kind": "word",
+      "value": "Tdes Edge 22"
+    },
+    {
+      "id": "char_word_tdes_edge_23",
+      "kind": "word",
+      "value": "Tdes Edge 23"
+    },
+    {
+      "id": "char_word_tdes_edge_24",
+      "kind": "word",
+      "value": "Tdes Edge 24"
+    },
+    {
+      "id": "char_word_tdes_edge_25",
+      "kind": "word",
+      "value": "Tdes Edge 25"
+    },
+    {
+      "id": "char_word_tdes_edge_26",
+      "kind": "word",
+      "value": "Tdes Edge 26"
+    },
+    {
+      "id": "char_word_tdes_edge_27",
+      "kind": "word",
+      "value": "Tdes Edge 27"
+    },
+    {
+      "id": "char_word_tdes_edge_28",
+      "kind": "word",
+      "value": "Tdes Edge 28"
+    },
+    {
+      "id": "char_word_tdes_edge_29",
+      "kind": "word",
+      "value": "Tdes Edge 29"
+    },
+    {
+      "id": "char_word_tdes_edge_30",
+      "kind": "word",
+      "value": "Tdes Edge 30"
+    },
+    {
+      "id": "char_word_tdes_edge_31",
+      "kind": "word",
+      "value": "Tdes Edge 31"
+    },
+    {
+      "id": "char_word_tdes_edge_32",
+      "kind": "word",
+      "value": "Tdes Edge 32"
+    },
+    {
+      "id": "char_word_tdes_edge_33",
+      "kind": "word",
+      "value": "Tdes Edge 33"
+    },
+    {
+      "id": "char_word_tdes_edge_34",
+      "kind": "word",
+      "value": "Tdes Edge 34"
+    },
+    {
+      "id": "char_word_tdes_edge_35",
+      "kind": "word",
+      "value": "Tdes Edge 35"
+    },
+    {
+      "id": "char_word_tdes_edge_36",
+      "kind": "word",
+      "value": "Tdes Edge 36"
+    },
+    {
+      "id": "char_word_tdes_edge_37",
+      "kind": "word",
+      "value": "Tdes Edge 37"
+    },
+    {
+      "id": "char_word_tdes_edge_38",
+      "kind": "word",
+      "value": "Tdes Edge 38"
+    },
+    {
+      "id": "char_word_tdes_edge_39",
+      "kind": "word",
+      "value": "Tdes Edge 39"
+    },
+    {
+      "id": "char_word_tdes_edge_40",
+      "kind": "word",
+      "value": "Tdes Edge 40"
+    },
+    {
+      "id": "char_word_tdes_edge_41",
+      "kind": "word",
+      "value": "Tdes Edge 41"
+    },
+    {
+      "id": "char_word_tdes_edge_42",
+      "kind": "word",
+      "value": "Tdes Edge 42"
+    },
+    {
+      "id": "char_word_tdes_edge_43",
+      "kind": "word",
+      "value": "Tdes Edge 43"
+    },
+    {
+      "id": "char_word_tdes_edge_44",
+      "kind": "word",
+      "value": "Tdes Edge 44"
+    },
+    {
+      "id": "char_word_tdes_edge_45",
+      "kind": "word",
+      "value": "Tdes Edge 45"
+    },
+    {
+      "id": "char_word_tdes_edge_46",
+      "kind": "word",
+      "value": "Tdes Edge 46"
+    },
+    {
+      "id": "char_word_tdes_edge_47",
+      "kind": "word",
+      "value": "Tdes Edge 47"
+    },
+    {
+      "id": "char_word_tdes_edge_48",
+      "kind": "word",
+      "value": "Tdes Edge 48"
+    },
+    {
+      "id": "char_word_tdes_edge_49",
+      "kind": "word",
+      "value": "Tdes Edge 49"
+    },
+    {
+      "id": "char_word_tdes_edge_50",
+      "kind": "word",
+      "value": "Tdes Edge 50"
+    },
+    {
+      "id": "char_word_tdes_edge_51",
+      "kind": "word",
+      "value": "Tdes Edge 51"
+    },
+    {
+      "id": "char_word_tdes_edge_52",
+      "kind": "word",
+      "value": "Tdes Edge 52"
+    },
+    {
+      "id": "char_word_tdes_edge_53",
+      "kind": "word",
+      "value": "Tdes Edge 53"
+    },
+    {
+      "id": "char_word_tdes_edge_54",
+      "kind": "word",
+      "value": "Tdes Edge 54"
+    },
+    {
+      "id": "char_word_tdes_edge_55",
+      "kind": "word",
+      "value": "Tdes Edge 55"
+    },
+    {
+      "id": "char_word_tdes_edge_56",
+      "kind": "word",
+      "value": "Tdes Edge 56"
+    },
+    {
+      "id": "char_word_tdes_edge_57",
+      "kind": "word",
+      "value": "Tdes Edge 57"
+    },
+    {
+      "id": "char_word_tdes_edge_58",
+      "kind": "word",
+      "value": "Tdes Edge 58"
+    },
+    {
+      "id": "char_word_tdes_edge_59",
+      "kind": "word",
+      "value": "Tdes Edge 59"
+    },
+    {
+      "id": "char_word_tdes_edge_60",
+      "kind": "word",
+      "value": "Tdes Edge 60"
+    },
+    {
+      "id": "char_word_tdes_edge_61",
+      "kind": "word",
+      "value": "Tdes Edge 61"
+    },
+    {
+      "id": "char_word_tdes_edge_62",
+      "kind": "word",
+      "value": "Tdes Edge 62"
+    },
+    {
+      "id": "char_word_tdes_edge_63",
+      "kind": "word",
+      "value": "Tdes Edge 63"
+    },
+    {
+      "id": "char_word_tdes_edge_64",
+      "kind": "word",
+      "value": "Tdes Edge 64"
+    },
+    {
+      "id": "char_word_tdes_edge_65",
+      "kind": "word",
+      "value": "Tdes Edge 65"
+    },
+    {
+      "id": "char_word_tdes_edge_66",
+      "kind": "word",
+      "value": "Tdes Edge 66"
+    },
+    {
+      "id": "char_word_force",
+      "kind": "word",
+      "value": "Force"
+    },
+    {
+      "id": "char_word_acts",
+      "kind": "word",
+      "value": "Acts"
+    },
+    {
+      "id": "char_word_interplays",
+      "kind": "word",
+      "value": "Interplays"
+    },
+    {
+      "id": "char_word_mutualities",
+      "kind": "word",
+      "value": "Mutualities"
+    },
+    {
+      "id": "char_word_steps",
+      "kind": "word",
+      "value": "Steps"
+    },
+    {
+      "id": "char_word_intervals",
+      "kind": "word",
+      "value": "Intervals"
+    },
+    {
+      "id": "char_word_components",
+      "kind": "word",
+      "value": "Components"
+    },
+    {
+      "id": "char_word_connective_designation_9_needs_research",
+      "kind": "word",
+      "value": "Connective Designation 9 Needs Research"
+    },
+    {
+      "id": "char_word_connective_designation_10_needs_research",
+      "kind": "word",
+      "value": "Connective Designation 10 Needs Research"
+    },
+    {
+      "id": "char_word_connective_designation_11_needs_research",
+      "kind": "word",
+      "value": "Connective Designation 11 Needs Research"
+    },
+    {
+      "id": "char_word_connective_designation_12_needs_research",
+      "kind": "word",
+      "value": "Connective Designation 12 Needs Research"
+    },
+    {
+      "id": "char_word_cdes_edge_1",
+      "kind": "word",
+      "value": "Cdes Edge 1"
+    },
+    {
+      "id": "char_word_cdes_edge_2",
+      "kind": "word",
+      "value": "Cdes Edge 2"
+    },
+    {
+      "id": "char_word_cdes_edge_3",
+      "kind": "word",
+      "value": "Cdes Edge 3"
+    },
+    {
+      "id": "char_word_cdes_edge_4",
+      "kind": "word",
+      "value": "Cdes Edge 4"
+    },
+    {
+      "id": "char_word_cdes_edge_5",
+      "kind": "word",
+      "value": "Cdes Edge 5"
+    },
+    {
+      "id": "char_word_cdes_edge_6",
+      "kind": "word",
+      "value": "Cdes Edge 6"
+    },
+    {
+      "id": "char_word_cdes_edge_7",
+      "kind": "word",
+      "value": "Cdes Edge 7"
+    },
+    {
+      "id": "char_word_cdes_edge_8",
+      "kind": "word",
+      "value": "Cdes Edge 8"
+    },
+    {
+      "id": "char_word_cdes_edge_9",
+      "kind": "word",
+      "value": "Cdes Edge 9"
+    },
+    {
+      "id": "char_word_cdes_edge_10",
+      "kind": "word",
+      "value": "Cdes Edge 10"
+    },
+    {
+      "id": "char_word_cdes_edge_11",
+      "kind": "word",
+      "value": "Cdes Edge 11"
+    },
+    {
+      "id": "char_word_cdes_edge_12",
+      "kind": "word",
+      "value": "Cdes Edge 12"
+    },
+    {
+      "id": "char_word_cdes_edge_13",
+      "kind": "word",
+      "value": "Cdes Edge 13"
+    },
+    {
+      "id": "char_word_cdes_edge_14",
+      "kind": "word",
+      "value": "Cdes Edge 14"
+    },
+    {
+      "id": "char_word_cdes_edge_15",
+      "kind": "word",
+      "value": "Cdes Edge 15"
+    },
+    {
+      "id": "char_word_cdes_edge_16",
+      "kind": "word",
+      "value": "Cdes Edge 16"
+    },
+    {
+      "id": "char_word_cdes_edge_17",
+      "kind": "word",
+      "value": "Cdes Edge 17"
+    },
+    {
+      "id": "char_word_cdes_edge_18",
+      "kind": "word",
+      "value": "Cdes Edge 18"
+    },
+    {
+      "id": "char_word_cdes_edge_19",
+      "kind": "word",
+      "value": "Cdes Edge 19"
+    },
+    {
+      "id": "char_word_cdes_edge_20",
+      "kind": "word",
+      "value": "Cdes Edge 20"
+    },
+    {
+      "id": "char_word_cdes_edge_21",
+      "kind": "word",
+      "value": "Cdes Edge 21"
+    },
+    {
+      "id": "char_word_cdes_edge_22",
+      "kind": "word",
+      "value": "Cdes Edge 22"
+    },
+    {
+      "id": "char_word_cdes_edge_23",
+      "kind": "word",
+      "value": "Cdes Edge 23"
+    },
+    {
+      "id": "char_word_cdes_edge_24",
+      "kind": "word",
+      "value": "Cdes Edge 24"
+    },
+    {
+      "id": "char_word_cdes_edge_25",
+      "kind": "word",
+      "value": "Cdes Edge 25"
+    },
+    {
+      "id": "char_word_cdes_edge_26",
+      "kind": "word",
+      "value": "Cdes Edge 26"
+    },
+    {
+      "id": "char_word_cdes_edge_27",
+      "kind": "word",
+      "value": "Cdes Edge 27"
+    },
+    {
+      "id": "char_word_cdes_edge_28",
+      "kind": "word",
+      "value": "Cdes Edge 28"
+    },
+    {
+      "id": "char_word_cdes_edge_29",
+      "kind": "word",
+      "value": "Cdes Edge 29"
+    },
+    {
+      "id": "char_word_cdes_edge_30",
+      "kind": "word",
+      "value": "Cdes Edge 30"
+    },
+    {
+      "id": "char_word_cdes_edge_31",
+      "kind": "word",
+      "value": "Cdes Edge 31"
+    },
+    {
+      "id": "char_word_cdes_edge_32",
+      "kind": "word",
+      "value": "Cdes Edge 32"
+    },
+    {
+      "id": "char_word_cdes_edge_33",
+      "kind": "word",
+      "value": "Cdes Edge 33"
+    },
+    {
+      "id": "char_word_cdes_edge_34",
+      "kind": "word",
+      "value": "Cdes Edge 34"
+    },
+    {
+      "id": "char_word_cdes_edge_35",
+      "kind": "word",
+      "value": "Cdes Edge 35"
+    },
+    {
+      "id": "char_word_cdes_edge_36",
+      "kind": "word",
+      "value": "Cdes Edge 36"
+    },
+    {
+      "id": "char_word_cdes_edge_37",
+      "kind": "word",
+      "value": "Cdes Edge 37"
+    },
+    {
+      "id": "char_word_cdes_edge_38",
+      "kind": "word",
+      "value": "Cdes Edge 38"
+    },
+    {
+      "id": "char_word_cdes_edge_39",
+      "kind": "word",
+      "value": "Cdes Edge 39"
+    },
+    {
+      "id": "char_word_cdes_edge_40",
+      "kind": "word",
+      "value": "Cdes Edge 40"
+    },
+    {
+      "id": "char_word_cdes_edge_41",
+      "kind": "word",
+      "value": "Cdes Edge 41"
+    },
+    {
+      "id": "char_word_cdes_edge_42",
+      "kind": "word",
+      "value": "Cdes Edge 42"
+    },
+    {
+      "id": "char_word_cdes_edge_43",
+      "kind": "word",
+      "value": "Cdes Edge 43"
+    },
+    {
+      "id": "char_word_cdes_edge_44",
+      "kind": "word",
+      "value": "Cdes Edge 44"
+    },
+    {
+      "id": "char_word_cdes_edge_45",
+      "kind": "word",
+      "value": "Cdes Edge 45"
+    },
+    {
+      "id": "char_word_cdes_edge_46",
+      "kind": "word",
+      "value": "Cdes Edge 46"
+    },
+    {
+      "id": "char_word_cdes_edge_47",
+      "kind": "word",
+      "value": "Cdes Edge 47"
+    },
+    {
+      "id": "char_word_cdes_edge_48",
+      "kind": "word",
+      "value": "Cdes Edge 48"
+    },
+    {
+      "id": "char_word_cdes_edge_49",
+      "kind": "word",
+      "value": "Cdes Edge 49"
+    },
+    {
+      "id": "char_word_cdes_edge_50",
+      "kind": "word",
+      "value": "Cdes Edge 50"
+    },
+    {
+      "id": "char_word_cdes_edge_51",
+      "kind": "word",
+      "value": "Cdes Edge 51"
+    },
+    {
+      "id": "char_word_cdes_edge_52",
+      "kind": "word",
+      "value": "Cdes Edge 52"
+    },
+    {
+      "id": "char_word_cdes_edge_53",
+      "kind": "word",
+      "value": "Cdes Edge 53"
+    },
+    {
+      "id": "char_word_cdes_edge_54",
+      "kind": "word",
+      "value": "Cdes Edge 54"
+    },
+    {
+      "id": "char_word_cdes_edge_55",
+      "kind": "word",
+      "value": "Cdes Edge 55"
+    },
+    {
+      "id": "char_word_cdes_edge_56",
+      "kind": "word",
+      "value": "Cdes Edge 56"
+    },
+    {
+      "id": "char_word_cdes_edge_57",
+      "kind": "word",
+      "value": "Cdes Edge 57"
+    },
+    {
+      "id": "char_word_cdes_edge_58",
+      "kind": "word",
+      "value": "Cdes Edge 58"
+    },
+    {
+      "id": "char_word_cdes_edge_59",
+      "kind": "word",
+      "value": "Cdes Edge 59"
+    },
+    {
+      "id": "char_word_cdes_edge_60",
+      "kind": "word",
+      "value": "Cdes Edge 60"
+    },
+    {
+      "id": "char_word_cdes_edge_61",
+      "kind": "word",
+      "value": "Cdes Edge 61"
+    },
+    {
+      "id": "char_word_cdes_edge_62",
+      "kind": "word",
+      "value": "Cdes Edge 62"
+    },
+    {
+      "id": "char_word_cdes_edge_63",
+      "kind": "word",
+      "value": "Cdes Edge 63"
+    },
+    {
+      "id": "char_word_cdes_edge_64",
+      "kind": "word",
+      "value": "Cdes Edge 64"
+    },
+    {
+      "id": "char_word_cdes_edge_65",
+      "kind": "word",
+      "value": "Cdes Edge 65"
+    },
+    {
+      "id": "char_word_cdes_edge_66",
+      "kind": "word",
+      "value": "Cdes Edge 66"
     }
   ],
   "coordinates": [],
@@ -1550,6 +2715,267 @@
         "char_word_interface_edge_2",
         "char_word_interface_edge_3"
       ]
+    },
+    {
+      "id": "vocab_coherence_attributes_12",
+      "name": "Coherence Attributes",
+      "order": 12,
+      "terms": [
+        "char_word_universality",
+        "char_word_complementarity",
+        "char_word_dynamism",
+        "char_word_activity_field",
+        "char_word_significance_and_potential",
+        "char_word_coalescence",
+        "char_word_generation",
+        "char_word_self_sufficiency",
+        "char_word_transformation",
+        "char_word_intrinsic_harmony",
+        "char_word_articulate_symmetry",
+        "char_word_perfection"
+      ],
+      "connectives": [
+        "char_word_coh_edge_1",
+        "char_word_coh_edge_2",
+        "char_word_coh_edge_3",
+        "char_word_coh_edge_4",
+        "char_word_coh_edge_5",
+        "char_word_coh_edge_6",
+        "char_word_coh_edge_7",
+        "char_word_coh_edge_8",
+        "char_word_coh_edge_9",
+        "char_word_coh_edge_10",
+        "char_word_coh_edge_11",
+        "char_word_coh_edge_12",
+        "char_word_coh_edge_13",
+        "char_word_coh_edge_14",
+        "char_word_coh_edge_15",
+        "char_word_coh_edge_16",
+        "char_word_coh_edge_17",
+        "char_word_coh_edge_18",
+        "char_word_coh_edge_19",
+        "char_word_coh_edge_20",
+        "char_word_coh_edge_21",
+        "char_word_coh_edge_22",
+        "char_word_coh_edge_23",
+        "char_word_coh_edge_24",
+        "char_word_coh_edge_25",
+        "char_word_coh_edge_26",
+        "char_word_coh_edge_27",
+        "char_word_coh_edge_28",
+        "char_word_coh_edge_29",
+        "char_word_coh_edge_30",
+        "char_word_coh_edge_31",
+        "char_word_coh_edge_32",
+        "char_word_coh_edge_33",
+        "char_word_coh_edge_34",
+        "char_word_coh_edge_35",
+        "char_word_coh_edge_36",
+        "char_word_coh_edge_37",
+        "char_word_coh_edge_38",
+        "char_word_coh_edge_39",
+        "char_word_coh_edge_40",
+        "char_word_coh_edge_41",
+        "char_word_coh_edge_42",
+        "char_word_coh_edge_43",
+        "char_word_coh_edge_44",
+        "char_word_coh_edge_45",
+        "char_word_coh_edge_46",
+        "char_word_coh_edge_47",
+        "char_word_coh_edge_48",
+        "char_word_coh_edge_49",
+        "char_word_coh_edge_50",
+        "char_word_coh_edge_51",
+        "char_word_coh_edge_52",
+        "char_word_coh_edge_53",
+        "char_word_coh_edge_54",
+        "char_word_coh_edge_55",
+        "char_word_coh_edge_56",
+        "char_word_coh_edge_57",
+        "char_word_coh_edge_58",
+        "char_word_coh_edge_59",
+        "char_word_coh_edge_60",
+        "char_word_coh_edge_61",
+        "char_word_coh_edge_62",
+        "char_word_coh_edge_63",
+        "char_word_coh_edge_64",
+        "char_word_coh_edge_65",
+        "char_word_coh_edge_66"
+      ]
+    },
+    {
+      "id": "vocab_term_designations_12",
+      "name": "Term Designations",
+      "order": 12,
+      "terms": [
+        "char_word_totality",
+        "char_word_poles",
+        "char_word_impulses",
+        "char_word_sources",
+        "char_word_limits",
+        "char_word_laws",
+        "char_word_states",
+        "char_word_elements",
+        "char_word_term_designation_9_needs_research",
+        "char_word_term_designation_10_needs_research",
+        "char_word_term_designation_11_needs_research",
+        "char_word_term_designation_12_needs_research"
+      ],
+      "connectives": [
+        "char_word_tdes_edge_1",
+        "char_word_tdes_edge_2",
+        "char_word_tdes_edge_3",
+        "char_word_tdes_edge_4",
+        "char_word_tdes_edge_5",
+        "char_word_tdes_edge_6",
+        "char_word_tdes_edge_7",
+        "char_word_tdes_edge_8",
+        "char_word_tdes_edge_9",
+        "char_word_tdes_edge_10",
+        "char_word_tdes_edge_11",
+        "char_word_tdes_edge_12",
+        "char_word_tdes_edge_13",
+        "char_word_tdes_edge_14",
+        "char_word_tdes_edge_15",
+        "char_word_tdes_edge_16",
+        "char_word_tdes_edge_17",
+        "char_word_tdes_edge_18",
+        "char_word_tdes_edge_19",
+        "char_word_tdes_edge_20",
+        "char_word_tdes_edge_21",
+        "char_word_tdes_edge_22",
+        "char_word_tdes_edge_23",
+        "char_word_tdes_edge_24",
+        "char_word_tdes_edge_25",
+        "char_word_tdes_edge_26",
+        "char_word_tdes_edge_27",
+        "char_word_tdes_edge_28",
+        "char_word_tdes_edge_29",
+        "char_word_tdes_edge_30",
+        "char_word_tdes_edge_31",
+        "char_word_tdes_edge_32",
+        "char_word_tdes_edge_33",
+        "char_word_tdes_edge_34",
+        "char_word_tdes_edge_35",
+        "char_word_tdes_edge_36",
+        "char_word_tdes_edge_37",
+        "char_word_tdes_edge_38",
+        "char_word_tdes_edge_39",
+        "char_word_tdes_edge_40",
+        "char_word_tdes_edge_41",
+        "char_word_tdes_edge_42",
+        "char_word_tdes_edge_43",
+        "char_word_tdes_edge_44",
+        "char_word_tdes_edge_45",
+        "char_word_tdes_edge_46",
+        "char_word_tdes_edge_47",
+        "char_word_tdes_edge_48",
+        "char_word_tdes_edge_49",
+        "char_word_tdes_edge_50",
+        "char_word_tdes_edge_51",
+        "char_word_tdes_edge_52",
+        "char_word_tdes_edge_53",
+        "char_word_tdes_edge_54",
+        "char_word_tdes_edge_55",
+        "char_word_tdes_edge_56",
+        "char_word_tdes_edge_57",
+        "char_word_tdes_edge_58",
+        "char_word_tdes_edge_59",
+        "char_word_tdes_edge_60",
+        "char_word_tdes_edge_61",
+        "char_word_tdes_edge_62",
+        "char_word_tdes_edge_63",
+        "char_word_tdes_edge_64",
+        "char_word_tdes_edge_65",
+        "char_word_tdes_edge_66"
+      ]
+    },
+    {
+      "id": "vocab_connective_designations_12",
+      "name": "Connective Designations",
+      "order": 12,
+      "terms": [
+        "char_word_unity",
+        "char_word_force",
+        "char_word_acts",
+        "char_word_interplays",
+        "char_word_mutualities",
+        "char_word_steps",
+        "char_word_intervals",
+        "char_word_components",
+        "char_word_connective_designation_9_needs_research",
+        "char_word_connective_designation_10_needs_research",
+        "char_word_connective_designation_11_needs_research",
+        "char_word_connective_designation_12_needs_research"
+      ],
+      "connectives": [
+        "char_word_cdes_edge_1",
+        "char_word_cdes_edge_2",
+        "char_word_cdes_edge_3",
+        "char_word_cdes_edge_4",
+        "char_word_cdes_edge_5",
+        "char_word_cdes_edge_6",
+        "char_word_cdes_edge_7",
+        "char_word_cdes_edge_8",
+        "char_word_cdes_edge_9",
+        "char_word_cdes_edge_10",
+        "char_word_cdes_edge_11",
+        "char_word_cdes_edge_12",
+        "char_word_cdes_edge_13",
+        "char_word_cdes_edge_14",
+        "char_word_cdes_edge_15",
+        "char_word_cdes_edge_16",
+        "char_word_cdes_edge_17",
+        "char_word_cdes_edge_18",
+        "char_word_cdes_edge_19",
+        "char_word_cdes_edge_20",
+        "char_word_cdes_edge_21",
+        "char_word_cdes_edge_22",
+        "char_word_cdes_edge_23",
+        "char_word_cdes_edge_24",
+        "char_word_cdes_edge_25",
+        "char_word_cdes_edge_26",
+        "char_word_cdes_edge_27",
+        "char_word_cdes_edge_28",
+        "char_word_cdes_edge_29",
+        "char_word_cdes_edge_30",
+        "char_word_cdes_edge_31",
+        "char_word_cdes_edge_32",
+        "char_word_cdes_edge_33",
+        "char_word_cdes_edge_34",
+        "char_word_cdes_edge_35",
+        "char_word_cdes_edge_36",
+        "char_word_cdes_edge_37",
+        "char_word_cdes_edge_38",
+        "char_word_cdes_edge_39",
+        "char_word_cdes_edge_40",
+        "char_word_cdes_edge_41",
+        "char_word_cdes_edge_42",
+        "char_word_cdes_edge_43",
+        "char_word_cdes_edge_44",
+        "char_word_cdes_edge_45",
+        "char_word_cdes_edge_46",
+        "char_word_cdes_edge_47",
+        "char_word_cdes_edge_48",
+        "char_word_cdes_edge_49",
+        "char_word_cdes_edge_50",
+        "char_word_cdes_edge_51",
+        "char_word_cdes_edge_52",
+        "char_word_cdes_edge_53",
+        "char_word_cdes_edge_54",
+        "char_word_cdes_edge_55",
+        "char_word_cdes_edge_56",
+        "char_word_cdes_edge_57",
+        "char_word_cdes_edge_58",
+        "char_word_cdes_edge_59",
+        "char_word_cdes_edge_60",
+        "char_word_cdes_edge_61",
+        "char_word_cdes_edge_62",
+        "char_word_cdes_edge_63",
+        "char_word_cdes_edge_64",
+        "char_word_cdes_edge_65",
+        "char_word_cdes_edge_66"
+      ]
     }
   ],
   "systems": [
@@ -1872,6 +3298,36 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_interface_3"
+    },
+    {
+      "id": "system_coherence_attributes_12",
+      "name": "Coherence Attributes",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_coherence_attributes_12"
+    },
+    {
+      "id": "system_term_designations_12",
+      "name": "Term Designations",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_term_designations_12"
+    },
+    {
+      "id": "system_connective_designations_12",
+      "name": "Connective Designations",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_connective_designations_12"
     }
   ],
   "perspectives": [],
