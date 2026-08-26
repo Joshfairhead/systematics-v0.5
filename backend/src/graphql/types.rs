@@ -362,6 +362,13 @@ impl QueryRoot {
             .collect()
     }
 
+    /// The **systematics hexad** for a cardinality — the six mutually-determining
+    /// metadata facets derived from the one number (name · coherence · term/connective
+    /// designation · term/connective cardinality). For the view's metadata section.
+    async fn systematics_hexad(&self, cardinality: i32) -> GqlSystematicsHexad {
+        crate::core::systematics::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
+    }
+
     // -------- Sequences (ordered series of member addresses) --------
 
     async fn sequence(&self, ctx: &Context<'_>, id: String) -> Option<GqlSequence> {
@@ -2270,4 +2277,30 @@ pub struct GqlLawReading {
     pub aliases: Vec<String>,
     /// The three term values reordered by this law (the directed reading).
     pub reading: Vec<String>,
+}
+
+/// The systematics hexad for the view — a system's six metadata facets, derived from
+/// its cardinality (name · coherence · term/connective designation · term/connective
+/// cardinality). All mutually determining.
+#[derive(SimpleObject)]
+pub struct GqlSystematicsHexad {
+    pub name: String,
+    pub coherence: String,
+    pub term_designation: String,
+    pub connective_designation: String,
+    pub term_cardinality: i32,
+    pub connective_cardinality: i32,
+}
+
+impl From<crate::core::systematics::SystematicsHexad> for GqlSystematicsHexad {
+    fn from(h: crate::core::systematics::SystematicsHexad) -> Self {
+        Self {
+            name: h.name,
+            coherence: h.coherence,
+            term_designation: h.term_designation,
+            connective_designation: h.connective_designation,
+            term_cardinality: h.term_cardinality as i32,
+            connective_cardinality: h.connective_cardinality as i32,
+        }
+    }
 }

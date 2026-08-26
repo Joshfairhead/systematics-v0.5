@@ -856,50 +856,18 @@ pub fn canonical_system_name(order: u8) -> &'static str {
     }
 }
 
+// The canonical metadata is single-sourced in `core::systematics` (the hexad model);
+// these seed-side helpers delegate to it.
 fn canonical_coherence(order: u8) -> &'static str {
-    match order {
-        1 => "Universality",
-        2 => "Complementarity",
-        3 => "Dynamism",
-        4 => "Activity Field",
-        5 => "Significance and Potential",
-        6 => "Coalescence",
-        7 => "Generation",
-        8 => "Self-Sufficiency",
-        9 => "Transformation",
-        10 => "Intrinsic Harmony",
-        11 => "Articulate Symmetry",
-        12 => "Perfection",
-        _ => "Unknown",
-    }
+    crate::core::systematics::coherence(order)
 }
 
 fn canonical_term_designation(order: u8) -> &'static str {
-    match order {
-        1 => "Totality",
-        2 => "Poles",
-        3 => "Impulses",
-        4 => "Sources",
-        5 => "Limits",
-        6 => "Laws",
-        7 => "States",
-        8 => "Elements",
-        _ => "Needs Research",
-    }
+    crate::core::systematics::term_designation(order)
 }
 
 fn canonical_connective_designation(order: u8) -> &'static str {
-    match order {
-        1 => "Unity",
-        2 => "Force",
-        3 => "Acts",
-        4 => "Interplays",
-        5 => "Mutualities",
-        6 => "Steps",
-        7 => "Intervals",
-        8 => "Components",
-        _ => "Needs Research",
-    }
+    crate::core::systematics::connective_designation(order)
 }
 
 // =============================================================================

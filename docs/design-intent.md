@@ -465,9 +465,14 @@ so lean on **cardinality** as core vocabulary.
   terms for the structure: **canonical form / schema / fixture / algebraic structure**; for its
   fixedness: **constant / immutable / canonical**. So: *n* (cardinality) = the hyperparameter; the
   triad = the `K_n` it parameterises.
-- **View metadata from cardinality:** a system's **metadata** (coherence attribute · term designation
-  · connective designation) should be *derived* by indexing the seeded **metadata dodecads** at the
-  system's cardinality — so cardinality 3 ⇒ "triad" + its three metadata values. (To wire.)
+- **View metadata from cardinality — BUILT (`core/systematics.rs`, 2026-08-20):** the **systematics
+  hexad** — `{name · coherence · term-designation · connective-designation · term-cardinality ·
+  connective-cardinality}`, all mutually determining from the one number. `systematics_hexad(3)` =
+  `{Triad, Dynamism, Impulses, Acts, 3, 3}`; `validate_metadata` fails if a triad's coherence ≠
+  Dynamism or its edge-cardinality ≠ 3; `cardinality_from("connective_designation","Acts") = 3`
+  (reciprocal derivation). Single source of truth (`data::mod` delegates here); exposed as the
+  GraphQL query `systematicsHexad(cardinality)`. Remaining: wire it into the view's metadata section;
+  fill the 9–12 designation gaps.
 
 **Line graph composed from the incidence matrix [user, 2026-08-20].** `Template::line_graph_adjacency`
 is now `L = Bᵀ·B` (diagonal zeroed) — **adjacency + incidence are the standalone primitives; the line
