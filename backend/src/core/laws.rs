@@ -321,4 +321,33 @@ mod tests {
             assert_eq!(&walk[0..5], &sentence[..], "law {law:?} categorical reading");
         }
     }
+
+    #[test]
+    fn test_graph_triad_six_laws() {
+        // The **graph triad** — the three matrices as NODES with the category-theory
+        // axioms as edges (user, 2026-08-26), grounded in the incidence matrix `B`:
+        //   Nodes: Line(+,1) · Adjacency(−,2) · Incidence(=,3).
+        //   {1,2} Line–Adjacency       = identity      (adjacency & line are duals — the
+        //                                               same up to iso; an "orbital")
+        //   {1,3} Line–Incidence       = associativity (the line graph is the operator L
+        //                                               with A·B = B·L, i.e. the
+        //                                               associativity of B·Bᵀ·B)
+        //   {2,3} Adjacency–Incidence  = composition   (adjacency = B·Bᵀ, incidence
+        //                                               composed with its transpose)
+        // Rotations read the cycle forward; reflections are the inverses.
+        let nodes = ["Line", "Adjacency", "Incidence"];
+        let edges = ["identity", "associativity", "composition"]; // (1,2), (1,3), (2,3)
+        let expect = [
+            (Law::Expansion, ["Line", "identity", "Adjacency", "composition", "Incidence"]), // 123
+            (Law::Identity, ["Adjacency", "composition", "Incidence", "associativity", "Line"]), // 231
+            (Law::Order, ["Incidence", "associativity", "Line", "identity", "Adjacency"]), // 312
+            (Law::Interaction, ["Line", "associativity", "Incidence", "composition", "Adjacency"]), // 132
+            (Law::Concentration, ["Adjacency", "identity", "Line", "associativity", "Incidence"]), // 213
+            (Law::Freedom, ["Incidence", "composition", "Adjacency", "identity", "Line"]), // 321
+        ];
+        for (law, sentence) in expect {
+            let walk = law.read_walk(&nodes, &edges);
+            assert_eq!(&walk[0..5], &sentence[..], "law {law:?} graph-triad reading");
+        }
+    }
 }
