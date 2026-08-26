@@ -856,18 +856,18 @@ pub fn canonical_system_name(order: u8) -> &'static str {
     }
 }
 
-// The canonical metadata is single-sourced in `core::systematics` (the hexad model);
+// The canonical metadata is single-sourced in `core::hexadicsystems` (the hexad model);
 // these seed-side helpers delegate to it.
 fn canonical_coherence(order: u8) -> &'static str {
-    crate::core::systematics::coherence(order)
+    crate::core::hexadicsystems::coherence(order)
 }
 
 fn canonical_term_designation(order: u8) -> &'static str {
-    crate::core::systematics::term_designation(order)
+    crate::core::hexadicsystems::term_designation(order)
 }
 
 fn canonical_connective_designation(order: u8) -> &'static str {
-    crate::core::systematics::connective_designation(order)
+    crate::core::hexadicsystems::connective_designation(order)
 }
 
 // =============================================================================

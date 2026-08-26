@@ -1,9 +1,11 @@
-//! The **systematics hexad** — a system's metadata self-description, keyed by its
+//! **Hexadic systematics** — the **shape / outline of a system**, keyed by its
 //! **cardinality**. The six facets are *mutually determining*: given the cardinality
-//! (or any one facet), the rest follow. This is the Controller's **validation +
-//! derivation** model — a **triad** MUST be `{Triad, Dynamism, Impulses, Acts, 3, 3}`;
-//! a wrong coherence, or cardinality 4, fails validation. It is the single source of
-//! truth for the canonical metadata (`data::mod` delegates here).
+//! (or any one facet), the rest follow. This is the reusable hexadic module — the
+//! Controller's **validation + derivation** template (and, in time, the generative
+//! instruction-set that composes/renders systematics). A **triad** MUST be
+//! `{Triad, Dynamism, Impulses, Acts, 3, 3}`; a wrong coherence, or cardinality 4,
+//! fails validation. It is the single source of truth for the canonical metadata
+//! (`data::mod` delegates here).
 
 use serde::{Deserialize, Serialize};
 

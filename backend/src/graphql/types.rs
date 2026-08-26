@@ -366,7 +366,7 @@ impl QueryRoot {
     /// metadata facets derived from the one number (name · coherence · term/connective
     /// designation · term/connective cardinality). For the view's metadata section.
     async fn systematics_hexad(&self, cardinality: i32) -> GqlSystematicsHexad {
-        crate::core::systematics::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
+        crate::core::hexadicsystems::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
     }
 
     // -------- Sequences (ordered series of member addresses) --------
@@ -2292,8 +2292,8 @@ pub struct GqlSystematicsHexad {
     pub connective_cardinality: i32,
 }
 
-impl From<crate::core::systematics::SystematicsHexad> for GqlSystematicsHexad {
-    fn from(h: crate::core::systematics::SystematicsHexad) -> Self {
+impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad {
+    fn from(h: crate::core::hexadicsystems::SystematicsHexad) -> Self {
         Self {
             name: h.name,
             coherence: h.coherence,
