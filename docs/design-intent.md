@@ -480,6 +480,27 @@ graph is derived from them**, not a parallel definition (making the matrices loa
 output, tests green. Next: **wire the line graph in as the morphism grammar** (the valid
 horizontal/vertical/orthogonal morphism combinatorics).
 
+**Morphism grammar — BUILT (`grammar.rs` + `substrate.rs`, 2026-08-26).** The three matrices are
+now **load-bearing in composition** — each gates one class of morphism, so "which morphisms are
+well-formed" is *read off the matrices*, not hard-coded:
+- **Adjacency `A` (−, topology)** → `Template::admits_edge(a,b)` — an edge morphism (`EdgeToOrbit`,
+  `ConnectiveToOrbit`, `CoordinateLine`, `ColourLine`) is legal iff `A[a][b] = 1`. A self-loop or an
+  out-of-range pair is ungrammatical.
+- **Incidence `B` (=, reconciler)** → `Template::admits_anchor(v,a,b)` — a term at vertex `v` may
+  anchor edge `{a,b}` iff `v` is an endpoint (`B[v][e] = 1`).
+- **Line graph `L` (+, semantics)** → `Template::admits_composition(e1,e2)` — two connective-operators
+  may **compose** iff `L[e1][e2] = 1` (they share a vertex). This is the **grammar for the coming
+  tensor product** — *which* pairs may compose is live; the `⊗` **operation itself is still to be
+  designed** (the spectral-graph-theory discussion below).
+
+Each `Morphism` now declares its `site()` (`Vertex(i)` | `Edge(a,b)`), and **`compose_checked` gates
+the whole build path** — `generate_topology` / `compose_system` / `compose_render` all route through
+it, so an ungrammatical morphism is **rejected, not applied** (with its site reported). Canonical
+bundles are grammatical by construction; a strayed/composed bundle is caught. 8 new tests; suite green.
+Deferred: the **six-laws-driven build order** (123/213 over the topology·semantics·geometry triad) —
+folded into the tensor-product design, since "which law drives composition" is bound up with the
+operation semantics we agreed to discuss first.
+
 **CORRECTION — matrix→domain remapping: adjacency = topology · line graph = semantics · incidence =
 reconciler [user, 2026-08-20].** Supersedes the earlier "incidence = Semantic Projection anchoring,
 line graph = reconciler." The **line graph is the *inverse* of the adjacency graph**, and

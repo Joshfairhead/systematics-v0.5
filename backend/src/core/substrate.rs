@@ -18,6 +18,16 @@
 //! orthogonal `vertex-element ──▶ term-character-element`). See `docs/design-intent.md`
 //! → *CORRECTED — materialisation is a Functor…*. (Retires the AD4M 'perspective'
 //! language.)
+//!
+//! **The morphism grammar (2026-08-26).** Composition is **gated by the grammar**: every
+//! `Morphism` declares its topological `site` (`Vertex` | `Edge`), and `compose_checked`
+//! admits it only where the `Template`'s matrices allow — the **adjacency matrix** gates
+//! edges and **order** gates vertices in this build path. (The **incidence** and **line
+//! graph** rules — `admits_anchor` / `admits_composition` in `grammar.rs` — are the
+//! reconciler and semantic-composition primitives for the anchor & tensor-product work to
+//! come; they exist and are tested, but no morphism `site` triggers them yet.) So the
+//! adjacency matrix is **load-bearing**, not decorative: an ungrammatical edge/vertex
+//! morphism is rejected, not applied.
 
 use serde::{Deserialize, Serialize};
 
@@ -138,12 +148,26 @@ pub enum MorphismKind {
     Homomorphism,
 }
 
+/// The **topological site** a morphism acts on — the coordinate the *grammar* checks
+/// before the morphism may be applied. A vertex-index morphism declares `Vertex`; an
+/// edge morphism declares `Edge`. The `Template` admits or rejects the morphism by
+/// reading its matrices at this site (adjacency for edges, order for vertices), so
+/// legality is *read off the topology*, not hard-coded into each morphism.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MorphismSite {
+    Vertex(u8),
+    Edge(u8, u8),
+}
+
 /// A **morphism** — a container with a *single function point* (`apply`). Concrete morphisms (structs) implement this and declare their `kind`.
 /// A system is composed by **bundling** morphisms and applying them to build up the
 /// hypergraph — "the model is a bundled set of monomorphisms".
 pub trait Morphism {
     /// Which kind of morphism this is (the enum taxonomy).
     fn kind(&self) -> MorphismKind;
+    /// The topological **site** this morphism acts on — what the grammar gates it
+    /// by (a vertex index, or an edge pair).
+    fn site(&self) -> MorphismSite;
     /// The single function point: apply this morphism to the hypergraph under
     /// construction (its one action).
     fn apply(&self, hg: &mut Hypergraph);
@@ -157,6 +181,9 @@ pub struct IndexToVertex {
 impl Morphism for IndexToVertex {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
+    }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Vertex(self.index)
     }
     fn apply(&self, hg: &mut Hypergraph) {
         hg.topology.elements.push(Element {
@@ -176,6 +203,9 @@ pub struct EdgeToOrbit {
 impl Morphism for EdgeToOrbit {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
+    }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
@@ -197,6 +227,9 @@ pub struct TermToVertex {
 impl Morphism for TermToVertex {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
+    }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Vertex(self.index)
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let term_id = format!("term_{}_{}", self.cardinality, self.index);
@@ -226,6 +259,9 @@ pub struct ConnectiveToOrbit {
 impl Morphism for ConnectiveToOrbit {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
+    }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
@@ -264,6 +300,9 @@ impl Morphism for CoordinateToVertex {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
     }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Vertex(self.index)
+    }
     fn apply(&self, hg: &mut Hypergraph) {
         let coord_id = format!("coord_{}_{}", self.cardinality, self.index);
         hg.data.push(DataElement {
@@ -291,6 +330,9 @@ impl Morphism for ColourToVertex {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
     }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Vertex(self.index)
+    }
     fn apply(&self, hg: &mut Hypergraph) {
         let colour_id = format!("colour_{}_{}", self.cardinality, self.index);
         hg.data.push(DataElement {
@@ -317,6 +359,9 @@ pub struct CoordinateLine {
 impl Morphism for CoordinateLine {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
+    }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
@@ -349,6 +394,9 @@ impl Morphism for ColourLine {
     fn kind(&self) -> MorphismKind {
         MorphismKind::Monomorphism
     }
+    fn site(&self) -> MorphismSite {
+        MorphismSite::Edge(self.a, self.b)
+    }
     fn apply(&self, hg: &mut Hypergraph) {
         let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
         let colline_id = format!("colline_{}_{}_{}", self.cardinality, a, b);
@@ -366,6 +414,53 @@ impl Morphism for ColourLine {
             target: colline_id,
             link_type: "anchor".to_string(),
         });
+    }
+}
+
+// ---- The grammar gate: the Template's matrices decide which morphisms are legal ----
+
+/// Does the **grammar** (the `Template`'s matrices) admit a morphism at this site?
+/// A vertex site is checked for range; an **edge** site is checked against the
+/// **adjacency matrix** (topology) — so an edge morphism on a non-edge (self-loop,
+/// out-of-range pair) is ungrammatical. This is the single dispatch point that turns
+/// the matrices into the legality rule for composition.
+pub fn admits(template: &Template, site: MorphismSite) -> bool {
+    match site {
+        MorphismSite::Vertex(i) => template.admits_vertex(i),
+        MorphismSite::Edge(a, b) => template.admits_edge(a, b),
+    }
+}
+
+/// **Grammar-checked composition** — the Controller applies a morphism bundle only
+/// where the grammar admits it. Each morphism's `site` is checked against the
+/// Template's matrices *before* it is applied; an ungrammatical morphism is
+/// **rejected**, not applied, and its site reported. This is what makes the matrices
+/// *load-bearing*: composition is **gated by the grammar**, not merely validated
+/// after the fact. The canonical bundles are grammatical by construction, so the
+/// build path (below) routes through here and always succeeds; a hand-built or
+/// composed bundle that strays off the topology is caught.
+pub fn compose_checked(
+    cardinality: u8,
+    bundle: Vec<Box<dyn Morphism>>,
+) -> Result<Hypergraph, Vec<String>> {
+    let template = Template::for_order(cardinality);
+    let mut hg = Hypergraph::default();
+    hg.topology.cardinality = cardinality;
+    let mut errs = Vec::new();
+    for m in &bundle {
+        let site = m.site();
+        if admits(&template, site) {
+            m.apply(&mut hg);
+        } else {
+            errs.push(format!(
+                "ungrammatical morphism at {site:?}: not a legal site for K_{cardinality} (rejected by the grammar)"
+            ));
+        }
+    }
+    if errs.is_empty() {
+        Ok(hg)
+    } else {
+        Err(errs)
     }
 }
 
@@ -387,11 +482,8 @@ pub fn topology_morphisms(cardinality: u8) -> Vec<Box<dyn Morphism>> {
 /// against the graph rules (the `Template`). Correct topology is guaranteed by the
 /// constraints. No semantics — those are anchored on by `compose_system`.
 pub fn generate_topology(cardinality: u8) -> TopologyGraph {
-    let mut hg = Hypergraph::default();
-    hg.topology.cardinality = cardinality;
-    for morphism in topology_morphisms(cardinality) {
-        morphism.apply(&mut hg);
-    }
+    let hg = compose_checked(cardinality, topology_morphisms(cardinality))
+        .expect("canonical topology bundle is grammatical");
     debug_assert!(
         hg.topology
             .validate_against(&Template::for_order(cardinality))
@@ -440,15 +532,9 @@ pub fn vocabulary_morphisms(
 }
 
 pub fn compose_system(cardinality: u8, terms: &[String], connectives: &[String]) -> Hypergraph {
-    let mut hg = Hypergraph::default();
-    hg.topology.cardinality = cardinality;
-    for morphism in topology_morphisms(cardinality) {
-        morphism.apply(&mut hg);
-    }
-    for morphism in vocabulary_morphisms(cardinality, terms, connectives) {
-        morphism.apply(&mut hg);
-    }
-    hg
+    let mut bundle = topology_morphisms(cardinality);
+    bundle.extend(vocabulary_morphisms(cardinality, terms, connectives));
+    compose_checked(cardinality, bundle).expect("canonical system bundle is grammatical")
 }
 
 /// **Compose the render** for an cardinality — topology + **geometry + colour**, on the
@@ -489,15 +575,9 @@ pub fn geometry_morphisms(
 }
 
 pub fn compose_render(cardinality: u8, coordinates: &[[f64; 3]], colours: &[String]) -> Hypergraph {
-    let mut hg = Hypergraph::default();
-    hg.topology.cardinality = cardinality;
-    for morphism in topology_morphisms(cardinality) {
-        morphism.apply(&mut hg);
-    }
-    for morphism in geometry_morphisms(cardinality, coordinates, colours) {
-        morphism.apply(&mut hg);
-    }
-    hg
+    let mut bundle = topology_morphisms(cardinality);
+    bundle.extend(geometry_morphisms(cardinality, coordinates, colours));
+    compose_checked(cardinality, bundle).expect("canonical render bundle is grammatical")
 }
 
 #[cfg(test)]
@@ -636,5 +716,53 @@ mod tests {
             .links
             .iter()
             .any(|l| l.id == "anchor_colline_3_1_2" && l.base == "lk_3_1_2"));
+    }
+
+    #[test]
+    fn every_canonical_morphism_declares_its_topological_site() {
+        // vertex morphisms → Vertex(index); edge morphisms → Edge(a,b).
+        assert_eq!(IndexToVertex { cardinality: 3, index: 2 }.site(), MorphismSite::Vertex(2));
+        assert_eq!(EdgeToOrbit { cardinality: 3, a: 1, b: 2 }.site(), MorphismSite::Edge(1, 2));
+        assert_eq!(
+            TermToVertex { cardinality: 3, index: 3, character: "x".into() }.site(),
+            MorphismSite::Vertex(3)
+        );
+        assert_eq!(
+            ConnectiveToOrbit { cardinality: 3, a: 2, b: 3, character: "y".into() }.site(),
+            MorphismSite::Edge(2, 3)
+        );
+    }
+
+    #[test]
+    fn grammar_checked_build_equals_the_direct_build() {
+        // Routing the canonical bundle through the grammar gate yields exactly the
+        // same topology as generate_topology (the gate admits every legal morphism).
+        let checked = compose_checked(3, topology_morphisms(3)).expect("canonical bundle is legal");
+        assert_eq!(checked.topology, generate_topology(3));
+    }
+
+    #[test]
+    fn grammar_rejects_an_ungrammatical_edge_morphism() {
+        // A self-loop (1,1) is not an edge of K_3 → the adjacency matrix has no such
+        // entry → the grammar rejects the bundle (composition is gated, not blind).
+        let mut bundle = topology_morphisms(3);
+        bundle.push(Box::new(EdgeToOrbit { cardinality: 3, a: 1, b: 1 }));
+        let result = compose_checked(3, bundle);
+        assert!(result.is_err(), "self-loop must be rejected");
+        assert!(result.unwrap_err()[0].contains("Edge(1, 1)"));
+
+        // An out-of-range edge (2,5) on a triad is likewise ungrammatical.
+        let mut bundle = topology_morphisms(3);
+        bundle.push(Box::new(ConnectiveToOrbit { cardinality: 3, a: 2, b: 5, character: "z".into() }));
+        assert!(compose_checked(3, bundle).is_err(), "out-of-range edge must be rejected");
+    }
+
+    #[test]
+    fn grammar_rejects_an_out_of_range_vertex_morphism() {
+        // Vertex 4 does not exist in K_3 → rejected.
+        let mut bundle = topology_morphisms(3);
+        bundle.push(Box::new(IndexToVertex { cardinality: 3, index: 4 }));
+        let err = compose_checked(3, bundle).unwrap_err();
+        assert!(err[0].contains("Vertex(4)"));
     }
 }

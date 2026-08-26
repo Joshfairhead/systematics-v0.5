@@ -103,12 +103,14 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 21 fragments + 6 module-owned
-    // (DU1 → 1 Dodecad, DU2 → 0: module systems now 3).
+    // Total systems = 12 canonical + 1 citation + 35 fragments + 3 module-owned = 51.
+    // Fragments grew 29 → 35 with the systematics-hexad seeding (commit 62cd10b):
+    // the harness triad, the interface triad, the six-laws hexad, and the three
+    // metadata dodecads (coherence · term-designations · connective-designations).
     assert_eq!(
         graph.systems.len(),
-        45,
-        "expected 12 canonical + 1 citation + 29 fragment + 3 module systems"
+        51,
+        "expected 12 canonical + 1 citation + 35 fragment + 3 module systems"
     );
 }
 

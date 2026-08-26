@@ -156,6 +156,59 @@ impl Template {
         l
     }
 
+    // ---- The morphism grammar: the matrices gate which morphisms are legal ----
+    //
+    // A grammar says which combinations are *well-formed*. The **morphism grammar**
+    // says which morphisms are well-formed — and that is **read off the three
+    // matrices**, one per morphism class (the corrected matrix→domain mapping):
+    //   • adjacency `A` (−, topology)   → edge morphisms   (legal iff `A[a][b] = 1`)
+    //   • incidence `B` (=, reconciler) → anchor morphisms (legal iff vertex ∈ edge)
+    //   • line graph `L` (+, semantics) → connective composition (legal iff `L[e1][e2]=1`)
+    // Nothing here is hard-coded: change the topology and the legal morphisms change
+    // with it. This is what makes the matrices *load-bearing* rather than decorative.
+
+    /// Grammar: is `index` a legal **vertex** site? Legal iff `1..=order` — the
+    /// adjacency matrix has a row/column for it.
+    pub fn admits_vertex(&self, index: u8) -> bool {
+        index >= 1 && index <= self.order
+    }
+
+    /// Grammar: is `{a, b}` a legal **edge** site? Reads the **adjacency matrix**
+    /// (`−`, topology): legal iff `A[a−1][b−1] = 1` — the pair is an edge of `K_n`
+    /// (distinct, in range). A self-loop `(v,v)` or an out-of-range pair is
+    /// ungrammatical — the topology itself forbids it.
+    pub fn admits_edge(&self, a: u8, b: u8) -> bool {
+        let n = self.order;
+        if a < 1 || b < 1 || a > n || b > n || a == b {
+            return false;
+        }
+        self.adjacency_matrix()[(a - 1) as usize][(b - 1) as usize] == 1
+    }
+
+    /// Grammar: may a term at vertex `v` **anchor** the edge `{a, b}`? Reads the
+    /// **incidence matrix** (`=`, the reconciler): legal iff vertex `v` is an
+    /// endpoint of that edge (`B[v−1][e] = 1`). Incidence is what relates
+    /// vertex-space (terms) to edge-space (connectives), so it gates the anchors.
+    pub fn admits_anchor(&self, v: u8, a: u8, b: u8) -> bool {
+        let (lo, hi) = if a < b { (a, b) } else { (b, a) };
+        let Some(e) = self.edges().iter().position(|&edge| edge == (lo, hi)) else {
+            return false;
+        };
+        let b_mat = self.incidence_matrix();
+        v >= 1 && (v as usize) <= b_mat.len() && b_mat[(v - 1) as usize][e] == 1
+    }
+
+    /// Grammar: may the **connectives** on edges `e1`, `e2` (indices into `edges()`)
+    /// **compose**? Reads the **line graph** (`+`, the semantic projection): legal
+    /// iff `L[e1][e2] = 1` — the two connective-operators share a vertex, so their
+    /// tensor product is defined. NB the *operation* (the tensor product itself) is
+    /// still to be designed; this is its **grammar** — *which* pairs may compose —
+    /// which is live now and reads straight off `L`.
+    pub fn admits_composition(&self, e1: usize, e2: usize) -> bool {
+        let l = self.line_graph();
+        e1 < l.len() && e2 < l.len() && l[e1][e2] == 1
+    }
+
     /// Validate that a Vocabulary satisfies this Template's rules (order + arity).
     pub fn validate(&self, vocab: &Vocabulary) -> Result<(), Vec<String>> {
         let mut errs = Vec::new();
@@ -342,5 +395,55 @@ mod tests {
         assert_eq!(l4[i12][i34], 0);
         let i13 = edges.iter().position(|&e| e == (1, 3)).unwrap();
         assert_eq!(l4[i12][i13], 1); // (1,2) & (1,3) share vertex 1
+    }
+
+    #[test]
+    fn admits_edge_reads_the_adjacency_matrix() {
+        let k3 = Template::for_order(3);
+        // legal edges of K_3 (all off-diagonal pairs).
+        assert!(k3.admits_edge(1, 2) && k3.admits_edge(1, 3) && k3.admits_edge(2, 3));
+        assert!(k3.admits_edge(2, 1)); // order-independent (undirected)
+        // ungrammatical: self-loop (on the diagonal → A = 0) and out-of-range.
+        assert!(!k3.admits_edge(1, 1));
+        assert!(!k3.admits_edge(1, 4));
+        assert!(!k3.admits_edge(0, 2));
+    }
+
+    #[test]
+    fn admits_vertex_reads_the_order() {
+        let k3 = Template::for_order(3);
+        assert!(k3.admits_vertex(1) && k3.admits_vertex(3));
+        assert!(!k3.admits_vertex(0) && !k3.admits_vertex(4));
+    }
+
+    #[test]
+    fn admits_anchor_reads_the_incidence_matrix() {
+        let k3 = Template::for_order(3);
+        // vertex 1 is an endpoint of edge (1,2); vertex 3 is not.
+        assert!(k3.admits_anchor(1, 1, 2) && k3.admits_anchor(2, 1, 2));
+        assert!(!k3.admits_anchor(3, 1, 2));
+        // a non-edge has no incidence column → no vertex anchors it.
+        assert!(!k3.admits_anchor(1, 1, 1));
+    }
+
+    #[test]
+    fn admits_composition_reads_the_line_graph() {
+        // K_3: every pair of connectives shares a vertex → all compose.
+        let k3 = Template::for_order(3);
+        for e1 in 0..3 {
+            for e2 in 0..3 {
+                if e1 != e2 {
+                    assert!(k3.admits_composition(e1, e2));
+                }
+            }
+        }
+        // K_4: connectives on (1,2) and (3,4) are disjoint → they do NOT compose.
+        let k4 = Template::for_order(4);
+        let edges = k4.edges();
+        let i12 = edges.iter().position(|&e| e == (1, 2)).unwrap();
+        let i34 = edges.iter().position(|&e| e == (3, 4)).unwrap();
+        let i13 = edges.iter().position(|&e| e == (1, 3)).unwrap();
+        assert!(!k4.admits_composition(i12, i34)); // disjoint operators
+        assert!(k4.admits_composition(i12, i13)); // share vertex 1
     }
 }
