@@ -501,6 +501,55 @@ Deferred: the **six-laws-driven build order** (123/213 over the topology·semant
 folded into the tensor-product design, since "which law drives composition" is bound up with the
 operation semantics we agreed to discuss first.
 
+**Terminology + generative direction [user, 2026-08-26].**
+- **Cardinality = count · Ordinality = placement.** Applied to the **Order/Degree dyad**:
+  *order-cardinality* = #vertices (n), *order-ordinality* = vertex position (1..n); *degree-cardinality*
+  = #connectives (C(n,2)), *degree-ordinality* = connective placement (read off the adjacency /
+  incidence / line matrices). The field now called `order` is really **order-cardinality**;
+  `position` is **order-ordinality**. (Rename pending — see also the multi-pronged query.)
+- **Anchor, don't guess.** Generate the **topology** from cardinality; then **anchor** vocabulary,
+  coordinates and colours onto it **by (topological) ordinality** — take the normalised, hand-worked
+  data (e.g. the **pentad's special layout**, which is *not* a regular polygon) and attach it. Do
+  **not** generate/guess geometry or colour (generation is a *later experiment*; anchoring is more
+  elegant than guessing). Vocabulary values are always supplied.
+- **Omnidirectional traversal (next build).** After anchoring we must traverse freely between
+  vertex ↔ term ↔ coordinate ↔ colour and edge ↔ connective ↔ line (and across): the Controller makes
+  the assignments; the **six laws are the traversal**.
+- **The hexad → a "hexadic systematics" module (the *shape/outline* of a system), a generative
+  instruction set.** Homoiconic: the hexadic expression both *validates* and *composes/renders* all
+  systematics — a reusable instruction-set template, not merely a checker. (Rename `systematics.rs` →
+  hexadic-systematics module pending; reused everywhere.)
+- **Laws = linguistic composition, not the mechanical walk.** `read_walk` only *sequences* nodes/edges
+  (lawful but flat); the real operation is **linguistic composition** of the reading — an **LLM
+  generates** the combinations, the **codebase checks** them. Do not mistake the walk for the op.
+- **Systems generate the MVC (homoiconicity).** We should *generate* Model/View/Controller *from*
+  triads/tetrads and use that to implement — for consistency + homoiconicity. Here the **edges
+  (connectives/operations) matter more than the nodes (terms).**
+- **MVC connectives — LOCKED [user, 2026-08-26]:** **compose (View–Model) · resolve (Model–Controller)
+  · render (Controller–View)** (compose=build, resolve=map, render/serve=produce/deliver cousins).
+  Edges are **bidirectional / isomorphic** ("everything here is essentially isomorphic, to the point
+  where isomorphism loses relevance"). Verified against `read_walk`: the six laws are the six directed
+  readings of this triangle; the connectives + their canonical directions form a **directed 3-cycle**
+  (View→compose→Model→resolve→Controller→render→View). The three **rotations** (123·231·312, even) walk
+  it **clockwise** (every edge forward = natural sentences); the three **reflections** (132·213·321,
+  odd) walk it **counter-clockwise** (every edge inverted = the inverse morphisms — valid because
+  edges are isos). *(Possible evolution/involution reading of the two directions — parked.)*
+  - **The serving path is the 321/Freedom reading:** *"Controller resolves the Model, which composes
+    the View."* So the view-swap is literally implementing that law of the MVC triad.
+- **RULE (user, 2026-08-26): analyse every triad this way** — assign connectives, derive the six
+  readings, classify clockwise/counter-clockwise, check the sentences, require iso edges. Codified as
+  the personal Claude skill **`triad-six-laws`** (to be usable in-app later).
+- **OPEN — the matrix generator [user, 2026-08-26, "fundamental, worth ironing out"]:** algebraically
+  **incidence `B` is the minimal generator** (`A = BBᵀ − D`, `L = BᵀB − 2I` are its two Gram products).
+  But **systematically the generator should be a *pole* (adjacency −), not the *reconciler* (incidence
+  =)**. Resolution: in our **generative order** the chain is **cardinality → adjacency (topology) →
+  incidence (reconciler) → line (semantics)** — adjacency is generated first, incidence *bridges* it to
+  the line graph. Proposed refactor: derive `incidence` **from `adjacency`** (enumerate its edges) so
+  the code makes adjacency-as-root explicit (output-identical; currently both derive from `edges()`).
+- **Speculation (parked):** MVC (triad) may be the *top half* of a **tetrad** running the six laws,
+  with the **substrate as the tetradic ground** — i.e. learning how the six laws of three apply to
+  tetrads / higher systems. Generative; revisit.
+
 **CORRECTION — matrix→domain remapping: adjacency = topology · line graph = semantics · incidence =
 reconciler [user, 2026-08-20].** Supersedes the earlier "incidence = Semantic Projection anchoring,
 line graph = reconciler." The **line graph is the *inverse* of the adjacency graph**, and
