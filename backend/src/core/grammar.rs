@@ -108,9 +108,12 @@ impl Template {
         a
     }
 
-    /// **Incidence matrix** `B` (`n × size`, vertices × edges — the Semantic
-    /// Projection's anchoring): `B[v][e] = 1` iff vertex `v+1` is an endpoint of
-    /// edge `e` (edges in `edges()` order).
+    /// **Incidence matrix** `B` (`n × size`, vertices × edges — the **RECONCILER**):
+    /// `B[v][e] = 1` iff vertex `v+1` is an endpoint of edge `e` (edges in `edges()`
+    /// order). It bridges vertex-space and edge-space — both the **adjacency**
+    /// (`A = BBᵀ − D`, topology) and the **line graph** (`L = BᵀB − 2I`, semantics)
+    /// derive from it — so incidence is the `=` term that brings topology and
+    /// semantics together (and where tensor products live).
     pub fn incidence_matrix(&self) -> Vec<Vec<u8>> {
         let n = self.order as usize;
         let edges = self.edges();
@@ -122,11 +125,15 @@ impl Template {
         b
     }
 
-    /// **Line-graph adjacency** `L` (`size × size`): each edge becomes a vertex, and
-    /// `L[e1][e2] = 1` iff edges `e1`, `e2` share an endpoint. This is what the Graph
-    /// Template uses to **reconcile** the adjacency (vertex) and incidence
-    /// (vertex×edge) views — edge-adjacency derived from shared incidence.
-    pub fn line_graph_adjacency(&self) -> Vec<Vec<u8>> {
+    /// **Line graph** `L` (`size × size`) — the **Semantic Projection**. Each edge
+    /// (connective) becomes a vertex, and `L[e1][e2] = 1` iff edges `e1`, `e2` share
+    /// an endpoint. Elevating **connectives (operators) to nodes** is what lets their
+    /// **tensor products** compute as adjacencies (VSA / quantum-linguistics / an
+    /// Edge-GNN "dual graph"): if `A —c1→ B —c2→ C`, the operator interaction is at
+    /// `B`, and here `c1, c2` are *adjacent nodes*. The line graph is the **inverse**
+    /// of the adjacency (topology); **incidence reconciles** the two, so `L` is
+    /// composed from the incidence matrix (`L = BᵀB`, diagonal zeroed).
+    pub fn line_graph(&self) -> Vec<Vec<u8>> {
         // COMPOSED from the incidence matrix `B` (which stands on its own): the
         // line graph is `L = Bᵀ·B` with the diagonal zeroed. `(Bᵀ·B)[i][j]` counts
         // the shared endpoints of edges `i, j` — 0 or 1 in a simple graph — so off
@@ -324,12 +331,12 @@ mod tests {
     #[test]
     fn test_line_graph_reconciles_incidence() {
         // In K_3 every pair of edges shares a vertex, so L(K_3) = K_3 (all adjacent).
-        let l = Template::for_order(3).line_graph_adjacency();
+        let l = Template::for_order(3).line_graph();
         assert_eq!(l, vec![vec![0, 1, 1], vec![1, 0, 1], vec![1, 1, 0]]);
         // K_4: edge (1,2) and edge (3,4) are disjoint → not adjacent in the line graph.
         let t = Template::for_order(4);
         let edges = t.edges();
-        let l4 = t.line_graph_adjacency();
+        let l4 = t.line_graph();
         let i12 = edges.iter().position(|&e| e == (1, 2)).unwrap();
         let i34 = edges.iter().position(|&e| e == (3, 4)).unwrap();
         assert_eq!(l4[i12][i34], 0);

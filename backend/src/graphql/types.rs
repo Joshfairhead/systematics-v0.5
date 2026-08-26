@@ -1689,8 +1689,8 @@ impl GqlTemplate {
         to_i32_matrix(self.inner.incidence_matrix())
     }
     /// Line-graph adjacency (size × size) — reconciles adjacency and incidence.
-    async fn line_graph_adjacency(&self) -> Vec<Vec<i32>> {
-        to_i32_matrix(self.inner.line_graph_adjacency())
+    async fn line_graph(&self) -> Vec<Vec<i32>> {
+        to_i32_matrix(self.inner.line_graph())
     }
 }
 

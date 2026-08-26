@@ -475,6 +475,29 @@ graph is derived from them**, not a parallel definition (making the matrices loa
 output, tests green. Next: **wire the line graph in as the morphism grammar** (the valid
 horizontal/vertical/orthogonal morphism combinatorics).
 
+**CORRECTION — matrix→domain remapping: adjacency = topology · line graph = semantics · incidence =
+reconciler [user, 2026-08-20].** Supersedes the earlier "incidence = Semantic Projection anchoring,
+line graph = reconciler." The **line graph is the *inverse* of the adjacency graph**, and
+**incidence is the reconciler**:
+- **Adjacency (−) = Topology** — vertex ↔ vertex.
+- **Line graph (+) = Semantic Projection** — edge ↔ edge: connectives (operators) elevated to nodes.
+- **Incidence (=) = the Reconciler** — vertex ↔ edge: both `A = BBᵀ − D` (adjacency) and
+  `L = BᵀB − 2I` (line graph) derive from it, so it brings topology and semantics together — and is
+  **where tensor products live**.
+
+Why the line graph is the semantic home: in **Vector Symbolic Architectures (VSA) / quantum
+linguistics / formal logic**, a connective (AND, OR, LOVES) is a functional **operator**, not an empty
+pipe. In `A —c₁→ B —c₂→ C` the operator interaction is at `B`; the line graph makes `c₁, c₂`
+**adjacent nodes**, so their **tensor product `⊗`** computes directly (a GNN **"Edge-GNN / Dual
+Graph"**). So **update the graph templates**: adjacency ⇒ topology, line graph ⇒ semantic projection,
+incidence ⇒ reconciler.
+
+**New language to carry:** Vector Symbolic Architectures (VSA) · quantum linguistics · **spectral graph
+theory** (eigenvalues · the graph **Laplacian**) · Edge-GNN / Dual Graph. **Spectral graph theory**
+(likely the Laplacian / its eigenvalues) is a candidate mechanism for the **monad ↔ triad coalescence**
+— e.g. **Fulfilment (monad) ↔ Healthy · Wealthy · Wise (triad)** and back — the tensor-product /
+`triad → monad` operation recorded earlier. Pursue.
+
 **We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
 triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
 imposes direction, generating directed relationships (links) — the hypergraph is what the
