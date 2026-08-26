@@ -580,6 +580,28 @@ pub fn compose_render(cardinality: u8, coordinates: &[[f64; 3]], colours: &[Stri
     compose_checked(cardinality, bundle).expect("canonical render bundle is grammatical")
 }
 
+/// **Compose the singular Model** — the *unified* builder: topology + vocabulary +
+/// geometry + colour anchored on **one** hypergraph. This expresses the base-space
+/// **tetrad** as a single model — Template (the grammar gate) · Topology (generated) ·
+/// Vocabulary (terms/connectives) · Geometry (coordinates/colours) — rather than the
+/// two partial builders (`compose_system` = topology+vocabulary, `compose_render` =
+/// topology+geometry). It is the **convergence target**: the one `compose` the serving
+/// path (`resolve_system`) will read from, so the Controller draws the view instead of
+/// the old stored-vocabulary stitching. Every bundle is applied through the grammar
+/// gate. `terms`/`connectives` are per-index/per-edge; `coordinates`/`colours` per-index.
+pub fn compose_model(
+    cardinality: u8,
+    terms: &[String],
+    connectives: &[String],
+    coordinates: &[[f64; 3]],
+    colours: &[String],
+) -> Hypergraph {
+    let mut bundle = topology_morphisms(cardinality);
+    bundle.extend(vocabulary_morphisms(cardinality, terms, connectives));
+    bundle.extend(geometry_morphisms(cardinality, coordinates, colours));
+    compose_checked(cardinality, bundle).expect("canonical model bundle is grammatical")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -764,5 +786,30 @@ mod tests {
         bundle.push(Box::new(IndexToVertex { cardinality: 3, index: 4 }));
         let err = compose_checked(3, bundle).unwrap_err();
         assert!(err[0].contains("Vertex(4)"));
+    }
+
+    #[test]
+    fn compose_model_unifies_topology_vocabulary_geometry_colour() {
+        // The singular Model: one topology, all four layers anchored on it.
+        let hg = compose_model(
+            3,
+            &["Will".into(), "Function".into(), "Being".into()],
+            &["Generation".into(), "Decision".into(), "Consent".into()],
+            &[[0.0, 1.0, 0.0], [0.0, -1.0, 0.0], [1.0, 0.0, 0.0]],
+            &["#FF0000".into(), "#0000FF".into(), "#FFFF00".into()],
+        );
+        assert_eq!(hg.topology.elements.len(), 3);
+        assert_eq!(hg.topology.links.len(), 3);
+        for (kind, n) in [("term", 3), ("connective", 3), ("coordinate", 3), ("colour", 3)] {
+            assert_eq!(hg.data.iter().filter(|d| d.kind == kind).count(), n, "{kind} count");
+        }
+        // the same anchors the two partial builders produce, now in ONE hypergraph.
+        assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
+        assert_eq!(hg.data.iter().find(|d| d.id == "colour_3_3").unwrap().character, "#FFFF00");
+        assert_eq!(hg.data.iter().find(|d| d.id == "coord_3_1").unwrap().character, "0,1,0");
+        // vertex el_3_1 anchors term, coordinate AND colour — the tetrad meeting at one vertex.
+        for target in ["term_3_1", "coord_3_1", "colour_3_1"] {
+            assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == target), "anchor {target}");
+        }
     }
 }

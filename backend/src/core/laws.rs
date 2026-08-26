@@ -286,4 +286,39 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_mvc_categorical_six_laws() {
+        // The MVC triad with **category-flavoured edges** (user, 2026-08-26). Positions
+        // 1=View(+), 2=Model(−), 3=Controller(=); canonical edge order (1,2),(1,3),(2,3):
+        //   (1,2) View–Model       = identity  (the View is the Model re-presented, no new info)
+        //   (1,3) View–Controller  = associate (render/serve — a *kind of* association)
+        //   (2,3) Model–Controller = compose   (the Controller composes the Model — `compose_checked`)
+        // Each law reads the triangle as a closed walk; the first five steps
+        // [node·edge·node·edge·node] are the law's "sentence". These reproduce the six
+        // categorical readings EXACTLY:
+        //   123 View —identity— Model —compose— Controller
+        //   132 View —associate— Controller —compose— Model
+        //   213 Model —identity— View —associate— Controller
+        //   231 Model —compose— Controller —associate— View
+        //   312 Controller —associate— View —identity— Model
+        //   321 Controller —compose— Model —identity— View
+        // (Honest caveat: in real category theory identity is a per-object self-loop and
+        // associativity is a *property* of composition — these are named relations on the
+        // triangle, not co-equal axioms.)
+        let nodes = ["View", "Model", "Controller"];
+        let edges = ["identity", "associate", "compose"]; // (1,2), (1,3), (2,3)
+        let expect = [
+            (Law::Expansion, ["View", "identity", "Model", "compose", "Controller"]), // 123
+            (Law::Interaction, ["View", "associate", "Controller", "compose", "Model"]), // 132
+            (Law::Concentration, ["Model", "identity", "View", "associate", "Controller"]), // 213
+            (Law::Identity, ["Model", "compose", "Controller", "associate", "View"]), // 231
+            (Law::Order, ["Controller", "associate", "View", "identity", "Model"]), // 312
+            (Law::Freedom, ["Controller", "compose", "Model", "identity", "View"]), // 321
+        ];
+        for (law, sentence) in expect {
+            let walk = law.read_walk(&nodes, &edges);
+            assert_eq!(&walk[0..5], &sentence[..], "law {law:?} categorical reading");
+        }
+    }
 }
