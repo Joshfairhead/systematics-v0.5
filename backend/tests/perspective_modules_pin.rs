@@ -103,14 +103,13 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 35 fragments + 3 module-owned = 51.
-    // Fragments grew 29 → 35 with the systematics-hexad seeding (commit 62cd10b):
-    // the harness triad, the interface triad, the six-laws hexad, and the three
-    // metadata dodecads (coherence · term-designations · connective-designations).
+    // Total systems = 12 canonical + 1 citation + 39 fragments + 3 module-owned = 55.
+    // Fragments grew 35 → 39 (2026-08-27): the Ouspensky Emotion tetrad + the AI-agent
+    // harness cluster (Harness Engineering, Harness Loop, Agent).
     assert_eq!(
         graph.systems.len(),
-        51,
-        "expected 12 canonical + 1 citation + 35 fragment + 3 module systems"
+        55,
+        "expected 12 canonical + 1 citation + 39 fragment + 3 module systems"
     );
 }
 

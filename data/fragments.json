@@ -526,14 +526,14 @@
       "value": "Identification Edge 1"
     },
     {
-      "id": "char_word_identification_edge_2",
+      "id": "char_word_attraction",
       "kind": "word",
-      "value": "Identification Edge 2"
+      "value": "Attraction"
     },
     {
-      "id": "char_word_identification_edge_3",
+      "id": "char_word_repulsion",
       "kind": "word",
-      "value": "Identification Edge 3"
+      "value": "Repulsion"
     },
     {
       "id": "char_word_imagination",
@@ -559,6 +559,131 @@
       "id": "char_word_sr_edge_3",
       "kind": "word",
       "value": "Sr Edge 3"
+    },
+    {
+      "id": "char_word_positive_emotion",
+      "kind": "word",
+      "value": "Positive Emotion"
+    },
+    {
+      "id": "char_word_pleasant_emotion",
+      "kind": "word",
+      "value": "Pleasant Emotion"
+    },
+    {
+      "id": "char_word_unpleasant_emotion",
+      "kind": "word",
+      "value": "Unpleasant Emotion"
+    },
+    {
+      "id": "char_word_emo_edge_1",
+      "kind": "word",
+      "value": "Emo Edge 1"
+    },
+    {
+      "id": "char_word_emo_edge_2",
+      "kind": "word",
+      "value": "Emo Edge 2"
+    },
+    {
+      "id": "char_word_emo_edge_3",
+      "kind": "word",
+      "value": "Emo Edge 3"
+    },
+    {
+      "id": "char_word_emo_edge_4",
+      "kind": "word",
+      "value": "Emo Edge 4"
+    },
+    {
+      "id": "char_word_emo_edge_5",
+      "kind": "word",
+      "value": "Emo Edge 5"
+    },
+    {
+      "id": "char_word_emo_edge_6",
+      "kind": "word",
+      "value": "Emo Edge 6"
+    },
+    {
+      "id": "char_word_prompt",
+      "kind": "word",
+      "value": "Prompt"
+    },
+    {
+      "id": "char_word_harness",
+      "kind": "word",
+      "value": "Harness"
+    },
+    {
+      "id": "char_word_he_edge_1",
+      "kind": "word",
+      "value": "He Edge 1"
+    },
+    {
+      "id": "char_word_he_edge_2",
+      "kind": "word",
+      "value": "He Edge 2"
+    },
+    {
+      "id": "char_word_he_edge_3",
+      "kind": "word",
+      "value": "He Edge 3"
+    },
+    {
+      "id": "char_word_act",
+      "kind": "word",
+      "value": "Act"
+    },
+    {
+      "id": "char_word_think",
+      "kind": "word",
+      "value": "Think"
+    },
+    {
+      "id": "char_word_observe",
+      "kind": "word",
+      "value": "Observe"
+    },
+    {
+      "id": "char_word_hl_edge_1",
+      "kind": "word",
+      "value": "Hl Edge 1"
+    },
+    {
+      "id": "char_word_hl_edge_2",
+      "kind": "word",
+      "value": "Hl Edge 2"
+    },
+    {
+      "id": "char_word_hl_edge_3",
+      "kind": "word",
+      "value": "Hl Edge 3"
+    },
+    {
+      "id": "char_word_agent",
+      "kind": "word",
+      "value": "Agent"
+    },
+    {
+      "id": "char_word_model",
+      "kind": "word",
+      "value": "Model"
+    },
+    {
+      "id": "char_word_ag_edge_1",
+      "kind": "word",
+      "value": "Ag Edge 1"
+    },
+    {
+      "id": "char_word_ag_edge_2",
+      "kind": "word",
+      "value": "Ag Edge 2"
+    },
+    {
+      "id": "char_word_ag_edge_3",
+      "kind": "word",
+      "value": "Ag Edge 3"
     },
     {
       "id": "char_word_semantic_projection",
@@ -2459,8 +2584,8 @@
       ],
       "connectives": [
         "char_word_identification_edge_1",
-        "char_word_identification_edge_2",
-        "char_word_identification_edge_3"
+        "char_word_attraction",
+        "char_word_repulsion"
       ]
     },
     {
@@ -2476,6 +2601,70 @@
         "char_word_sr_edge_1",
         "char_word_sr_edge_2",
         "char_word_sr_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_emotion_4",
+      "name": "Emotion",
+      "order": 4,
+      "terms": [
+        "char_word_positive_emotion",
+        "char_word_negative_emotion",
+        "char_word_pleasant_emotion",
+        "char_word_unpleasant_emotion"
+      ],
+      "connectives": [
+        "char_word_emo_edge_1",
+        "char_word_emo_edge_2",
+        "char_word_emo_edge_3",
+        "char_word_emo_edge_4",
+        "char_word_emo_edge_5",
+        "char_word_emo_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_harness_engineering_3",
+      "name": "Harness Engineering",
+      "order": 3,
+      "terms": [
+        "char_word_prompt",
+        "char_word_context",
+        "char_word_harness"
+      ],
+      "connectives": [
+        "char_word_he_edge_1",
+        "char_word_he_edge_2",
+        "char_word_he_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_harness_loop_3",
+      "name": "Harness Loop",
+      "order": 3,
+      "terms": [
+        "char_word_act",
+        "char_word_think",
+        "char_word_observe"
+      ],
+      "connectives": [
+        "char_word_hl_edge_1",
+        "char_word_hl_edge_2",
+        "char_word_hl_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_agent_3",
+      "name": "Agent",
+      "order": 3,
+      "terms": [
+        "char_word_agent",
+        "char_word_harness",
+        "char_word_model"
+      ],
+      "connectives": [
+        "char_word_ag_edge_1",
+        "char_word_ag_edge_2",
+        "char_word_ag_edge_3"
       ]
     },
     {
@@ -3153,6 +3342,46 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_self_remembering_3"
+    },
+    {
+      "id": "system_emotion_4",
+      "name": "Emotion",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_emotion_4"
+    },
+    {
+      "id": "system_harness_engineering_3",
+      "name": "Harness Engineering",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_harness_engineering_3"
+    },
+    {
+      "id": "system_harness_loop_3",
+      "name": "Harness Loop",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_harness_loop_3"
+    },
+    {
+      "id": "system_agent_3",
+      "name": "Agent",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_agent_3"
     },
     {
       "id": "system_graph_construction_3",

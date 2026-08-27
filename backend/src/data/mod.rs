@@ -591,14 +591,16 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["requests_edge_1", "requests_edge_2", "requests_edge_3"]),
     );
     // Identification triad [Ouspensky, The Fourth Way] — Like (+) · Dislike (−) ·
-    // Identification (=): like and dislike are both identification.
+    // Identification (=): like and dislike are both identification. Edges (user,
+    // 2026-08-27), canonical order (1,2),(1,3),(2,3): (1,3) Like–Identification =
+    // Attraction, (2,3) Dislike–Identification = Repulsion; (1,2) Like–Dislike TBD.
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Identification",
         3,
         &slugs(&["like", "dislike", "identification"]),
-        &slugs(&["identification_edge_1", "identification_edge_2", "identification_edge_3"]),
+        &slugs(&["identification_edge_1", "attraction", "repulsion"]),
     );
     // Self-Remembering triad [Ouspensky, The Fourth Way] — Imagination (+) ·
     // Negative emotion (−) · Identification (=) (user, 2026-08-27; corrected from the
@@ -611,6 +613,48 @@ pub fn build_fragments_from_tables() -> GraphContent {
         3,
         &slugs(&["imagination", "negative_emotion", "identification"]),
         &slugs(&["sr_edge_1", "sr_edge_2", "sr_edge_3"]),
+    );
+    // Ouspensky tetrad on emotion [The Fourth Way] (user, 2026-08-27): Positive (++) ·
+    // Negative (−−) · Pleasant (+−) · Unpleasant (−+). (`negative_emotion` char reused.)
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Emotion",
+        4,
+        &slugs(&["positive_emotion", "negative_emotion", "pleasant_emotion", "unpleasant_emotion"]),
+        &edge_slugs("emo", 4),
+    );
+
+    // ---- AI-agent harness cluster (user, 2026-08-27) [levelup.gitconnected
+    // "Your AI Agent Isn't Broken, Your Harness Is"]. Assignments TENTATIVE — user
+    // unsure; likely a dodecad to complete from the article's harness components. ----
+    // Harness-engineering triad: Prompt (+, what the model reads) · Context (−, what
+    // enters the window & when) · Harness (=, the full app infrastructure).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Harness Engineering",
+        3,
+        &slugs(&["prompt", "context", "harness"]),
+        &edge_slugs("he", 3),
+    );
+    // Harness loop — the agent's cycle: Act (+) · Think (−) · Observe (=). "All is here."
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Harness Loop",
+        3,
+        &slugs(&["act", "think", "observe"]),
+        &edge_slugs("hl", 3),
+    );
+    // Agent triad — "Agents = Model + Harness": Agent (+) · Harness (−) · Model (=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Agent",
+        3,
+        &slugs(&["agent", "harness", "model"]),
+        &edge_slugs("ag", 3),
     );
 
     // ---- Graph-theory / topology scaffold (user, 2026-08-13) [architecture] ----
