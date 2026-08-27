@@ -536,29 +536,29 @@
       "value": "Identification Edge 3"
     },
     {
-      "id": "char_word_negative_emotion",
-      "kind": "word",
-      "value": "Negative Emotion"
-    },
-    {
       "id": "char_word_imagination",
       "kind": "word",
       "value": "Imagination"
     },
     {
-      "id": "char_word_ne_edge_1",
+      "id": "char_word_negative_emotion",
       "kind": "word",
-      "value": "Ne Edge 1"
+      "value": "Negative Emotion"
     },
     {
-      "id": "char_word_ne_edge_2",
+      "id": "char_word_sr_edge_1",
       "kind": "word",
-      "value": "Ne Edge 2"
+      "value": "Sr Edge 1"
     },
     {
-      "id": "char_word_ne_edge_3",
+      "id": "char_word_sr_edge_2",
       "kind": "word",
-      "value": "Ne Edge 3"
+      "value": "Sr Edge 2"
+    },
+    {
+      "id": "char_word_sr_edge_3",
+      "kind": "word",
+      "value": "Sr Edge 3"
     },
     {
       "id": "char_word_semantic_projection",
@@ -574,21 +574,6 @@
       "id": "char_word_graph_template",
       "kind": "word",
       "value": "Graph Template"
-    },
-    {
-      "id": "char_word_gc_edge_1",
-      "kind": "word",
-      "value": "Gc Edge 1"
-    },
-    {
-      "id": "char_word_gc_edge_2",
-      "kind": "word",
-      "value": "Gc Edge 2"
-    },
-    {
-      "id": "char_word_gc_edge_3",
-      "kind": "word",
-      "value": "Gc Edge 3"
     },
     {
       "id": "char_word_size",
@@ -1063,7 +1048,7 @@
     {
       "id": "char_word_significance_and_potential",
       "kind": "word",
-      "value": "Significance And Potential"
+      "value": "Significance and Potential"
     },
     {
       "id": "char_word_coalescence",
@@ -1078,7 +1063,7 @@
     {
       "id": "char_word_self_sufficiency",
       "kind": "word",
-      "value": "Self Sufficiency"
+      "value": "Self-Sufficiency"
     },
     {
       "id": "char_word_transformation",
@@ -1471,24 +1456,24 @@
       "value": "Elements"
     },
     {
-      "id": "char_word_term_designation_9_needs_research",
+      "id": "char_word_needs_research",
       "kind": "word",
-      "value": "Term Designation 9 Needs Research"
+      "value": "Needs Research"
     },
     {
-      "id": "char_word_term_designation_10_needs_research",
+      "id": "char_word_needs_research_10",
       "kind": "word",
-      "value": "Term Designation 10 Needs Research"
+      "value": "Needs Research"
     },
     {
-      "id": "char_word_term_designation_11_needs_research",
+      "id": "char_word_needs_research_11",
       "kind": "word",
-      "value": "Term Designation 11 Needs Research"
+      "value": "Needs Research"
     },
     {
-      "id": "char_word_term_designation_12_needs_research",
+      "id": "char_word_needs_research_12",
       "kind": "word",
-      "value": "Term Designation 12 Needs Research"
+      "value": "Needs Research"
     },
     {
       "id": "char_word_tdes_edge_1",
@@ -1854,26 +1839,6 @@
       "id": "char_word_components",
       "kind": "word",
       "value": "Components"
-    },
-    {
-      "id": "char_word_connective_designation_9_needs_research",
-      "kind": "word",
-      "value": "Connective Designation 9 Needs Research"
-    },
-    {
-      "id": "char_word_connective_designation_10_needs_research",
-      "kind": "word",
-      "value": "Connective Designation 10 Needs Research"
-    },
-    {
-      "id": "char_word_connective_designation_11_needs_research",
-      "kind": "word",
-      "value": "Connective Designation 11 Needs Research"
-    },
-    {
-      "id": "char_word_connective_designation_12_needs_research",
-      "kind": "word",
-      "value": "Connective Designation 12 Needs Research"
     },
     {
       "id": "char_word_cdes_edge_1",
@@ -2499,18 +2464,18 @@
       ]
     },
     {
-      "id": "vocab_negative_emotion_3",
-      "name": "Negative Emotion",
+      "id": "vocab_self_remembering_3",
+      "name": "Self Remembering",
       "order": 3,
       "terms": [
+        "char_word_imagination",
         "char_word_negative_emotion",
-        "char_word_identification",
-        "char_word_imagination"
+        "char_word_identification"
       ],
       "connectives": [
-        "char_word_ne_edge_1",
-        "char_word_ne_edge_2",
-        "char_word_ne_edge_3"
+        "char_word_sr_edge_1",
+        "char_word_sr_edge_2",
+        "char_word_sr_edge_3"
       ]
     },
     {
@@ -2523,9 +2488,9 @@
         "char_word_graph_template"
       ],
       "connectives": [
-        "char_word_gc_edge_1",
-        "char_word_gc_edge_2",
-        "char_word_gc_edge_3"
+        "char_word_identity",
+        "char_word_associativity",
+        "char_word_composition"
       ]
     },
     {
@@ -2816,10 +2781,10 @@
         "char_word_laws",
         "char_word_states",
         "char_word_elements",
-        "char_word_term_designation_9_needs_research",
-        "char_word_term_designation_10_needs_research",
-        "char_word_term_designation_11_needs_research",
-        "char_word_term_designation_12_needs_research"
+        "char_word_needs_research",
+        "char_word_needs_research_10",
+        "char_word_needs_research_11",
+        "char_word_needs_research_12"
       ],
       "connectives": [
         "char_word_tdes_edge_1",
@@ -2903,10 +2868,10 @@
         "char_word_steps",
         "char_word_intervals",
         "char_word_components",
-        "char_word_connective_designation_9_needs_research",
-        "char_word_connective_designation_10_needs_research",
-        "char_word_connective_designation_11_needs_research",
-        "char_word_connective_designation_12_needs_research"
+        "char_word_needs_research",
+        "char_word_needs_research_10",
+        "char_word_needs_research_11",
+        "char_word_needs_research_12"
       ],
       "connectives": [
         "char_word_cdes_edge_1",
@@ -3180,14 +3145,14 @@
       "vocabulary_ref": "vocab_identification_3"
     },
     {
-      "id": "system_negative_emotion_3",
-      "name": "Negative Emotion",
+      "id": "system_self_remembering_3",
+      "name": "Self Remembering",
       "order": 3,
       "coherence": "Dynamism",
       "term_designation": "Impulses",
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
-      "vocabulary_ref": "vocab_negative_emotion_3"
+      "vocabulary_ref": "vocab_self_remembering_3"
     },
     {
       "id": "system_graph_construction_3",
