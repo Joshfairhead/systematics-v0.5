@@ -600,29 +600,35 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["like", "dislike", "identification"]),
         &slugs(&["identification_edge_1", "identification_edge_2", "identification_edge_3"]),
     );
-    // Negative-emotion triad [Ouspensky, The Fourth Way] — Negative emotion (+) ·
-    // Identification (−) · Imagination (=). Shares the `identification` character
+    // Self-Remembering triad [Ouspensky, The Fourth Way] — Imagination (+) ·
+    // Negative emotion (−) · Identification (=) (user, 2026-08-27; corrected from the
+    // mislabelled "Negative Emotion" layout). Shares the `identification` character
     // with the Identification triad (same term, reused across systems).
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "Negative Emotion",
+        "Self Remembering",
         3,
-        &slugs(&["negative_emotion", "identification", "imagination"]),
-        &slugs(&["ne_edge_1", "ne_edge_2", "ne_edge_3"]),
+        &slugs(&["imagination", "negative_emotion", "identification"]),
+        &slugs(&["sr_edge_1", "sr_edge_2", "sr_edge_3"]),
     );
 
     // ---- Graph-theory / topology scaffold (user, 2026-08-13) [architecture] ----
     // The construction triad — how we build a system for examining property graphs:
-    // Semantic Projection (+) · Structural Topology (−) · Graph Template (=). Alt
-    // graph-theory names: Incidence graph (+) · Adjacency graph (−) · Line graph (=).
+    // Semantic Projection (+) · Structural Topology (−) · Graph Template (=). Matrix
+    // names (validated 2026-08-26): Line graph (+) · Adjacency graph (−) · Incidence
+    // graph (=). Its edges are the **category-theory axioms**, grounded in incidence
+    // `B` (edge order (1,2),(1,3),(2,3) over the nodes above):
+    //   (1,2) Line–Adjacency      = identity      (duals, same up to iso — an orbital)
+    //   (1,3) Line–Incidence      = associativity (A·B = B·L, assoc. of B·Bᵀ·B)
+    //   (2,3) Adjacency–Incidence = composition   (A = B·Bᵀ)
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Graph Construction",
         3,
         &slugs(&["semantic_projection", "structural_topology", "graph_template"]),
-        &edge_slugs("gc", 3),
+        &slugs(&["identity", "associativity", "composition"]),
     );
     // The dyad on each construction node: what that impulse defines.
     // Graph Template (=) → order · size.
