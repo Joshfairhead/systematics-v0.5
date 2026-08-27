@@ -218,7 +218,6 @@ impl GraphQLClient {
         connectiveDesignation
         terms {
             position
-            characterId
             value
         }
         coordinates {

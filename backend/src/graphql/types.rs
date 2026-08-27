@@ -561,7 +561,6 @@ pub struct RenderedSystemData {
 
 pub struct GrammarTermData {
     pub position: i32,
-    pub character_id: String,
     pub value: String,
 }
 
@@ -615,7 +614,6 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         if let Some(c) = graph.character(char_id) {
             terms.push(GrammarTermData {
                 position,
-                character_id: c.id.clone(),
                 value: c.value.clone(),
             });
         }
@@ -733,7 +731,6 @@ impl GqlRenderedSystem {
             .iter()
             .map(|t| GqlGrammarTerm {
                 position: t.position,
-                character_id: t.character_id.clone(),
                 value: t.value.clone(),
             })
             .collect()
@@ -797,7 +794,6 @@ impl GqlRenderedSystem {
 #[derive(SimpleObject)]
 pub struct GqlGrammarTerm {
     pub position: i32,
-    pub character_id: String,
     pub value: String,
 }
 

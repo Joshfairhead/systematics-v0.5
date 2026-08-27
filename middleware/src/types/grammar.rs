@@ -15,8 +15,6 @@ use async_graphql::SimpleObject;
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct GrammarTerm {
     pub position: i32,
-    #[serde(rename = "characterId")]
-    pub character_id: String,
     pub value: String,
 }
 
