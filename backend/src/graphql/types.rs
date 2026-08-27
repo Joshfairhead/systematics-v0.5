@@ -603,18 +603,36 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
     let name = canonical_system_name(order).to_string();
     let system_name = system.name.clone();
     let grammar = graph.template(&system.grammar_ref)?;
-    let topology = graph.topology(&grammar.topological_vocab_ref)?;
+    let _topology = graph.topology(&grammar.topological_vocab_ref)?; // existence guard
     let semantic = graph.vocabulary(&system.vocabulary_ref)?;
     let colour_vocab = graph.canonical_colour_vocab_for_order(order);
 
-    // Terms (word Characters at each Point in position order).
+    // --- The Controller composes the model, then resolves the view from it ---
+    // Substrate-composed rather than hand-assembled: the "compose, don't load"
+    // convergence (JSON loading is a legacy device). `compose_system` is law-agnostic
+    // — it builds the complete model from the grammar-gated morphisms; the view is one
+    // reading of it. Geometry (coordinates/colours/lines) is the render layer and stays
+    // a direct read below.
+    let term_values: Vec<String> = semantic
+        .terms
+        .iter()
+        .filter_map(|cid| graph.character(cid).map(|c| c.value.clone()))
+        .collect();
+    let connective_values: Vec<String> = semantic
+        .connectives
+        .iter()
+        .filter_map(|cid| graph.character(cid).map(|c| c.value.clone()))
+        .collect();
+    let model = crate::core::substrate::compose_system(order, &term_values, &connective_values);
+
+    // Terms — resolved from the composed model, in ordinality order.
     let mut terms = Vec::new();
-    for (idx, char_id) in semantic.terms.iter().enumerate() {
-        let position = (idx + 1) as i32;
-        if let Some(c) = graph.character(char_id) {
+    for index in 1..=order {
+        let term_id = format!("term_{}_{}", order, index);
+        if let Some(d) = model.data.iter().find(|d| d.id == term_id) {
             terms.push(GrammarTermData {
-                position,
-                value: c.value.clone(),
+                position: index as i32,
+                value: d.character.clone(),
             });
         }
     }
@@ -653,24 +671,17 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
     }
 
     // Connectives: pair Perspective's topology.lines[i] with semantic.connectives[i].
+    // Connectives — resolved from the composed model, in canonical edge order. The
+    // connective `id` keeps the legacy `line_{order}_{a}_{b}` format the frontend uses.
     let mut connectives = Vec::new();
-    for (idx, line_id) in topology.lines.iter().enumerate() {
-        if let Some(line) = graph.get_entry(line_id).and_then(|e| match e {
-            Entry::Line(l) => Some(l),
-            _ => None,
-        }) {
-            let base = line.position_value().unwrap_or(0) as i32;
-            let target = line.position_secondary_value().unwrap_or(0) as i32;
-            let char_id = semantic.connectives.get(idx).cloned().unwrap_or_default();
-            let value = graph
-                .character(&char_id)
-                .map(|c| c.value.clone())
-                .unwrap_or_default();
+    for (a, b) in crate::core::grammar::Template::for_order(order).edges() {
+        let conn_id = format!("conn_{}_{}_{}", order, a, b);
+        if let Some(d) = model.data.iter().find(|d| d.id == conn_id) {
             connectives.push(GrammarConnectiveData {
-                id: line.id.clone(),
-                base_position: base,
-                target_position: target,
-                character_value: value,
+                id: format!("line_{}_{}_{}", order, a, b),
+                base_position: a as i32,
+                target_position: b as i32,
+                character_value: d.character.clone(),
             });
         }
     }
