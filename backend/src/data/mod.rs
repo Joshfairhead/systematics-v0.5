@@ -315,6 +315,59 @@ fn edge_slugs(prefix: &str, order: usize) -> Vec<String> {
     (1..=count).map(|i| format!("{prefix}_edge_{i}")).collect()
 }
 
+/// Seed a metadata **dodecad** by **composing it from the single source**
+/// (`core::hexadicsystems`): each of the 12 terms takes the *exact* facet value for
+/// its ordinality, so the dodecad can never drift from the hexad. The hexad module is
+/// primordial (the seed) and *composes* the dodecads — not the reverse (reading the
+/// in-graph dodecads at seed time would be circular, since seeding each dodecad calls
+/// `canonical_*`). Char-id slugs are disambiguated where a value repeats ("Needs
+/// Research" at 9–12); the character *value* stays the exact hexadic string.
+/// Connectives are placeholder edges.
+fn push_metadata_dodecad(
+    content: &mut GraphContent,
+    have_char: &mut std::collections::HashSet<String>,
+    name: &str,
+    edge_prefix: &str,
+    facet: impl Fn(u8) -> &'static str,
+) {
+    let mut seen: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
+    let mut term_char_ids = Vec::with_capacity(12);
+    for n in 1..=12u8 {
+        let value = facet(n);
+        let base = value.to_lowercase().replace(' ', "_").replace('-', "_");
+        let count = seen.entry(base.clone()).or_insert(0);
+        *count += 1;
+        let slug = if *count == 1 { base } else { format!("{base}_{n}") };
+        let id = format!("char_word_{slug}");
+        if have_char.insert(id.clone()) {
+            content.characters.push(Character::new(id.clone(), "word", value));
+        }
+        term_char_ids.push(id);
+    }
+    let mut connective_char_ids = Vec::new();
+    for slug in edge_slugs(edge_prefix, 12) {
+        let id = format!("char_word_{slug}");
+        if have_char.insert(id.clone()) {
+            content
+                .characters
+                .push(Character::new(id.clone(), "word", word_from_slug(&slug)));
+        }
+        connective_char_ids.push(id);
+    }
+    let vocab = Vocabulary::with_auto_id(name, 12, term_char_ids, connective_char_ids);
+    let vocab_id = vocab.id.clone();
+    content.vocabularies.push(vocab);
+    content.systems.push(System::with_auto_id(
+        name,
+        12,
+        canonical_coherence(12),
+        canonical_term_designation(12),
+        canonical_connective_designation(12),
+        "grammar_12".to_string(),
+        &vocab_id,
+    ));
+}
+
 /// Build the author-contributed and systematics-core **fragments** as their own
 /// bundle (`data/fragments.json`). Source of the author triads: **Josh Fairhead**
 /// (see `docs/fragments.md`). Each is a real K_n system (terms + named/placeholder
@@ -656,47 +709,31 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("interface", 3),
     );
 
-    // Metadata dodecads (user, 2026-08-20) — the 12 values per metadata dimension made
-    // explicit as order-12 systems, to fill the view's metadata sections (the first
-    // stage of the systemic product). Values are the canonical metadata per order
-    // (cf. `canonical_coherence` / `_term_designation` / `_connective_designation`);
-    // designations 9–12 are still "needs research". Edges TBD → placeholder.
-    push_triadic_system(
+    // Metadata dodecads (user, 2026-08-20; composed-from-source 2026-08-27) — the 12
+    // values per metadata dimension as order-12 systems, to fill the view's metadata
+    // sections. **Composed from the single source** (`core::hexadicsystems`) so they
+    // can't drift from the hexad; designations 9–12 are still "Needs Research". Edges
+    // TBD → placeholder.
+    push_metadata_dodecad(
         &mut content,
         &mut have_char,
         "Coherence Attributes",
-        12,
-        &slugs(&[
-            "universality", "complementarity", "dynamism", "activity_field",
-            "significance_and_potential", "coalescence", "generation", "self_sufficiency",
-            "transformation", "intrinsic_harmony", "articulate_symmetry", "perfection",
-        ]),
-        &edge_slugs("coh", 12),
+        "coh",
+        crate::core::hexadicsystems::coherence,
     );
-    push_triadic_system(
+    push_metadata_dodecad(
         &mut content,
         &mut have_char,
         "Term Designations",
-        12,
-        &slugs(&[
-            "totality", "poles", "impulses", "sources", "limits", "laws", "states", "elements",
-            "term_designation_9_needs_research", "term_designation_10_needs_research",
-            "term_designation_11_needs_research", "term_designation_12_needs_research",
-        ]),
-        &edge_slugs("tdes", 12),
+        "tdes",
+        crate::core::hexadicsystems::term_designation,
     );
-    push_triadic_system(
+    push_metadata_dodecad(
         &mut content,
         &mut have_char,
         "Connective Designations",
-        12,
-        &slugs(&[
-            "unity", "force", "acts", "interplays", "mutualities", "steps", "intervals",
-            "components", "connective_designation_9_needs_research",
-            "connective_designation_10_needs_research", "connective_designation_11_needs_research",
-            "connective_designation_12_needs_research",
-        ]),
-        &edge_slugs("cdes", 12),
+        "cdes",
+        crate::core::hexadicsystems::connective_designation,
     );
 
     content
