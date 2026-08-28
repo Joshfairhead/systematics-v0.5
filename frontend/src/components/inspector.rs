@@ -1,5 +1,5 @@
 //! Inspector — a self-contained view module (a prototype micro-module) that shows a
-//! pinned **subject**'s quads grouped by predicate → position → object, each with its
+//! pinned **subject**'s quads grouped by predicate → ordinality → object, each with its
 //! citation. Reciprocal traversal: "everything at node 1 → its terms across
 //! perspectives; scope by source → one."
 //!
@@ -16,14 +16,14 @@ pub struct ObjCite {
     pub citations: Vec<String>,
 }
 
-/// The objects at one topological position (node index or edge `base-target`).
+/// The objects at one topological ordinality (node index or edge `base-target`).
 #[derive(Clone, PartialEq)]
 pub struct PosGroup {
-    pub position: String,
+    pub ordinality: String,
     pub objects: Vec<ObjCite>,
 }
 
-/// One predicate's objects, grouped by position. `is_edge` picks the position label
+/// One predicate's objects, grouped by ordinality. `is_edge` picks the ordinality label
 /// (`edge 1-2` for connectives vs `node 1` for terms); `label` is the display name.
 #[derive(Clone, PartialEq)]
 pub struct PredGroup {
@@ -71,7 +71,7 @@ pub fn inspector(props: &InspectorProps) -> Html {
     }
 }
 
-/// One predicate row: its label, then each position on its own line, each object
+/// One predicate row: its label, then each ordinality on its own line, each object
 /// (with its citation when expanded) one per line.
 fn render_pred(g: &PredGroup, cites_on: bool) -> Html {
     html! {
@@ -79,12 +79,12 @@ fn render_pred(g: &PredGroup, cites_on: bool) -> Html {
             <span class="inspect-pred">{ &g.label }</span>
             <div class="inspect-positions">
                 { for g.positions.iter().map(|p| {
-                    let pos_label = if p.position.is_empty() {
+                    let pos_label = if p.ordinality.is_empty() {
                         String::new()
                     } else if g.is_edge {
-                        format!("edge {}", p.position)
+                        format!("edge {}", p.ordinality)
                     } else {
-                        format!("node {}", p.position)
+                        format!("node {}", p.ordinality)
                     };
                     html! {
                         <div class="inspect-posrow">

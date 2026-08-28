@@ -118,14 +118,14 @@ struct AllReferencesResponse {
     all_references: Vec<ReferenceView>,
 }
 
-/// A term/connective character with its graph-derived **position** — node index
+/// A term/connective character with its graph-derived **ordinality** — node index
 /// (`"1"`) for a term, edge (`"1-2"`) for a connective. Supplied by the backend so
 /// the frontend anchors to the topology instead of guessing from a list index.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct PositionedChar {
     pub value: String,
     #[serde(default)]
-    pub position: String,
+    pub ordinality: String,
 }
 
 /// A non-canonical System the Load control can browse (id, display name, order).
@@ -217,31 +217,31 @@ impl GraphQLClient {
         termDesignation
         connectiveDesignation
         terms {
-            position
+            ordinality
             value
         }
         coordinates {
             id
             pointRef
             order
-            position
+            ordinality
             x
             y
             z
         }
         colours {
-            position
+            ordinality
             value
         }
         lines {
             id
-            basePosition
-            targetPosition
+            baseOrdinality
+            targetOrdinality
         }
         connectives {
             id
-            basePosition
-            targetPosition
+            baseOrdinality
+            targetOrdinality
             characterValue
         }
     "#;
@@ -365,7 +365,7 @@ impl GraphQLClient {
 
     /// The non-canonical instance systems the Load control browses.
     pub async fn fetch_instance_systems(&self) -> Result<Vec<InstanceSystem>, ApiError> {
-        let query = r#"query { instanceSystems { id name order terms { value position } connectives { value position } } }"#;
+        let query = r#"query { instanceSystems { id name order terms { value ordinality } connectives { value ordinality } } }"#;
         let response: GraphQLResponse<InstanceSystemsResponse> =
             self.execute_query(query, None).await?;
         if let Some(errors) = response.errors {

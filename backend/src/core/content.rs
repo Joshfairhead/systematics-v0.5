@@ -1,6 +1,6 @@
 //! GraphContent — the serialisable data layer.
 //!
-//! The combinatoric substrate (Order, Position, Point, Line, Segment, and the
+//! The combinatoric substrate (Order, Ordinality, Point, Line, Segment, and the
 //! topological/geometric vocabulary ref-lists) is deterministic from the Order
 //! and lives in code. Everything *data-like* — coordinates, characters,
 //! semantic vocabularies, and perspectives — is content, and it round-trips through
@@ -41,7 +41,7 @@ pub struct GraphContent {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
-    /// Same-grammar functors (position permutations between systems of one
+    /// Same-grammar functors (ordinality permutations between systems of one
     /// Order). User-created transforms, persisted like systems/references.
     #[serde(default)]
     pub functors: Vec<Functor>,

@@ -18,8 +18,8 @@ async fn substrate_composed_triad_view_is_byte_identical() {
     let schema = make_schema();
     let q = r#"query {
         system(order: 3) {
-            terms { position value }
-            connectives { id basePosition targetPosition characterValue }
+            terms { ordinality value }
+            connectives { id baseOrdinality targetOrdinality characterValue }
         }
     }"#;
     let resp = schema.execute(q).await;
@@ -30,9 +30,9 @@ async fn substrate_composed_triad_view_is_byte_identical() {
     // Terms — composed by the substrate, in ordinality order.
     let terms = sys["terms"].as_array().unwrap();
     assert_eq!(terms.len(), 3);
-    assert_eq!((terms[0]["position"].as_i64().unwrap(), terms[0]["value"].as_str().unwrap()), (1, "Will"));
-    assert_eq!((terms[1]["position"].as_i64().unwrap(), terms[1]["value"].as_str().unwrap()), (2, "Function"));
-    assert_eq!((terms[2]["position"].as_i64().unwrap(), terms[2]["value"].as_str().unwrap()), (3, "Being"));
+    assert_eq!((terms[0]["ordinality"].as_i64().unwrap(), terms[0]["value"].as_str().unwrap()), (1, "Will"));
+    assert_eq!((terms[1]["ordinality"].as_i64().unwrap(), terms[1]["value"].as_str().unwrap()), (2, "Function"));
+    assert_eq!((terms[2]["ordinality"].as_i64().unwrap(), terms[2]["value"].as_str().unwrap()), (3, "Being"));
 
     // Connectives — canonical edge order, with the legacy `line_{n}_{a}_{b}` ids the
     // frontend depends on, and the character values on the right edges.
@@ -42,8 +42,8 @@ async fn substrate_composed_triad_view_is_byte_identical() {
         .map(|c| {
             (
                 c["id"].as_str().unwrap(),
-                c["basePosition"].as_i64().unwrap(),
-                c["targetPosition"].as_i64().unwrap(),
+                c["baseOrdinality"].as_i64().unwrap(),
+                c["targetOrdinality"].as_i64().unwrap(),
                 c["characterValue"].as_str().unwrap(),
             )
         })
@@ -63,7 +63,7 @@ async fn substrate_composes_higher_orders() {
     // The substrate composes any K_n, not just the triad: the hexad has 6 terms and
     // C(6,2)=15 connectives, with canonical edge ids.
     let schema = make_schema();
-    let q = r#"query { system(order: 6) { terms { position } connectives { id targetPosition } } }"#;
+    let q = r#"query { system(order: 6) { terms { ordinality } connectives { id targetOrdinality } } }"#;
     let resp = schema.execute(q).await;
     assert!(resp.errors.is_empty(), "errors: {:?}", resp.errors);
     let d = resp.data.into_json().unwrap();

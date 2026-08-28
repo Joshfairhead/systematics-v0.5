@@ -465,7 +465,7 @@ pub fn compose_checked(
 }
 
 /// The **bundle** of monomorphisms that composes a K_n topology from its graph rules
-/// (the `Template`): a `Position→Vertex` per vertex, an `Edge→Orbit` per edge.
+/// (the `Template`): a `Ordinality→Vertex` per vertex, an `Edge→Orbit` per edge.
 pub fn topology_morphisms(cardinality: u8) -> Vec<Box<dyn Morphism>> {
     let mut bundle: Vec<Box<dyn Morphism>> = Vec::new();
     for index in 1..=cardinality {

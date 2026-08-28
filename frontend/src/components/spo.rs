@@ -1,7 +1,7 @@
 //! SPO — the flat triple store and its query API, isolated as its own module so the
 //! **mechanism is swappable** (a spike; the base-space remodel may replace it with a
 //! six-laws / path-distance navigation). Everything an attribute of an element is a
-//! `(subject, predicate, object)` with a topological `position` and a `citation` — so
+//! `(subject, predicate, object)` with a topological `ordinality` and a `citation` — so
 //! the browser/filter has **zero per-predicate code** and consumes this API rather than
 //! embedding SPO internals.
 
@@ -60,7 +60,7 @@ pub fn frag_pred(f: &str) -> &'static str {
 }
 
 /// A flat **SPO triple** — the uniform unit the Filter operates over. Every attribute
-/// of every element is `(subject, predicate, object)` + a topological `position` (node
+/// of every element is `(subject, predicate, object)` + a topological `ordinality` (node
 /// index `"1"` / edge `"1-2"` / `""`) + a `citation` (source·artefact·lookup; "" for
 /// base-space facts). Base-space topology + fiber assertions flatten into one list.
 #[derive(Clone)]
@@ -68,7 +68,7 @@ pub struct Triple {
     pub subject: String,
     pub predicate: String,
     pub object: String,
-    pub position: String,
+    pub ordinality: String,
     pub citation: String,
 }
 
@@ -81,8 +81,8 @@ pub fn ref_citation(r: &ReferenceView) -> String {
         .join(" · ")
 }
 
-/// The topological position encoded in a reference `#fragment`: `term:1` → `1`,
-/// `conn:1-2` → `1-2`; whole-system fragments carry no position.
+/// The topological ordinality encoded in a reference `#fragment`: `term:1` → `1`,
+/// `conn:1-2` → `1-2`; whole-system fragments carry no ordinality.
 pub fn frag_position(f: &str) -> String {
     if let Some(n) = f.strip_prefix("term:") {
         n.to_string()
@@ -102,25 +102,25 @@ pub fn build_triples(
     seqs: &[SequenceView],
 ) -> Vec<Triple> {
     let mut t: Vec<Triple> = Vec::new();
-    let mut base = |subject: &str, predicate: &str, object: String, position: String| {
+    let mut base = |subject: &str, predicate: &str, object: String, ordinality: String| {
         t.push(Triple {
             subject: subject.to_string(),
             predicate: predicate.to_string(),
             object,
-            position,
+            ordinality,
             citation: String::new(),
         });
     };
     for s in systems {
         base(&s.id, "name", s.name.clone(), String::new()); // scope to a *specific* system
         base(&s.id, "order", order_name(s.order), String::new());
-        // Terms/connectives carry their GRAPH position (node index / base–target edge),
+        // Terms/connectives carry their GRAPH ordinality (node index / base–target edge),
         // supplied by the backend — terms anchor to nodes, connectives to edges.
         for term in &s.terms {
-            base(&s.id, "term", term.value.clone(), term.position.clone());
+            base(&s.id, "term", term.value.clone(), term.ordinality.clone());
         }
         for c in &s.connectives {
-            base(&s.id, "connective", c.value.clone(), c.position.clone());
+            base(&s.id, "connective", c.value.clone(), c.ordinality.clone());
         }
     }
     let _ = seqs; // monads carry no base-space triples yet (they show unfiltered)
@@ -135,7 +135,7 @@ pub fn build_triples(
                     subject: ts.id.clone(),
                     predicate: pred.to_string(),
                     object: obj.clone(),
-                    position: frag_position(&fragment),
+                    ordinality: frag_position(&fragment),
                     citation: cite.clone(),
                 });
             }
@@ -151,7 +151,7 @@ pub fn build_triples(
                 subject: ts.id.clone(),
                 predicate: "source".to_string(),
                 object: origin,
-                position: String::new(),
+                ordinality: String::new(),
                 citation: cite,
             });
         }

@@ -25,8 +25,8 @@ const GRAPHIQL_HTML: &str = r#"<!DOCTYPE html>
     coherence
     termDesignation
     connectiveDesignation
-    terms { position value }
-    connectives { basePosition targetPosition characterValue }
+    terms { ordinality value }
+    connectives { baseOrdinality targetOrdinality characterValue }
   }
 }`;
       ReactDOM.render(

@@ -1,7 +1,7 @@
 //! Core types for the Systematics property graph.
 //!
 //! Layered ontology:
-//! - `entries` — the substrate (Order, Position, Point, Line, Coordinate,
+//! - `entries` — the substrate (Order, Ordinality, Point, Line, Coordinate,
 //!   Segment, Character) plus the `Entry` sum type.
 //! - `vocabularies` — `Topology`, `Geometry`,
 //!   `Vocabulary` — ordered per-Order references into the substrate.
@@ -26,7 +26,7 @@ pub mod systems;
 pub mod vocabularies;
 
 pub use entries::{
-    Character, Coordinate, Entry, Line, Order, Point, Point3d, Position, Segment,
+    Character, Coordinate, Entry, Line, Order, Point, Point3d, Ordinality, Segment,
 };
 
 pub use vocabularies::{Geometry, Vocabulary, Topology};

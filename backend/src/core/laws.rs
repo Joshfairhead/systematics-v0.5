@@ -31,7 +31,7 @@ pub enum Law {
 }
 
 impl Law {
-    /// The six laws in **Hexad-position order** (positions 1..=6, with colours):
+    /// The six laws in **Hexad-ordinality order** (positions 1..=6, with colours):
     /// 1 red identity · 2 blue expansion · 3 yellow order · 4 green freedom ·
     /// 5 purple interaction · 6 orange concentration. *(Layout per the user,
     /// 2026-08-18; the hexad itself may still flip — separate inquiry.)*
@@ -45,7 +45,7 @@ impl Law {
     ];
 
     /// The law's permutation in one-line notation over positions `1..=3`:
-    /// `permutation()[i]` is the position read into slot `i`. (Verified against
+    /// `permutation()[i]` is the ordinality read into slot `i`. (Verified against
     /// the S₃ table in `docs/design-intent.md`.)
     pub fn permutation(&self) -> [u8; 3] {
         match self {
@@ -75,7 +75,7 @@ impl Law {
         }
     }
 
-    /// Hexad position `1..=6` (see `HEXAD`).
+    /// Hexad ordinality `1..=6` (see `HEXAD`).
     pub fn hexad_position(&self) -> u8 {
         (Self::HEXAD.iter().position(|l| l == self).unwrap() + 1) as u8
     }

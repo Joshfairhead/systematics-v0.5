@@ -755,8 +755,8 @@ fn table_view(ctx: TableCtx) -> Html {
             .find(|s| s.id == sid)
             .map(|s| s.name.clone())
             .unwrap_or_else(|| sid.clone());
-        // Group the subject's triples: predicate → position → object → citation(s).
-        // Grouping by position is the bijective mapping — every perspective's value at
+        // Group the subject's triples: predicate → ordinality → object → citation(s).
+        // Grouping by ordinality is the bijective mapping — every perspective's value at
         // the SAME node lands together (node 1: Will · Function[DU1] · Affirmation[DU2]).
         let mut by_pred: BTreeMap<String, BTreeMap<String, BTreeMap<String, BTreeSet<String>>>> =
             BTreeMap::new();
@@ -764,7 +764,7 @@ fn table_view(ctx: TableCtx) -> Html {
             let cites = by_pred
                 .entry(t.predicate.clone())
                 .or_default()
-                .entry(t.position.clone())
+                .entry(t.ordinality.clone())
                 .or_default()
                 .entry(t.object.clone())
                 .or_default();
@@ -796,8 +796,8 @@ fn table_view(ctx: TableCtx) -> Html {
                     is_edge: p == "connective",
                     positions: positions
                         .into_iter()
-                        .map(|(position, objs)| PosGroup {
-                            position,
+                        .map(|(ordinality, objs)| PosGroup {
+                            ordinality,
                             objects: objs
                                 .into_iter()
                                 .map(|(object, cites)| ObjCite {

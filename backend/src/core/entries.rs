@@ -3,7 +3,7 @@
 //! Layered ontology (from the plan):
 //!
 //! ```text
-//! Order, Position           ← numeric substrate anchors
+//! Order, Ordinality           ← numeric substrate anchors
 //! Point, Line               ← topological anchors (1-vertex and 2-vertex)
 //! Coordinate, Segment       ← geometric bindings to Point / Line
 //! Character                 ← content-only semantic value (no anchor field)
@@ -75,14 +75,14 @@ impl Order {
     }
 }
 
-/// Position: abstract "n-th place" (1-12).
+/// Ordinality: abstract "n-th place" (1-12).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Position {
+pub struct Ordinality {
     pub id: String,
     pub value: u8,
 }
 
-impl Position {
+impl Ordinality {
     pub fn new(value: u8) -> Self {
         Self {
             id: format!("position_{}", value),
@@ -98,17 +98,17 @@ impl Position {
 /// A topological anchor at a single vertex of the K_n system.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Point {
-    pub id: String,       // "point_{order}_{position}"
+    pub id: String,       // "point_{order}_{ordinality}"
     pub order: String,    // "order_{order}"
-    pub position: String, // "position_{position}"
+    pub ordinality: String, // "position_{ordinality}"
 }
 
 impl Point {
-    pub fn new(order: u8, position: u8) -> Self {
+    pub fn new(order: u8, ordinality: u8) -> Self {
         Self {
-            id: format!("point_{}_{}", order, position),
+            id: format!("point_{}_{}", order, ordinality),
             order: format!("order_{}", order),
-            position: format!("position_{}", position),
+            ordinality: format!("position_{}", ordinality),
         }
     }
 
@@ -119,7 +119,7 @@ impl Point {
     }
 
     pub fn position_value(&self) -> Option<u8> {
-        self.position
+        self.ordinality
             .strip_prefix("position_")
             .and_then(|s| s.parse().ok())
     }
@@ -127,13 +127,13 @@ impl Point {
 
 /// A topological anchor at an edge (two vertices) of the K_n system.
 ///
-/// Canonical form: `position <= position_secondary`. `Line::new(3, 2, 1)`
+/// Canonical form: `ordinality <= position_secondary`. `Line::new(3, 2, 1)`
 /// produces the same ID as `Line::new(3, 1, 2)`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Line {
     pub id: String,                 // "line_{order}_{p1}_{p2}" with p1 < p2
     pub order: String,              // "order_{order}"
-    pub position: String,           // "position_{p1}"
+    pub ordinality: String,           // "position_{p1}"
     pub position_secondary: String, // "position_{p2}"
 }
 
@@ -143,7 +143,7 @@ impl Line {
         Self {
             id: format!("line_{}_{}_{}", order, lo, hi),
             order: format!("order_{}", order),
-            position: format!("position_{}", lo),
+            ordinality: format!("position_{}", lo),
             position_secondary: format!("position_{}", hi),
         }
     }
@@ -155,7 +155,7 @@ impl Line {
     }
 
     pub fn position_value(&self) -> Option<u8> {
-        self.position
+        self.ordinality
             .strip_prefix("position_")
             .and_then(|s| s.parse().ok())
     }
@@ -174,26 +174,26 @@ impl Line {
 /// A geometric point bound to a topological `Point`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Coordinate {
-    pub id: String,        // "coord_{order}_{position}"
-    pub point_ref: String, // "point_{order}_{position}"
+    pub id: String,        // "coord_{order}_{ordinality}"
+    pub point_ref: String, // "point_{order}_{ordinality}"
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
 impl Coordinate {
-    pub fn new(order: u8, position: u8, x: f64, y: f64, z: f64) -> Self {
+    pub fn new(order: u8, ordinality: u8, x: f64, y: f64, z: f64) -> Self {
         Self {
-            id: format!("coord_{}_{}", order, position),
-            point_ref: format!("point_{}_{}", order, position),
+            id: format!("coord_{}_{}", order, ordinality),
+            point_ref: format!("point_{}_{}", order, ordinality),
             x,
             y,
             z,
         }
     }
 
-    pub fn from_point3d(order: u8, position: u8, p: Point3d) -> Self {
-        Self::new(order, position, p.x, p.y, p.z)
+    pub fn from_point3d(order: u8, ordinality: u8, p: Point3d) -> Self {
+        Self::new(order, ordinality, p.x, p.y, p.z)
     }
 
     pub fn order_value(&self) -> Option<u8> {
@@ -278,7 +278,8 @@ impl Character {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Entry {
     Order(Order),
-    Position(Position),
+    #[serde(rename = "Position")] // JSON tag kept stable through the position→ordinality rename
+    Ordinality(Ordinality),
     Point(Point),
     Line(Line),
     Coordinate(Coordinate),
@@ -291,7 +292,7 @@ impl Entry {
     pub fn id(&self) -> &str {
         match self {
             Entry::Order(e) => &e.id,
-            Entry::Position(e) => &e.id,
+            Entry::Ordinality(e) => &e.id,
             Entry::Point(e) => &e.id,
             Entry::Line(e) => &e.id,
             Entry::Coordinate(e) => &e.id,
@@ -304,7 +305,7 @@ impl Entry {
     pub fn order(&self) -> Option<u8> {
         match self {
             Entry::Order(e) => Some(e.value),
-            Entry::Position(_) => None,
+            Entry::Ordinality(_) => None,
             Entry::Point(e) => e.order_value(),
             Entry::Line(e) => e.order_value(),
             Entry::Coordinate(e) => e.order_value(),
@@ -313,10 +314,10 @@ impl Entry {
         }
     }
 
-    /// Get the position value of this entry (if applicable).
-    pub fn position(&self) -> Option<u8> {
+    /// Get the ordinality value of this entry (if applicable).
+    pub fn ordinality(&self) -> Option<u8> {
         match self {
-            Entry::Position(e) => Some(e.value),
+            Entry::Ordinality(e) => Some(e.value),
             Entry::Point(e) => e.position_value(),
             Entry::Line(e) => e.position_value(),
             Entry::Coordinate(e) => e.position_value(),
@@ -324,9 +325,9 @@ impl Entry {
         }
     }
 
-    /// True if this is a numeric substrate anchor (Order or Position).
+    /// True if this is a numeric substrate anchor (Order or Ordinality).
     pub fn is_numeric_anchor(&self) -> bool {
-        matches!(self, Entry::Order(_) | Entry::Position(_))
+        matches!(self, Entry::Order(_) | Entry::Ordinality(_))
     }
 
     /// True if this is a topological anchor (Point or Line).
@@ -359,7 +360,7 @@ mod tests {
 
     #[test]
     fn test_position_creation() {
-        let pos = Position::new(1);
+        let pos = Ordinality::new(1);
         assert_eq!(pos.id, "position_1");
         assert_eq!(pos.value, 1);
     }

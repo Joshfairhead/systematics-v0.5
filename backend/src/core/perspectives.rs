@@ -96,9 +96,9 @@ pub mod address {
         format!("system:{}", system_id)
     }
 
-    /// An individual term (node) within a System: `system:<system_id>#term:<position>`.
-    pub fn term(system_id: &str, position: u8) -> String {
-        format!("system:{}#term:{}", system_id, position)
+    /// An individual term (node) within a System: `system:<system_id>#term:<ordinality>`.
+    pub fn term(system_id: &str, ordinality: u8) -> String {
+        format!("system:{}#term:{}", system_id, ordinality)
     }
 
     /// A connective (edge) within a System: `system:<system_id>#conn:<p1>-<p2>`.

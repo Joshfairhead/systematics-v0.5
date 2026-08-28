@@ -8,7 +8,7 @@ use tokio::sync::RwLock;
 
 use crate::core::{
     Artefact, Character, Coordinate, Entry, Functor, Geometry, Template, Graph, Law, Line,
-    Lookup, Order, Perspective, PerspectiveLink, Point, Position, Reference, Sequence, Vocabulary,
+    Lookup, Order, Perspective, PerspectiveLink, Point, Ordinality, Reference, Sequence, Vocabulary,
     Segment, Source, System, Topology,
 };
 
@@ -63,12 +63,12 @@ impl QueryRoot {
         g.orders().into_iter().map(|o| GqlOrder::new(o.clone())).collect()
     }
 
-    async fn position(&self, ctx: &Context<'_>, value: i32) -> Option<GqlPosition> {
+    async fn ordinality(&self, ctx: &Context<'_>, value: i32) -> Option<GqlPosition> {
         if !(1..=12).contains(&value) {
             return None;
         }
         let g = graph_snapshot(ctx).await;
-        g.position(value as u8).map(|p| GqlPosition::new(p.clone()))
+        g.ordinality(value as u8).map(|p| GqlPosition::new(p.clone()))
     }
 
     async fn positions(&self, ctx: &Context<'_>) -> Vec<GqlPosition> {
@@ -79,9 +79,9 @@ impl QueryRoot {
             .collect()
     }
 
-    async fn point(&self, ctx: &Context<'_>, order: i32, position: i32) -> Option<GqlPoint> {
+    async fn point(&self, ctx: &Context<'_>, order: i32, ordinality: i32) -> Option<GqlPoint> {
         let g = graph_snapshot(ctx).await;
-        g.point(order as u8, position as u8)
+        g.point(order as u8, ordinality as u8)
             .map(|p| GqlPoint::new(p.clone()))
     }
 
@@ -117,10 +117,10 @@ impl QueryRoot {
         &self,
         ctx: &Context<'_>,
         order: i32,
-        position: i32,
+        ordinality: i32,
     ) -> Option<GqlCoordinate> {
         let g = graph_snapshot(ctx).await;
-        g.coordinate(order as u8, position as u8)
+        g.coordinate(order as u8, ordinality as u8)
             .map(|c| GqlCoordinate::new(c.clone()))
     }
 
@@ -327,7 +327,7 @@ impl QueryRoot {
         let Some(vocab) = g.vocabulary(&sys.vocabulary_ref) else {
             return Vec::new();
         };
-        // Term *values* in position order (fall back to the char id if unresolved).
+        // Term *values* in ordinality order (fall back to the char id if unresolved).
         let term_values: Vec<String> = vocab
             .terms
             .iter()
@@ -560,25 +560,25 @@ pub struct RenderedSystemData {
 }
 
 pub struct GrammarTermData {
-    pub position: i32,
+    pub ordinality: i32,
     pub value: String,
 }
 
 pub struct GrammarColourData {
-    pub position: i32,
+    pub ordinality: i32,
     pub value: String,
 }
 
 pub struct GrammarLineData {
     pub id: String,
-    pub base_position: i32,
-    pub target_position: i32,
+    pub base_ordinality: i32,
+    pub target_ordinality: i32,
 }
 
 pub struct GrammarConnectiveData {
     pub id: String,
-    pub base_position: i32,
-    pub target_position: i32,
+    pub base_ordinality: i32,
+    pub target_ordinality: i32,
     pub character_value: String,
 }
 
@@ -592,7 +592,7 @@ fn canonical_system_id(order: u8) -> String {
 }
 
 /// Resolve a System (by id) into a complete bound RenderedSystem — terms bound
-/// to points, connectives to lines, coordinates + colours per position, metadata
+/// to points, connectives to lines, coordinates + colours per ordinality, metadata
 /// applied. This is "resolve the wiring into a renderable K-graph".
 fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> {
     let system = graph.system(system_id)?;
@@ -631,13 +631,13 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         let term_id = format!("term_{}_{}", order, index);
         if let Some(d) = model.data.iter().find(|d| d.id == term_id) {
             terms.push(GrammarTermData {
-                position: index as i32,
+                ordinality: index as i32,
                 value: d.character.clone(),
             });
         }
     }
 
-    // Coordinates in position order.
+    // Coordinates in ordinality order.
     let mut coordinates = Vec::new();
     for pos in 1..=order {
         if let Some(c) = graph.coordinate(order, pos) {
@@ -651,21 +651,21 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         for (idx, char_id) in cvocab.terms.iter().enumerate() {
             if let Some(c) = graph.character(char_id) {
                 colours.push(GrammarColourData {
-                    position: (idx + 1) as i32,
+                    ordinality: (idx + 1) as i32,
                     value: c.value.clone(),
                 });
             }
         }
     }
 
-    // Lines: every canonical position pair.
+    // Lines: every canonical ordinality pair.
     let mut lines = Vec::new();
     for p1 in 1..=order {
         for p2 in (p1 + 1)..=order {
             lines.push(GrammarLineData {
                 id: format!("line_{}_{}_{}", order, p1, p2),
-                base_position: p1 as i32,
-                target_position: p2 as i32,
+                base_ordinality: p1 as i32,
+                target_ordinality: p2 as i32,
             });
         }
     }
@@ -679,8 +679,8 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         if let Some(d) = model.data.iter().find(|d| d.id == conn_id) {
             connectives.push(GrammarConnectiveData {
                 id: format!("line_{}_{}_{}", order, a, b),
-                base_position: a as i32,
-                target_position: b as i32,
+                base_ordinality: a as i32,
+                target_ordinality: b as i32,
                 character_value: d.character.clone(),
             });
         }
@@ -741,7 +741,7 @@ impl GqlRenderedSystem {
             .terms
             .iter()
             .map(|t| GqlGrammarTerm {
-                position: t.position,
+                ordinality: t.ordinality,
                 value: t.value.clone(),
             })
             .collect()
@@ -759,7 +759,7 @@ impl GqlRenderedSystem {
             .colours
             .iter()
             .map(|c| GqlGrammarColour {
-                position: c.position,
+                ordinality: c.ordinality,
                 value: c.value.clone(),
             })
             .collect()
@@ -770,8 +770,8 @@ impl GqlRenderedSystem {
             .iter()
             .map(|l| GqlGrammarLine {
                 id: l.id.clone(),
-                base_position: l.base_position,
-                target_position: l.target_position,
+                base_ordinality: l.base_ordinality,
+                target_ordinality: l.target_ordinality,
             })
             .collect()
     }
@@ -781,8 +781,8 @@ impl GqlRenderedSystem {
             .iter()
             .map(|c| GqlGrammarConnective {
                 id: c.id.clone(),
-                base_position: c.base_position,
-                target_position: c.target_position,
+                base_ordinality: c.base_ordinality,
+                target_ordinality: c.target_ordinality,
                 character_value: c.character_value.clone(),
             })
             .collect()
@@ -790,7 +790,7 @@ impl GqlRenderedSystem {
 
     /// The canonical *class* this system instantiates — the canonical system of
     /// the same order. `None` when this system already *is* that canonical one.
-    /// Both share the K_n structure, so terms/connectives pair by position — the
+    /// Both share the K_n structure, so terms/connectives pair by ordinality — the
     /// frontend's "Canonical override" toggle flips instance labels to these.
     async fn canonical_class(&self, ctx: &Context<'_>) -> Option<GqlRenderedSystem> {
         let canonical_id = canonical_system_id(self.inner.order);
@@ -804,39 +804,39 @@ impl GqlRenderedSystem {
 
 #[derive(SimpleObject)]
 pub struct GqlGrammarTerm {
-    pub position: i32,
+    pub ordinality: i32,
     pub value: String,
 }
 
 #[derive(SimpleObject)]
 pub struct GqlGrammarColour {
-    pub position: i32,
+    pub ordinality: i32,
     pub value: String,
 }
 
 #[derive(SimpleObject)]
 pub struct GqlGrammarLine {
     pub id: String,
-    pub base_position: i32,
-    pub target_position: i32,
+    pub base_ordinality: i32,
+    pub target_ordinality: i32,
 }
 
 #[derive(SimpleObject)]
 pub struct GqlGrammarConnective {
     pub id: String,
-    pub base_position: i32,
-    pub target_position: i32,
+    pub base_ordinality: i32,
+    pub target_ordinality: i32,
     pub character_value: String,
 }
 
-/// A term/connective character with its **topological position** — a node index
+/// A term/connective character with its **topological ordinality** — a node index
 /// (`"1"`) for a term, or an edge (`"1-2"`) for a connective. This is the
-/// graph-derived position the inspector/triple-store consumes so the frontend
+/// graph-derived ordinality the inspector/triple-store consumes so the frontend
 /// never guesses (terms→nodes, connectives→edges of the adjacency matrix).
 #[derive(SimpleObject)]
 pub struct GqlPositionedChar {
     pub value: String,
-    pub position: String,
+    pub ordinality: String,
 }
 
 /// The `index`-th edge of a `K_order` in the canonical lexicographic order
@@ -1427,10 +1427,10 @@ impl GqlOrder {
 }
 
 pub struct GqlPosition {
-    inner: Position,
+    inner: Ordinality,
 }
 impl GqlPosition {
-    pub fn new(inner: Position) -> Self {
+    pub fn new(inner: Ordinality) -> Self {
         Self { inner }
     }
 }
@@ -1460,14 +1460,14 @@ impl GqlPoint {
     async fn order(&self) -> Option<i32> {
         self.inner.order_value().map(|v| v as i32)
     }
-    async fn position(&self) -> Option<i32> {
+    async fn ordinality(&self) -> Option<i32> {
         self.inner.position_value().map(|v| v as i32)
     }
     async fn order_ref(&self) -> &str {
         &self.inner.order
     }
     async fn position_ref(&self) -> &str {
-        &self.inner.position
+        &self.inner.ordinality
     }
 }
 
@@ -1487,7 +1487,7 @@ impl GqlLine {
     async fn order(&self) -> Option<i32> {
         self.inner.order_value().map(|v| v as i32)
     }
-    async fn position(&self) -> Option<i32> {
+    async fn ordinality(&self) -> Option<i32> {
         self.inner.position_value().map(|v| v as i32)
     }
     async fn position_secondary(&self) -> Option<i32> {
@@ -1514,7 +1514,7 @@ impl GqlCoordinate {
     async fn order(&self) -> Option<i32> {
         self.inner.order_value().map(|v| v as i32)
     }
-    async fn position(&self) -> Option<i32> {
+    async fn ordinality(&self) -> Option<i32> {
         self.inner.position_value().map(|v| v as i32)
     }
     async fn x(&self) -> f64 {
@@ -1750,7 +1750,7 @@ impl GqlSystem {
     async fn vocabulary_ref(&self) -> &str {
         &self.inner.vocabulary_ref
     }
-    /// The system's **term characters with their node position** (1..n) — resolved
+    /// The system's **term characters with their node ordinality** (1..n) — resolved
     /// from the vocabulary in order, so the frontend anchors each term to its node.
     async fn terms(&self, ctx: &Context<'_>) -> Vec<GqlPositionedChar> {
         let g = graph_snapshot(ctx).await;
@@ -1762,7 +1762,7 @@ impl GqlSystem {
                     .filter_map(|(i, c)| {
                         g.character(c).map(|c| GqlPositionedChar {
                             value: c.value.clone(),
-                            position: (i + 1).to_string(),
+                            ordinality: (i + 1).to_string(),
                         })
                     })
                     .collect()
@@ -1782,7 +1782,7 @@ impl GqlSystem {
                     .filter_map(|(i, c)| {
                         g.character(c).map(|c| GqlPositionedChar {
                             value: c.value.clone(),
-                            position: nth_edge(order, i),
+                            ordinality: nth_edge(order, i),
                         })
                     })
                     .collect()
@@ -1838,8 +1838,8 @@ impl GqlFunctor {
     async fn target_ref(&self) -> &str {
         &self.inner.target_ref
     }
-    /// The object map: `permutation[i]` is the 1-based target position of source
-    /// position `i + 1`.
+    /// The object map: `permutation[i]` is the 1-based target ordinality of source
+    /// ordinality `i + 1`.
     async fn permutation(&self) -> Vec<i32> {
         self.inner.permutation.iter().map(|&p| p as i32).collect()
     }
@@ -1979,8 +1979,8 @@ pub struct FunctorInput {
     pub order: i32,
     pub source_ref: String,
     pub target_ref: String,
-    /// The object map: `permutation[i]` is the 1-based target position of source
-    /// position `i + 1`. Validate with `validateFunctor` after creating.
+    /// The object map: `permutation[i]` is the 1-based target ordinality of source
+    /// ordinality `i + 1`. Validate with `validateFunctor` after creating.
     pub permutation: Vec<i32>,
 }
 
@@ -2274,7 +2274,7 @@ pub fn create_schema_with_store(graph: SharedGraph, store: Option<PathBuf>) -> S
 pub struct GqlLawReading {
     /// Bennett's name for the law (expansion / identity / order / interaction / …).
     pub law: String,
-    /// Hexad position 1..=6 (1 red identity … 5 purple interaction … 6 orange concentration).
+    /// Hexad ordinality 1..=6 (1 red identity … 5 purple interaction … 6 orange concentration).
     pub hexad_position: i32,
     /// The law's Hexad colour.
     pub colour: String,

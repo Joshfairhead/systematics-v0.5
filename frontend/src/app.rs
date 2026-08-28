@@ -720,19 +720,19 @@ impl Component for ApiApp {
                 id: s.system_id.clone(),
                 name: s.name.clone(),
                 order: s.order,
-                // Canonical systems carry graph positions: term.position (node) and
+                // Canonical systems carry graph positions: term.ordinality (node) and
                 // connective base–target (edge) — the same source the graph view uses.
                 terms: s
                     .terms
                     .iter()
-                    .map(|t| PositionedChar { value: t.value.clone(), position: t.position.to_string() })
+                    .map(|t| PositionedChar { value: t.value.clone(), ordinality: t.ordinality.to_string() })
                     .collect(),
                 connectives: s
                     .connectives
                     .iter()
                     .map(|c| PositionedChar {
                         value: c.character_value.clone(),
-                        position: format!("{}-{}", c.base_position, c.target_position),
+                        ordinality: format!("{}-{}", c.base_ordinality, c.target_ordinality),
                     })
                     .collect(),
             })

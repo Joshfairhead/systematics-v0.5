@@ -3,7 +3,7 @@
 //! For a fixed Order `n` the complete graph `K_n` has exactly the symmetric
 //! group `S_n` as its automorphisms — in `K_n` every pair of vertices is
 //! adjacent, so *any* permutation of the vertices preserves adjacency. A
-//! same-grammar Functor is therefore stored as a single *position permutation*
+//! same-grammar Functor is therefore stored as a single *ordinality permutation*
 //! (the object map on terms); the morphism map on connectives is **derived**: a
 //! connective between source positions `p,q` maps to the connective between
 //! `f(p),f(q)`. Structure preservation (the functor square
@@ -30,7 +30,7 @@ pub struct Functor {
     /// Target System id (the object in the codomain).
     pub target_ref: String,
     /// The object map as a permutation in `S_order`: `permutation[i]` is the
-    /// 1-based target position that source position `i + 1` maps to. To be a
+    /// 1-based target ordinality that source ordinality `i + 1` maps to. To be a
     /// functor it must have length `order` and be a bijection of `1..=order`.
     pub permutation: Vec<u8>,
 }
@@ -54,7 +54,7 @@ impl Functor {
         }
     }
 
-    /// The identity endomorphism on a System of `order` (position `i` ↦ `i`).
+    /// The identity endomorphism on a System of `order` (ordinality `i` ↦ `i`).
     pub fn identity(
         id: impl Into<String>,
         name: impl Into<String>,
@@ -65,19 +65,19 @@ impl Functor {
         Self::new(id, name, order, system_ref.clone(), system_ref, (1..=order).collect())
     }
 
-    /// Map a source position (1-based) to its target position, if in range.
-    pub fn map_position(&self, position: u8) -> Option<u8> {
-        if position == 0 {
+    /// Map a source ordinality (1-based) to its target ordinality, if in range.
+    pub fn map_position(&self, ordinality: u8) -> Option<u8> {
+        if ordinality == 0 {
             return None;
         }
-        self.permutation.get((position - 1) as usize).copied()
+        self.permutation.get((ordinality - 1) as usize).copied()
     }
 
     /// Validate the functor laws (advisory — mirrors `System`/`Template`
     /// validation; nothing is rejected at write time):
-    ///  * totality — one target per source position (`permutation.len() == order`),
+    ///  * totality — one target per source ordinality (`permutation.len() == order`),
     ///  * sort/type preservation and invertibility — the permutation is a
-    ///    bijection of `1..=order` (each target position hit exactly once).
+    ///    bijection of `1..=order` (each target ordinality hit exactly once).
     ///
     /// A construct that fails these is a mere relabelling *table*, not a functor.
     pub fn validate(&self) -> Result<(), Vec<String>> {
@@ -89,7 +89,7 @@ impl Functor {
         }
         if self.permutation.len() != n {
             errs.push(format!(
-                "Functor {}: permutation has {} entries, expected {} (one per source position — not total)",
+                "Functor {}: permutation has {} entries, expected {} (one per source ordinality — not total)",
                 self.id,
                 self.permutation.len(),
                 n
@@ -100,12 +100,12 @@ impl Functor {
         for &p in &self.permutation {
             if p < 1 || p as usize > n {
                 errs.push(format!(
-                    "Functor {}: target position {} out of range 1..={}",
+                    "Functor {}: target ordinality {} out of range 1..={}",
                     self.id, p, self.order
                 ));
             } else if seen[(p - 1) as usize] {
                 errs.push(format!(
-                    "Functor {}: target position {} mapped more than once (not a bijection)",
+                    "Functor {}: target ordinality {} mapped more than once (not a bijection)",
                     self.id, p
                 ));
             } else {
@@ -131,7 +131,7 @@ impl Functor {
     ///  * `system:src#coherence` (etc.) → `system:tgt#coherence` (system-level
     ///    fragment retargeted, unchanged)
     ///
-    /// An address whose position is out of range or unparseable is passed
+    /// An address whose ordinality is out of range or unparseable is passed
     /// through unchanged rather than corrupted.
     pub fn map_address(&self, address: &str) -> String {
         let Some(rest) = address.strip_prefix("system:") else {
@@ -280,9 +280,9 @@ mod tests {
         let comp = sigma.then(&tau, "comp", "sigma;tau").expect("composable");
         assert_eq!(comp.source_ref, "system_a_3");
         assert_eq!(comp.target_ref, "system_c_3");
-        // position 1: σ(1)=2, τ(2)=1  => 1
-        // position 2: σ(2)=3, τ(3)=3  => 3
-        // position 3: σ(3)=1, τ(1)=2  => 2
+        // ordinality 1: σ(1)=2, τ(2)=1  => 1
+        // ordinality 2: σ(2)=3, τ(3)=3  => 3
+        // ordinality 3: σ(3)=1, τ(1)=2  => 2
         assert_eq!(comp.permutation, vec![1, 3, 2]);
         assert!(comp.validate().is_ok());
         // and applying the composite equals applying σ then τ.

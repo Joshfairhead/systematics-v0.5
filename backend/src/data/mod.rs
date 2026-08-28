@@ -1,11 +1,11 @@
 //! Seed the property graph.
 //!
-//! Emits substrate entries (Order, Position, Point, Line, Coordinate, Segment,
+//! Emits substrate entries (Order, Ordinality, Point, Line, Coordinate, Segment,
 //! Character) followed by the canonical Topological / Geometric / Semantic
 //! Vocabularies and one Canonical Perspective per Order.
 
 use crate::core::{
-    Entry, Geometry, Template, GraphContent, Graph, Line, Order, Point, Position,
+    Entry, Geometry, Template, GraphContent, Graph, Line, Order, Point, Ordinality,
     Segment, Topology,
 };
 
@@ -117,7 +117,7 @@ fn load_embedded_modules(graph: &mut Graph) -> usize {
 
 /// Build the complete graph with all systems (1-12).
 ///
-/// The combinatoric substrate (Order, Position, Point, Line, Segment, and the
+/// The combinatoric substrate (Order, Ordinality, Point, Line, Segment, and the
 /// topological/geometric vocabulary ref-lists) is computed here; the data layer
 /// (coordinates, characters, semantic vocabularies, perspectives) is applied from
 /// the canonical seed and then marked canonical so later user additions can be
@@ -153,7 +153,7 @@ fn add_orders(graph: &mut Graph) {
 
 fn add_positions(graph: &mut Graph) {
     for i in 1..=12u8 {
-        graph.add_entry(Entry::Position(Position::new(i)));
+        graph.add_entry(Entry::Ordinality(Ordinality::new(i)));
     }
 }
 
@@ -163,8 +163,8 @@ fn add_positions(graph: &mut Graph) {
 /// come from the canonical seed.
 fn add_substrate_combinatorics(graph: &mut Graph) {
     for order in 1..=12u8 {
-        for position in 1..=order {
-            graph.add_entry(Entry::Point(Point::new(order, position)));
+        for ordinality in 1..=order {
+            graph.add_entry(Entry::Point(Point::new(order, ordinality)));
         }
         for p1 in 1..=order {
             for p2 in (p1 + 1)..=order {
@@ -380,7 +380,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
     let mut content = GraphContent::default();
     let mut have_char = std::collections::HashSet::new();
 
-    // Impulse → position convention: **pos1 = + (affirming), pos2 = − (denying),
+    // Impulse → ordinality convention: **pos1 = + (affirming), pos2 = − (denying),
     // pos3 = = (reconciling)** — fixed by the confirmed-correct Maths sub-triad.
 
     // Root triad: Aesthetics (+) · Maths (−) · Harmony (=).
@@ -469,16 +469,16 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["perspective_node_1", "perspective_node_2", "perspective_node_3"]),
         &slugs(&["subject", "predicate", "object"]),
     );
-    // Order · Position · Location triad [WIP] — the topological anchor. `order ×
-    // position = location`; most triples attach to a location (e.g. Location ·
+    // Order · Ordinality · Location triad [WIP] — the topological anchor. `order ×
+    // ordinality = location`; most triples attach to a location (e.g. Location ·
     // Term-character · Source; Lines = Location · Connection · Location). May fold
     // into a pentad.
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "Order Position Location",
+        "Order Ordinality Location",
         3,
-        &slugs(&["order", "position", "location"]),
+        &slugs(&["order", "ordinality", "location"]),
         &slugs(&["opl_edge_1", "opl_edge_2", "opl_edge_3"]),
     );
     // Data Object triad [WIP] — the reference triple: key (+) · value (−) ·
@@ -689,17 +689,17 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &mut have_char,
         "Graph Theory",
         7,
-        &slugs(&["order", "degree", "index", "adjacency", "neighbourhood", "location", "position"]),
+        &slugs(&["order", "degree", "index", "adjacency", "neighbourhood", "location", "ordinality"]),
         &edge_slugs("gt", 7),
     );
-    // Topology · Geometry · Position · Location tetrad — the topology/geometry split
-    // (position = combinatorial/topological adjacency; location = geometric).
+    // Topology · Geometry · Ordinality · Location tetrad — the topology/geometry split
+    // (ordinality = combinatorial/topological adjacency; location = geometric).
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Topology Geometry",
         4,
-        &slugs(&["topology", "geometry", "position", "location"]),
+        &slugs(&["topology", "geometry", "ordinality", "location"]),
         &edge_slugs("tg", 4),
     );
     // Provenance pentad (generalises the citation triad): Source · Distributer ·
@@ -714,7 +714,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
     );
 
     // The six laws of three as a Hexad — the Controller laid out as DATA (the laws
-    // named as nodes). Terms in Hexad-position order (1 identity · 2 expansion ·
+    // named as nodes). Terms in Hexad-ordinality order (1 identity · 2 expansion ·
     // 3 order · 4 freedom · 5 interaction[SPO] · 6 concentration), matching
     // `core::laws::Law::HEXAD`. Edges = the S₃ group relations between laws, TBD →
     // placeholder for now. The morphism logic (permutation/read/compose) lives in
@@ -736,7 +736,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
     );
 
     // Harness triad — what a harness *is* (the Controller-as-harness). Impulse →
-    // position: pos1 = + (tools), pos2 = − (constraints), pos3 = = (environment).
+    // ordinality: pos1 = + (tools), pos2 = − (constraints), pos3 = = (environment).
     // Edges TBD → placeholder.
     push_triadic_system(
         &mut content,
@@ -793,7 +793,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
 // Canonical vocabulary data
 // =============================================================================
 
-/// Term-character values in position order for each canonical system.
+/// Term-character values in ordinality order for each canonical system.
 fn get_term_characters(order: u8) -> Vec<&'static str> {
     match order {
         1 => vec!["Unity"],

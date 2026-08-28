@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
-use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Position, Segment};
+use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Ordinality, Segment};
 use super::functors::Functor;
 use super::grammar::Template;
 use super::sequences::Sequence;
@@ -46,7 +46,7 @@ pub struct Graph {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
-    /// Same-grammar functors: position permutations between systems of one Order.
+    /// Same-grammar functors: ordinality permutations between systems of one Order.
     #[serde(default)]
     pub functors: Vec<Functor>,
     /// Sequences: ordered series of member addresses (container triad `+` pole).
@@ -82,7 +82,7 @@ impl Graph {
     }
 
     // ==========================================================================
-    // Substrate queries: Order, Position, Point, Line, Coordinate, Segment,
+    // Substrate queries: Order, Ordinality, Point, Line, Coordinate, Segment,
     // Character
     // ==========================================================================
 
@@ -103,25 +103,25 @@ impl Graph {
             .collect()
     }
 
-    pub fn position(&self, value: u8) -> Option<&Position> {
+    pub fn ordinality(&self, value: u8) -> Option<&Ordinality> {
         self.entries.iter().find_map(|e| match e {
-            Entry::Position(p) if p.value == value => Some(p),
+            Entry::Ordinality(p) if p.value == value => Some(p),
             _ => None,
         })
     }
 
-    pub fn positions(&self) -> Vec<&Position> {
+    pub fn positions(&self) -> Vec<&Ordinality> {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Position(p) => Some(p),
+                Entry::Ordinality(p) => Some(p),
                 _ => None,
             })
             .collect()
     }
 
-    pub fn point(&self, order: u8, position: u8) -> Option<&Point> {
-        let id = format!("point_{}_{}", order, position);
+    pub fn point(&self, order: u8, ordinality: u8) -> Option<&Point> {
+        let id = format!("point_{}_{}", order, ordinality);
         self.entries.iter().find_map(|e| match e {
             Entry::Point(p) if p.id == id => Some(p),
             _ => None,
@@ -161,8 +161,8 @@ impl Graph {
             .collect()
     }
 
-    pub fn coordinate(&self, order: u8, position: u8) -> Option<&Coordinate> {
-        let id = format!("coord_{}_{}", order, position);
+    pub fn coordinate(&self, order: u8, ordinality: u8) -> Option<&Coordinate> {
+        let id = format!("coord_{}_{}", order, ordinality);
         self.entries.iter().find_map(|e| match e {
             Entry::Coordinate(c) if c.id == id => Some(c),
             _ => None,
@@ -950,7 +950,7 @@ mod tests {
         let mut g = Graph::new();
         g.add_entry(Entry::Order(Order::new(3)));
         for pos in 1..=3 {
-            g.add_entry(Entry::Position(Position::new(pos)));
+            g.add_entry(Entry::Ordinality(Ordinality::new(pos)));
             g.add_entry(Entry::Point(Point::new(3, pos)));
             g.add_entry(Entry::Coordinate(Coordinate::new(3, pos, 0.0, 0.0, 0.0)));
         }
@@ -996,7 +996,7 @@ mod tests {
     fn test_substrate_queries() {
         let g = triad_test_graph();
         assert!(g.order(3).is_some());
-        assert!(g.position(2).is_some());
+        assert!(g.ordinality(2).is_some());
         assert_eq!(g.point(3, 1).unwrap().id, "point_3_1");
         assert_eq!(g.line(3, 1, 2).unwrap().id, "line_3_1_2");
         assert_eq!(g.coordinate(3, 1).unwrap().point_ref, "point_3_1");

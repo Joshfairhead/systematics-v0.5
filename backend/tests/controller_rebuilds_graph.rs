@@ -8,7 +8,7 @@
 use systematics_backend::core::substrate::{compose_system, generate_topology};
 use systematics_backend::data;
 
-/// The trailing integer of an id like `point_3_1` → 1 (the position).
+/// The trailing integer of an id like `point_3_1` → 1 (the ordinality).
 fn tail(id: &str) -> u8 {
     id.rsplit('_').next().unwrap().parse().unwrap()
 }

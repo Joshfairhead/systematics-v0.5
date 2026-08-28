@@ -32,7 +32,7 @@ async fn run_six_laws_over_canonical_triad() {
     let expansion = find("expansion"); // 123 — the base order
     let interaction = find("interaction"); // 132 — SPO
 
-    // interaction is the SPO law: purple, hexad position 5, alias SPO.
+    // interaction is the SPO law: purple, hexad ordinality 5, alias SPO.
     assert_eq!(interaction["aliases"], json!(["SPO"]));
     assert_eq!(interaction["colour"], "purple");
     assert_eq!(interaction["hexadPosition"], 5);
