@@ -24,9 +24,10 @@ Convention below: **+** affirming · **−** receptive · **=** reconciling.
 | **degree-cardinality** | number of connectives `C(n,2)` (graph "size") | `expected_connectives` / `size` |
 | **degree-ordinality** | a connective's placement | read off adjacency/incidence/line |
 
-**Rename map (pending):** `position → ordinality`; `order` (the count field) → keep as
-the count but understand it as **order-cardinality**; reserve "**order**" for
-node-counting only.
+**Rename map (in progress):**
+- `position → ordinality` (a node/edge's placement).
+- **`order` should not stand alone** — it means **order-cardinality**: the cardinality of
+  *nodes* in a graph (K₃ has order-cardinality 3). Rename the field `order → order_cardinality`.
 
 ---
 
@@ -143,3 +144,7 @@ substrate, a system is **composed** by bundling morphisms and applying them thro
 - This guide is a companion to the **in-graph** representation (the Architecture Pentad /
   the seeded systems). Prefer noting new language *into the library* (as systems +
   connectives) — this doc mirrors that.
+- **Dogfooding — use the system to articulate the system.** The language should update from
+  the in-graph systems (the library is authoritative; this guide follows). This needs a
+  dedicated **"build the system / library" section** — a place to construct and edit the
+  app's *own* language systems — kept in sync with this guide.
