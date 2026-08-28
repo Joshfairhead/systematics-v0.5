@@ -602,6 +602,65 @@ pub fn compose_model(
     compose_checked(cardinality, bundle).expect("canonical model bundle is grammatical")
 }
 
+// ---- The substrate as a DATA SOURCE (not just an assembly mechanism) ----
+
+/// The substrate **store** — the persistent data source: raw, **content-addressed**
+/// elements + links. Data is *ingested* here as bare elements (e.g. from the legacy
+/// JSON at first), then systems are **composed from the store** — no JSON at compose
+/// time. This is the `−−` ground of the architecture tetrad. Elements are raw (just the
+/// datum); relationships live in links (Holochain-style) — never as fields on an element.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+pub struct SubstrateStore {
+    pub elements: Vec<DataElement>,
+    pub links: Vec<HyperLink>,
+}
+
+impl SubstrateStore {
+    /// The **content address** of a datum: the id *is* derived from the content, so the
+    /// same value is one element (natural dedup — content-addressing supersedes ref ids).
+    pub fn content_id(kind: &str, value: &str) -> String {
+        format!("{kind}:{value}")
+    }
+
+    /// **Ingest** a raw datum as a content-addressed element (deduped by content).
+    /// Returns its content id — the handle you compose with.
+    pub fn ingest(&mut self, kind: &str, value: &str) -> String {
+        let id = Self::content_id(kind, value);
+        if !self.elements.iter().any(|e| e.id == id) {
+            self.elements.push(DataElement {
+                id: id.clone(),
+                kind: kind.to_string(),
+                character: value.to_string(),
+            });
+        }
+        id
+    }
+
+    /// Look up a stored element by its content id.
+    pub fn get(&self, id: &str) -> Option<&DataElement> {
+        self.elements.iter().find(|e| e.id == id)
+    }
+}
+
+/// **Compose a system from the store** — the substrate-as-data-source path. Given the
+/// ordinality (order-cardinality) and the *content ids* of the term/connective elements
+/// (looked up from the store, e.g. by searching the coherence dodecad by cardinality),
+/// generate the topology and anchor the stored elements to it. No raw strings pass in —
+/// the data comes from the substrate.
+pub fn compose_from_store(
+    store: &SubstrateStore,
+    cardinality: u8,
+    term_ids: &[String],
+    connective_ids: &[String],
+) -> Hypergraph {
+    let resolve = |ids: &[String]| -> Vec<String> {
+        ids.iter()
+            .filter_map(|id| store.get(id).map(|e| e.character.clone()))
+            .collect()
+    };
+    compose_system(cardinality, &resolve(term_ids), &resolve(connective_ids))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -811,5 +870,33 @@ mod tests {
         for target in ["term_3_1", "coord_3_1", "colour_3_1"] {
             assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == target), "anchor {target}");
         }
+    }
+
+    #[test]
+    fn store_ingests_content_addressed_then_composes_from_it() {
+        let mut store = SubstrateStore::default();
+        // content-addressed: the same value ingested twice is ONE element (dedup).
+        let a = store.ingest("word", "Will");
+        let b = store.ingest("word", "Will");
+        assert_eq!(a, b);
+        assert_eq!(a, "word:Will");
+        assert_eq!(store.elements.len(), 1);
+
+        // ingest a triad's vocabulary as raw elements, keep their content ids.
+        let terms: Vec<String> = ["Will", "Function", "Being"]
+            .iter()
+            .map(|v| store.ingest("word", v))
+            .collect();
+        let conns: Vec<String> = ["Generation", "Decision", "Consent"]
+            .iter()
+            .map(|v| store.ingest("word", v))
+            .collect();
+        assert_eq!(store.elements.len(), 6); // Will already there; +2 terms +3 conns
+
+        // compose the system FROM the store (no raw strings passed in).
+        let hg = compose_from_store(&store, 3, &terms, &conns);
+        assert_eq!(hg.topology.elements.len(), 3);
+        assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
+        assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_1_2").unwrap().character, "Generation");
     }
 }
