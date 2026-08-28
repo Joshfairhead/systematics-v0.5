@@ -32,18 +32,21 @@ node-counting only.
 
 ## 2. The systems, by order (the vocabulary)
 
-Order names: **Monad · Dyad · Triad · Tetrad · Pentad · Hexad · Heptad · Octad · Ennead
-· Decad · Undecad · Dodecad** (orders 1–12).
+The twelve **systems** (by order-cardinality 1–12): **Monad · Dyad · Triad · Tetrad ·
+Pentad · Hexad · Heptad · Octad · Ennead · Decad · Undecad · Dodecad**.
 
-Each order has a **hexadic-systematics** row (its "shape", `core::hexadicsystems`) — six
-mutually-determining facets keyed by cardinality:
+Each **system** has a **hexadic-systematics** set of rows that determine its *shape*
+(`core::hexadicsystems`) — six mutually-determining facets:
 
-`{ name · coherence · term-designation · connective-designation · term-cardinality (|V|=n)
-· connective-cardinality (|E|=C(n,2)) }`
+`{ name · coherence · term-designation · connective-designation · term-characters ·
+connective-characters }`
 
-e.g. `hexad(3) = {Triad, Dynamism, Impulses, Acts, 3, 3}`. These facets are themselves
-seeded as **dodecad** systems (Coherence Attributes, Term Designations, Connective
-Designations), composed from the single source.
+e.g. `hexad(3) = {Triad, Dynamism, Impulses, Acts, 3, 3}` — each facet is the *one
+determined value* for that system (name = Triad, coherence = Dynamism, …), and the two
+`3`s are the **character sets**: term-characters = 3 = {Will, Function, Being};
+connective-characters = 3 = {Generation, Decision, Consent}. These facets are themselves
+seeded as **dodecad** systems (Coherence Attributes, Term/Connective Designations),
+composed from the single source.
 
 - **Term** = a node's character (a word). **Connective** = an edge's character.
 - **Coherence** = the quality that makes an order-n system one whole (e.g. Triad =
@@ -71,6 +74,9 @@ Model/View**.
 `View →compose→ Model →resolve→ Controller →render→ View`. The serving path is the
 `321`/Freedom reading — "Controller resolves the Model, which composes the View."
 
+The **tetrad's** four-way links (how Substrate relates to Model · View · Controller) are
+**still to be worked out** — and the six laws of three apply here too.
+
 ---
 
 ## 4. The graph triad (the matrices)
@@ -94,27 +100,26 @@ The three matrices, as **nodes**, grounded in the incidence matrix `B`:
 The 3 impulses of a triad read in `3! = 6` orders. Each law = a permutation; the six
 are the Controller's traversals.
 
-| law | perm | parity | hexad pos · colour |
-|---|---|---|---|
-| Expansion | 123 | rotation | 2 · blue |
-| Identity | 231 | rotation | 1 · red |
-| Order | 312 | rotation | 3 · yellow |
-| Interaction (SPO) | 132 | reflection | 5 · purple |
-| Concentration | 213 | reflection | 6 · orange |
-| Freedom | 321 | reflection | 4 · green |
+| law | perm |
+|---|---|
+| Expansion | 123 |
+| Identity | 231 |
+| Order | 312 |
+| Interaction (SPO) | 132 |
+| Concentration | 213 |
+| Freedom | 321 |
 
-Rotations walk a triad's directed 3-cycle **clockwise** (natural readings); reflections
-**counter-clockwise** (the inverse morphisms). Tooling: the `triad-six-laws` skill.
+Half the readings run a triad's directed 3-cycle one way (natural sentences), half the
+other (the inverse morphisms). Tooling: the `triad-six-laws` skill. *(A hexad layout with
+colours for the laws exists but is a separate, unsettled inquiry.)*
 
 ---
 
 ## 6. Morphisms
 
-The morphism-type ladder (edges should aim for **isomorphism**, so a triad is fully
-bidirectional): **injective / surjective / bijective → monomorphism / epimorphism /
-isomorphism → functor**. In the substrate, a system is **composed** by bundling
-morphisms and applying them through the **grammar gate** (the matrices decide which
-morphisms are legal).
+A morphism (an edge of a system) is **bidirectional** — an **isomorphism**. In the
+substrate, a system is **composed** by bundling morphisms and applying them through the
+**grammar gate** (the matrices decide which morphisms are legal).
 
 ---
 
@@ -124,10 +129,10 @@ morphisms are legal).
   separate reference ids — content-addressing supersedes them).
 - **Link** — a relationship between elements (`base–type–target`). Relationships live in
   links, **never** as fields on an element.
-- **Anchor** — an orthogonal link mapping a topology element to its data (vertex → term,
-  orbit → connective). **Lateral** — a within-system link (`term –connective– term`).
-- **Modular seam** — a connective/link that is a clean swap boundary (every architectural
-  edge is one).
+- **Anchor** — an orthogonal link from a topology element to its data (vertex → term).
+- **Within-system relationships use the domain's own word:** **connective** (systematics),
+  **line** (geometry), **edge** (topology) — the right domain language for the right
+  domain. (Not a generic "lateral".)
 
 ---
 
