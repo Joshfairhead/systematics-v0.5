@@ -74,7 +74,7 @@ FBW reading) but as **mutualities** of this pentad:
   aspiration (Grammar–Semantics) / operation (Grammar–Syntax) edges** rather than relabelling
   Number/Colour — a later refinement.
 
-This dovetails with *The reference tuple* in `architecture-systems.md`: content-addressing
+This dovetails with *The reference tuple* in `design-intent.md`: content-addressing
 supplies **identity**, and the S₃ traversals supply the **associative** lookup — so the
 store's identity/associativity halves are pentad edges. [Proposed; firmer than the
 CT-axioms-as-triad-edges reading, which stays cooled off. Number/Colour direction pending.]

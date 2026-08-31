@@ -10,21 +10,19 @@ use super::Coordinate;
 #[cfg(feature = "server")]
 use async_graphql::SimpleObject;
 
-/// A rendered term at a specific position within a system.
+/// A rendered term at a specific ordinality within a system.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct GrammarTerm {
-    pub position: i32,
-    #[serde(rename = "characterId")]
-    pub character_id: String,
+    pub ordinality: i32,
     pub value: String,
 }
 
-/// A colour at a specific position within a system (hex form).
+/// A colour at a specific ordinality within a system (hex form).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct GrammarColour {
-    pub position: i32,
+    pub ordinality: i32,
     pub value: String,
 }
 
@@ -33,10 +31,10 @@ pub struct GrammarColour {
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct GrammarLine {
     pub id: String,
-    #[serde(rename = "basePosition")]
-    pub base_position: i32,
-    #[serde(rename = "targetPosition")]
-    pub target_position: i32,
+    #[serde(rename = "baseOrdinality")]
+    pub base_ordinality: i32,
+    #[serde(rename = "targetOrdinality")]
+    pub target_ordinality: i32,
 }
 
 /// A connective within a system, with its character label and endpoints.
@@ -44,19 +42,20 @@ pub struct GrammarLine {
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct GrammarConnective {
     pub id: String,
-    #[serde(rename = "basePosition")]
-    pub base_position: i32,
-    #[serde(rename = "targetPosition")]
-    pub target_position: i32,
+    #[serde(rename = "baseOrdinality")]
+    pub base_ordinality: i32,
+    #[serde(rename = "targetOrdinality")]
+    pub target_ordinality: i32,
     #[serde(rename = "characterValue")]
     pub character_value: String,
 }
 
-/// A complete rendered view of a system at a given order.
+/// A complete rendered view of a system at a given order_cardinality.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct RenderedSystem {
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     #[serde(rename = "systemId")]
     pub system_id: String,
     pub name: String,
@@ -70,9 +69,9 @@ pub struct RenderedSystem {
     pub colours: Vec<GrammarColour>,
     pub lines: Vec<GrammarLine>,
     pub connectives: Vec<GrammarConnective>,
-    /// The canonical *class* this system instantiates (same order); `None` when
+    /// The canonical *class* this system instantiates (same order_cardinality); `None` when
     /// this system is itself canonical. Drives the "Canonical override" toggle —
-    /// terms/connectives pair with the instance's by position.
+    /// terms/connectives pair with the instance's by ordinality.
     #[serde(default, rename = "canonicalClass")]
     pub canonical_class: Option<Box<RenderedSystem>>,
 }
@@ -83,7 +82,7 @@ impl RenderedSystem {
     }
 
     pub fn k_notation(&self) -> String {
-        format!("K{}", self.order)
+        format!("K{}", self.order_cardinality)
     }
 
     pub fn description(&self) -> String {
@@ -91,24 +90,24 @@ impl RenderedSystem {
     }
 
     pub fn node_count(&self) -> usize {
-        self.order as usize
+        self.order_cardinality as usize
     }
 
-    pub fn term_at(&self, position: i32) -> Option<&str> {
+    pub fn term_at(&self, ordinality: i32) -> Option<&str> {
         self.terms
             .iter()
-            .find(|t| t.position == position)
+            .find(|t| t.ordinality == ordinality)
             .map(|t| t.value.as_str())
     }
 
-    pub fn colour_at(&self, position: i32) -> Option<&str> {
+    pub fn colour_at(&self, ordinality: i32) -> Option<&str> {
         self.colours
             .iter()
-            .find(|c| c.position == position)
+            .find(|c| c.ordinality == ordinality)
             .map(|c| c.value.as_str())
     }
 
-    pub fn coordinate_at(&self, position: i32) -> Option<&Coordinate> {
-        self.coordinates.iter().find(|c| c.position == position)
+    pub fn coordinate_at(&self, ordinality: i32) -> Option<&Coordinate> {
+        self.coordinates.iter().find(|c| c.ordinality == ordinality)
     }
 }

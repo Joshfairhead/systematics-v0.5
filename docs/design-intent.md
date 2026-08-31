@@ -1,9 +1,20 @@
-# Systematic architecture registry
+# Design intent — the systematic architecture record
 
-The codebase's language follows a **systematic schema**: every dyad, triad,
-tetrad, … we implement *is* a system, and is documented here as one. This is the
-map for auditing and refactoring the code back toward its systematic description
-(dynamic homoiconicity) — when the codebase becomes a mess, come here.
+**What this document is (and is not).** This is a **record of design intent**, not a data
+store. It is the hand-written map of *what the architecture means to be*: every dyad, triad,
+tetrad, … the codebase implements *is* a system, documented here as one, tagged with its
+status (`impl` / `seeded` / `proposed`) and its code location — plus, now, the audited ground
+truth of what the code actually does. The **system data** itself lives elsewhere (the
+canonical / citation / fragments seed, the perspective modules loaded at startup, and the user
+store). So "registry" was a misnomer (it read like a data catalogue); this is the **design
+intent** the code is refactored toward (dynamic homoiconicity — the app should eventually *be*
+its own documentation, retiring this file). When the codebase becomes a mess, come here.
+*(Renamed from `architecture-systems.md`, 2026-08-18.)*
+
+**The use case (user, 2026-08-18).** At bottom this project is about **representing intent in a
+coherent way**. Every part of the architecture — the base-space Model, the six-laws Controller,
+the views — exists to let a person express intent and have it hang together coherently. When
+weighing a design choice, favour the option that represents intent more coherently.
 
 **The typing rule** (the Dyad's force): a **term (vertex) is a noun**; a
 **connective (edge) is a verb**. So a triad of *nouns* is node-typed (containers,
@@ -101,6 +112,39 @@ the graph · `proposed` = named but not built/settled.
   seeds (fragments first, canonical last) to app/JSON-authored data. (User data —
   Monads from Extract — already takes the app→`store.json` path.)
 
+## The architecture progression — Monad → Pentad [user, 2026-08-18]
+
+The architecture unfolds as a **progression**, one system per order (a core sequence — each
+order refines the previous):
+
+| order | system | terms |
+|---|---|---|
+| **Monad** | **Architecture** | the whole |
+| **Dyad** | Backend · Frontend | the two poles (the crate split) |
+| **Triad** | **MVC** | Model (−) · View (+) · Controller (=) |
+| **Tetrad** | the **Model**'s base space | Template · Topology · Geometry · Vocabulary |
+| **Pentad** | the **Architecture Pentad** | Grammar · Semantics · Syntax · Signs · Symbols |
+
+Each order refines the one before: the Dyad's two poles (Backend / Frontend) gain a
+**reconciler** to become the MVC **Triad** (the Controller = middleware + GraphQL appears at
+order 3, which is why MVC is more nuanced than the backend/frontend split); the Model (−) of
+that triad expands into the **Tetrad** (Template · Topology · Geometry · Vocabulary); and that
+blends/links up into the **Pentad** (the existing Architecture Pentad). So the MVC triad, the
+Model tetrad, and the Architecture Pentad are *the same architecture at successive
+resolutions*. Links: [[architecture-pentad]]; *The architecture is an MVC triad*; *The Model is
+an Architectural Tetrad*. *(To be seeded as a real order-navigable sequence in-graph.)*
+
+**Pentad edges [user, 2026-08-18].** Within the Pentad, three of the links (mutualities) among
+Grammar · Semantics · Syntax read as:
+- **Grammar ↔ Semantics = terms** (the vertex characters projected),
+- **Grammar ↔ Syntax = connectives** (the edge characters),
+- **Syntax ↔ Semantics = interface / complete graphs** (the assembled K_n — the system as a
+  graph).
+
+So the base-space matrices/graphs are these pentad edges, made concrete: terms + connectives
+projected by the grammar, reconciled into the complete graph at the syntax↔semantics interface.
+[Proposed placement of 3 of the 10 mutualities.]
+
 ## The architecture is an MVC triad — Model (−) · View (+) · Controller (=) [user, 2026-08-18]
 
 The whole architecture **is** a triad, and it is now the lens that organises the base-space
@@ -110,20 +154,435 @@ remodel. Naming the impulses (canonical: affirming **+**, receptive **−**, rec
 |---|---|---|---|
 | **Model** | **−** (receptive) | the **triadic base space** — the passive store of *what is* | backend data + the base-space triad below |
 | **View** | **+** (affirming) | the **interface** — what actively presents / initiates interaction | frontend (`browser_controls`, `inspector`, `graph_view`) |
-| **Controller** | **=** (reconciling) | the **algorithm / law layer** mediating View ↔ Model | **target = the `middleware` crate**, elevated into a real controller (today only DTOs; the mediation is net-new — see *Ground truth*) |
+| **Controller** | **=** (reconciling) | the **reconciling layer** mediating View ↔ Model — **includes GraphQL** as the reconciler, with `middleware` elevated to join it | today GraphQL reconciles (limited); `middleware` holds only shared data types. The six laws = **six morphisms**. See *Ground truth* |
 
 This supersedes the earlier loose "middleware = controller, backend = model, frontend = view"
 gloss by giving each an **impulse** and naming what each *contains*. **MVC is more nuanced
 than the backend / middleware / frontend split** (user, 2026-08-18) — the roles are not a 1:1
-map onto the three crates. **The intent: `middleware` SHOULD BE the Controller** — a real
-mediating layer that works *with* the Model and the View. That mediating job is **what the
-GraphQL layer currently does, but too narrowly in scope**; the remodel elevates `middleware`
-from a shared type vocabulary into the controller that carries the six laws.
+map onto the three crates. **The Controller (=) is the reconciler, and it should include
+GraphQL** (user, 2026-08-18): GraphQL already does the mediating job, just too narrowly. So
+the Controller = **GraphQL as the reconciler**, with the `middleware` crate **elevated** from a
+shared type vocabulary to join it and carry the six laws.
 
-**Present state (audit 2026-08-18), i.e. the gap to close:** `middleware` is *today* only a
-**shared wire-format / DTO crate** (`middleware/src/types/*`), depended on by both backend and
-frontend — it holds no mediating logic yet. GraphQL (`backend/src/graphql`) plays the limited
-controller role now. So "Controller = middleware" is the **target**, not the current fact.
+**The six laws are six morphisms [user, 2026-08-18].** The Controller's S₃ logic should be
+**six morphisms — one per law of three**. Today `core/functors.rs` implements exactly *one*
+morphism (a single same-grammar permutation); the remodel generalises it to the **six** (the
+six laws / S₃ = six functorial readings). So "build the six laws" = build the six morphisms.
+**BUILT — `backend/src/core/laws.rs` (Stage B, 2026-08-18):** the Hexad layout + colours,
+`permutation()` (verified vs the S₃ table), `read()` (the directed reading of an undirected
+triad — interaction = SPO), `compose()` (the S₃ group op), and a bridge to the `Functor`
+machinery. **Seeded** in-graph as `system_six_laws_of_three_6`. The GraphQL query
+`runSixLaws(systemId, positions)` runs any system through the six laws (interpret a 3-node
+selection as a triad — an octad via `positions: [4,6,1]`).
+
+**The Controller is a MODULE / HARNESS — hidden, to be redesigned [user, 2026-08-20].** The
+`SixLaws` frontend panel was a quick "make it visible" spike; **it's not correct by a long
+shot, so it's turned OFF** (the panel, `client.run_six_laws`, and the CSS are removed). Treat
+the Controller as a **composable module** (a *harness*) that plugs into the others — kept as
+the backend `core/laws.rs` + `runSixLaws` (queryable, not shown) for the **redesign**. The
+current `read`/`read_walk` are only the ordering **mimic**; the real operation is the
+tensor-product / "semantic maths" over the substrate. **Next: the substrate**, so the laws can
+become real operations rather than orderings.
+
+**Morphism orders + the laws as data [user, 2026-08-18 — refinements].**
+- **First-order morphisms = the links themselves.** *Every link in the system is a morphism* —
+  a triad's edges *generation · consent · decision* (and *search · sort · filter*, …) are
+  **first-order** morphisms.
+- **Second-order morphisms = the six laws.** The six laws (S₃) operate *over* a triad's
+  structure — they are **second-order** morphisms, and the **primary means of operating the
+  system**: adapting to circumstance and composing data. **Run any triad *through* the six laws
+  to understand its context** — e.g. analyse the Model·View·Controller relations by reading MVC
+  under each law. (Do this early — it yields understanding.)
+- **The laws are DATA (Hexad nodes), not a code enum.** `enum Law` is **interim**: the six laws
+  should live as the **nodes of a seeded Hexad** — *nodes hold data*, and here the data is the
+  laws. `core/laws.rs` is the seed-source + morphism logic; the graph holds the laws. (This
+  "nodes hold data" move is the same one the shared substrate needs — see Stage D.)
+- **read = 132 = interaction = a sort / sequence** (of will · being · function).
+- **compose = the generative version of read.** The S₃ ops look **CRUD-ish**: *create = 123
+  (expansion) · read = 132 (interaction) · update = 213 (concentration)* · … (rest TBD; *delete*
+  may not apply; CRUD-as-a-tetrad is probably not the right four). These are the operations the
+  Controller offers over the Model.
+
+**Direction of travel for links [user, 2026-08-18].** The `perspectives::Link`
+(subject·predicate·object, AD4M) is kept **for now** and is foundational in a way, but the
+user is **not sold on the SPO triple** and will **probably retire it** — **AD4M is less
+reliable than Holochain**, which we will lean on. **Most likely the links will BE the matrices
+and graphs** (the adjacency / incidence / line-graph now on the Template): they are the
+**links between Grammar · Semantics · Syntax** in the Pentad (edges, not nodes). Symmetry is
+key: a link/matrix is **undirected**; **direction is broken by the six laws** (the Controller),
+not stored in the base. So the target substrate is **Holochain elements + links**, with the
+structural matrices/graphs as the link content; SPO is a stepping-stone.
+
+**Holochain elements + links [user, 2026-08-18].** AD4M is probably more about *traversing*
+Holochain, but fell short on the SPO. The systems that are graphs (the semantics/syntax
+*interfaces* — see *Pentad edges*) are best expressed as graphs via **Holochain's core types:
+elements (entries) + links `(base, type, target)`**. **Open concern:** a Holochain link may be
+**directed** — if so it conflicts with our undirected base (direction should come only from the
+six laws), and we must **consider our options** (e.g. store both directions, or a symmetric
+link type).
+
+**RE-REVISED — the substrate is Holochain elements + links; work UNDIRECTED (user, 2026-08-20).**
+**Retire `perspectives::Link` and all AD4M 'perspective'/'Link' language** — it was just a
+rehash of Holochain. The substrate is **Holochain-style elements + links** (placeholders until a
+real Holochain backend):
+- **Elements** (nodes) and **links** (edges) are each a **function-monad** — a *container with a
+  boundary + a set of actions* (functional-composition sense). **NB: this is the FP monad, NOT
+  our systematics *Monad* (the order-1 system) — do not conflate the two.**
+- **Articulate our systems on top:** a topological **vertex → an element**, a topological
+  **edge → a link**. Vertices/edges **link to data** — **term characters** (on vertices) and
+  **connective characters** (on edges) — which may themselves **link to further data**.
+- **Work UNDIRECTED.** A triad = **3 nodes + 6 directed links**, but the six simplify to **3
+  bidirectional 'orbits'** (an orbit = the two opposite directed links treated as one) — we
+  want to stay in undirected territory. The 6 directed links are **NOT the six laws**.
+- A **system materialises as a hypergraph** — a **constructed set of links** (this is what
+  'perspective' loosely meant; drop the word and the type).
+- The **Controller / harness operates over these links** (triad or decad). It **holds space for
+  three terms** (which will be **tensor products**). Scoped **within a single graph** for now;
+  later the tensor products will **transcend graph boundaries** (products *across* graphs).
+- **Derived → stored.** Materialisation is **derived** at first; if useful, **stored** — landing
+  in the **DHT**.
+- **MVC are three aspects of one thing** (different emphasis on each) — so the *whole* system is
+  essentially a controller/harness; the earlier `SixLaws` module is just a loose piece, to be
+  articulated as a system later (deferred).
+
+**CORRECTED — materialisation is a Functor of morphisms over the semantic Pentad [user,
+2026-08-20].** (Supersedes the first `core/substrate.rs::materialize`, which wrongly took
+coordinates/colours as inputs and *embedded* data — see the shape correction below.)
+
+- **The mapping's shape is a Pentad** (the system's semantic core), NOT order/size/coords/colours:
+  **coherence** (centre-left) · **term-designation** (lower-mid) · **connective-designation**
+  (upper-mid) · **terms** (lower-right) · **connectives** (upper-right); **Type** = the system
+  name. **Order + size are GRAPH RULES** (the Template). **Coordinates + colours are SEPARATE
+  mappings** — the *same form* as terms→vertices (a parallel mapping onto the complete graph),
+  not part of the pentad. (Transitivity between these mappings: later.)
+- **A Functor composed of individual morphisms.** The full-system map is a **functor**, built
+  from **morphisms** that map term/connective ↔ vertex/edge, term ↔ term, and term → connective →
+  term. The **valid morphism combinatorics** — mapping **horizontally / vertically / orthogonally**
+  — *is* the **incidence + adjacency matrix combined as a line graph** (the Stage-A matrices,
+  reused as the morphism grammar).
+- **Everything is Holochain elements + links.** Vertices, edges, term characters, connective
+  characters (and coordinates, colours) are all **elements/links**. Both the **K₃ topology**
+  (vertex–edge–vertex = the *lateral topology* domain) and the **triad** (term–connective–term =
+  the *lateral system* domain) are elements/links, joined **orthogonally**: **vertex-element
+  ──link──▶ term-character-element** (edge ▶ connective-character). **Shape correction:** the
+  `Element` must **link to** its data elements, not embed `term`/`coordinate`/`colour`.
+
+**Build approach — generate, don't read [user, 2026-08-20].** Reading an existing system to
+materialise it is **blunt/backwards** — systems are **composed then stored**, so if a system is in
+the graph, composition already happened. Instead build a **model for the Controller to functionally
+articulate parameters into the DHT** (generation):
+1. **Graph rules** — **order + size** define the limits of complete graphs; **incidence + adjacency
+   matrices** express the graph's shape → **generate a Template/topology** (K₃ = 3 nodes · 3
+   connectives · triangle; K₄ = the tetrad's diamond-with-central-cross; …).
+2. **Store the topology in the DHT** and use it to **anchor** terms/connectives.
+3. **Anchor via individual morphisms** (term→vertex is possibly a **monomorphism / bimorphism**);
+   or target a whole system via a **functor**. **Template rules** (incidence+adjacency as a line
+   graph) constrain **both** topology and system shape — and since K₃ ≡ triad, they **match exactly**.
+
+**Homoiconic Controller — systems ARE the morphisms [user, 2026-08-20].** The Controller uses
+**each system as a functor**: a **Monad** (order-1) is the *type* of the simple mappings and a
+**monomorphism is an INSTANCE of that Monad** (user, 2026-08-20 — *the monad is not the
+monomorphism; the monomorphism instantiates it*) — e.g. vertex↔term, vertex↔vertex; … up to a
+**Pentad** (order-5) = a **full-system functor** bundling morphism types to map the five core
+elements (coherence · term-designation · connective-designation · terms · connectives). So the
+Controller **composes** system models (functional composition of systems-as-functors),
+**derives/generates** them for **DHT storage**, and **consumes them again** to make **remixes**
+(tensor products): the self-construction loop **compose → derive → store → consume → remix**.
+(NB: this Monad is our systematics order-1 system; the FP function-monad is Holochain's element —
+distinct, see above.)
+
+**Numbers are hyperparameters [user, 2026-08-20].** A number is dual: **`3` defines K₃** (a whole
+graph) **and** names **a node** (position 3) within K₃ and higher graphs. So order and position
+are the *same* hyperparameter seen at two scales — the fractal/holonic hook (a node of one system
+is itself a system).
+
+**Build the graph, then let the Controller rebuild it — validation [user, 2026-08-20].** Preferred
+path: build the system **bottom-up by functional composition**, starting from a **kernel /
+controller / harness** that composes the rest (hack around blockers as needed). The **existing
+working models** (the visualisation + correct assignments) are the **ground truth**: build the
+graph, then **validate the Controller by checking it can rebuild the same graphs**. First rung
+(implemented): `generate_topology(n)` (the controller's topology generator) must reproduce the
+seeded graph's topology for every order — see `backend/tests/controller_rebuilds_graph.rs`. As
+anchoring (terms/geometry/colour) is added, the rebuild is checked against more of the graph.
+
+**How the Controller builds a system — imperative build-up + micro-monads [user, 2026-08-20].**
+The Controller composes a system **bottom-up** by bundling **monomorphisms**, each a **micro-monad**
+(an FP function-monad — a container with a *single function point*). Imperative build of the topology:
+1. **Order → graph rules.** From the hyperparameter `n`, instantiate the **`Template`** (order `n`,
+   size `C(n,2)`, adjacency/incidence/line-graph) — the constraints.
+2. **Assign vertices.** For each position `p ∈ 1..=n`, apply the monomorphism `p ↦ vertex-element`
+   (`el_n_p`) — `n` micro-monads.
+3. **Assign orbits.** For each template edge `(a,b)`, apply `(a,b) ↦ orbit-link` between the two
+   vertex-elements — `C(n,2)` micro-monads (undirected orbits; each names existing vertices →
+   referential integrity).
+4. **Assemble + validate against the Template.** order → exactly `n` vertices; size → exactly
+   `C(n,2)` orbits; shape → every orbit is a legal edge of the **adjacency matrix**. This *is*
+   `Template::validate` — **the Graph Template holding the Controller's validation rules** (the
+   Stage-A insight, operationalised): the correct topology is **guaranteed** by the constraints.
+Semantic anchoring adds more monomorphism **types** (term→vertex, connective→orbit,
+coordinate→vertex, colour→vertex), each a micro-monad; **a system = the specific bundle of these
+that composes it** (up to a Pentad-functor over the five semantic elements). Since **numbers are
+hyperparameters** (order = position at another scale), the build **recurses** — a node is itself a
+system. Homoiconic: **the model is a bundled set of monomorphisms** (user, 2026-08-20).
+
+**Semantic anchoring — decoupled triad + dyadic remap [user, 2026-08-20].** Extend the bundle with
+**semantic monomorphisms**: **term character → vertex**, **connective character → orbit**, and
+**term character → term character *linked by* a connective character** (the *lateral system* domain
+`term–connective–term`, parallel to the *lateral topology* `vertex–edge–vertex`). The **topology is
+the anchor** — terms have **canonical positions that must not be missed** (same for geometry;
+today topology · geometry · colours · semantics all correspond). Because the two domains are
+elements+links joined **orthogonally**, the semantic triad **stays decoupled if desired**: you can
+**detach** a triad (it is already internally connected through its terms + connectives) and later
+**remap** it onto a topology with an **appropriate mapping** — likely a **dyadic / 2-morphism**
+(just the two orthogonal maps *term→vertex* and *connective→edge*), since the triad's internal
+term–connective–term structure is already there.
+
+**Render layer + transitivity; metadata dodecads [user, 2026-08-20].**
+- **`compose_system` stays K_n** (order → size = C(n,2)). Non-complete graphs would need order
+  **and** size plus **edge/orbit-placement rules** — deferred (best left for now).
+- **Validation to extend beyond the triad:** the rebuild check currently verifies triadic
+  assignments; it must grow to check positions for higher orders too.
+- **Geometry + colour = the render layer**, each with the **same transitivity as semantics**:
+  **coordinate→vertex** (orthogonal) *and* **coordinate→coordinate = a line** (lateral);
+  **colour→vertex** (orthogonal) *and* **colour→colour** (lateral). This renders a system **on
+  its own terms** (topology + geometry + colour) **without its metadata**.
+- **Metadata dodecads — SEEDED (2026-08-20):** order-12 systems `system_coherence_attributes_12`,
+  `system_term_designations_12`, `system_connective_designations_12` — the 12 values per metadata
+  dimension made explicit (from the canonical metadata; designations 9–12 still "needs research").
+  These fill each system's **metadata** sections in the view — the **first stage of the systemic
+  product** (later, multiplying terms with terms, etc.). Remaining: wire them into the view's
+  metadata sections; fill the designation 9–12 gaps.
+
+**All four base-space types are mutually isomorphic — the Architectural Tetrad [user, 2026-08-20].**
+Topology is *an* anchor, but not the *only* one: **Template · Topology · Geometry · Vocabulary are
+all mutually transitive/isomorphic**, because each shares the same **hyperparameter** structure
+(positions 1…12). So the mappings are symmetric — **geometry↔colour, geometry↔vocabulary,
+vocabulary↔colour**, etc., not only topology↔X. This *is* the **Architectural Tetrad** (Graph
+Template ++ · Topology −− · Geometry +− · Vocabulary −+): the four are one system's four
+mutually-anchorable faces (colour sits within the Geometry/render aspect). The current `compose_*`
+functions anchor onto topology *by convention*; the isomorphism means **any face could anchor any
+other**. See *The Model is an Architectural Tetrad*.
+
+**Scope check — what the Controller actually composes (honest) [user, 2026-08-20].** Distrust the
+grand phrasing. `compose_system` / `compose_render` are **pure derived functions** that each bundle
+**simple positional monomorphisms** (term `i` → vertex `i`, coordinate `i` → vertex `i`, …) over one
+order's K_n, composing **topology + one layer** (semantics *or* render), validated against the
+Template (topology) and the seeded triad (assignments). They do **NOT** compose everything at once,
+store anything (no DHT), run in the app, or perform any six-laws / tensor-product / remix operation.
+Real but modest — the **fine** level of the build. (Fix, 2026-08-20: the geometric `line` and
+`colour-line` now **anchor to their topological orbit**, so edge ↔ line ↔ colour-line correspond,
+mirroring the connective.)
+
+**Morphism scale — monomorphism · bimorphism · holomorphism [user, 2026-08-20].** The morphism kinds
+form a scale:
+- **monomorphism** — *fine*: a single positional map (vertex↔term, edge↔connective, …) — what exists.
+- **bimorphism** — the **dyadic remap** of a *decoupled* triad onto a topology (term→vertex +
+  connective→edge).
+- **holomorphism** — *coarse / whole*: the **six laws**, usable at **multiple scales** — build an
+  individual system (topology from order/vertex/edge; likewise semantics), *and* larger actions like
+  composing **Vocabulary · Topology · Geometry** as a triad, or composing a whole system from the
+  **Model · View · Controller** triad (much more complex). This coarse level is **not** happening via
+  the Controller yet.
+- **Stretch goal — autopoiesis:** one *completed* system builds another (the fully self-constructing
+  loop). The holomorphism is the hook.
+
+**The six laws of assembly — Vocabulary · Topology · Geometry [user, 2026-08-20].** The six laws
+should run at **any scale** if the system is built from triangles (up to limits); a **discontinuity
+means we built something wrong**. A concrete **near-term holomorphism target** (should be possible
+now; MVC is too much): the triad **Vocabulary (+) · Topology (−) · Geometry (=)** (positions 1·2·3),
+read the six ways (edge verbs: *generates · configures · decides · positions*):
+
+| law | reading (assembly) |
+|---|---|
+| 123 | vocabulary **generates** the topology which **configures** the geometry |
+| 132 | vocabulary **decides** the geometry which **configures** the topology |
+| 213 | topology **generates** the positioning of the vocabulary which **decides** the geometry |
+| 231 | topology **configures** the geometry which **decides** the vocabulary |
+| 312 | geometry **decides** the vocabulary which **generates** the topology |
+| 321 | geometry **configures** the topology which **generates** the vocabulary |
+
+**Colour + geometry are a special case of Vocabulary** used for the *view* — technically somewhat
+superfluous; the core is **language (vocabulary) + topology**. So the fundamental base is the
+**Vocabulary ↔ Topology** duality, with geometry/colour as view-specialisations. (NB: this assembly
+triad's impulses — Vocabulary + · Topology − · Geometry = — differ from the *Model tetrad*'s
+`Template ++ · Topology −− · Geometry +− · Vocabulary −+`; different systems, both valid.)
+
+**Tensor-product / coalescence operations — DU2 dodecad → tetrad [user, 2026-08-20; recorded intent,
+not now].** A target class of *coarse* operations (the systemic/semantic product; a **holomorphism**):
+**collapse a triad into a monad** — coalesce three values into one. The worked example from **DU2**:
+a **dodecad** (12 values) splits into **three sets of four**; taking one value from each set (aligned
+by index) forms a **triad**, giving **four triads**; each triad is **coalesced into a single value**,
+and the four results form a **tetrad**. So **dodecad → tetrad** via four `triad → monad`
+coalescences — *"basically a kind of tensor product."* **Intent:** perform such operations in-system,
+starting with **`triad → monad`**. Relates to the **semantic product** (Stage D) and the
+**holomorphism** level. Not now — recorded.
+
+**Terminology, organisation, and the CT-monad link [user, 2026-08-20].**
+- **Retire `order`/`position` in the substrate** → **cardinality** (`|V|`, the vertex count that
+  locks the graph to `K_n`) and **index** (the 1-based vertex index). Precise terms:
+  *vertex cardinality* `|V|=n` · *vertex indexing* `v₁` · *isomorphism* `≅ K_n` · *canonical
+  ordering*. Done — `Element { id, cardinality, index }`. (The systematics **order** —
+  Monad…Dodecad — is retained *elsewhere*; for a `K_n` system it equals the cardinality.) And
+  **don't call morphisms "micro-monads"** (confusing) — just **morphisms**.
+- **`EdgeToOrbit { cardinality: 3, a: 1, b: 2 }` joins vertex 1 to vertex 2** in a 3-vertex graph —
+  the `3` is the *cardinality* (`|V|`), **not** a third vertex; 1 and 2 are the edge's two endpoints,
+  joined to *each other* (an undirected orbit). The old `order` field made this read like "anchor
+  1,2 → 3" — hence the rename.
+- **Organisation intent:** `topology_morphisms` returns a box of morphisms; with geometry +
+  semantics there are vertex-makers + edge-makers *per domain*, so we will need a **box-within-a-box**
+  (grouped by domain) and to rename `topology_morphisms` → **`morphisms`**. Needs its own
+  organisation (not yet).
+- **Controller ≈ a CT monad containing the triad `identity · composition · associativity`
+  [user, 2026-08-20; link to make].** The **composer** (`compose_system`/`compose_render`) *is* the
+  Controller's composition function; broadly the Controller is the composing layer, which looks like
+  a category-theory **monad** whose three laws form a **triad**. Open question: **are the six laws the
+  *associativity* rules?** — plausibly they are the *associative* readings/traversals (chained
+  compositions land unambiguously). Ties to the earlier note *content-addressing = identity; the six
+  laws (S₃) = the associative-lookup traversals*. Record and pursue.
+  - **Extension [user, 2026-08-20]:** the Controller's CT triad may be **nodes = Theorem · Lemma ·
+    Proof** (the seeded **Maths** sub-triad — theorems=1 · lemmas=2 · proofs=3, see `fragments.md`)
+    with **edges = identity · composition · associativity**. Then the **six laws** may be **lemmas
+    that compose — via identity/composition/associativity — into a theorem**. So "the Controller
+    *has* these three nodes/edges." [Proposed; the compose-check (do theorem·lemma·proof +
+    identity·composition·associativity sit cleanly on a K₃, and which edge is which?) is pending.]
+- **Coalescence example (intent):** collapse the triad **Wisdom · Health · Wealth → the monad
+  Flourishing** (and back, monad → triad) — a semantic composition of strong interest (extends the
+  DU2 dodecad→tetrad / tensor-product intent). Not now.
+
+**Cardinality as the reconciling concept; canonical systems as hyperparameters [user, 2026-08-20].**
+**Cardinality** is a central/reconciling term — many cardinalities all stem from the number `n`:
+**order cardinality** `|V|` (vertices), **size / edge cardinality** `|E| = C(n,2)` (edges),
+**neighbourhood cardinality** (a vertex's adjacent-node count, `n−1` in `K_n`), and more. For a
+**triad**, order cardinality = 3 *and* edge cardinality = 3 (they coincide — part of what makes the
+triad special). This is exactly Bennett's theme, the **qualitative/concrete significance of number**,
+so lean on **cardinality** as core vocabulary.
+- **Canonical systems are effectively hyperparameters** — fixed values that don't change/update, all
+  determined by cardinality.
+- **CS-word question:** there's no clean CS term for "a fixed, interrelated grouping of parameters"
+  (a triad = 3 terms + 3 connectives). But the intuition that drew you to *hyperparameter* is right if
+  located precisely: **the hyperparameter is the cardinality `n`** — the single number that configures
+  the whole structure; the system is the fixed structure it *generates* (a `K_n`). Nearby precise
+  terms for the structure: **canonical form / schema / fixture / algebraic structure**; for its
+  fixedness: **constant / immutable / canonical**. So: *n* (cardinality) = the hyperparameter; the
+  triad = the `K_n` it parameterises.
+- **View metadata from cardinality — BUILT (`core/systematics.rs`, 2026-08-20):** the **systematics
+  hexad** — `{name · coherence · term-designation · connective-designation · term-cardinality ·
+  connective-cardinality}`, all mutually determining from the one number. `systematics_hexad(3)` =
+  `{Triad, Dynamism, Impulses, Acts, 3, 3}`; `validate_metadata` fails if a triad's coherence ≠
+  Dynamism or its edge-cardinality ≠ 3; `cardinality_from("connective_designation","Acts") = 3`
+  (reciprocal derivation). Single source of truth (`data::mod` delegates here); exposed as the
+  GraphQL query `systematicsHexad(cardinality)`. Remaining: wire it into the view's metadata section;
+  fill the 9–12 designation gaps.
+
+**Line graph composed from the incidence matrix [user, 2026-08-20].** `Template::line_graph_adjacency`
+is now `L = Bᵀ·B` (diagonal zeroed) — **adjacency + incidence are the standalone primitives; the line
+graph is derived from them**, not a parallel definition (making the matrices load-bearing). Same K₃/K₄
+output, tests green. Next: **wire the line graph in as the morphism grammar** (the valid
+horizontal/vertical/orthogonal morphism combinatorics).
+
+**Morphism grammar — BUILT (`grammar.rs` + `substrate.rs`, 2026-08-26).** The three matrices are
+now **load-bearing in composition** — each gates one class of morphism, so "which morphisms are
+well-formed" is *read off the matrices*, not hard-coded:
+- **Adjacency `A` (−, topology)** → `Template::admits_edge(a,b)` — an edge morphism (`EdgeToOrbit`,
+  `ConnectiveToOrbit`, `CoordinateLine`, `ColourLine`) is legal iff `A[a][b] = 1`. A self-loop or an
+  out-of-range pair is ungrammatical.
+- **Incidence `B` (=, reconciler)** → `Template::admits_anchor(v,a,b)` — a term at vertex `v` may
+  anchor edge `{a,b}` iff `v` is an endpoint (`B[v][e] = 1`).
+- **Line graph `L` (+, semantics)** → `Template::admits_composition(e1,e2)` — two connective-operators
+  may **compose** iff `L[e1][e2] = 1` (they share a vertex). This is the **grammar for the coming
+  tensor product** — *which* pairs may compose is live; the `⊗` **operation itself is still to be
+  designed** (the spectral-graph-theory discussion below).
+
+Each `Morphism` now declares its `site()` (`Vertex(i)` | `Edge(a,b)`), and **`compose_checked` gates
+the whole build path** — `generate_topology` / `compose_system` / `compose_render` all route through
+it, so an ungrammatical morphism is **rejected, not applied** (with its site reported). Canonical
+bundles are grammatical by construction; a strayed/composed bundle is caught. 8 new tests; suite green.
+Deferred: the **six-laws-driven build order** (123/213 over the topology·semantics·geometry triad) —
+folded into the tensor-product design, since "which law drives composition" is bound up with the
+operation semantics we agreed to discuss first.
+
+**Terminology + generative direction [user, 2026-08-26].**
+- **Cardinality = count · Ordinality = placement.** Applied to the **Order/Degree dyad**:
+  *order-cardinality* = #vertices (n), *order-ordinality* = vertex position (1..n); *degree-cardinality*
+  = #connectives (C(n,2)), *degree-ordinality* = connective placement (read off the adjacency /
+  incidence / line matrices). The field now called `order` is really **order-cardinality**;
+  `position` is **order-ordinality**. (Rename pending — see also the multi-pronged query.)
+- **Anchor, don't guess.** Generate the **topology** from cardinality; then **anchor** vocabulary,
+  coordinates and colours onto it **by (topological) ordinality** — take the normalised, hand-worked
+  data (e.g. the **pentad's special layout**, which is *not* a regular polygon) and attach it. Do
+  **not** generate/guess geometry or colour (generation is a *later experiment*; anchoring is more
+  elegant than guessing). Vocabulary values are always supplied.
+- **Omnidirectional traversal (next build).** After anchoring we must traverse freely between
+  vertex ↔ term ↔ coordinate ↔ colour and edge ↔ connective ↔ line (and across): the Controller makes
+  the assignments; the **six laws are the traversal**.
+- **The hexad → a "hexadic systematics" module (the *shape/outline* of a system), a generative
+  instruction set.** Homoiconic: the hexadic expression both *validates* and *composes/renders* all
+  systematics — a reusable instruction-set template, not merely a checker. (Rename `systematics.rs` →
+  hexadic-systematics module pending; reused everywhere.)
+- **Laws = linguistic composition, not the mechanical walk.** `read_walk` only *sequences* nodes/edges
+  (lawful but flat); the real operation is **linguistic composition** of the reading — an **LLM
+  generates** the combinations, the **codebase checks** them. Do not mistake the walk for the op.
+- **Systems generate the MVC (homoiconicity).** We should *generate* Model/View/Controller *from*
+  triads/tetrads and use that to implement — for consistency + homoiconicity. Here the **edges
+  (connectives/operations) matter more than the nodes (terms).**
+- **MVC connectives — LOCKED [user, 2026-08-26]:** **compose (View–Model) · resolve (Model–Controller)
+  · render (Controller–View)** (compose=build, resolve=map, render/serve=produce/deliver cousins).
+  Edges are **bidirectional / isomorphic** ("everything here is essentially isomorphic, to the point
+  where isomorphism loses relevance"). Verified against `read_walk`: the six laws are the six directed
+  readings of this triangle; the connectives + their canonical directions form a **directed 3-cycle**
+  (View→compose→Model→resolve→Controller→render→View). The three **rotations** (123·231·312, even) walk
+  it **clockwise** (every edge forward = natural sentences); the three **reflections** (132·213·321,
+  odd) walk it **counter-clockwise** (every edge inverted = the inverse morphisms — valid because
+  edges are isos). *(Possible evolution/involution reading of the two directions — parked.)*
+  - **The serving path is the 321/Freedom reading:** *"Controller resolves the Model, which composes
+    the View."* So the view-swap is literally implementing that law of the MVC triad.
+- **RULE (user, 2026-08-26): analyse every triad this way** — assign connectives, derive the six
+  readings, classify clockwise/counter-clockwise, check the sentences, require iso edges. Codified as
+  the personal Claude skill **`triad-six-laws`** (to be usable in-app later).
+- **OPEN — the matrix generator [user, 2026-08-26, "fundamental, worth ironing out"]:** algebraically
+  **incidence `B` is the minimal generator** (`A = BBᵀ − D`, `L = BᵀB − 2I` are its two Gram products).
+  But **systematically the generator should be a *pole* (adjacency −), not the *reconciler* (incidence
+  =)**. Resolution: in our **generative order** the chain is **cardinality → adjacency (topology) →
+  incidence (reconciler) → line (semantics)** — adjacency is generated first, incidence *bridges* it to
+  the line graph. Proposed refactor: derive `incidence` **from `adjacency`** (enumerate its edges) so
+  the code makes adjacency-as-root explicit (output-identical; currently both derive from `edges()`).
+- **Speculation (parked):** MVC (triad) may be the *top half* of a **tetrad** running the six laws,
+  with the **substrate as the tetradic ground** — i.e. learning how the six laws of three apply to
+  tetrads / higher systems. Generative; revisit.
+
+**CORRECTION — matrix→domain remapping: adjacency = topology · line graph = semantics · incidence =
+reconciler [user, 2026-08-20].** Supersedes the earlier "incidence = Semantic Projection anchoring,
+line graph = reconciler." The **line graph is the *inverse* of the adjacency graph**, and
+**incidence is the reconciler**:
+- **Adjacency (−) = Topology** — vertex ↔ vertex.
+- **Line graph (+) = Semantic Projection** — edge ↔ edge: connectives (operators) elevated to nodes.
+- **Incidence (=) = the Reconciler** — vertex ↔ edge: both `A = BBᵀ − D` (adjacency) and
+  `L = BᵀB − 2I` (line graph) derive from it, so it brings topology and semantics together — and is
+  **where tensor products live**.
+
+Why the line graph is the semantic home: in **Vector Symbolic Architectures (VSA) / quantum
+linguistics / formal logic**, a connective (AND, OR, LOVES) is a functional **operator**, not an empty
+pipe. In `A —c₁→ B —c₂→ C` the operator interaction is at `B`; the line graph makes `c₁, c₂`
+**adjacent nodes**, so their **tensor product `⊗`** computes directly (a GNN **"Edge-GNN / Dual
+Graph"**). So **update the graph templates**: adjacency ⇒ topology, line graph ⇒ semantic projection,
+incidence ⇒ reconciler.
+
+**New language to carry:** Vector Symbolic Architectures (VSA) · quantum linguistics · **spectral graph
+theory** (eigenvalues · the graph **Laplacian**) · Edge-GNN / Dual Graph. **Spectral graph theory**
+(likely the Laplacian / its eigenvalues) is a candidate mechanism for the **monad ↔ triad coalescence**
+— e.g. **Fulfilment (monad) ↔ Healthy · Wealthy · Wise (triad)** and back — the tensor-product /
+`triad → monad` operation recorded earlier. Pursue.
+
+**We are building a hypergraph [user, 2026-08-20].** The whole thing is a **hypergraph made of
+triads**, where the **triadic laws break the symmetry**: the base triad is symmetric; a law
+imposes direction, generating directed relationships (links) — the hypergraph is what the
+Controller *generates* by applying the six laws to a semantically-assigned triad.
+
+**Present state (audit 2026-08-18), i.e. the gap to close:** the `middleware` crate is *today*
+only a **shared data-types crate** (`middleware/src/types/*`), used by both backend and
+frontend — it holds no mediating logic yet. **GraphQL** (`backend/src/graphql`) is the
+reconciler that works today (limited scope). So "Controller = GraphQL + an elevated
+`middleware`" is the **target**; only the shared-types part exists now.
 
 **Separate the concerns — the earlier remodel conflated them (user, 2026-08-18).** The
 base-space plan folded model, controller and view together. Pulled apart:
@@ -164,14 +623,49 @@ interaction we default to (132 / SPO) — check the work across **all six** perm
 that Model, Controller and View develop in balance. A proposed reading of the six over the
 MVC base (View = **+**/1, Model = **−**/2, Controller = **=**/3), for sign-off:
 
-| law (order) | reading over MVC (positions View=1 · Model=2 · Controller=3) |
+Read semantically (user, 2026-08-20 — edge verbs: **generates · acts · consents/conforms ·
+decides**; positions View=1 · Model=2 · Controller=3):
+
+| law (order) | reading over MVC (View=1 · Model=2 · Controller=3) |
 |---|---|
-| expansion (123) | View → Model → Controller |
-| identity (231) | Model → Controller → View |
-| order (312) | Controller → View → Model |
-| interaction (132) | View → Controller → Model  ← the SPO / request reading |
-| concentration (213) | Model → View → Controller |
-| freedom (321) | Controller → Model → View |
+| expansion (123) | **view generates models which consent to the controller** |
+| interaction (132) | **view acts on controller which consents to the model** (SPO) |
+| concentration (213) | **models generate a view that decides the controller design** |
+| identity (231) | **models consent to the controller's constraints which act on the view** |
+| order (312) | **controller acts on the view to generate models** |
+| freedom (321) | **controller consents to a model to generate a view** |
+
+*(consent ≈ conforms.)* These are the six ways Model·View·Controller relate — the balance check.
+
+**The Controller is the generative goal [user, 2026-08-20].** The Controller is the *goal*: it
+should ideally sit where it **generates the rest** — by **assigning semantics to a triad** and
+then **using the six laws to build the relationships** (the hypergraph). But to apply the six
+laws it **needs a Model**; and because we want **homoiconicity**, we **mimic the laws of three**
+(in code) **until the Controller can use the primitives we are designing to self-articulate**.
+
+- **We've built the Model and the View but under-built the Controller** — which is *probably why
+  things feel unbalanced* (cf. the balance rule). The Controller needs models to run, so we must
+  **express models in a way the Controller understands**, then use it. Getting the **data model
+  correct** is the current work.
+- **Topology · Template · Semantics** still need working out, and **each must be triadically
+  modelled**. A working Controller would **relate the three by anchoring the semantic terms on
+  the topological graph** (the bijective semantic↔topological anchoring — see Stage D).
+- **Critique — the laws are not yet operations [user, 2026-08-20].** The way `core/laws.rs`
+  uses the laws today (`read`/`read_walk`) merely **orders data into a sequence** (a
+  permutation). That is the **homoiconic mimic**, not the real thing. The laws should perform
+  **operations** — **possibly tensor products**. So: keep the ordering as the interim mimic;
+  the **target is laws-as-operations (tensor products)**, to be designed once the data model is
+  right and the Controller can self-articulate. [Direction; the tensor-product form is not yet
+  specified — do not fabricate it.]
+- **The Model is the TETRAD** (Template · Topology · Geometry · Vocabulary) — geometry was only
+  elided for brevity earlier. The **Template encapsulates** topology/geometry/vocabulary but
+  *complicates the engine*, which is a **triadic process that traverses the tetrad**.
+- **The Controller operates over ALL graphs — "semantic maths" [user, 2026-08-20].** It should
+  run the triadic algo on *any* system by **interpreting a selection of nodes as a triad**
+  (e.g. in an octad, read node 4 → node 6 → node 1 as a triad and run the laws). Higher example:
+  **DU2 interprets the dodecad through the lens of the pentad → eight cosmoses** — a system
+  operated on by another system. So the Controller does **various operations *between* systems**
+  ("semantic maths") — the same family as the tensor-product target above.
 
 *(The **rule** "check all six for balance" is settled; each row's concrete meaning is a
 working guess. Note: this six-over-MVC application is **distinct** from the six laws as the
@@ -219,16 +713,44 @@ what already exists, so the remodel *re-articulates* rather than builds from scr
   *(Full frontend/graphql/status sweep deferred — the audit workflow hit a session limit;
   resume for complete coverage.)*
 
+**The Model is an Architectural Tetrad [user, 2026-08-18].** MVC is the **architectural
+triad**; its **Model (−)** node expands into an **Architectural Tetrad** — the four base-space
+types the code already has, with the tetrad's four impulse-combinations:
+
+| tetrad pole | term | code type | role |
+|---|---|---|---|
+| **++** | **Graph Template** | `Grammar` | the **source** — order + size = the K_n rules |
+| **−−** | **Topology** | `TopologicalVocabulary` | adjacency (points + lines) |
+| **+−** (left) | **Geometry** | `GeometricVocabulary` | coordinates / spatial layout |
+| **−+** (right) | **Vocabulary** | `Vocabulary` | the **semantic projection** (term/connective characters) |
+
+The earlier "base-space triad" (Topology · Template · Projection) was the same thing seen too
+small — adding **Grammar as the source** makes it a **tetrad** (topology · geometry · vocabulary
+reconciled by the graph template). **Links:** this Architectural Tetrad *is* the Model node of
+the **MVC triad** (above) and extends into the **Architecture Pentad** (Sign · Symbol · Syntax ·
+Semantics · Grammar) — a further blending/linking step (as the old pentad linked grammar ·
+semantics · syntax) that would complete the pentad; **deferred** ("good for now"). See
+`docs/architecture-pentad.md`, [[architecture-pentad]].
+
 **The remodel plan [agreed, user 2026-08-18].** Develop the three MVC roles in balance (the
 six-laws rule), backend/Model first (the 321 discipline):
 
-- **Stage A — Model (−): re-articulate the existing base-space triad.** Rename the code to the
-  systematic names (`Grammar`→**Graph Template**, `TopologicalVocabulary`→**Structural
-  Topology**, `Vocabulary`→**Semantic Projection**), make **adjacency + incidence** explicit
-  (matrices, reconciled by the template as a **line graph**), and expose **order + degree as
-  first-class constraint-values** in the Graph Template (they already exist as
-  `expected_terms`/`expected_connectives`). Backend-first, verified against the untouched graph
-  view.
+- **Stage A — Model (−): re-articulate the base-space as the Architectural Tetrad.** The Model
+  is a **tetrad** (see *The Model is an Architectural Tetrad*), so rename the four existing code
+  types to the systematic names: `Grammar`→**Graph Template** (++), `TopologicalVocabulary`→
+  **Topology** (−−), `GeometricVocabulary`→**Geometry** (+−), `Vocabulary`→**Vocabulary** (−+,
+  the semantic projection). Then:
+  - Make **adjacency + incidence** explicit **matrices**, reconciled by the Graph Template as a
+    **line graph**. These are **links in the Architecture Pentad** (edges between Grammar,
+    Syntax, Semantics), **not nodes** (user, 2026-08-18).
+  - **Retire the two colliding `Link` types** (`core/links.rs` shim vs `perspectives::Link`),
+    **grounding both in the Topology**. Keep in mind **Holochain's core types are *elements* and
+    *links*** — so our topological links should translate to those (the content-addressed heap
+    direction). See [[reference-tuple-store]].
+  - Expose **order + degree as first-class constraint-values** in the Graph Template (they exist
+    as `expected_terms`/`expected_connectives`); the Template should eventually hold the **other
+    systematics variables** too (coherence, designations, …) as a full template — extend later.
+  - Backend-first, **verified against the untouched graph view at each step.**
 - **Stage B — Controller (=): the six laws of three.** Build the six laws as a real layer
   (target: elevate `middleware` per above). **`SPO` is retired as a name — it is just another
   name for the *interaction* law (132); use "interaction".** Represent the **six laws as a
@@ -237,10 +759,92 @@ six-laws rule), backend/Model first (the 321 discipline):
   `SPO`. (The primary names are Bennett's — expansion · identity · order · interaction ·
   concentration · freedom; the S₃ structure is already tabulated below.) The six laws are the
   Controller's **traversal algorithms** over the S·P·O impulse triad; interaction is one.
-- **Stage C — View (+): the two-line sort/filter redesign**, consuming the Controller's
-  queries (the `browser_controls` module is already the decoupled seam).
-- **Stage D — the shared k₃ + semantic product.** Anchor all semantic triads to one shared
-  topological k₃ (bijective mapping) → the north-star **semantic product**.
+**Stage C and D are SWAPPED (user, 2026-08-18): do the shared substrate (was D) BEFORE the
+view (was C)** — the substrate is what makes the generative view work, so it comes first.
+
+- **Stage D (now before C) — decoupled projection space, then the shared k₃ + semantic product.**
+  *Clarified (user, 2026-08-18):* the **Semantic Projection lives in its OWN space, decoupled
+  from the k₃ topology.** A semantic triad — e.g. *Function · Being · Will*, or *Affirming ·
+  Receptive · Reconciling* — must **stand on its own as a micro-model** in the graph: its
+  nodes and edges related to each other by an **incidence matrix**, i.e. a closed
+  **node–edge chain** that composes the triad —
+  *affirming — generation — receptive — consent — being — decision — affirming*.
+  **The incidence chain is UNDIRECTED** (user, 2026-08-18) — it only *looks* directed when
+  written out, because **text is a linear medium**. The graph itself is symmetric; **direction
+  is imposed by the six laws** (the Controller), which is where the symmetry breaks into a
+  directed reading (each of the six laws = one directed traversal of the undirected triad —
+  the S₃ symmetry group). So: **undirected projection (Model) + six-law reading (Controller) =
+  a directed walk.** That decoupled projection can *then* be anchored to **one shared
+  topological k₃** via the bijective semantic↔topological mapping — which unblocks the
+  north-star **semantic product** (node-1-of-X × node-1-of-Y → a derived term).
+  Projection-in-its-own-space **first**, the shared-k₃ anchor **second**.
+- **Stage C (now after D) — View (+): the generative view** — the two-line **Search · Sort ·
+  Filter** redesign, consuming the Controller's queries/laws over the shared substrate (the
+  `browser_controls` module is already the decoupled seam). Comes **after** the substrate.
+
+**The six laws as a Hexad — layout [user, 2026-08-18].** Stage B **also records the six laws
+as a Hexad** (order-6). Provisional vertex assignment by the hexad's numbered/coloured
+positions (the layout itself may still flip — separate inquiry):
+
+| # | colour | law | S₃ permutation | aliases |
+|---|---|---|---|---|
+| 1 | red | identity | 231 | |
+| 2 | blue | expansion | 123 | |
+| 3 | yellow | order | 312 | |
+| 4 | green | freedom | 321 | |
+| 5 | purple | interaction | 132 | **SPO** |
+| 6 | orange | concentration | 213 | |
+
+Each law-vertex carries **aliases** (interaction ← `SPO`); the S₃-permutation column ties each
+hexad position to the traversal signature tabulated below.
+
+## Pre-remodel audit — drift report (2026-08-18)
+
+A registry-vs-code audit ran before the remodel (a fan-out workflow for backend-core +
+middleware; the frontend/graphql/status auditors hit a session limit, so those rows are from
+direct inspection). Confirmed findings, most remodel-relevant first:
+
+1. **The Controller is GraphQL (the reconciler) + an elevated `middleware`** [high]. The
+   `middleware/src/types/*` crate holds only **shared data types** used by both backend and
+   frontend — no mediating logic. **GraphQL** (`backend/src/graphql`, ~50 `QueryRoot` resolvers
+   + mutations) is the reconciler that works today (limited scope). No six-laws engine exists;
+   the only S₃ logic is `core/functors.rs` — **one** morphism (`impl`+tested), and the six laws
+   want **six** morphisms. → **Stage B builds the six morphisms into the Controller.**
+2. **The Model base-space triad exists in embryo** [confirmed]. `Grammar` (Graph Template —
+   `order`, `expected_terms`/`expected_connectives`, `validate`/`validate_with`) ·
+   `TopologicalVocabulary` (Structural Topology, points+lines) · `Vocabulary` (Semantic
+   Projection). `System` reconciles them; `Graph::validate_system` runs the triad. → **Stage A
+   renames + makes matrices explicit.**
+3. **Adjacency + incidence are IMPLICIT** [medium]. `core/entries.rs` (Point·Line·Coordinate·
+   Segment·Character) + the positional index-join `graph.rs:706-730`
+   (`character_at_point`/`_line`, `topology.points[idx] ↔ vocab.terms[idx]`) *are* the
+   topology/incidence — there is **no explicit matrix** anywhere (grep `adjacen|incidence|
+   matrix` → only a `functors.rs` doc-comment). → **Stage A's core gap.**
+4. **Two colliding `Link` types** [medium]. `core/links.rs` `Link{base,target,link_type,tag}`
+   + `LinkType::{Line,Connective}` — a **legacy geometric-adjacency shim** ("retained during
+   frontend migration", used by `Graph::add_link`) — vs `core/perspectives.rs` `Link`
+   (subject·predicate·object, the AD4M SPO triple the registry's "Link/triple" row documents).
+   → **Stage A should retire/rename the shim.**
+5. **Seeded Citation triad has placeholder edges** [medium]. `system_citation_3` is seeded and
+   validates, but its connectives are `char_word_citation_act_{1,2,3}_needs_research`, **not**
+   cites·recordedIn·atLocation (those verbs live only on `Reference`/`Perspective` links). Two
+   co-existing citation representations; the remodel should pick the canonical one.
+6. **Stale — the Query triad is now Search · Sort · Filter** [medium]. The old Triads-table
+   entry ("Sort · **Tag** · Filter", "reconciler-typed", `ColKey`/`CiteKind`, Filter =
+   cite-degree) is superseded. **Rename: the Query triad = Search · Sort · Filter** (user,
+   2026-08-18) — Tag is dropped, Search is the third term. Sort/Filter/Search now live in
+   `frontend/components/browser_controls.rs` (decoupled view) + `spo.rs` (query interface);
+   Filter is a predicate→object drill-down (the *interaction* traversal). It contradicts the
+   later reference-tuple section (which already records the filter as BUILT).
+7. **Undocumented persistence** [low]. `core/content.rs` `GraphContent` is the portable slice
+   (seed JSON + user store); **Grammars are code-seeded, not persisted** — so exposing order +
+   degree as first-class Graph Template *data* (Stage A) is a deliberate choice.
+8. **Task drift — #13 is done** [confirmed]. `main.rs:87` calls `load_perspective_modules`,
+   which `read_dir`s the `*.json` perspective modules at startup — the 9 QSM + DU vols 1–3
+   **load**. Task #13 (Scrape Hodgson Qualsystems) is done+loaded. (#14 = DU vol 4, absent.)
+
+*(Undocumented backend files now surfaced: `core/{entries,graph,content,links}.rs` — to be
+folded into the registry as the base-space Model is re-articulated in Stage A.)*
 
 ## Monads, operations, and the six laws of three [proposed — potentially major]
 
@@ -821,20 +1425,23 @@ counterpart of the canonical run: the run *enumerates* orders 1→12; the doubli
 
 | system | terms / role | node- or edge-typed | code | status |
 |---|---|---|---|---|
-| **Citation** | Source · Artefact · Lookup (nouns); edges *recordedIn · atLocation · cites* (verbs) | nouns=nodes, verbs=edges | `core/citations.rs`; seeded `system_citation_3` | impl + seeded |
+| **Citation** ⭐ | nodes **Source · Artefact · Lookup**; **edges = the citation-query (user, 2026-08-18): Source–Lookup = Search · Source–Artefact = Sort · Artefact–Lookup = Filter**. These are the triad's real connectives — they **replace the placeholder `_needs_research` edges** the audit flagged, and supersede the earlier *recordedIn·atLocation·cites* AD4M-predicate naming as the triad's canonical edges. | nouns=nodes, verbs (Search·Sort·Filter)=edges | `core/citations.rs`; seeded `system_citation_3` (connectives → search/sort/filter) | impl + seeded (edges being corrected in the seed) |
 | **Operations (ELT ≅ RAG)** | Extract · Load · Transform — **renamed from ELT to "Operations"** (not "compose"). **ELT ≅ RAG** (data-warehouse ↔ generative-AI): the same isomorphic triangle, both **composition**. The six permutations of the triad = the **six laws of three** (see below). Wired: `createSequence` · file-picker · `applyFunctor` + author (`authorSystem`), surfaced by the in-app **Editor**. **SPO = the *Perspective* triad** (Subject·Predicate·Object as edges). **[open] ELT may BE the sort/filter triad** — *Load = selecting the keys to display values* (i.e. Sort = header tags). If so there is a sequence **Data (monad) → key·value (dyad) → ELT (triad)** — "data" being what we call *tags* (everything is a tag ⇒ it is just data). Recorded, not resolved. | **edge-typed** (all verbs) | `graphql/types.rs`; UI: `components/reference_browser.rs` `elt_triad` (Nullad page) | impl (not seeded). **Extract** is wired (Nullad → Monad): materializes the current data-view selection (distinct `system:<id>` of the filtered references) into a persisted Monad via `createSequence` + `create_sequence` (client). **Load** is wired (`loadPerspective` → `on_load`). **Transform** (apply a Functor) is surfaced but **not yet wired**. Monad auto-naming is provisional (the members' *integral* is a later refinement) |
 | **Containers** | System · Sequence · Perspective (nouns) | node-typed | `core/{systems,sequences,perspectives}.rs` | impl (all three built; triad-ness unsettled). **Open:** *Perspective* may be retired — or kept only as the subject·predicate·object **Link** substrate, which is arguably *everything* in the system (every tag is a `key:value` predicate on a node). |
-| **Query (Sort · Tag · Filter)** | **Tag (=)** reconciles **Sort (+)** and **Filter (−)**, mapping to **class / instantiation / instance**. **Sort = selecting the header tags** — which tag keys are the columns (the *class*: header/keys; `ColKey`; default Order + Citation). **Filter = scoping the data returned** in those columns (the *instances*: values), by **cite-degree** — the data categorised by number per the schema **1 term-designation · 2 connective-designation · 3 coherence · 4 term · 5 connective · 6 system** (their coalescence). So you can view only systems (*manifolds* = systems not yet placed), only terms, only connectives, etc. | reconciler-typed | UI: `components/reference_browser.rs` (`CiteKind`; Sort = column selector, Filter = degree scoper) | impl v1. Citation column in **Source · Artefact · Lookup** order |
+| **Citation query** (Search · Sort · Filter) | **NOT a standalone triad (user, 2026-08-18): Search · Sort · Filter are the EDGES of the Citation triad** (Source·Artefact·Lookup) — see the Citation row. So there is no separate "Query" system; it is the **citation query** — the *edge view* of Citation. The view/query interface realises these operations. | edge-typed (verbs = the Citation triad's edges) | UI: `components/browser_controls.rs` + `components/spo.rs`; the edges live on `system_citation_3` | folded into **Citation** (no separate seed). Superseded the `CiteKind`/`ColKey` cite-degree design |
 | **Data (Data · Graph · Table)** | **Data (=)** is the content the header scopes; **Graph (+)** and **Table (−)** are its two views. The switch (right of the header menu) chooses one. | reconciler-typed (Data is the whole; Graph/Table its views) | UI: `components/system_selector.rs` (`ViewMode`) | impl — Table live; Graph = per-system K-graph (Nullad Graph = the future all-graph) |
 | **Class · Instantiation · Instance** | e.g. **K₄ (class) · Tetrad (instantiation) · Canonical Tetrad (instance)**. The abstract complete graph → its systematic instantiation → a concrete instance. Also the table's own structure: header/keys (class) · data types/keys (instantiation) · data/values (instance). | node-typed (nouns) | (documented; extends the existing Class/Instance dyad) | proposed |
 | **Link / triple** | subject · predicate · object (`source · predicate · target`) | the edge itself | `core/perspectives.rs` `Link` | impl (AD4M) |
 | **Architecture MVC** ⭐ | **Model (−)** · **View (+)** · **Controller (=)** (nouns) — base-space store · interface · six-laws algo layer. The **organising frame for the base-space remodel**: separate the concerns; Controller = the six laws of three (SPO = only the 132/interaction law). The Graph Template (Model's inner =) holds the Controller's validation rules. | node-typed (nouns) | model = backend data + base-space triad · view = `frontend/components/{browser_controls,inspector,graph_view}` · controller = middleware + six laws | proposed (user 2026-08-18) — see *The architecture is an MVC triad* |
+| **Harness** ⭐ | **Tools (+)** · **Constraints (−)** · **Environment (=)** (nouns) — what a harness *is*: the tools it affords, the constraints it imposes, reconciled by the environment it operates in. The Controller-as-harness is described by this triad. | node-typed (nouns) | seeded `system_harness_3` (`data/mod.rs`) | seeded (user, 2026-08-20; edges TBD) |
+| **Interface** ⭐ | **Struct (+)** · **Enum (−)** · **Trait (=)** (nouns) — how the Controller's morphisms are expressed in Rust: a **Struct** is a concrete *instance*, an **Enum** is the *kinds*/taxonomy, and a **Trait** is the *interface* (behaviour) that reconciles instances with kinds. (Impulse assignment tentative.) | node-typed (nouns) | seeded `system_interface_3`; `core/substrate.rs` (`MorphismKind` enum · `Morphism` trait · `PositionToVertex`/… structs) | seeded (user, 2026-08-20; edges TBD) |
 
 ## Tetrad (order 4 — Sources / Interplays)
 
 | system | terms / edges | typing | status |
 |---|---|---|---|
 | **Determining Conditions** ⭐ | nodes **Time (Chronos) · Hyparxis · Eternity (Aionios) · Space** (the four "dimensions"); the **six laws as its six K₄ edges** — *statistical · correspondence · classification · conservation · irreversibility · coexistence*. **This is what the whole system is trying to codify** as a representational medium. | nodes=nouns, edges (laws)=the determining conditions | seeded `system_determining_conditions_4`; `docs/fragments.md`; [[determining-conditions]] | seeded (edge→law assignment TBD; may *also* be a hexad of the laws as nodes) |
+| **Architectural Tetrad (the Model)** ⭐ | **Graph Template (++)** · **Topology (−−)** · **Geometry (+−)** · **Vocabulary (−+)** — the four base-space types. Graph Template = the source (order + size); the other three reconciled by it. **This is the Model node of the MVC triad**, and extends into the Architecture Pentad. | nodes=nouns (four base-space types) | code: `backend/src/core/{grammar,vocabularies}.rs` (type `Template` lives in `grammar.rs`); `System` reconciles them | **Stage A COMPLETE (2026-08-18).** (1) rename — `Grammar`→**`Template`** (via `GraphTemplate`), `TopologicalVocabulary`→`Topology`, `GeometricVocabulary`→`Geometry`; Gql mirrors backend + `Gql` prefix (`GqlTemplate`/`GqlTopology`/`GqlGeometry`), resolvers/queries mirrored (`templateForOrder`, `topology`, `geometry`, …). (2) **adjacency + incidence matrices + line-graph** — `Template::{adjacency_matrix, incidence_matrix, line_graph_adjacency, edges}` (+ on `GqlTemplate`). (3) **order + degree + size** constraint-values — `Template::{order, degree, size}`. (3a) vestigial `core/links.rs` shim + `Graph::lines` **removed**. (3b) `perspectives::Link` (`source·predicate·target`, AD4M/Holochain shape) kept as the single link for now (its source/predicate will draw on the template's matrices/line-graph; likely retired for Holochain). **Serde field-names + string ids kept stable** (`grammar_ref`, `"grammar_N"`, `topvocab_N` — addressable graph nodes; seed JSON migrates when the store moves in-system); frontend/graph view unaffected (the frontend never queries this surface); 45 tests pass. Links: *The architecture is an MVC triad*, [[architecture-pentad]] |
 | ~~Organise~~ | four *sources* (nouns) — TBD; operations *sort · tag · filter · search* | **superseded** — the operations are now the **Sort · Tag · Filter triad** (below); *search* is a separate free-text mechanism, not a fourth term | discarded |
 
 ## Pentad (order 5 — Limits / Mutualities) — settled

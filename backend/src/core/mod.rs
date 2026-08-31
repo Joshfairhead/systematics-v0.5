@@ -1,14 +1,12 @@
 //! Core types for the Systematics property graph.
 //!
 //! Layered ontology:
-//! - `entries` — the substrate (Order, Position, Point, Line, Coordinate,
+//! - `entries` — the substrate (OrderCardinality, Ordinality, Point, Line, Coordinate,
 //!   Segment, Character) plus the `Entry` sum type.
-//! - `links` — Link entries (currently `Line` for coordinate-to-coordinate
-//!   rendering; `Connective` shim retained during frontend migration).
-//! - `vocabularies` — `TopologicalVocabulary`, `GeometricVocabulary`,
-//!   `Vocabulary` — ordered per-Order references into the substrate.
-//! - `grammar` — `Grammar`: the K_n structure + arity validation rules.
-//! - `systems` — `System`: metadata reconciling a Grammar with a Vocabulary.
+//! - `vocabularies` — `Topology`, `Geometry`,
+//!   `Vocabulary` — ordered per-OrderCardinality references into the substrate.
+//! - `grammar` — `Template`: the K_n structure + arity validation rules.
+//! - `systems` — `System`: metadata reconciling a Template with a Vocabulary.
 //! - `perspectives` — `Perspective`/`Link`: AD4M-style directed webs.
 //! - `citations` — `Source`/`Artefact`/`Lookup`/`Reference`: the citation triad.
 //! - `graph` — the container plus queries and mutations.
@@ -19,25 +17,27 @@ pub mod entries;
 pub mod functors;
 pub mod grammar;
 pub mod graph;
-pub mod links;
+pub mod laws;
 pub mod perspectives;
 pub mod sequences;
+pub mod substrate;
+pub mod hexadicsystems;
 pub mod systems;
 pub mod vocabularies;
 
 pub use entries::{
-    Character, Coordinate, Entry, Line, Order, Point, Point3d, Position, Segment,
+    Character, Coordinate, Entry, Line, OrderCardinality, Point, Point3d, Ordinality, Segment,
 };
 
-pub use links::{Link, LinkType};
+pub use vocabularies::{Geometry, Vocabulary, Topology};
 
-pub use vocabularies::{GeometricVocabulary, Vocabulary, TopologicalVocabulary};
-
-pub use grammar::Grammar;
+pub use grammar::Template;
 
 pub use systems::System;
 
 pub use functors::Functor;
+
+pub use laws::Law;
 
 pub use sequences::Sequence;
 

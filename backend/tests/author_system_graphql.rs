@@ -18,10 +18,10 @@ async fn author_triad_from_values() {
         mutation {
             authorSystem(input: {
                 name: "My Triad",
-                order: 3,
+                orderCardinality: 3,
                 terms: ["Alpha", "Beta", "Gamma"],
                 connectives: ["e1", "e2", "e3"]
-            }) { id name order }
+            }) { id name orderCardinality }
         }
     "#;
     let resp = schema.execute(m).await;
@@ -42,7 +42,7 @@ async fn author_triad_from_values() {
 #[tokio::test]
 async fn author_rejects_wrong_arity() {
     let schema = make_schema();
-    let m = r#"mutation { authorSystem(input: { name: "Bad", order: 3, terms: ["a","b"], connectives: ["e1","e2","e3"] }) { id } }"#;
+    let m = r#"mutation { authorSystem(input: { name: "Bad", orderCardinality: 3, terms: ["a","b"], connectives: ["e1","e2","e3"] }) { id } }"#;
     let resp = schema.execute(m).await;
     assert!(!resp.errors.is_empty(), "wrong term count must error");
 }

@@ -16,19 +16,19 @@
       "value": "Lookup"
     },
     {
-      "id": "char_word_citation_act_1_needs_research",
+      "id": "char_word_sort",
       "kind": "word",
-      "value": "Citation Act 1 Needs Research"
+      "value": "Sort"
     },
     {
-      "id": "char_word_citation_act_2_needs_research",
+      "id": "char_word_search",
       "kind": "word",
-      "value": "Citation Act 2 Needs Research"
+      "value": "Search"
     },
     {
-      "id": "char_word_citation_act_3_needs_research",
+      "id": "char_word_filter",
       "kind": "word",
-      "value": "Citation Act 3 Needs Research"
+      "value": "Filter"
     }
   ],
   "coordinates": [],
@@ -43,9 +43,9 @@
         "char_word_lookup"
       ],
       "connectives": [
-        "char_word_citation_act_1_needs_research",
-        "char_word_citation_act_2_needs_research",
-        "char_word_citation_act_3_needs_research"
+        "char_word_sort",
+        "char_word_search",
+        "char_word_filter"
       ]
     }
   ],
@@ -65,5 +65,7 @@
   "sources": [],
   "artefacts": [],
   "lookups": [],
-  "references": []
+  "references": [],
+  "functors": [],
+  "sequences": []
 }

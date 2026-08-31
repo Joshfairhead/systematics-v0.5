@@ -21,18 +21,18 @@ fn make_schema() -> systematics_backend::SystematicsSchema {
 async fn functor_create_validate_apply() {
     let schema = make_schema();
 
-    // A valid S_3 permutation between two existing order-3 systems: 1→2, 2→3,
+    // A valid S_3 permutation between two existing order_cardinality-3 systems: 1→2, 2→3,
     // 3→1, from the canonical triad to the citation triad.
     let create = r#"
         mutation {
             createFunctor(input: {
                 id: "functor_rot3",
                 name: "Rotate triad",
-                order: 3,
+                orderCardinality: 3,
                 sourceRef: "system_canonical_triad_3",
                 targetRef: "system_citation_3",
                 permutation: [2, 3, 1]
-            }) { id order sourceRef targetRef permutation }
+            }) { id orderCardinality sourceRef targetRef permutation }
         }
     "#;
     let resp = schema.execute(create).await;
@@ -41,7 +41,7 @@ async fn functor_create_validate_apply() {
     assert_eq!(data["createFunctor"]["id"], "functor_rot3");
     assert_eq!(data["createFunctor"]["permutation"], json!([2, 3, 1]));
 
-    // It validates (permutation laws hold + both systems exist at order 3).
+    // It validates (permutation laws hold + both systems exist at order_cardinality 3).
     let validate = r#"query { validateFunctor(id: "functor_rot3") }"#;
     let resp = schema.execute(validate).await;
     let data = resp.data.into_json().unwrap();
@@ -115,7 +115,7 @@ async fn non_bijection_fails_validation() {
             createFunctor(input: {
                 id: "functor_bad",
                 name: "Collapse",
-                order: 3,
+                orderCardinality: 3,
                 sourceRef: "system_canonical_triad_3",
                 targetRef: "system_citation_3",
                 permutation: [1, 1, 3]

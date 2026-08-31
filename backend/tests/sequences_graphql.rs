@@ -1,6 +1,6 @@
 //! End-to-end test for the Sequence surface (the `+` pole of the container
 //! triad System · Sequence · Perspective). A Sequence is an ordered list of
-//! member addresses; here we create one, read it back, and confirm order is
+//! member addresses; here we create one, read it back, and confirm order_cardinality is
 //! preserved and delete works.
 
 use std::sync::Arc;
@@ -18,7 +18,7 @@ async fn create_read_delete_sequence() {
     let schema = make_schema();
 
     // Create — members reference the pentad plus two canonical placeholders,
-    // in order (an "Architecture Run"-shaped sequence).
+    // in order_cardinality (an "Architecture Run"-shaped sequence).
     let create = r#"
         mutation {
             createSequence(input: {
@@ -38,7 +38,7 @@ async fn create_read_delete_sequence() {
     assert_eq!(data["createSequence"]["id"], "sequence_test_run");
     let members = data["createSequence"]["members"].as_array().unwrap();
     assert_eq!(members.len(), 3);
-    // Order preserved.
+    // OrderCardinality preserved.
     assert_eq!(members[2], "system:system_architecture_pentad_5");
 
     // Read back via the list + single queries.

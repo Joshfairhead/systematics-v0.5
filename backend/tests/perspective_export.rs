@@ -28,7 +28,7 @@ fn bundled_module_reexports_its_own_systems() {
 
     // DU1 now owns a single system — its **Coherence Dodecad** (the 12 categories)
     // — and references the canonical systems by address (it was re-declared onto
-    // canonical, dropping its 12 empty per-order shells). The one owned system must
+    // canonical, dropping its 12 empty per-order_cardinality shells). The one owned system must
     // still survive re-export (the bundled/canonical split guarantee).
     assert_eq!(
         exported.systems.len(),

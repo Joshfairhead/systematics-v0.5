@@ -47,13 +47,13 @@ pub fn system_editor(props: &SystemEditorProps) -> Html {
         html! { <input class="ed-input" value={ val } oninput={ oninput } /> }
     };
 
-    let order = sys.order;
+    let order_cardinality = sys.order_cardinality;
     let on_save = {
         let (on_author, name, terms, conns) = (props.on_author.clone(), name.clone(), terms.clone(), conns.clone());
         Callback::from(move |_: MouseEvent| {
             on_author.emit(AuthorRequest {
                 name: (*name).clone(),
-                order,
+                order_cardinality,
                 terms: (*terms).clone(),
                 connectives: (*conns).clone(),
             });
@@ -67,7 +67,7 @@ pub fn system_editor(props: &SystemEditorProps) -> Html {
         <div class="editor-form system-editor">
             <div class="editor-row">
                 <input class="ed-input ed-name" placeholder="System name" value={ (*name).clone() } oninput={ on_name } />
-                <span class="ed-label">{ format!("order {order}") }</span>
+                <span class="ed-label">{ format!("order_cardinality {order_cardinality}") }</span>
                 <button class="elt-btn" disabled={ !can_save } onclick={ on_save }>{ "Save as system" }</button>
             </div>
             <div class="editor-fields">

@@ -39,7 +39,7 @@ async fn create_theology_triad_end_to_end() {
         mutation {
             createVocabulary(input: {
                 name: "Theology Triad",
-                order: 3,
+                orderCardinality: 3,
                 terms: [
                     "char_word_immanent",
                     "char_word_omniscient",
@@ -50,7 +50,7 @@ async fn create_theology_triad_end_to_end() {
                     "char_word_decision",
                     "char_word_consent"
                 ]
-            }) { id name order terms connectives validationErrors }
+            }) { id name orderCardinality terms connectives validationErrors }
         }
     "#;
     let resp = schema.execute(create_sv).await;
@@ -69,7 +69,7 @@ async fn create_theology_triad_end_to_end() {
         mutation Create($sv: String!) {
             createSystem(input: {
                 name: "Theology Triad",
-                order: 3,
+                orderCardinality: 3,
                 coherence: "Trinity",
                 termDesignation: "Persons",
                 connectiveDesignation: "Perichoresis",

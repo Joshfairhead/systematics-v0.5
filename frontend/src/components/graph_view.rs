@@ -114,7 +114,7 @@ impl Component for ApiGraphView {
                         class={ classes!("designation", "designation-term", term_tip.is_some().then_some("cited")) }
                         title={ term_tip.clone() }
                     >
-                        { format!("{} {}", system.order, system.term_designation) }
+                        { format!("{} {}", system.order_cardinality, system.term_designation) }
                     </span>
                     <span
                         class={ classes!("designation", "designation-connective", conn_tip.is_some().then_some("cited")) }
@@ -183,8 +183,8 @@ impl ApiGraphView {
             .iter()
             .map(|line| {
                 // Positions come directly (1-based).
-                let base_pos = line.base_position;
-                let target_pos = line.target_position;
+                let base_pos = line.base_ordinality;
+                let target_pos = line.target_ordinality;
 
                 web_sys::console::log_1(
                     &format!(
@@ -294,12 +294,12 @@ impl ApiGraphView {
         );
 
         system.lines.iter().enumerate().map(|(line_idx, line)| {
-            let line_base_pos = line.base_position;
-            let line_target_pos = line.target_position;
+            let line_base_pos = line.base_ordinality;
+            let line_target_pos = line.target_ordinality;
 
             let matching_connective = system.connectives.iter().enumerate().find(|(_, conn)| {
-                let conn_base = conn.base_position;
-                let conn_target = conn.target_position;
+                let conn_base = conn.base_ordinality;
+                let conn_target = conn.target_ordinality;
                 (conn_base == line_base_pos && conn_target == line_target_pos) ||
                 (conn_base == line_target_pos && conn_target == line_base_pos)
             });
@@ -317,7 +317,7 @@ impl ApiGraphView {
                     c.connectives
                         .iter()
                         .find(|k| {
-                            (k.base_position.min(k.target_position), k.base_position.max(k.target_position))
+                            (k.base_ordinality.min(k.target_ordinality), k.base_ordinality.max(k.target_ordinality))
                                 == (ep1, ep2)
                         })
                         .map(|k| k.character_value.clone())
@@ -420,8 +420,8 @@ impl ApiGraphView {
     /// Render nodes from coordinates and terms
     fn render_nodes(&self, ctx: &Context<Self>, system: &RenderedSystem) -> Html {
         system.coordinates.iter().map(|coord| {
-            let position = coord.position;
-            let idx = (position - 1) as usize;  // Convert 1-based position to 0-based index
+            let ordinality = coord.ordinality;
+            let idx = (ordinality - 1) as usize;  // Convert 1-based ordinality to 0-based index
 
             let is_selected = self.selected_node == Some(idx);
 
@@ -429,7 +429,7 @@ impl ApiGraphView {
             let fill = if is_selected {
                 SELECTED_NODE_COLOR.to_string()
             } else {
-                system.colour_at(position)
+                system.colour_at(ordinality)
                     .map(|s| s.to_string())
                     .unwrap_or_else(|| DEFAULT_NODE_COLOR.to_string())
             };
@@ -437,22 +437,22 @@ impl ApiGraphView {
             let radius = if is_selected { 18.0 } else { 12.0 };
             let onclick = ctx.link().callback(move |_| ApiGraphMsg::NodeClicked(idx));
 
-            // Get term label for this position (canonical class when overridden).
+            // Get term label for this ordinality (canonical class when overridden).
             let class_term = if ctx.props().show_canonical {
                 system
                     .canonical_class
                     .as_deref()
-                    .and_then(|c| c.term_at(position))
+                    .and_then(|c| c.term_at(ordinality))
                     .map(|s| s.to_string())
             } else {
                 None
             };
             let term: &str = class_term
                 .as_deref()
-                .unwrap_or_else(|| system.term_at(position).unwrap_or(""));
+                .unwrap_or_else(|| system.term_at(ordinality).unwrap_or(""));
 
             // Citations for this term → native hover tooltip on the node.
-            let address = format!("system:{}#term:{}", system.system_id, position);
+            let address = format!("system:{}#term:{}", system.system_id, ordinality);
             let node_refs: Vec<&ReferenceView> = ctx
                 .props()
                 .references
@@ -497,10 +497,10 @@ impl ApiGraphView {
                         fill="white"
                         stroke="black"
                         stroke-width="1"
-                        paint-order="stroke"
+                        paint-order_cardinality="stroke"
                         style="font-size: 12px; font-weight: bold; pointer-events: none; user-select: none;"
                     >
-                        { position }
+                        { ordinality }
                     </text>
                     // Render vocabulary label if available
                     if !term.is_empty() {

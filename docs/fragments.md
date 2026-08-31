@@ -3,7 +3,7 @@
 Fragments are loose low-order systems: triads (faces), dyads, tetrads whose place
 in a larger whole is not yet fixed. We **track** them here (and as members of a
 Monad) and **fold them in** once their place is known — the raw material of
-self-construction. See `architecture-systems.md` → *Self-documentation →
+self-construction. See `design-intent.md` → *Self-documentation →
 self-construction*.
 
 Status of everything below: **[authored — to seed]** — captured faithfully in

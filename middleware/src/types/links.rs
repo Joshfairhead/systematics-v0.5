@@ -19,5 +19,6 @@ pub struct Link {
     pub target_id: String,
     #[serde(rename = "linkType")]
     pub link_type: LinkType,
-    pub order: Option<i32>,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: Option<i32>,
 }

@@ -1,0 +1,150 @@
+# Language guide
+
+The canonical terminology for this codebase. The words here are not arbitrary labels —
+they are **systematic**, and much of this language *already lives in the graph* as
+seeded systems (the library is the living source; this guide mirrors it and records the
+pending renames). When code and this guide disagree, the guide is the target: the code
+is being refactored toward it (`position → ordinality`, etc.).
+
+Convention below: **+** affirming · **−** receptive · **=** reconciling.
+
+---
+
+## 1. Counting & placement (the core dyads → a tetrad)
+
+- **Cardinality = count.** **Ordinality = placement.** (The reconciling concept is
+  *number* — one value read two ways.)
+- These cross with the **Order / Degree** dyad (vertex-side / edge-side) to give a
+  **tetrad** (`Cardinality ++ · Ordinality −− · Order −+ · Degree +−`):
+
+| term | meaning | current code name |
+|---|---|---|
+| **order-cardinality** | number of vertices `n` | `order` |
+| **order-ordinality** | a vertex's placement `1..n` | `position` |
+| **degree-cardinality** | number of connectives `C(n,2)` (graph "size") | `expected_connectives` / `size` |
+| **degree-ordinality** | a connective's placement | read off adjacency/incidence/line |
+
+**Rename map (in progress):**
+- `position → ordinality` (a node/edge's placement).
+- **`order` should not stand alone** — it means **order-cardinality**: the cardinality of
+  *nodes* in a graph (K₃ has order-cardinality 3). Rename the field `order → order_cardinality`.
+
+---
+
+## 2. The systems, by order (the vocabulary)
+
+The twelve **systems** (by order-cardinality 1–12): **Monad · Dyad · Triad · Tetrad ·
+Pentad · Hexad · Heptad · Octad · Ennead · Decad · Undecad · Dodecad**.
+
+Each **system** has a **hexadic-systematics** set of rows that determine its *shape*
+(`core::hexadicsystems`) — six mutually-determining facets:
+
+`{ name · coherence · term-designation · connective-designation · term-characters ·
+connective-characters }`
+
+e.g. `hexad(3) = {Triad, Dynamism, Impulses, Acts, 3, 3}` — each facet is the *one
+determined value* for that system (name = Triad, coherence = Dynamism, …), and the two
+`3`s are the **character sets**: term-characters = 3 = {Will, Function, Being};
+connective-characters = 3 = {Generation, Decision, Consent}. These facets are themselves
+seeded as **dodecad** systems (Coherence Attributes, Term/Connective Designations),
+composed from the single source.
+
+- **Term** = a node's character (a word). **Connective** = an edge's character.
+- **Coherence** = the quality that makes an order-n system one whole (e.g. Triad =
+  Dynamism, Hexad = Coalescence).
+
+---
+
+## 3. The architecture (a tetrad)
+
+The app *is* a systematic tetrad:
+
+| face | polarity | role |
+|---|---|---|
+| **Controller** | ++ | the assembly mechanism / grammar-gate — **composes** |
+| **Substrate** | −− | the data source (ground): elements + links, vocabulary anchored to topology |
+| **Model** | +− or −+ | left projection |
+| **View** | −+ or +− | right projection |
+
+(Which of Model/View is `+−` vs `−+` is open.) Maps onto the base-space tetrad:
+**Template(++) ↔ Controller · Topology(−−) ↔ Substrate · Geometry(+−)/Vocabulary(−+) ↔
+Model/View**.
+
+**MVC triad connectives** (the edges, LOCKED): **compose** (View–Model) · **resolve**
+(Model–Controller) · **render** (Controller–View). Directed 3-cycle
+`View →compose→ Model →resolve→ Controller →render→ View`. The serving path is the
+`321`/Freedom reading — "Controller resolves the Model, which composes the View."
+
+The **tetrad's** four-way links (how Substrate relates to Model · View · Controller) are
+**still to be worked out** — and the six laws of three apply here too.
+
+---
+
+## 4. The graph triad (the matrices)
+
+The three matrices, as **nodes**, grounded in the incidence matrix `B`:
+
+| matrix | polarity | domain | relation |
+|---|---|---|---|
+| **Adjacency** `A` | − | Topology (vertex↔vertex) | `A = B·Bᵀ` |
+| **Line** `L` | + | Semantics (edge↔edge) | `L = Bᵀ·B` |
+| **Incidence** `B` | = | Reconciler (vertex↔edge) | the generator/bridge |
+
+**Edges = category-theory axioms:** **identity** (Adjacency–Line, duals/orbital) ·
+**composition** (Adjacency–Incidence, `A=BBᵀ`) · **associativity** (Line–Incidence,
+`A·B=B·L`). Seeded as the **Graph Construction** system.
+
+---
+
+## 5. The six laws of three (`S₃`)
+
+The 3 impulses of a triad read in `3! = 6` orders. Each law = a permutation; the six
+are the Controller's traversals.
+
+| law | perm |
+|---|---|
+| Expansion | 123 |
+| Identity | 231 |
+| Order | 312 |
+| Interaction (SPO) | 132 |
+| Concentration | 213 |
+| Freedom | 321 |
+
+Half the readings run a triad's directed 3-cycle one way (natural sentences), half the
+other (the inverse morphisms). Tooling: the `triad-six-laws` skill. *(A hexad layout with
+colours for the laws exists but is a separate, unsettled inquiry.)*
+
+---
+
+## 6. Morphisms
+
+A morphism (an edge of a system) is **bidirectional** — an **isomorphism**. In the
+substrate, a system is **composed** by bundling morphisms and applying them through the
+**grammar gate** (the matrices decide which morphisms are legal).
+
+---
+
+## 7. Substrate terms (Holochain-flavoured)
+
+- **Element** — a raw, content-addressed data node (the value *is* the identity; no
+  separate reference ids — content-addressing supersedes them).
+- **Link** — a relationship between elements (`base–type–target`). Relationships live in
+  links, **never** as fields on an element.
+- **Anchor** — an orthogonal link from a topology element to its data (vertex → term).
+- **Within-system relationships use the domain's own word:** **connective** (systematics),
+  **line** (geometry), **edge** (topology) — the right domain language for the right
+  domain. (Not a generic "lateral".)
+
+---
+
+## Notes
+- JSON (`data/*.json`) is a **legacy loading device** — ad hoc temp storage. The target
+  is vocabulary anchored to topology in the substrate (Holochain / vector DB), with JSON
+  as export only.
+- This guide is a companion to the **in-graph** representation (the Architecture Pentad /
+  the seeded systems). Prefer noting new language *into the library* (as systems +
+  connectives) — this doc mirrors that.
+- **Dogfooding — use the system to articulate the system.** The language should update from
+  the in-graph systems (the library is authoritative; this guide follows). This needs a
+  dedicated **"build the system / library" section** — a place to construct and edit the
+  app's *own* language systems — kept in sync with this guide.

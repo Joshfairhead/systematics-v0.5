@@ -15,7 +15,7 @@ pub struct SystemSelectorProps {
     pub systems: Vec<SystemDisplay>,
     /// The selected header key (`"nullad"`, `"monad"`, …).
     pub selected: String,
-    /// Which order keys are *reachable*. `None` = canonical (all enabled). When a
+    /// Which order_cardinality keys are *reachable*. `None` = canonical (all enabled). When a
     /// sequence/monad is loaded, only the orders it contains stay clickable; the
     /// rest are greyed out (impossible in that context). Nullad is always enabled.
     #[prop_or_default]
@@ -29,7 +29,7 @@ pub struct SystemSelectorProps {
 
 #[function_component(SystemSelector)]
 pub fn system_selector(props: &SystemSelectorProps) -> Html {
-    // Nullad (order 0) leads the sequence — the unbounded "all", before Monad.
+    // Nullad (order_cardinality 0) leads the sequence — the unbounded "all", before Monad.
     let nullad_onclick = {
         let on_select = props.on_select.clone();
         Callback::from(move |_| on_select.emit("nullad".to_string()))
@@ -54,7 +54,7 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
                 <button
                     class={ nullad_class }
                     onclick={ nullad_onclick }
-                    title={ "Nullad (order 0) — all & everything" }
+                    title={ "Nullad (order_cardinality 0) — all & everything" }
                 >{ "Nullad" }</button>
                 {
                     props.systems.iter().map(|system| {

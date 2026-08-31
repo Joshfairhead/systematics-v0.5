@@ -1,9 +1,9 @@
-//! Functor: a same-grammar morphism between two Systems of one Order.
+//! Functor: a same-grammar morphism between two Systems of one OrderCardinality.
 //!
-//! For a fixed Order `n` the complete graph `K_n` has exactly the symmetric
+//! For a fixed OrderCardinality `n` the complete graph `K_n` has exactly the symmetric
 //! group `S_n` as its automorphisms — in `K_n` every pair of vertices is
 //! adjacent, so *any* permutation of the vertices preserves adjacency. A
-//! same-grammar Functor is therefore stored as a single *position permutation*
+//! same-grammar Functor is therefore stored as a single *ordinality permutation*
 //! (the object map on terms); the morphism map on connectives is **derived**: a
 //! connective between source positions `p,q` maps to the connective between
 //! `f(p),f(q)`. Structure preservation (the functor square
@@ -11,27 +11,28 @@
 //! map is never stored, only computed, and cannot disagree with the object map.
 //!
 //! This is deliberately the honest, minimal case. Cross-grammar functors
-//! (order-changing, e.g. dyad → triad — Bennett's "qualitative Fourier
-//! transform") are non-order-preserving and are deferred; they are *not*
+//! (order_cardinality-changing, e.g. dyad → triad — Bennett's "qualitative Fourier
+//! transform") are non-order_cardinality-preserving and are deferred; they are *not*
 //! expressible as an `S_n` permutation and must not be forced into this type.
 
 use serde::{Deserialize, Serialize};
 
-/// A same-grammar morphism between two Systems of equal Order, stored as an
+/// A same-grammar morphism between two Systems of equal OrderCardinality, stored as an
 /// `S_order` permutation of term positions.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Functor {
     pub id: String,
     pub name: String,
-    /// The shared Order of the source and target systems.
-    pub order: u8,
+    /// The shared OrderCardinality of the source and target systems.
+    #[serde(rename = "order")]
+    pub order_cardinality: u8,
     /// Source System id (the object in the domain).
     pub source_ref: String,
     /// Target System id (the object in the codomain).
     pub target_ref: String,
     /// The object map as a permutation in `S_order`: `permutation[i]` is the
-    /// 1-based target position that source position `i + 1` maps to. To be a
-    /// functor it must have length `order` and be a bijection of `1..=order`.
+    /// 1-based target ordinality that source ordinality `i + 1` maps to. To be a
+    /// functor it must have length `order_cardinality` and be a bijection of `1..=order_cardinality`.
     pub permutation: Vec<u8>,
 }
 
@@ -39,7 +40,7 @@ impl Functor {
     pub fn new(
         id: impl Into<String>,
         name: impl Into<String>,
-        order: u8,
+        order_cardinality: u8,
         source_ref: impl Into<String>,
         target_ref: impl Into<String>,
         permutation: Vec<u8>,
@@ -47,49 +48,49 @@ impl Functor {
         Self {
             id: id.into(),
             name: name.into(),
-            order,
+            order_cardinality,
             source_ref: source_ref.into(),
             target_ref: target_ref.into(),
             permutation,
         }
     }
 
-    /// The identity endomorphism on a System of `order` (position `i` ↦ `i`).
+    /// The identity endomorphism on a System of `order_cardinality` (ordinality `i` ↦ `i`).
     pub fn identity(
         id: impl Into<String>,
         name: impl Into<String>,
-        order: u8,
+        order_cardinality: u8,
         system_ref: impl Into<String>,
     ) -> Self {
         let system_ref = system_ref.into();
-        Self::new(id, name, order, system_ref.clone(), system_ref, (1..=order).collect())
+        Self::new(id, name, order_cardinality, system_ref.clone(), system_ref, (1..=order_cardinality).collect())
     }
 
-    /// Map a source position (1-based) to its target position, if in range.
-    pub fn map_position(&self, position: u8) -> Option<u8> {
-        if position == 0 {
+    /// Map a source ordinality (1-based) to its target ordinality, if in range.
+    pub fn map_position(&self, ordinality: u8) -> Option<u8> {
+        if ordinality == 0 {
             return None;
         }
-        self.permutation.get((position - 1) as usize).copied()
+        self.permutation.get((ordinality - 1) as usize).copied()
     }
 
-    /// Validate the functor laws (advisory — mirrors `System`/`Grammar`
+    /// Validate the functor laws (advisory — mirrors `System`/`Template`
     /// validation; nothing is rejected at write time):
-    ///  * totality — one target per source position (`permutation.len() == order`),
+    ///  * totality — one target per source ordinality (`permutation.len() == order_cardinality`),
     ///  * sort/type preservation and invertibility — the permutation is a
-    ///    bijection of `1..=order` (each target position hit exactly once).
+    ///    bijection of `1..=order_cardinality` (each target ordinality hit exactly once).
     ///
     /// A construct that fails these is a mere relabelling *table*, not a functor.
     pub fn validate(&self) -> Result<(), Vec<String>> {
         let mut errs = Vec::new();
-        let n = self.order as usize;
+        let n = self.order_cardinality as usize;
 
-        if self.order == 0 {
-            errs.push(format!("Functor {}: order must be >= 1", self.id));
+        if self.order_cardinality == 0 {
+            errs.push(format!("Functor {}: order_cardinality must be >= 1", self.id));
         }
         if self.permutation.len() != n {
             errs.push(format!(
-                "Functor {}: permutation has {} entries, expected {} (one per source position — not total)",
+                "Functor {}: permutation has {} entries, expected {} (one per source ordinality — not total)",
                 self.id,
                 self.permutation.len(),
                 n
@@ -100,12 +101,12 @@ impl Functor {
         for &p in &self.permutation {
             if p < 1 || p as usize > n {
                 errs.push(format!(
-                    "Functor {}: target position {} out of range 1..={}",
-                    self.id, p, self.order
+                    "Functor {}: target ordinality {} out of range 1..={}",
+                    self.id, p, self.order_cardinality
                 ));
             } else if seen[(p - 1) as usize] {
                 errs.push(format!(
-                    "Functor {}: target position {} mapped more than once (not a bijection)",
+                    "Functor {}: target ordinality {} mapped more than once (not a bijection)",
                     self.id, p
                 ));
             } else {
@@ -131,7 +132,7 @@ impl Functor {
     ///  * `system:src#coherence` (etc.) → `system:tgt#coherence` (system-level
     ///    fragment retargeted, unchanged)
     ///
-    /// An address whose position is out of range or unparseable is passed
+    /// An address whose ordinality is out of range or unparseable is passed
     /// through unchanged rather than corrupted.
     pub fn map_address(&self, address: &str) -> String {
         let Some(rest) = address.strip_prefix("system:") else {
@@ -174,7 +175,7 @@ impl Functor {
     }
 
     /// Compose two functors: `self.then(g)` applies `self` first, then `g`
-    /// (`g ∘ self` on positions). Requires equal order and `self.target_ref ==
+    /// (`g ∘ self` on positions). Requires equal order_cardinality and `self.target_ref ==
     /// g.source_ref`; the result maps `self.source_ref → g.target_ref`. Returns
     /// `None` when the categories don't line up (non-composable).
     pub fn then(
@@ -183,7 +184,7 @@ impl Functor {
         id: impl Into<String>,
         name: impl Into<String>,
     ) -> Option<Functor> {
-        if self.order != g.order || self.target_ref != g.source_ref {
+        if self.order_cardinality != g.order_cardinality || self.target_ref != g.source_ref {
             return None;
         }
         let permutation = self
@@ -194,7 +195,7 @@ impl Functor {
         Some(Functor::new(
             id,
             name,
-            self.order,
+            self.order_cardinality,
             self.source_ref.clone(),
             g.target_ref.clone(),
             permutation,
@@ -254,7 +255,7 @@ mod tests {
         // conn between positions 2,3 -> f(2)=3, f(3)=1 -> canonical min-max = 1-3.
         let f = rotate_triad();
         assert_eq!(f.map_address("system:system_a_3#conn:2-3"), "system:system_b_3#conn:1-3");
-        // and it agrees regardless of input endpoint order (structure preservation).
+        // and it agrees regardless of input endpoint order_cardinality (structure preservation).
         assert_eq!(f.map_address("system:system_a_3#conn:3-2"), "system:system_b_3#conn:1-3");
     }
 
@@ -280,9 +281,9 @@ mod tests {
         let comp = sigma.then(&tau, "comp", "sigma;tau").expect("composable");
         assert_eq!(comp.source_ref, "system_a_3");
         assert_eq!(comp.target_ref, "system_c_3");
-        // position 1: σ(1)=2, τ(2)=1  => 1
-        // position 2: σ(2)=3, τ(3)=3  => 3
-        // position 3: σ(3)=1, τ(1)=2  => 2
+        // ordinality 1: σ(1)=2, τ(2)=1  => 1
+        // ordinality 2: σ(2)=3, τ(3)=3  => 3
+        // ordinality 3: σ(3)=1, τ(1)=2  => 2
         assert_eq!(comp.permutation, vec![1, 3, 2]);
         assert!(comp.validate().is_ok());
         // and applying the composite equals applying σ then τ.

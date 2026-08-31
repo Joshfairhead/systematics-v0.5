@@ -103,12 +103,13 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 21 fragments + 6 module-owned
-    // (DU1 → 1 Dodecad, DU2 → 0: module systems now 3).
+    // Total systems = 12 canonical + 1 citation + 39 fragments + 3 module-owned = 55.
+    // Fragments grew 35 → 39 (2026-08-27): the Ouspensky Emotion tetrad + the AI-agent
+    // harness cluster (Harness Engineering, Harness Loop, Agent).
     assert_eq!(
         graph.systems.len(),
-        45,
-        "expected 12 canonical + 1 citation + 29 fragment + 3 module systems"
+        55,
+        "expected 12 canonical + 1 citation + 39 fragment + 3 module systems"
     );
 }
 
@@ -152,7 +153,7 @@ fn architectural_monad_registry_loads() {
         .sequence("sequence_architectural_monad")
         .expect("Architectural Monad registry loaded from its module");
     // A **bucket**: the architecture systems grouped for sorting (several triads,
-    // so it is not an order-linear sequence). Order does not matter here.
+    // so it is not an order_cardinality-linear sequence). OrderCardinality does not matter here.
     assert_eq!(
         monad.members,
         vec![
