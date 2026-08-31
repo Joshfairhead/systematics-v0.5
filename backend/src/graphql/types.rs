@@ -369,6 +369,50 @@ impl QueryRoot {
         crate::core::hexadicsystems::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
     }
 
+    /// **Compose a system PURELY from the substrate** — the prototype. Ingest the graph's
+    /// characters + each system's structure into a content-addressed store, then compose
+    /// the requested system from the store *alone* (no graph at compose time): its
+    /// cardinality, `term@n`/`connective@{a}-{b}` links, and value elements. Shows the
+    /// terms/connectives the Controller builds from the substrate data source.
+    async fn substrate_compose(
+        &self,
+        ctx: &Context<'_>,
+        system_id: String,
+    ) -> Option<GqlSubstrateSystem> {
+        use crate::core::grammar::Template;
+        use crate::core::substrate::{compose_from_store_by_system, ingest_from_graph};
+        let g = graph_snapshot(ctx).await;
+        let store = ingest_from_graph(&g);
+        let hg = compose_from_store_by_system(&store, &format!("system:{}", system_id))?;
+        let n = hg.topology.cardinality;
+        let terms: Vec<String> = (1..=n)
+            .filter_map(|i| {
+                hg.data
+                    .iter()
+                    .find(|d| d.id == format!("term_{n}_{i}"))
+                    .map(|d| d.character.clone())
+            })
+            .collect();
+        let connectives: Vec<GqlSubstrateConnective> = Template::for_order(n)
+            .edges()
+            .into_iter()
+            .filter_map(|(a, b)| {
+                hg.data
+                    .iter()
+                    .find(|d| d.id == format!("conn_{n}_{a}_{b}"))
+                    .map(|d| GqlSubstrateConnective {
+                        edge: format!("{a}-{b}"),
+                        value: d.character.clone(),
+                    })
+            })
+            .collect();
+        Some(GqlSubstrateSystem {
+            cardinality: n as i32,
+            terms,
+            connectives,
+        })
+    }
+
     // -------- Sequences (ordered series of member addresses) --------
 
     async fn sequence(&self, ctx: &Context<'_>, id: String) -> Option<GqlSequence> {
@@ -2310,4 +2354,20 @@ impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad
             connective_cardinality: h.connective_cardinality as i32,
         }
     }
+}
+
+/// A system composed **purely from the substrate store** (via `substrateCompose`) — its
+/// terms in ordinality order and connectives on their edges, built by the Controller
+/// from content-addressed elements + `term@`/`connective@` links (no JSON at compose time).
+#[derive(SimpleObject)]
+pub struct GqlSubstrateSystem {
+    pub cardinality: i32,
+    pub terms: Vec<String>,
+    pub connectives: Vec<GqlSubstrateConnective>,
+}
+
+#[derive(SimpleObject)]
+pub struct GqlSubstrateConnective {
+    pub edge: String,
+    pub value: String,
 }
