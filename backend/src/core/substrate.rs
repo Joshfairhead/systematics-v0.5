@@ -32,6 +32,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::grammar::Template;
+use super::graph::Graph;
 
 /// A vertex of the topology — a Holochain-style **element** (a function-monad:
 /// container + actions). Bare: it holds only its topological anchor `(cardinality,
@@ -659,6 +660,47 @@ pub fn compose_from_store(
             .collect()
     };
     compose_system(cardinality, &resolve(term_ids), &resolve(connective_ids))
+}
+
+/// **The ingest bridge** — walk a loaded `Graph`'s characters into the store as raw,
+/// **content-addressed** elements (id = `"{kind}:{value}"`, deduped by content — so a
+/// word shared across systems is one element). This is the JSON→store bridge: once
+/// ingested, systems compose **from the store** (`compose_system_from_store`), not from
+/// the JSON. JSON becomes import/export only (the legacy device).
+pub fn ingest_from_graph(graph: &Graph) -> SubstrateStore {
+    let mut store = SubstrateStore::default();
+    for c in graph.characters(None) {
+        store.ingest(&c.kind, &c.value);
+    }
+    store
+}
+
+/// **Compose a seeded system from the store** — the substrate-as-data-source path for a
+/// real system. Its *structure* (the ordered term/connective character refs) comes from
+/// the graph's vocabulary; each ref is resolved to a **store content-id**, and the system
+/// is composed from the stored elements. The term/connective *values* come from the
+/// substrate, not the JSON — the Controller composing the Model from the data source.
+pub fn compose_system_from_store(
+    graph: &Graph,
+    store: &SubstrateStore,
+    system_id: &str,
+) -> Option<Hypergraph> {
+    let system = graph.system(system_id)?;
+    let vocab = graph.vocabulary(&system.vocabulary_ref)?;
+    let content_ids = |refs: &[String]| -> Vec<String> {
+        refs.iter()
+            .filter_map(|r| {
+                let c = graph.character(r)?;
+                Some(SubstrateStore::content_id(&c.kind, &c.value))
+            })
+            .collect()
+    };
+    Some(compose_from_store(
+        store,
+        system.order_cardinality,
+        &content_ids(&vocab.terms),
+        &content_ids(&vocab.connectives),
+    ))
 }
 
 #[cfg(test)]
