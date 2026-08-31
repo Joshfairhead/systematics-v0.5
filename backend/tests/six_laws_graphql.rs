@@ -1,6 +1,6 @@
 //! End-to-end test for the Controller surface: `runSixLaws` runs a seeded system
 //! through the six laws of three (mimic form — each law reorders a triad). Also
-//! exercises `positions` — interpreting a selection of nodes from a higher-order
+//! exercises `positions` — interpreting a selection of nodes from a higher-order_cardinality
 //! system as a triad (the "semantic maths over any graph" move, e.g. an octad).
 
 use std::sync::Arc;
@@ -29,7 +29,7 @@ async fn run_six_laws_over_canonical_triad() {
     assert_eq!(rows.len(), 6, "one reading per law");
 
     let find = |name: &str| rows.iter().find(|r| r["law"] == name).unwrap().clone();
-    let expansion = find("expansion"); // 123 — the base order
+    let expansion = find("expansion"); // 123 — the base order_cardinality
     let interaction = find("interaction"); // 132 — SPO
 
     // interaction is the SPO law: purple, hexad ordinality 5, alias SPO.
@@ -49,7 +49,7 @@ async fn run_six_laws_over_canonical_triad() {
 #[tokio::test]
 async fn run_six_laws_interprets_selected_nodes_as_a_triad() {
     // The Controller operates over ANY graph: pick 3 nodes from the seeded Hexad
-    // (order 6) — positions 4, 6, 1 — and read them as a triad.
+    // (order_cardinality 6) — positions 4, 6, 1 — and read them as a triad.
     let schema = make_schema();
     let q = r#"query {
         runSixLaws(systemId: "system_six_laws_of_three_6", positions: [4, 6, 1]) {
@@ -62,7 +62,7 @@ async fn run_six_laws_interprets_selected_nodes_as_a_triad() {
     let rows = data["runSixLaws"].as_array().unwrap();
     assert_eq!(rows.len(), 6);
 
-    // positions [4,6,1] pick a triad; expansion (123) reads it in that order, and
+    // positions [4,6,1] pick a triad; expansion (123) reads it in that order_cardinality, and
     // interaction (132) reorders it to [pos4, pos1, pos6] = [base[0], base[2], base[1]].
     let expansion = rows.iter().find(|r| r["law"] == "expansion").unwrap();
     let base = expansion["reading"].as_array().unwrap();

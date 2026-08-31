@@ -1,7 +1,7 @@
 //! The substrate — Holochain-style **elements + links** (placeholders until a real
 //! Holochain backend). Each element and each link is a **function-monad**: a
 //! *container with a boundary + a set of actions* (functional composition). **NB:
-//! this is the FP monad, NOT our systematics `Monad` (the order-1 system) — do not
+//! this is the FP monad, NOT our systematics `Monad` (the order_cardinality-1 system) — do not
 //! conflate them.**
 //!
 //! **Generate, don't read (user, 2026-08-20).** Systems are *composed then stored*,
@@ -22,7 +22,7 @@
 //! **The morphism grammar (2026-08-26).** Composition is **gated by the grammar**: every
 //! `Morphism` declares its topological `site` (`Vertex` | `Edge`), and `compose_checked`
 //! admits it only where the `Template`'s matrices allow — the **adjacency matrix** gates
-//! edges and **order** gates vertices in this build path. (The **incidence** and **line
+//! edges and **order_cardinality** gates vertices in this build path. (The **incidence** and **line
 //! graph** rules — `admits_anchor` / `admits_composition` in `grammar.rs` — are the
 //! reconciler and semantic-composition primitives for the anchor & tensor-product work to
 //! come; they exist and are tested, but no morphism `site` triggers them yet.) So the
@@ -70,7 +70,7 @@ impl TopologyGraph {
     /// validation rules, so a correct topology is *enforced*, not hoped for.
     pub fn validate_against(&self, template: &Template) -> Result<(), Vec<String>> {
         let mut errs = Vec::new();
-        let n = template.order();
+        let n = template.order_cardinality();
         if self.elements.len() != n as usize {
             errs.push(format!(
                 "cardinality: {} vertices, expected {n}",
@@ -151,7 +151,7 @@ pub enum MorphismKind {
 /// The **topological site** a morphism acts on — the coordinate the *grammar* checks
 /// before the morphism may be applied. A vertex-index morphism declares `Vertex`; an
 /// edge morphism declares `Edge`. The `Template` admits or rejects the morphism by
-/// reading its matrices at this site (adjacency for edges, order for vertices), so
+/// reading its matrices at this site (adjacency for edges, order_cardinality for vertices), so
 /// legality is *read off the topology*, not hard-coded into each morphism.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MorphismSite {
@@ -499,8 +499,8 @@ pub fn generate_topology(cardinality: u8) -> TopologyGraph {
 /// (`(1,2),(1,3),…`). Topology is composed first so the semantic anchors reference
 /// existing vertex/orbit elements.
 /// The **vocabulary morphisms** — the semantic bundle: a `TermToVertex` per index +
-/// a `ConnectiveToOrbit` per edge. `terms` in index order (`1..=cardinality`);
-/// `connectives` in canonical edge order.
+/// a `ConnectiveToOrbit` per edge. `terms` in index order_cardinality (`1..=cardinality`);
+/// `connectives` in canonical edge order_cardinality.
 pub fn vocabulary_morphisms(
     cardinality: u8,
     terms: &[String],
@@ -643,7 +643,7 @@ impl SubstrateStore {
 }
 
 /// **Compose a system from the store** — the substrate-as-data-source path. Given the
-/// ordinality (order-cardinality) and the *content ids* of the term/connective elements
+/// ordinality (order_cardinality-cardinality) and the *content ids* of the term/connective elements
 /// (looked up from the store, e.g. by searching the coherence dodecad by cardinality),
 /// generate the topology and anchor the stored elements to it. No raw strings pass in —
 /// the data comes from the substrate.

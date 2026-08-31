@@ -3,7 +3,7 @@
 //! Layered ontology (from the plan):
 //!
 //! ```text
-//! Order, Ordinality           ← numeric substrate anchors
+//! OrderCardinality, Ordinality           ← numeric substrate anchors
 //! Point, Line               ← topological anchors (1-vertex and 2-vertex)
 //! Coordinate, Segment       ← geometric bindings to Point / Line
 //! Character                 ← content-only semantic value (no anchor field)
@@ -40,14 +40,14 @@ impl Point3d {
 // Numeric substrate anchors
 // =============================================================================
 
-/// Order: the system level (1-12).
+/// OrderCardinality: the system level (1-12).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Order {
+pub struct OrderCardinality {
     pub id: String,
     pub value: u8,
 }
 
-impl Order {
+impl OrderCardinality {
     pub fn new(value: u8) -> Self {
         Self {
             id: format!("order_{}", value),
@@ -55,7 +55,7 @@ impl Order {
         }
     }
 
-    /// Get the standard name for this order.
+    /// Get the standard name for this order_cardinality.
     pub fn standard_name(&self) -> Option<&'static str> {
         match self.value {
             1 => Some("Monad"),
@@ -98,22 +98,23 @@ impl Ordinality {
 /// A topological anchor at a single vertex of the K_n system.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Point {
-    pub id: String,       // "point_{order}_{ordinality}"
-    pub order: String,    // "order_{order}"
+    pub id: String,       // "point_{order_cardinality}_{ordinality}"
+    #[serde(rename = "order")]
+    pub order_cardinality: String,    // "order_{order_cardinality}"
     pub ordinality: String, // "position_{ordinality}"
 }
 
 impl Point {
-    pub fn new(order: u8, ordinality: u8) -> Self {
+    pub fn new(order_cardinality: u8, ordinality: u8) -> Self {
         Self {
-            id: format!("point_{}_{}", order, ordinality),
-            order: format!("order_{}", order),
+            id: format!("point_{}_{}", order_cardinality, ordinality),
+            order_cardinality: format!("order_{}", order_cardinality),
             ordinality: format!("position_{}", ordinality),
         }
     }
 
     pub fn order_value(&self) -> Option<u8> {
-        self.order
+        self.order_cardinality
             .strip_prefix("order_")
             .and_then(|s| s.parse().ok())
     }
@@ -131,25 +132,26 @@ impl Point {
 /// produces the same ID as `Line::new(3, 1, 2)`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Line {
-    pub id: String,                 // "line_{order}_{p1}_{p2}" with p1 < p2
-    pub order: String,              // "order_{order}"
+    pub id: String,                 // "line_{order_cardinality}_{p1}_{p2}" with p1 < p2
+    #[serde(rename = "order")]
+    pub order_cardinality: String,              // "order_{order_cardinality}"
     pub ordinality: String,           // "position_{p1}"
     pub position_secondary: String, // "position_{p2}"
 }
 
 impl Line {
-    pub fn new(order: u8, p1: u8, p2: u8) -> Self {
+    pub fn new(order_cardinality: u8, p1: u8, p2: u8) -> Self {
         let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
         Self {
-            id: format!("line_{}_{}_{}", order, lo, hi),
-            order: format!("order_{}", order),
+            id: format!("line_{}_{}_{}", order_cardinality, lo, hi),
+            order_cardinality: format!("order_{}", order_cardinality),
             ordinality: format!("position_{}", lo),
             position_secondary: format!("position_{}", hi),
         }
     }
 
     pub fn order_value(&self) -> Option<u8> {
-        self.order
+        self.order_cardinality
             .strip_prefix("order_")
             .and_then(|s| s.parse().ok())
     }
@@ -174,26 +176,26 @@ impl Line {
 /// A geometric point bound to a topological `Point`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Coordinate {
-    pub id: String,        // "coord_{order}_{ordinality}"
-    pub point_ref: String, // "point_{order}_{ordinality}"
+    pub id: String,        // "coord_{order_cardinality}_{ordinality}"
+    pub point_ref: String, // "point_{order_cardinality}_{ordinality}"
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
 impl Coordinate {
-    pub fn new(order: u8, ordinality: u8, x: f64, y: f64, z: f64) -> Self {
+    pub fn new(order_cardinality: u8, ordinality: u8, x: f64, y: f64, z: f64) -> Self {
         Self {
-            id: format!("coord_{}_{}", order, ordinality),
-            point_ref: format!("point_{}_{}", order, ordinality),
+            id: format!("coord_{}_{}", order_cardinality, ordinality),
+            point_ref: format!("point_{}_{}", order_cardinality, ordinality),
             x,
             y,
             z,
         }
     }
 
-    pub fn from_point3d(order: u8, ordinality: u8, p: Point3d) -> Self {
-        Self::new(order, ordinality, p.x, p.y, p.z)
+    pub fn from_point3d(order_cardinality: u8, ordinality: u8, p: Point3d) -> Self {
+        Self::new(order_cardinality, ordinality, p.x, p.y, p.z)
     }
 
     pub fn order_value(&self) -> Option<u8> {
@@ -215,20 +217,20 @@ impl Coordinate {
 /// Explicit type gives future rendering metadata (style, curve) a home.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Segment {
-    pub id: String,              // "seg_{order}_{p1}_{p2}"
-    pub line_ref: String,        // "line_{order}_{p1}_{p2}"
-    pub start_coord_ref: String, // "coord_{order}_{p1}"
-    pub end_coord_ref: String,   // "coord_{order}_{p2}"
+    pub id: String,              // "seg_{order_cardinality}_{p1}_{p2}"
+    pub line_ref: String,        // "line_{order_cardinality}_{p1}_{p2}"
+    pub start_coord_ref: String, // "coord_{order_cardinality}_{p1}"
+    pub end_coord_ref: String,   // "coord_{order_cardinality}_{p2}"
 }
 
 impl Segment {
-    pub fn new(order: u8, p1: u8, p2: u8) -> Self {
+    pub fn new(order_cardinality: u8, p1: u8, p2: u8) -> Self {
         let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
         Self {
-            id: format!("seg_{}_{}_{}", order, lo, hi),
-            line_ref: format!("line_{}_{}_{}", order, lo, hi),
-            start_coord_ref: format!("coord_{}_{}", order, lo),
-            end_coord_ref: format!("coord_{}_{}", order, hi),
+            id: format!("seg_{}_{}_{}", order_cardinality, lo, hi),
+            line_ref: format!("line_{}_{}_{}", order_cardinality, lo, hi),
+            start_coord_ref: format!("coord_{}_{}", order_cardinality, lo),
+            end_coord_ref: format!("coord_{}_{}", order_cardinality, hi),
         }
     }
 }
@@ -277,7 +279,8 @@ impl Character {
 /// Graph to hold all entry types in one `entries` field.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Entry {
-    Order(Order),
+    #[serde(rename = "Order")]
+    OrderCardinality(OrderCardinality),
     #[serde(rename = "Position")] // JSON tag kept stable through the position→ordinality rename
     Ordinality(Ordinality),
     Point(Point),
@@ -291,7 +294,7 @@ impl Entry {
     /// Get the ID of this entry.
     pub fn id(&self) -> &str {
         match self {
-            Entry::Order(e) => &e.id,
+            Entry::OrderCardinality(e) => &e.id,
             Entry::Ordinality(e) => &e.id,
             Entry::Point(e) => &e.id,
             Entry::Line(e) => &e.id,
@@ -301,10 +304,10 @@ impl Entry {
         }
     }
 
-    /// Get the order value of this entry (if applicable).
-    pub fn order(&self) -> Option<u8> {
+    /// Get the order_cardinality value of this entry (if applicable).
+    pub fn order_cardinality(&self) -> Option<u8> {
         match self {
-            Entry::Order(e) => Some(e.value),
+            Entry::OrderCardinality(e) => Some(e.value),
             Entry::Ordinality(_) => None,
             Entry::Point(e) => e.order_value(),
             Entry::Line(e) => e.order_value(),
@@ -325,9 +328,9 @@ impl Entry {
         }
     }
 
-    /// True if this is a numeric substrate anchor (Order or Ordinality).
+    /// True if this is a numeric substrate anchor (OrderCardinality or Ordinality).
     pub fn is_numeric_anchor(&self) -> bool {
-        matches!(self, Entry::Order(_) | Entry::Ordinality(_))
+        matches!(self, Entry::OrderCardinality(_) | Entry::Ordinality(_))
     }
 
     /// True if this is a topological anchor (Point or Line).
@@ -352,10 +355,10 @@ mod tests {
 
     #[test]
     fn test_order_creation() {
-        let order = Order::new(3);
-        assert_eq!(order.id, "order_3");
-        assert_eq!(order.value, 3);
-        assert_eq!(order.standard_name(), Some("Triad"));
+        let order_cardinality = OrderCardinality::new(3);
+        assert_eq!(order_cardinality.id, "order_3");
+        assert_eq!(order_cardinality.value, 3);
+        assert_eq!(order_cardinality.standard_name(), Some("Triad"));
     }
 
     #[test]
@@ -409,7 +412,7 @@ mod tests {
 
     #[test]
     fn test_entry_categorisation() {
-        assert!(Entry::Order(Order::new(3)).is_numeric_anchor());
+        assert!(Entry::OrderCardinality(OrderCardinality::new(3)).is_numeric_anchor());
         assert!(Entry::Point(Point::new(3, 1)).is_topological());
         assert!(Entry::Line(Line::new(3, 1, 2)).is_topological());
         assert!(Entry::Coordinate(Coordinate::new(3, 1, 0.0, 0.0, 0.0)).is_geometric());

@@ -12,7 +12,8 @@ use async_graphql::SimpleObject;
 pub struct Perspective {
     pub id: String,
     pub name: String,
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     pub coherence: String,
     #[serde(rename = "termDesignation")]
     pub term_designation: String,

@@ -35,7 +35,7 @@ pub struct PredGroup {
 #[derive(Properties, PartialEq)]
 pub struct InspectorProps {
     pub subject_name: String,
-    /// Predicate groups, already in systematics order (name · order · coherence ·
+    /// Predicate groups, already in systematics order_cardinality (name · order_cardinality · coherence ·
     /// term-designation · connective-designation · term · connective · source).
     pub groups: Vec<PredGroup>,
     pub on_close: Callback<()>,

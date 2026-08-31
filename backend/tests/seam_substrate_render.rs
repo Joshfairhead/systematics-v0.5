@@ -17,7 +17,7 @@ fn make_schema() -> systematics_backend::SystematicsSchema {
 async fn substrate_composed_triad_view_is_byte_identical() {
     let schema = make_schema();
     let q = r#"query {
-        system(order: 3) {
+        system(orderCardinality: 3) {
             terms { ordinality value }
             connectives { id baseOrdinality targetOrdinality characterValue }
         }
@@ -27,14 +27,14 @@ async fn substrate_composed_triad_view_is_byte_identical() {
     let d = resp.data.into_json().unwrap();
     let sys = &d["system"];
 
-    // Terms — composed by the substrate, in ordinality order.
+    // Terms — composed by the substrate, in ordinality orderCardinality.
     let terms = sys["terms"].as_array().unwrap();
     assert_eq!(terms.len(), 3);
     assert_eq!((terms[0]["ordinality"].as_i64().unwrap(), terms[0]["value"].as_str().unwrap()), (1, "Will"));
     assert_eq!((terms[1]["ordinality"].as_i64().unwrap(), terms[1]["value"].as_str().unwrap()), (2, "Function"));
     assert_eq!((terms[2]["ordinality"].as_i64().unwrap(), terms[2]["value"].as_str().unwrap()), (3, "Being"));
 
-    // Connectives — canonical edge order, with the legacy `line_{n}_{a}_{b}` ids the
+    // Connectives — canonical edge orderCardinality, with the legacy `line_{n}_{a}_{b}` ids the
     // frontend depends on, and the character values on the right edges.
     let conns = sys["connectives"].as_array().unwrap();
     let got: Vec<(&str, i64, i64, &str)> = conns
@@ -63,7 +63,7 @@ async fn substrate_composes_higher_orders() {
     // The substrate composes any K_n, not just the triad: the hexad has 6 terms and
     // C(6,2)=15 connectives, with canonical edge ids.
     let schema = make_schema();
-    let q = r#"query { system(order: 6) { terms { ordinality } connectives { id targetOrdinality } } }"#;
+    let q = r#"query { system(orderCardinality: 6) { terms { ordinality } connectives { id targetOrdinality } } }"#;
     let resp = schema.execute(q).await;
     assert!(resp.errors.is_empty(), "errors: {:?}", resp.errors);
     let d = resp.data.into_json().unwrap();

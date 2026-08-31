@@ -8,14 +8,14 @@
 //!
 //! Two tabs over the enriched `allReferences` data:
 //!  * **Table**: all references, sortable by column and filterable by
-//!    **button facets** (perspective / source / artefact / order) with a
+//!    **button facets** (perspective / source / artefact / order_cardinality) with a
 //!    free-text search — the provenance audit view. Each row carries its
 //!    **citation triad** (source · locator · artefact) as clickable tags.
-//!  * **Compare**: a matrix of order × perspective, each cell showing how that
-//!    perspective characterizes that order's system (its coherence value) with
+//!  * **Compare**: a matrix of order_cardinality × perspective, each cell showing how that
+//!    perspective characterizes that order_cardinality's system (its coherence value) with
 //!    the citation as a tooltip — the comparative lens.
 //!
-//! The grouping key is the target system's *order* (perspectives cite their own
+//! The grouping key is the target system's *order_cardinality* (perspectives cite their own
 //! system ids, not a shared canonical address), resolved server-side into
 //! `ReferenceView.target_system`.
 
@@ -41,8 +41,8 @@ pub struct ReferenceBrowserProps {
     pub instance_systems: Vec<InstanceSystem>,
     /// Load an instance system (by id) into the graph.
     pub on_load: Callback<String>,
-    /// The order selected in the header — filters the view to that system.
-    /// `None` = Nullad = the whole registry (no order filter).
+    /// The order_cardinality selected in the header — filters the view to that system.
+    /// `None` = Nullad = the whole registry (no order_cardinality filter).
     #[prop_or_default]
     pub filter_order: Option<i32>,
     /// Extract (Nullad → Monad): materialize the current selection as a Monad.
@@ -66,7 +66,7 @@ pub struct ReferenceBrowserProps {
     /// addresses (`system:<id>`). `None` = no scope (the whole registry).
     #[prop_or_default]
     pub scope_ids: Option<Vec<String>>,
-    /// Canonical term/connective values per order — the editor prefills from these
+    /// Canonical term/connective values per order_cardinality — the editor prefills from these
     /// ("open the canonical system, then customise").
     #[prop_or_default]
     pub templates: Vec<SystemTemplate>,
@@ -84,15 +84,15 @@ pub struct ReferenceBrowserProps {
 #[derive(Clone, PartialEq)]
 pub struct RawElement {
     pub name: String,
-    pub order: i32,
+    pub order_cardinality: i32,
     /// false = node (term), true = edge (connective).
     pub is_edge: bool,
 }
 
-/// The canonical term/connective values for one order — an editor prefill source.
+/// The canonical term/connective values for one order_cardinality — an editor prefill source.
 #[derive(Clone, PartialEq)]
 pub struct SystemTemplate {
-    pub order: i32,
+    pub order_cardinality: i32,
     pub terms: Vec<String>,
     pub connectives: Vec<String>,
 }
@@ -101,7 +101,7 @@ pub struct SystemTemplate {
 #[derive(Clone, PartialEq)]
 pub struct AuthorRequest {
     pub name: String,
-    pub order: i32,
+    pub order_cardinality: i32,
     pub terms: Vec<String>,
     pub connectives: Vec<String>,
 }
@@ -120,7 +120,7 @@ pub struct ExtractRequest {
 /// a column is just a tag key surfaced.
 #[derive(Clone, Copy, PartialEq)]
 enum ColKey {
-    Order,
+    OrderCardinality,
     Name,
     Perspective,
     Citation,
@@ -128,9 +128,9 @@ enum ColKey {
     Note,
 }
 
-/// Canonical column order (independent of the order keys were toggled on).
+/// Canonical column order_cardinality (independent of the order_cardinality keys were toggled on).
 const ALL_COLS: [ColKey; 6] = [
-    ColKey::Order,
+    ColKey::OrderCardinality,
     ColKey::Name,
     ColKey::Perspective,
     ColKey::Citation,
@@ -141,7 +141,7 @@ const ALL_COLS: [ColKey; 6] = [
 impl ColKey {
     fn label(self) -> &'static str {
         match self {
-            ColKey::Order => "Order",
+            ColKey::OrderCardinality => "OrderCardinality",
             ColKey::Name => "Name",
             ColKey::Perspective => "Perspective",
             ColKey::Citation => "Citation",
@@ -167,12 +167,12 @@ enum Row<'a> {
 }
 
 impl Row<'_> {
-    fn order(&self) -> Option<i32> {
+    fn order_cardinality(&self) -> Option<i32> {
         match self {
-            Row::Sys(s) => Some(s.order),
+            Row::Sys(s) => Some(s.order_cardinality),
             Row::Ref(r) => order_of(r),
-            Row::Raw(e) => Some(e.order),
-            // A monad isn't tied to a K_n order; None sorts it to the top so
+            Row::Raw(e) => Some(e.order_cardinality),
+            // A monad isn't tied to a K_n order_cardinality; None sorts it to the top so
             // monads (Architecture Monad, Data, …) are easy to find.
             Row::Seq(_) => None,
         }
@@ -201,10 +201,10 @@ impl Row<'_> {
     }
 }
 
-/// Whether a **row** passes the header **order** scope and free-text **search**.
+/// Whether a **row** passes the header **order_cardinality** scope and free-text **search**.
 /// (The Filter proper is the SPO constraints — see `passes_constraints`.)
 fn passes_row(row: Row, filter_order: Option<i32>, needle: &str) -> bool {
-    filter_order.is_none_or(|o| row.order() == Some(o))
+    filter_order.is_none_or(|o| row.order_cardinality() == Some(o))
         && (needle.is_empty() || row.hay().contains(needle))
 }
 /// Whether a row falls inside a **bucket scope** (a monad's member addresses).
@@ -281,14 +281,14 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let search = use_state(String::new);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
-    let visible_cols = use_state(|| vec![ColKey::Order, ColKey::Name, ColKey::Citation]);
+    let visible_cols = use_state(|| vec![ColKey::OrderCardinality, ColKey::Name, ColKey::Citation]);
     // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
     // SPO filter over a flat triple store: which predicate (key) is being *viewed*
     // in the menu, and the **stacked** constraints (predicate → selected objects),
     // which AND together. Everything is a predicate now — `type` is not special.
-    let active_pred = use_state(|| "order".to_string());
+    let active_pred = use_state(|| "order_cardinality".to_string());
     let spo_constraints = use_state(HashMap::<String, HashSet<String>>::new);
     // Reciprocal traversal: a **pinned subject** whose quads (predicate · object ·
     // source) are shown — the S→(P,O,source) read, "a location advertising its
@@ -309,7 +309,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let seqs = &props.sequences;
     // Flatten everything into SPO triples — the uniform substrate the Filter queries.
     let triples = build_triples(systems, refs, seqs);
-    // The order filter comes from the header (Nullad = None = all).
+    // The order_cardinality filter comes from the header (Nullad = None = all).
     let filter_order = props.filter_order;
     // A bucket monad scopes the view to its members (a group for sorting).
     let scope = props.scope_ids.as_deref();
@@ -362,18 +362,18 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         Callback::from(move |_: MouseEvent| {
             on_author.emit(AuthorRequest {
                 name: (*ed_name).clone(),
-                order: ed_order_val,
+                order_cardinality: ed_order_val,
                 terms: (*ed_terms).clone(),
                 connectives: (*ed_conns).clone(),
             });
         })
     };
-    // Prefill from the canonical system of the current order ("open the canonical").
+    // Prefill from the canonical system of the current order_cardinality ("open the canonical").
     let on_prefill = {
         let (templates, ed_order, ed_terms, ed_conns) =
             (props.templates.clone(), ed_order.clone(), ed_terms.clone(), ed_conns.clone());
         Callback::from(move |_: MouseEvent| {
-            if let Some(t) = templates.iter().find(|t| t.order == *ed_order) {
+            if let Some(t) = templates.iter().find(|t| t.order_cardinality == *ed_order) {
                 ed_terms.set(t.terms.clone());
                 ed_conns.set(t.connectives.clone());
             }
@@ -439,10 +439,10 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             <div class="editor-form">
                 <div class="editor-row">
                     <input class="ed-input ed-name" placeholder="New system name" value={ (*ed_name).clone() } oninput={ on_ed_name } />
-                    <label class="ed-label">{ "Order" }
-                        <input class="ed-input ed-order" type="number" min="1" max="12" value={ ed_order_val.to_string() } oninput={ on_ed_order } />
+                    <label class="ed-label">{ "OrderCardinality" }
+                        <input class="ed-input ed-order_cardinality" type="number" min="1" max="12" value={ ed_order_val.to_string() } oninput={ on_ed_order } />
                     </label>
-                    <button class="elt-btn" onclick={ on_prefill } title="Prefill terms/connectives from the canonical system of this order">{ "↺ Canonical" }</button>
+                    <button class="elt-btn" onclick={ on_prefill } title="Prefill terms/connectives from the canonical system of this order_cardinality">{ "↺ Canonical" }</button>
                     <button class="elt-btn" disabled={ !can_create } onclick={ on_create }>{ "Create system" }</button>
                 </div>
                 <div class="editor-fields">
@@ -506,7 +506,7 @@ struct TableCtx<'a> {
     on_delete_sequence: &'a Callback<String>,
     /// Delete selected rows by address (row-select CRUD).
     on_delete_rows: &'a Callback<Vec<String>>,
-    /// Order filter from the header (`None` = Nullad = all).
+    /// OrderCardinality filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     /// Bucket scope — when a bucket monad is entered, show only its members.
     scope: Option<&'a [String]>,
@@ -557,7 +557,7 @@ fn table_view(ctx: TableCtx) -> Html {
         editor_form,
     } = ctx;
 
-    // Filter — same predicate Extract uses (header order + cite-degree + search).
+    // Filter — same predicate Extract uses (header order_cardinality + cite-degree + search).
     // Rows: every System + Monad + Reference + the focused system's raw nodes/edges.
     let needle = search.to_lowercase();
     let mut rows: Vec<Row> = all_rows(systems, seqs, refs, raw)
@@ -584,8 +584,8 @@ fn table_view(ctx: TableCtx) -> Html {
             .is_none_or(|ts| !shown_sys.contains(ts.id.as_str())),
         _ => true,
     });
-    // Default row order: by systematic order (the header axis).
-    rows.sort_by_key(|row| row.order());
+    // Default row order_cardinality: by systematic order_cardinality (the header axis).
+    rows.sort_by_key(|row| row.order_cardinality());
 
     // ---- Control-bar display data + callbacks (for the decoupled BrowserControls
     // view). The controller computes chips/predicates via spo::; the view only renders
@@ -648,13 +648,13 @@ fn table_view(ctx: TableCtx) -> Html {
         })
     };
     let active_pred_label = pred_label(&active_pred_key);
-    // Visible columns in canonical order (independent of toggle order).
+    // Visible columns in canonical order_cardinality (independent of toggle order_cardinality).
     let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
 
     let cell = |k: ColKey, row: &Row| -> Html {
         let order_cell = |o: Option<i32>| html! { { o.map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } };
         match (k, row) {
-            (ColKey::Order, _) => order_cell(row.order()),
+            (ColKey::OrderCardinality, _) => order_cell(row.order_cardinality()),
             (ColKey::Name, Row::Sys(s)) => {
                 let load = {
                     let on_load = on_load.clone();
@@ -772,9 +772,9 @@ fn table_view(ctx: TableCtx) -> Html {
                 cites.insert(t.citation.clone());
             }
         }
-        // Systematics predicate order; any others appended after.
+        // Systematics predicate order_cardinality; any others appended after.
         const ORDER: [&str; 8] = [
-            "name", "order", "coherence", "term-designation", "connective-designation",
+            "name", "order_cardinality", "coherence", "term-designation", "connective-designation",
             "term", "connective", "source",
         ];
         let mut preds: Vec<String> = ORDER
@@ -920,7 +920,7 @@ fn persp_tag(r: &ReferenceView) -> Html {
     html! { <span class="tag tag-perspective">{ perspective }</span> }
 }
 
-/// Render a reference's **citation triad** in triad order — **Source · Artefact ·
+/// Render a reference's **citation triad** in triad order_cardinality — **Source · Artefact ·
 /// Lookup** (display only; the Citation column key surfaces this).
 fn citation_tags(r: &ReferenceView) -> Html {
     let source = src(r);

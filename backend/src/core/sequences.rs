@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 pub struct Sequence {
     pub id: String,
     pub name: String,
-    /// Ordered member addresses. Order = Vec ordinality.
+    /// Ordered member addresses. OrderCardinality = Vec ordinality.
     #[serde(default)]
     pub members: Vec<String>,
 }

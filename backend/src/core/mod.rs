@@ -1,10 +1,10 @@
 //! Core types for the Systematics property graph.
 //!
 //! Layered ontology:
-//! - `entries` — the substrate (Order, Ordinality, Point, Line, Coordinate,
+//! - `entries` — the substrate (OrderCardinality, Ordinality, Point, Line, Coordinate,
 //!   Segment, Character) plus the `Entry` sum type.
 //! - `vocabularies` — `Topology`, `Geometry`,
-//!   `Vocabulary` — ordered per-Order references into the substrate.
+//!   `Vocabulary` — ordered per-OrderCardinality references into the substrate.
 //! - `grammar` — `Template`: the K_n structure + arity validation rules.
 //! - `systems` — `System`: metadata reconciling a Template with a Vocabulary.
 //! - `perspectives` — `Perspective`/`Link`: AD4M-style directed webs.
@@ -26,7 +26,7 @@ pub mod systems;
 pub mod vocabularies;
 
 pub use entries::{
-    Character, Coordinate, Entry, Line, Order, Point, Point3d, Ordinality, Segment,
+    Character, Coordinate, Entry, Line, OrderCardinality, Point, Point3d, Ordinality, Segment,
 };
 
 pub use vocabularies::{Geometry, Vocabulary, Topology};

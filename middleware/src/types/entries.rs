@@ -10,7 +10,8 @@ use async_graphql::SimpleObject;
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct Point {
     pub id: String,
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     pub ordinality: i32,
 }
 
@@ -19,7 +20,8 @@ pub struct Point {
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct Line {
     pub id: String,
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     pub ordinality: i32,
     #[serde(rename = "positionSecondary")]
     pub position_secondary: i32,
@@ -32,7 +34,8 @@ pub struct Coordinate {
     pub id: String,
     #[serde(rename = "pointRef")]
     pub point_ref: String,
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     pub ordinality: i32,
     pub x: f64,
     pub y: f64,

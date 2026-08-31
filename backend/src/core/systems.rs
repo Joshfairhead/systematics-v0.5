@@ -1,6 +1,6 @@
 //! System: the reconciler of a Template and a Vocabulary.
 //!
-//! A `System` holds the system-relevant metadata (name, order, coherence,
+//! A `System` holds the system-relevant metadata (name, order_cardinality, coherence,
 //! term/connective designations) and reconciles one `Template` (the K_n
 //! structure/rules) with one Vocabulary (`Vocabulary` — a particular
 //! set of terms). "The triad of XYZ" is a System. Conceptually a System is a
@@ -9,12 +9,13 @@
 
 use serde::{Deserialize, Serialize};
 
-/// A System over one Order: metadata + refs to a Template and a Vocabulary.
+/// A System over one OrderCardinality: metadata + refs to a Template and a Vocabulary.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct System {
     pub id: String,
     pub name: String,
-    pub order: u8,
+    #[serde(rename = "order")]
+    pub order_cardinality: u8,
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
@@ -29,7 +30,7 @@ impl System {
     pub fn new(
         id: impl Into<String>,
         name: impl Into<String>,
-        order: u8,
+        order_cardinality: u8,
         coherence: impl Into<String>,
         term_designation: impl Into<String>,
         connective_designation: impl Into<String>,
@@ -39,7 +40,7 @@ impl System {
         Self {
             id: id.into(),
             name: name.into(),
-            order,
+            order_cardinality,
             coherence: coherence.into(),
             term_designation: term_designation.into(),
             connective_designation: connective_designation.into(),
@@ -48,11 +49,11 @@ impl System {
         }
     }
 
-    /// Build an id from name and order: `system_{slug}_{order}`.
+    /// Build an id from name and order_cardinality: `system_{slug}_{order_cardinality}`.
     #[allow(clippy::too_many_arguments)]
     pub fn with_auto_id(
         name: impl Into<String>,
-        order: u8,
+        order_cardinality: u8,
         coherence: impl Into<String>,
         term_designation: impl Into<String>,
         connective_designation: impl Into<String>,
@@ -62,9 +63,9 @@ impl System {
         let name = name.into();
         let slug = name.to_lowercase().replace(' ', "_");
         Self::new(
-            format!("system_{}_{}", slug, order),
+            format!("system_{}_{}", slug, order_cardinality),
             name,
-            order,
+            order_cardinality,
             coherence,
             term_designation,
             connective_designation,

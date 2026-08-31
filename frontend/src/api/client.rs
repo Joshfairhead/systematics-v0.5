@@ -58,11 +58,12 @@ pub struct RefLookup {
 }
 
 /// The System behind a reference's target address (resolved server-side): the
-/// grouping key (`order`) and the value each perspective gives it (`coherence`).
+/// grouping key (`order_cardinality`) and the value each perspective gives it (`coherence`).
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct RefSystem {
     pub id: String,
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     pub name: String,
     pub coherence: String,
     #[serde(rename = "termDesignation")]
@@ -93,7 +94,7 @@ pub struct ReferenceView {
     /// target predicate (e.g. `coherence` → `"Structure"` per DU1). #25.
     #[serde(default)]
     pub object: Option<String>,
-    /// Resolved target System (order/name/coherence/designations). `None` unless
+    /// Resolved target System (order_cardinality/name/coherence/designations). `None` unless
     /// selected or when the target system isn't loaded.
     #[serde(rename = "targetSystem", default)]
     pub target_system: Option<RefSystem>,
@@ -128,12 +129,13 @@ pub struct PositionedChar {
     pub ordinality: String,
 }
 
-/// A non-canonical System the Load control can browse (id, display name, order).
+/// A non-canonical System the Load control can browse (id, display name, order_cardinality).
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct InstanceSystem {
     pub id: String,
     pub name: String,
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     /// Term characters at their node positions — for the SPO Term predicate.
     #[serde(default)]
     pub terms: Vec<PositionedChar>,
@@ -210,7 +212,7 @@ impl GraphQLClient {
     }
 
     const SYSTEM_FIELDS: &'static str = r#"
-        order
+        orderCardinality
         systemId
         name
         coherence
@@ -223,7 +225,7 @@ impl GraphQLClient {
         coordinates {
             id
             pointRef
-            order
+            orderCardinality
             ordinality
             x
             y
@@ -247,11 +249,11 @@ impl GraphQLClient {
     "#;
 
     #[allow(dead_code)]
-    pub async fn fetch_system_by_order(&self, order: i32) -> Result<RenderedSystem, ApiError> {
+    pub async fn fetch_system_by_order(&self, order_cardinality: i32) -> Result<RenderedSystem, ApiError> {
         let query = format!(
             r#"
-            query GetSystem($order: Int!) {{
-                system(order: $order) {{
+            query GetSystem($orderCardinality: Int!) {{
+                system(orderCardinality: $orderCardinality) {{
                     {}
                 }}
             }}
@@ -259,7 +261,7 @@ impl GraphQLClient {
             Self::SYSTEM_FIELDS
         );
 
-        let variables = serde_json::json!({ "order": order });
+        let variables = serde_json::json!({ "orderCardinality": order_cardinality });
 
         let response: GraphQLResponse<SystemQueryResponse> =
             self.execute_query(&query, Some(variables)).await?;
@@ -277,7 +279,7 @@ impl GraphQLClient {
         let system = response
             .data
             .and_then(|d| d.system)
-            .ok_or_else(|| ApiError::NotFound(format!("System with order {} not found", order)))?;
+            .ok_or_else(|| ApiError::NotFound(format!("System with order_cardinality {} not found", order_cardinality)))?;
 
         Ok(self.transform_coordinates(system))
     }
@@ -365,7 +367,7 @@ impl GraphQLClient {
 
     /// The non-canonical instance systems the Load control browses.
     pub async fn fetch_instance_systems(&self) -> Result<Vec<InstanceSystem>, ApiError> {
-        let query = r#"query { instanceSystems { id name order terms { value ordinality } connectives { value ordinality } } }"#;
+        let query = r#"query { instanceSystems { id name orderCardinality terms { value ordinality } connectives { value ordinality } } }"#;
         let response: GraphQLResponse<InstanceSystemsResponse> =
             self.execute_query(query, None).await?;
         if let Some(errors) = response.errors {
@@ -475,7 +477,7 @@ impl GraphQLClient {
 
     /// Every citation in the graph, enriched with owning perspective + resolved
     /// target system — the single query that powers the reference browser
-    /// (both the table and the compare-by-order matrix).
+    /// (both the table and the compare-by-order_cardinality matrix).
     pub async fn fetch_all_references(&self) -> Result<Vec<ReferenceView>, ApiError> {
         let query = r#"
             query AllRefs {
@@ -490,7 +492,7 @@ impl GraphQLClient {
                     artefact { title url }
                     lookup { locator }
                     targetSystem {
-                        id order name coherence termDesignation connectiveDesignation
+                        id order_cardinality name coherence termDesignation connectiveDesignation
                     }
                 }
             }
@@ -602,17 +604,17 @@ impl GraphQLClient {
     pub async fn author_system(
         &self,
         name: &str,
-        order: i32,
+        order_cardinality: i32,
         terms: Vec<String>,
         connectives: Vec<String>,
     ) -> Result<InstanceSystem, ApiError> {
         let query = r#"
             mutation Author($input: AuthorSystemInput!) {
-                authorSystem(input: $input) { id name order }
+                authorSystem(input: $input) { id name orderCardinality }
             }
         "#;
         let variables = serde_json::json!({
-            "input": { "name": name, "order": order, "terms": terms, "connectives": connectives }
+            "input": { "name": name, "orderCardinality": order_cardinality, "terms": terms, "connectives": connectives }
         });
         let response: GraphQLResponse<AuthorSystemResponse> =
             self.execute_query(query, Some(variables)).await?;

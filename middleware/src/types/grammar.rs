@@ -50,11 +50,12 @@ pub struct GrammarConnective {
     pub character_value: String,
 }
 
-/// A complete rendered view of a system at a given order.
+/// A complete rendered view of a system at a given order_cardinality.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "server", derive(SimpleObject))]
 pub struct RenderedSystem {
-    pub order: i32,
+    #[serde(rename = "orderCardinality")]
+    pub order_cardinality: i32,
     #[serde(rename = "systemId")]
     pub system_id: String,
     pub name: String,
@@ -68,7 +69,7 @@ pub struct RenderedSystem {
     pub colours: Vec<GrammarColour>,
     pub lines: Vec<GrammarLine>,
     pub connectives: Vec<GrammarConnective>,
-    /// The canonical *class* this system instantiates (same order); `None` when
+    /// The canonical *class* this system instantiates (same order_cardinality); `None` when
     /// this system is itself canonical. Drives the "Canonical override" toggle —
     /// terms/connectives pair with the instance's by ordinality.
     #[serde(default, rename = "canonicalClass")]
@@ -81,7 +82,7 @@ impl RenderedSystem {
     }
 
     pub fn k_notation(&self) -> String {
-        format!("K{}", self.order)
+        format!("K{}", self.order_cardinality)
     }
 
     pub fn description(&self) -> String {
@@ -89,7 +90,7 @@ impl RenderedSystem {
     }
 
     pub fn node_count(&self) -> usize {
-        self.order as usize
+        self.order_cardinality as usize
     }
 
     pub fn term_at(&self, ordinality: i32) -> Option<&str> {

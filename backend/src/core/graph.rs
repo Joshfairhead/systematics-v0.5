@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
-use super::entries::{Character, Coordinate, Entry, Line, Order, Point, Ordinality, Segment};
+use super::entries::{Character, Coordinate, Entry, Line, OrderCardinality, Point, Ordinality, Segment};
 use super::functors::Functor;
 use super::grammar::Template;
 use super::sequences::Sequence;
@@ -27,7 +27,7 @@ pub struct Graph {
     pub geometric_vocabs: Vec<Geometry>,
     #[serde(default)]
     pub vocabularies: Vec<Vocabulary>,
-    /// Complete-graph structures, one per Order. Seeded in code (deterministic),
+    /// Complete-graph structures, one per OrderCardinality. Seeded in code (deterministic),
     /// never persisted as content.
     #[serde(default)]
     pub templates: Vec<Template>,
@@ -46,13 +46,13 @@ pub struct Graph {
     pub lookups: Vec<Lookup>,
     #[serde(default)]
     pub references: Vec<Reference>,
-    /// Same-grammar functors: ordinality permutations between systems of one Order.
+    /// Same-grammar functors: ordinality permutations between systems of one OrderCardinality.
     #[serde(default)]
     pub functors: Vec<Functor>,
     /// Sequences: ordered series of member addresses (container triad `+` pole).
     #[serde(default)]
     pub sequences: Vec<Sequence>,
-    /// IDs of the immutable canonical *archetypes* (the seed: the 12 per-order
+    /// IDs of the immutable canonical *archetypes* (the seed: the 12 per-order_cardinality
     /// systems + the citation triad + their vocabularies/characters). Runtime
     /// only, never serialised. This is the "do not copy me into a module file"
     /// set used by `export_perspective` — it must NOT include module content, or
@@ -82,22 +82,22 @@ impl Graph {
     }
 
     // ==========================================================================
-    // Substrate queries: Order, Ordinality, Point, Line, Coordinate, Segment,
+    // Substrate queries: OrderCardinality, Ordinality, Point, Line, Coordinate, Segment,
     // Character
     // ==========================================================================
 
-    pub fn order(&self, value: u8) -> Option<&Order> {
+    pub fn order_cardinality(&self, value: u8) -> Option<&OrderCardinality> {
         self.entries.iter().find_map(|e| match e {
-            Entry::Order(o) if o.value == value => Some(o),
+            Entry::OrderCardinality(o) if o.value == value => Some(o),
             _ => None,
         })
     }
 
-    pub fn orders(&self) -> Vec<&Order> {
+    pub fn orders(&self) -> Vec<&OrderCardinality> {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Order(o) => Some(o),
+                Entry::OrderCardinality(o) => Some(o),
                 _ => None,
             })
             .collect()
@@ -120,19 +120,19 @@ impl Graph {
             .collect()
     }
 
-    pub fn point(&self, order: u8, ordinality: u8) -> Option<&Point> {
-        let id = format!("point_{}_{}", order, ordinality);
+    pub fn point(&self, order_cardinality: u8, ordinality: u8) -> Option<&Point> {
+        let id = format!("point_{}_{}", order_cardinality, ordinality);
         self.entries.iter().find_map(|e| match e {
             Entry::Point(p) if p.id == id => Some(p),
             _ => None,
         })
     }
 
-    pub fn points(&self, order: Option<u8>) -> Vec<&Point> {
+    pub fn points(&self, order_cardinality: Option<u8>) -> Vec<&Point> {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Point(p) if order.map(|o| p.order_value() == Some(o)).unwrap_or(true) => {
+                Entry::Point(p) if order_cardinality.map(|o| p.order_value() == Some(o)).unwrap_or(true) => {
                     Some(p)
                 }
                 _ => None,
@@ -140,20 +140,20 @@ impl Graph {
             .collect()
     }
 
-    pub fn line(&self, order: u8, p1: u8, p2: u8) -> Option<&Line> {
+    pub fn line(&self, order_cardinality: u8, p1: u8, p2: u8) -> Option<&Line> {
         let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
-        let id = format!("line_{}_{}_{}", order, lo, hi);
+        let id = format!("line_{}_{}_{}", order_cardinality, lo, hi);
         self.entries.iter().find_map(|e| match e {
             Entry::Line(l) if l.id == id => Some(l),
             _ => None,
         })
     }
 
-    pub fn lines_of(&self, order: Option<u8>) -> Vec<&Line> {
+    pub fn lines_of(&self, order_cardinality: Option<u8>) -> Vec<&Line> {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Line(l) if order.map(|o| l.order_value() == Some(o)).unwrap_or(true) => {
+                Entry::Line(l) if order_cardinality.map(|o| l.order_value() == Some(o)).unwrap_or(true) => {
                     Some(l)
                 }
                 _ => None,
@@ -161,20 +161,20 @@ impl Graph {
             .collect()
     }
 
-    pub fn coordinate(&self, order: u8, ordinality: u8) -> Option<&Coordinate> {
-        let id = format!("coord_{}_{}", order, ordinality);
+    pub fn coordinate(&self, order_cardinality: u8, ordinality: u8) -> Option<&Coordinate> {
+        let id = format!("coord_{}_{}", order_cardinality, ordinality);
         self.entries.iter().find_map(|e| match e {
             Entry::Coordinate(c) if c.id == id => Some(c),
             _ => None,
         })
     }
 
-    pub fn coordinates(&self, order: Option<u8>) -> Vec<&Coordinate> {
+    pub fn coordinates(&self, order_cardinality: Option<u8>) -> Vec<&Coordinate> {
         self.entries
             .iter()
             .filter_map(|e| match e {
                 Entry::Coordinate(c)
-                    if order.map(|o| c.order_value() == Some(o)).unwrap_or(true) =>
+                    if order_cardinality.map(|o| c.order_value() == Some(o)).unwrap_or(true) =>
                 {
                     Some(c)
                 }
@@ -183,9 +183,9 @@ impl Graph {
             .collect()
     }
 
-    pub fn segment(&self, order: u8, p1: u8, p2: u8) -> Option<&Segment> {
+    pub fn segment(&self, order_cardinality: u8, p1: u8, p2: u8) -> Option<&Segment> {
         let (lo, hi) = if p1 <= p2 { (p1, p2) } else { (p2, p1) };
-        let id = format!("seg_{}_{}_{}", order, lo, hi);
+        let id = format!("seg_{}_{}_{}", order_cardinality, lo, hi);
         self.entries.iter().find_map(|e| match e {
             Entry::Segment(s) if s.id == id => Some(s),
             _ => None,
@@ -217,26 +217,26 @@ impl Graph {
         self.topological_vocabs.iter().find(|v| v.id == id)
     }
 
-    pub fn topology_for_order(&self, order: u8) -> Option<&Topology> {
-        self.topological_vocabs.iter().find(|v| v.order == order)
+    pub fn topology_for_order(&self, order_cardinality: u8) -> Option<&Topology> {
+        self.topological_vocabs.iter().find(|v| v.order_cardinality == order_cardinality)
     }
 
     pub fn geometry(&self, id: &str) -> Option<&Geometry> {
         self.geometric_vocabs.iter().find(|v| v.id == id)
     }
 
-    pub fn geometry_for_order(&self, order: u8) -> Option<&Geometry> {
-        self.geometric_vocabs.iter().find(|v| v.order == order)
+    pub fn geometry_for_order(&self, order_cardinality: u8) -> Option<&Geometry> {
+        self.geometric_vocabs.iter().find(|v| v.order_cardinality == order_cardinality)
     }
 
     pub fn vocabulary(&self, id: &str) -> Option<&Vocabulary> {
         self.vocabularies.iter().find(|v| v.id == id)
     }
 
-    pub fn vocabularies_for_order(&self, order: u8) -> Vec<&Vocabulary> {
+    pub fn vocabularies_for_order(&self, order_cardinality: u8) -> Vec<&Vocabulary> {
         self.vocabularies
             .iter()
-            .filter(|v| v.order == order)
+            .filter(|v| v.order_cardinality == order_cardinality)
             .collect()
     }
 
@@ -271,8 +271,8 @@ impl Graph {
         self.templates.iter().find(|g| g.id == id)
     }
 
-    pub fn template_for_order(&self, order: u8) -> Option<&Template> {
-        self.templates.iter().find(|g| g.order == order)
+    pub fn template_for_order(&self, order_cardinality: u8) -> Option<&Template> {
+        self.templates.iter().find(|g| g.order_cardinality == order_cardinality)
     }
 
     pub fn add_template(&mut self, grammar: Template) {
@@ -285,8 +285,8 @@ impl Graph {
         self.systems.iter().find(|s| s.id == id)
     }
 
-    pub fn systems_for_order(&self, order: u8) -> Vec<&System> {
-        self.systems.iter().filter(|s| s.order == order).collect()
+    pub fn systems_for_order(&self, order_cardinality: u8) -> Vec<&System> {
+        self.systems.iter().filter(|s| s.order_cardinality == order_cardinality).collect()
     }
 
     pub fn add_system(&mut self, system: System) {
@@ -340,9 +340,9 @@ impl Graph {
         };
         for (role, sref) in [("source", &f.source_ref), ("target", &f.target_ref)] {
             match self.system(sref) {
-                Some(s) if s.order != f.order => errs.push(format!(
-                    "Functor {}: {} system '{}' has order {}, expected {}",
-                    f.id, role, sref, s.order, f.order
+                Some(s) if s.order_cardinality != f.order_cardinality => errs.push(format!(
+                    "Functor {}: {} system '{}' has order_cardinality {}, expected {}",
+                    f.id, role, sref, s.order_cardinality, f.order_cardinality
                 )),
                 Some(_) => {}
                 None => errs.push(format!(
@@ -698,7 +698,7 @@ impl Graph {
         point_id: &str,
     ) -> Option<&Character> {
         let sv = self.vocabulary(vocabulary_id)?;
-        let topology = self.topology_for_order(sv.order)?;
+        let topology = self.topology_for_order(sv.order_cardinality)?;
         let idx = topology.points.iter().position(|p| p == point_id)?;
         let char_id = sv.terms.get(idx)?;
         self.character(char_id)
@@ -712,7 +712,7 @@ impl Graph {
         line_id: &str,
     ) -> Option<&Character> {
         let sv = self.vocabulary(vocabulary_id)?;
-        let topology = self.topology_for_order(sv.order)?;
+        let topology = self.topology_for_order(sv.order_cardinality)?;
         let idx = topology.lines.iter().position(|l| l == line_id)?;
         let char_id = sv.connectives.get(idx)?;
         self.character(char_id)
@@ -752,11 +752,11 @@ impl Graph {
     }
 
     /// Look up the Canonical Vocabulary containing hex colours for
-    /// the given order (created by seed as "Canonical Colours {name}").
-    pub fn canonical_colour_vocab_for_order(&self, order: u8) -> Option<&Vocabulary> {
+    /// the given order_cardinality (created by seed as "Canonical Colours {name}").
+    pub fn canonical_colour_vocab_for_order(&self, order_cardinality: u8) -> Option<&Vocabulary> {
         self.vocabularies
             .iter()
-            .find(|v| v.order == order && v.name.starts_with("Canonical Colours"))
+            .find(|v| v.order_cardinality == order_cardinality && v.name.starts_with("Canonical Colours"))
     }
 
     // ==========================================================================
@@ -948,7 +948,7 @@ mod tests {
 
     fn triad_test_graph() -> Graph {
         let mut g = Graph::new();
-        g.add_entry(Entry::Order(Order::new(3)));
+        g.add_entry(Entry::OrderCardinality(OrderCardinality::new(3)));
         for pos in 1..=3 {
             g.add_entry(Entry::Ordinality(Ordinality::new(pos)));
             g.add_entry(Entry::Point(Point::new(3, pos)));
@@ -995,7 +995,7 @@ mod tests {
     #[test]
     fn test_substrate_queries() {
         let g = triad_test_graph();
-        assert!(g.order(3).is_some());
+        assert!(g.order_cardinality(3).is_some());
         assert!(g.ordinality(2).is_some());
         assert_eq!(g.point(3, 1).unwrap().id, "point_3_1");
         assert_eq!(g.line(3, 1, 2).unwrap().id, "line_3_1_2");

@@ -27,34 +27,34 @@ const CONNECTIVE_DESIGNATION: [&str; 12] = [
     "Components", "Needs Research", "Needs Research", "Needs Research", "Needs Research",
 ];
 
-fn lookup(table: &[&'static str; 12], order: u8) -> &'static str {
+fn lookup(table: &[&'static str; 12], order_cardinality: u8) -> &'static str {
     table
-        .get(order.wrapping_sub(1) as usize)
+        .get(order_cardinality.wrapping_sub(1) as usize)
         .copied()
         .unwrap_or("Unknown")
 }
 
-pub fn order_name(order: u8) -> &'static str {
-    lookup(&ORDER_NAMES, order)
+pub fn order_name(order_cardinality: u8) -> &'static str {
+    lookup(&ORDER_NAMES, order_cardinality)
 }
-pub fn coherence(order: u8) -> &'static str {
-    lookup(&COHERENCE, order)
+pub fn coherence(order_cardinality: u8) -> &'static str {
+    lookup(&COHERENCE, order_cardinality)
 }
-pub fn term_designation(order: u8) -> &'static str {
-    lookup(&TERM_DESIGNATION, order)
+pub fn term_designation(order_cardinality: u8) -> &'static str {
+    lookup(&TERM_DESIGNATION, order_cardinality)
 }
-pub fn connective_designation(order: u8) -> &'static str {
-    lookup(&CONNECTIVE_DESIGNATION, order)
+pub fn connective_designation(order_cardinality: u8) -> &'static str {
+    lookup(&CONNECTIVE_DESIGNATION, order_cardinality)
 }
 
-/// `|E| = C(n, 2)` — the connective (edge) cardinality for order `n`.
-fn edge_cardinality(order: u8) -> u8 {
-    let n = order as usize;
+/// `|E| = C(n, 2)` — the connective (edge) cardinality for order_cardinality `n`.
+fn edge_cardinality(order_cardinality: u8) -> u8 {
+    let n = order_cardinality as usize;
     (n * n.saturating_sub(1) / 2) as u8
 }
 
 /// The **systematics hexad** — a system's six mutually-determining metadata facets.
-/// Term cardinality = `|V|` = order; connective cardinality = `|E|` = `C(order, 2)`.
+/// Term cardinality = `|V|` = order_cardinality; connective cardinality = `|E|` = `C(order_cardinality, 2)`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SystematicsHexad {
     pub name: String,
@@ -65,7 +65,7 @@ pub struct SystematicsHexad {
     pub connective_cardinality: u8,
 }
 
-/// The canonical hexad row for a cardinality (order `n`): all six facets derived from
+/// The canonical hexad row for a cardinality (order_cardinality `n`): all six facets derived from
 /// the one number — e.g. `3 → {Triad, Dynamism, Impulses, Acts, 3, 3}`.
 pub fn systematics_hexad(cardinality: u8) -> SystematicsHexad {
     SystematicsHexad {

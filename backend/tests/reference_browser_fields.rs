@@ -1,5 +1,5 @@
 //! The reference-browser design enriches GqlReference with resolved fields so a
-//! single `allReferences` query drives both the table and the compare-by-order
+//! single `allReferences` query drives both the table and the compare-by-orderCardinality
 //! matrix. This pins those resolvers against real module data.
 
 use std::sync::Arc;
@@ -30,7 +30,7 @@ async fn all_references_exposes_resolved_browser_fields() {
                 target
                 targetFragment
                 object
-                targetSystem { order name coherence }
+                targetSystem { orderCardinality name coherence }
             }
         }
     "#;
@@ -49,7 +49,7 @@ async fn all_references_exposes_resolved_browser_fields() {
         .expect("DU1 heptad coherence citation onto canonical present");
 
     assert_eq!(du1_heptad["targetFragment"], "coherence");
-    assert_eq!(du1_heptad["targetSystem"]["order"], 7);
+    assert_eq!(du1_heptad["targetSystem"]["orderCardinality"], 7);
     // The value DU1 affixes is now the reference `object` (not a field on a shell).
     assert_eq!(du1_heptad["object"], "Structure");
 }
@@ -62,7 +62,7 @@ async fn whole_system_citation_has_empty_fragment() {
             allReferences {
                 target
                 targetFragment
-                targetSystem { order }
+                targetSystem { orderCardinality }
             }
         }
     "#;
@@ -71,11 +71,11 @@ async fn whole_system_citation_has_empty_fragment() {
     let refs = data["allReferences"].as_array().unwrap();
 
     // A whole-system citation (no '#') resolves an empty fragment but still a system.
-    // DU1's whole-system citation now points at its Coherence Dodecad (order 12).
+    // DU1's whole-system citation now points at its Coherence Dodecad (orderCardinality 12).
     let whole = refs
         .iter()
         .find(|r| r["target"] == "system:system_du1_coherence_dodecad_12")
         .expect("DU1 whole-dodecad citation present");
     assert_eq!(whole["targetFragment"], "");
-    assert_eq!(whole["targetSystem"]["order"], 12);
+    assert_eq!(whole["targetSystem"]["orderCardinality"], 12);
 }

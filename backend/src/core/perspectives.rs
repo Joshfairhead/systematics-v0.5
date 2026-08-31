@@ -106,9 +106,9 @@ pub mod address {
         format!("system:{}#conn:{}-{}", system_id, p1, p2)
     }
 
-    /// A Template (structure): `grammar:<order>`.
-    pub fn grammar(order: u8) -> String {
-        format!("grammar:{}", order)
+    /// A Template (structure): `grammar:<order_cardinality>`.
+    pub fn grammar(order_cardinality: u8) -> String {
+        format!("grammar:{}", order_cardinality)
     }
 
     /// A Vocabulary: `vocab:<vocab_id>`.

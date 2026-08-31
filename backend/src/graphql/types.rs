@@ -8,7 +8,7 @@ use tokio::sync::RwLock;
 
 use crate::core::{
     Artefact, Character, Coordinate, Entry, Functor, Geometry, Template, Graph, Law, Line,
-    Lookup, Order, Perspective, PerspectiveLink, Point, Ordinality, Reference, Sequence, Vocabulary,
+    Lookup, OrderCardinality, Perspective, PerspectiveLink, Point, Ordinality, Reference, Sequence, Vocabulary,
     Segment, Source, System, Topology,
 };
 
@@ -50,12 +50,12 @@ pub struct QueryRoot;
 impl QueryRoot {
     // -------- substrate anchors --------
 
-    async fn order(&self, ctx: &Context<'_>, value: i32) -> Option<GqlOrder> {
+    async fn order_cardinality(&self, ctx: &Context<'_>, value: i32) -> Option<GqlOrder> {
         if !(1..=12).contains(&value) {
             return None;
         }
         let g = graph_snapshot(ctx).await;
-        g.order(value as u8).map(|o| GqlOrder::new(o.clone()))
+        g.order_cardinality(value as u8).map(|o| GqlOrder::new(o.clone()))
     }
 
     async fn orders(&self, ctx: &Context<'_>) -> Vec<GqlOrder> {
@@ -79,15 +79,15 @@ impl QueryRoot {
             .collect()
     }
 
-    async fn point(&self, ctx: &Context<'_>, order: i32, ordinality: i32) -> Option<GqlPoint> {
+    async fn point(&self, ctx: &Context<'_>, order_cardinality: i32, ordinality: i32) -> Option<GqlPoint> {
         let g = graph_snapshot(ctx).await;
-        g.point(order as u8, ordinality as u8)
+        g.point(order_cardinality as u8, ordinality as u8)
             .map(|p| GqlPoint::new(p.clone()))
     }
 
-    async fn points(&self, ctx: &Context<'_>, order: Option<i32>) -> Vec<GqlPoint> {
+    async fn points(&self, ctx: &Context<'_>, order_cardinality: Option<i32>) -> Vec<GqlPoint> {
         let g = graph_snapshot(ctx).await;
-        g.points(order.map(|o| o as u8))
+        g.points(order_cardinality.map(|o| o as u8))
             .into_iter()
             .map(|p| GqlPoint::new(p.clone()))
             .collect()
@@ -96,18 +96,18 @@ impl QueryRoot {
     async fn line(
         &self,
         ctx: &Context<'_>,
-        order: i32,
+        order_cardinality: i32,
         p1: i32,
         p2: i32,
     ) -> Option<GqlLine> {
         let g = graph_snapshot(ctx).await;
-        g.line(order as u8, p1 as u8, p2 as u8)
+        g.line(order_cardinality as u8, p1 as u8, p2 as u8)
             .map(|l| GqlLine::new(l.clone()))
     }
 
-    async fn lines_of(&self, ctx: &Context<'_>, order: Option<i32>) -> Vec<GqlLine> {
+    async fn lines_of(&self, ctx: &Context<'_>, order_cardinality: Option<i32>) -> Vec<GqlLine> {
         let g = graph_snapshot(ctx).await;
-        g.lines_of(order.map(|o| o as u8))
+        g.lines_of(order_cardinality.map(|o| o as u8))
             .into_iter()
             .map(|l| GqlLine::new(l.clone()))
             .collect()
@@ -116,17 +116,17 @@ impl QueryRoot {
     async fn coordinate(
         &self,
         ctx: &Context<'_>,
-        order: i32,
+        order_cardinality: i32,
         ordinality: i32,
     ) -> Option<GqlCoordinate> {
         let g = graph_snapshot(ctx).await;
-        g.coordinate(order as u8, ordinality as u8)
+        g.coordinate(order_cardinality as u8, ordinality as u8)
             .map(|c| GqlCoordinate::new(c.clone()))
     }
 
-    async fn coordinates(&self, ctx: &Context<'_>, order: Option<i32>) -> Vec<GqlCoordinate> {
+    async fn coordinates(&self, ctx: &Context<'_>, order_cardinality: Option<i32>) -> Vec<GqlCoordinate> {
         let g = graph_snapshot(ctx).await;
-        g.coordinates(order.map(|o| o as u8))
+        g.coordinates(order_cardinality.map(|o| o as u8))
             .into_iter()
             .map(|c| GqlCoordinate::new(c.clone()))
             .collect()
@@ -135,12 +135,12 @@ impl QueryRoot {
     async fn segment(
         &self,
         ctx: &Context<'_>,
-        order: i32,
+        order_cardinality: i32,
         p1: i32,
         p2: i32,
     ) -> Option<GqlSegment> {
         let g = graph_snapshot(ctx).await;
-        g.segment(order as u8, p1 as u8, p2 as u8)
+        g.segment(order_cardinality as u8, p1 as u8, p2 as u8)
             .map(|s| GqlSegment::new(s.clone()))
     }
 
@@ -172,10 +172,10 @@ impl QueryRoot {
     async fn topology_for_order(
         &self,
         ctx: &Context<'_>,
-        order: i32,
+        order_cardinality: i32,
     ) -> Option<GqlTopology> {
         let g = graph_snapshot(ctx).await;
-        g.topology_for_order(order as u8)
+        g.topology_for_order(order_cardinality as u8)
             .map(|v| GqlTopology::new(v.clone()))
     }
 
@@ -192,10 +192,10 @@ impl QueryRoot {
     async fn geometry_for_order(
         &self,
         ctx: &Context<'_>,
-        order: i32,
+        order_cardinality: i32,
     ) -> Option<GqlGeometry> {
         let g = graph_snapshot(ctx).await;
-        g.geometry_for_order(order as u8)
+        g.geometry_for_order(order_cardinality as u8)
             .map(|v| GqlGeometry::new(v.clone()))
     }
 
@@ -212,10 +212,10 @@ impl QueryRoot {
     async fn vocabularies_for_order(
         &self,
         ctx: &Context<'_>,
-        order: i32,
+        order_cardinality: i32,
     ) -> Vec<GqlVocabulary> {
         let g = graph_snapshot(ctx).await;
-        g.vocabularies_for_order(order as u8)
+        g.vocabularies_for_order(order_cardinality as u8)
             .into_iter()
             .map(|v| GqlVocabulary::new(v.clone()))
             .collect()
@@ -223,9 +223,9 @@ impl QueryRoot {
 
     // -------- templates (structure) and systems (reconcilers) --------
 
-    async fn template_for_order(&self, ctx: &Context<'_>, order: i32) -> Option<GqlTemplate> {
+    async fn template_for_order(&self, ctx: &Context<'_>, order_cardinality: i32) -> Option<GqlTemplate> {
         let g = graph_snapshot(ctx).await;
-        g.template_for_order(order as u8).map(|gr| GqlTemplate::new(gr.clone()))
+        g.template_for_order(order_cardinality as u8).map(|gr| GqlTemplate::new(gr.clone()))
     }
 
     async fn system_by_id(&self, ctx: &Context<'_>, id: String) -> Option<GqlSystem> {
@@ -233,23 +233,23 @@ impl QueryRoot {
         g.system(&id).map(|s| GqlSystem::new(s.clone()))
     }
 
-    async fn systems_for_order(&self, ctx: &Context<'_>, order: i32) -> Vec<GqlSystem> {
+    async fn systems_for_order(&self, ctx: &Context<'_>, order_cardinality: i32) -> Vec<GqlSystem> {
         let g = graph_snapshot(ctx).await;
-        g.systems_for_order(order as u8)
+        g.systems_for_order(order_cardinality as u8)
             .into_iter()
             .map(|s| GqlSystem::new(s.clone()))
             .collect()
     }
 
     /// Instance systems: every System that is *not* the canonical archetype for
-    /// its order (DU1/DU2/ES systems, the Citation triad, the Architecture
+    /// its order_cardinality (DU1/DU2/ES systems, the Citation triad, the Architecture
     /// Pentad, …). These are what the Load control browses — the canonical
-    /// categories are reached by the normal order navigation.
+    /// categories are reached by the normal order_cardinality navigation.
     async fn instance_systems(&self, ctx: &Context<'_>) -> Vec<GqlSystem> {
         let g = graph_snapshot(ctx).await;
         g.systems
             .iter()
-            .filter(|s| s.id != canonical_system_id(s.order))
+            .filter(|s| s.id != canonical_system_id(s.order_cardinality))
             // Hide empty/unlabelled systems (e.g. un-scraped DU1) so they don't
             // give misleading blank representations.
             .filter(|s| g.vocabulary(&s.vocabulary_ref).is_some_and(|v| !v.terms.is_empty()))
@@ -327,7 +327,7 @@ impl QueryRoot {
         let Some(vocab) = g.vocabulary(&sys.vocabulary_ref) else {
             return Vec::new();
         };
-        // Term *values* in ordinality order (fall back to the char id if unresolved).
+        // Term *values* in ordinality order_cardinality (fall back to the char id if unresolved).
         let term_values: Vec<String> = vocab
             .terms
             .iter()
@@ -396,18 +396,18 @@ impl QueryRoot {
         resolve_system(&g, "system_citation_3").map(GqlRenderedSystem::new)
     }
 
-    /// Convenience: the canonical RenderedSystem for an order (resolves the
+    /// Convenience: the canonical RenderedSystem for an order_cardinality (resolves the
     /// seed's `Canonical <Name>` system).
-    async fn system(&self, ctx: &Context<'_>, order: i32) -> Option<GqlRenderedSystem> {
-        if !(1..=12).contains(&order) {
+    async fn system(&self, ctx: &Context<'_>, order_cardinality: i32) -> Option<GqlRenderedSystem> {
+        if !(1..=12).contains(&order_cardinality) {
             return None;
         }
         let g = graph_snapshot(ctx).await;
-        resolve_system(&g, &canonical_system_id(order as u8)).map(GqlRenderedSystem::new)
+        resolve_system(&g, &canonical_system_id(order_cardinality as u8)).map(GqlRenderedSystem::new)
     }
 
     async fn system_by_name(&self, ctx: &Context<'_>, name: String) -> Option<GqlRenderedSystem> {
-        let order = match name.to_lowercase().as_str() {
+        let order_cardinality = match name.to_lowercase().as_str() {
             "monad" => 1,
             "dyad" => 2,
             "triad" => 3,
@@ -423,7 +423,7 @@ impl QueryRoot {
             _ => return None,
         };
         let g = graph_snapshot(ctx).await;
-        resolve_system(&g, &canonical_system_id(order)).map(GqlRenderedSystem::new)
+        resolve_system(&g, &canonical_system_id(order_cardinality)).map(GqlRenderedSystem::new)
     }
 
     async fn all_systems(&self, ctx: &Context<'_>) -> Vec<GqlRenderedSystem> {
@@ -524,8 +524,8 @@ impl QueryRoot {
 // Compat: computed Template for the current SVG frontend renderer.
 // ============================================================================
 
-fn canonical_system_name(order: u8) -> &'static str {
-    match order {
+fn canonical_system_name(order_cardinality: u8) -> &'static str {
+    match order_cardinality {
         1 => "Monad",
         2 => "Dyad",
         3 => "Triad",
@@ -543,9 +543,9 @@ fn canonical_system_name(order: u8) -> &'static str {
 }
 
 pub struct RenderedSystemData {
-    pub order: u8,
+    pub order_cardinality: u8,
     pub system_id: String,
-    /// The order's display label (e.g. "Triad") — what the nav navigates by.
+    /// The order_cardinality's display label (e.g. "Triad") — what the nav navigates by.
     pub name: String,
     /// The System's own name (e.g. "Citation", "Canonical Triad").
     pub system_name: String,
@@ -582,12 +582,12 @@ pub struct GrammarConnectiveData {
     pub character_value: String,
 }
 
-/// Canonical System id for an order (the seed's `Canonical <Name>`).
-fn canonical_system_id(order: u8) -> String {
+/// Canonical System id for an order_cardinality (the seed's `Canonical <Name>`).
+fn canonical_system_id(order_cardinality: u8) -> String {
     format!(
         "system_canonical_{}_{}",
-        canonical_system_name(order).to_lowercase(),
-        order
+        canonical_system_name(order_cardinality).to_lowercase(),
+        order_cardinality
     )
 }
 
@@ -596,16 +596,16 @@ fn canonical_system_id(order: u8) -> String {
 /// applied. This is "resolve the wiring into a renderable K-graph".
 fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> {
     let system = graph.system(system_id)?;
-    let order = system.order;
-    // Display label is the order's system name (e.g. "Triad"), not the
+    let order_cardinality = system.order_cardinality;
+    // Display label is the order_cardinality's system name (e.g. "Triad"), not the
     // system's name ("Canonical Triad"). The frontend navigates by this
     // (systemByName expects "triad", not "canonical triad").
-    let name = canonical_system_name(order).to_string();
+    let name = canonical_system_name(order_cardinality).to_string();
     let system_name = system.name.clone();
     let grammar = graph.template(&system.grammar_ref)?;
     let _topology = graph.topology(&grammar.topological_vocab_ref)?; // existence guard
     let semantic = graph.vocabulary(&system.vocabulary_ref)?;
-    let colour_vocab = graph.canonical_colour_vocab_for_order(order);
+    let colour_vocab = graph.canonical_colour_vocab_for_order(order_cardinality);
 
     // --- The Controller composes the model, then resolves the view from it ---
     // Substrate-composed rather than hand-assembled: the "compose, don't load"
@@ -623,12 +623,12 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         .iter()
         .filter_map(|cid| graph.character(cid).map(|c| c.value.clone()))
         .collect();
-    let model = crate::core::substrate::compose_system(order, &term_values, &connective_values);
+    let model = crate::core::substrate::compose_system(order_cardinality, &term_values, &connective_values);
 
-    // Terms — resolved from the composed model, in ordinality order.
+    // Terms — resolved from the composed model, in ordinality order_cardinality.
     let mut terms = Vec::new();
-    for index in 1..=order {
-        let term_id = format!("term_{}_{}", order, index);
+    for index in 1..=order_cardinality {
+        let term_id = format!("term_{}_{}", order_cardinality, index);
         if let Some(d) = model.data.iter().find(|d| d.id == term_id) {
             terms.push(GrammarTermData {
                 ordinality: index as i32,
@@ -637,10 +637,10 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         }
     }
 
-    // Coordinates in ordinality order.
+    // Coordinates in ordinality order_cardinality.
     let mut coordinates = Vec::new();
-    for pos in 1..=order {
-        if let Some(c) = graph.coordinate(order, pos) {
+    for pos in 1..=order_cardinality {
+        if let Some(c) = graph.coordinate(order_cardinality, pos) {
             coordinates.push(c.clone());
         }
     }
@@ -660,10 +660,10 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
 
     // Lines: every canonical ordinality pair.
     let mut lines = Vec::new();
-    for p1 in 1..=order {
-        for p2 in (p1 + 1)..=order {
+    for p1 in 1..=order_cardinality {
+        for p2 in (p1 + 1)..=order_cardinality {
             lines.push(GrammarLineData {
-                id: format!("line_{}_{}_{}", order, p1, p2),
+                id: format!("line_{}_{}_{}", order_cardinality, p1, p2),
                 base_ordinality: p1 as i32,
                 target_ordinality: p2 as i32,
             });
@@ -671,14 +671,14 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
     }
 
     // Connectives: pair Perspective's topology.lines[i] with semantic.connectives[i].
-    // Connectives — resolved from the composed model, in canonical edge order. The
-    // connective `id` keeps the legacy `line_{order}_{a}_{b}` format the frontend uses.
+    // Connectives — resolved from the composed model, in canonical edge order_cardinality. The
+    // connective `id` keeps the legacy `line_{order_cardinality}_{a}_{b}` format the frontend uses.
     let mut connectives = Vec::new();
-    for (a, b) in crate::core::grammar::Template::for_order(order).edges() {
-        let conn_id = format!("conn_{}_{}_{}", order, a, b);
+    for (a, b) in crate::core::grammar::Template::for_order(order_cardinality).edges() {
+        let conn_id = format!("conn_{}_{}_{}", order_cardinality, a, b);
         if let Some(d) = model.data.iter().find(|d| d.id == conn_id) {
             connectives.push(GrammarConnectiveData {
-                id: format!("line_{}_{}_{}", order, a, b),
+                id: format!("line_{}_{}_{}", order_cardinality, a, b),
                 base_ordinality: a as i32,
                 target_ordinality: b as i32,
                 character_value: d.character.clone(),
@@ -687,7 +687,7 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
     }
 
     Some(RenderedSystemData {
-        order,
+        order_cardinality,
         system_id: system.id.clone(),
         name,
         system_name,
@@ -714,8 +714,8 @@ impl GqlRenderedSystem {
 
 #[Object]
 impl GqlRenderedSystem {
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn system_id(&self) -> &str {
         &self.inner.system_id
@@ -723,7 +723,7 @@ impl GqlRenderedSystem {
     async fn name(&self) -> &str {
         &self.inner.name
     }
-    /// The System's own name (e.g. "Citation") — distinct from the order label.
+    /// The System's own name (e.g. "Citation") — distinct from the order_cardinality label.
     async fn system_name(&self) -> &str {
         &self.inner.system_name
     }
@@ -789,11 +789,11 @@ impl GqlRenderedSystem {
     }
 
     /// The canonical *class* this system instantiates — the canonical system of
-    /// the same order. `None` when this system already *is* that canonical one.
+    /// the same order_cardinality. `None` when this system already *is* that canonical one.
     /// Both share the K_n structure, so terms/connectives pair by ordinality — the
     /// frontend's "Canonical override" toggle flips instance labels to these.
     async fn canonical_class(&self, ctx: &Context<'_>) -> Option<GqlRenderedSystem> {
-        let canonical_id = canonical_system_id(self.inner.order);
+        let canonical_id = canonical_system_id(self.inner.order_cardinality);
         if self.inner.system_id == canonical_id {
             return None;
         }
@@ -839,13 +839,13 @@ pub struct GqlPositionedChar {
     pub ordinality: String,
 }
 
-/// The `index`-th edge of a `K_order` in the canonical lexicographic order
+/// The `index`-th edge of a `K_order` in the canonical lexicographic order_cardinality
 /// `(1,2),(1,3),…,(2,3),…` — matches the render path's line enumeration, so a
 /// connective at vocabulary index `i` sits on edge `i`.
-fn nth_edge(order: u8, index: usize) -> String {
+fn nth_edge(order_cardinality: u8, index: usize) -> String {
     let mut k = 0;
-    for p1 in 1..=order {
-        for p2 in (p1 + 1)..=order {
+    for p1 in 1..=order_cardinality {
+        for p2 in (p1 + 1)..=order_cardinality {
             if k == index {
                 return format!("{p1}-{p2}");
             }
@@ -963,28 +963,28 @@ impl MutationRoot {
         ctx: &Context<'_>,
         input: AuthorSystemInput,
     ) -> async_graphql::Result<GqlSystem> {
-        let order = input.order as u8;
-        if !(1..=12).contains(&order) {
-            return Err(Error::new(format!("order {order} out of range 1..=12")));
+        let order_cardinality = input.order_cardinality as u8;
+        if !(1..=12).contains(&order_cardinality) {
+            return Err(Error::new(format!("order_cardinality {order_cardinality} out of range 1..=12")));
         }
-        let grammar = Template::for_order(order);
+        let grammar = Template::for_order(order_cardinality);
         let expected_conn = grammar.expected_connectives();
-        if input.terms.len() != order as usize {
+        if input.terms.len() != order_cardinality as usize {
             return Err(Error::new(format!(
-                "expected {order} terms, got {}",
+                "expected {order_cardinality} terms, got {}",
                 input.terms.len()
             )));
         }
         if input.connectives.len() != expected_conn {
             return Err(Error::new(format!(
-                "order {order} expects {expected_conn} connectives, got {}",
+                "order_cardinality {order_cardinality} expects {expected_conn} connectives, got {}",
                 input.connectives.len()
             )));
         }
 
         // Match the id scheme used by `with_auto_id` so char ids stay unique.
         let slug = input.name.to_lowercase().replace(' ', "_");
-        let sys_id = format!("system_{slug}_{order}");
+        let sys_id = format!("system_{slug}_{order_cardinality}");
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         if graph.system(&sys_id).is_some() {
@@ -1004,15 +1004,15 @@ impl MutationRoot {
             characters.push(Character::new(id.clone(), "word", value.clone()));
             conn_ids.push(id);
         }
-        let vocab = Vocabulary::with_auto_id(&input.name, order, term_ids, conn_ids);
+        let vocab = Vocabulary::with_auto_id(&input.name, order_cardinality, term_ids, conn_ids);
         let vocab_id = vocab.id.clone();
         let system = System::with_auto_id(
             &input.name,
-            order,
+            order_cardinality,
             input.coherence.unwrap_or_else(|| "Custom".to_string()),
             input.term_designation.unwrap_or_else(|| "Terms".to_string()),
             input.connective_designation.unwrap_or_else(|| "Connectives".to_string()),
-            format!("grammar_{order}"),
+            format!("grammar_{order_cardinality}"),
             &vocab_id,
         );
         let content = crate::core::content::GraphContent {
@@ -1406,10 +1406,10 @@ impl MutationRoot {
 // ============================================================================
 
 pub struct GqlOrder {
-    inner: Order,
+    inner: OrderCardinality,
 }
 impl GqlOrder {
-    pub fn new(inner: Order) -> Self {
+    pub fn new(inner: OrderCardinality) -> Self {
         Self { inner }
     }
 }
@@ -1457,14 +1457,14 @@ impl GqlPoint {
     async fn id(&self) -> &str {
         &self.inner.id
     }
-    async fn order(&self) -> Option<i32> {
+    async fn order_cardinality(&self) -> Option<i32> {
         self.inner.order_value().map(|v| v as i32)
     }
     async fn ordinality(&self) -> Option<i32> {
         self.inner.position_value().map(|v| v as i32)
     }
     async fn order_ref(&self) -> &str {
-        &self.inner.order
+        &self.inner.order_cardinality
     }
     async fn position_ref(&self) -> &str {
         &self.inner.ordinality
@@ -1484,7 +1484,7 @@ impl GqlLine {
     async fn id(&self) -> &str {
         &self.inner.id
     }
-    async fn order(&self) -> Option<i32> {
+    async fn order_cardinality(&self) -> Option<i32> {
         self.inner.order_value().map(|v| v as i32)
     }
     async fn ordinality(&self) -> Option<i32> {
@@ -1511,7 +1511,7 @@ impl GqlCoordinate {
     async fn point_ref(&self) -> &str {
         &self.inner.point_ref
     }
-    async fn order(&self) -> Option<i32> {
+    async fn order_cardinality(&self) -> Option<i32> {
         self.inner.order_value().map(|v| v as i32)
     }
     async fn ordinality(&self) -> Option<i32> {
@@ -1586,8 +1586,8 @@ impl GqlTopology {
     async fn id(&self) -> &str {
         &self.inner.id
     }
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn points(&self) -> &[String] {
         &self.inner.points
@@ -1613,8 +1613,8 @@ impl GqlGeometry {
     async fn id(&self) -> &str {
         &self.inner.id
     }
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn coordinates(&self) -> &[String] {
         &self.inner.coordinates
@@ -1643,8 +1643,8 @@ impl GqlVocabulary {
     async fn name(&self) -> &str {
         &self.inner.name
     }
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn terms(&self) -> &[String] {
         &self.inner.terms
@@ -1657,7 +1657,7 @@ impl GqlVocabulary {
     }
 }
 
-/// Structural Template wrapper (the K_n graph + arity rules for an Order).
+/// Structural Template wrapper (the K_n graph + arity rules for an OrderCardinality).
 pub struct GqlTemplate {
     inner: Template,
 }
@@ -1671,8 +1671,8 @@ impl GqlTemplate {
     async fn id(&self) -> &str {
         &self.inner.id
     }
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn topological_vocab_ref(&self) -> &str {
         &self.inner.topological_vocab_ref
@@ -1690,7 +1690,7 @@ impl GqlTemplate {
     async fn degree(&self) -> i32 {
         self.inner.degree() as i32
     }
-    /// Size — the number of edges, `C(order, 2)`; a constraint-value.
+    /// Size — the number of edges, `C(order_cardinality, 2)`; a constraint-value.
     async fn size(&self) -> i32 {
         self.inner.size() as i32
     }
@@ -1732,8 +1732,8 @@ impl GqlSystem {
     async fn name(&self) -> &str {
         &self.inner.name
     }
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn coherence(&self) -> &str {
         &self.inner.coherence
@@ -1751,7 +1751,7 @@ impl GqlSystem {
         &self.inner.vocabulary_ref
     }
     /// The system's **term characters with their node ordinality** (1..n) — resolved
-    /// from the vocabulary in order, so the frontend anchors each term to its node.
+    /// from the vocabulary in order_cardinality, so the frontend anchors each term to its node.
     async fn terms(&self, ctx: &Context<'_>) -> Vec<GqlPositionedChar> {
         let g = graph_snapshot(ctx).await;
         g.vocabulary(&self.inner.vocabulary_ref)
@@ -1773,7 +1773,7 @@ impl GqlSystem {
     /// connective at vocabulary index `i` sits on the `i`-th canonical edge.
     async fn connectives(&self, ctx: &Context<'_>) -> Vec<GqlPositionedChar> {
         let g = graph_snapshot(ctx).await;
-        let order = self.inner.order;
+        let order_cardinality = self.inner.order_cardinality;
         g.vocabulary(&self.inner.vocabulary_ref)
             .map(|v| {
                 v.connectives
@@ -1782,7 +1782,7 @@ impl GqlSystem {
                     .filter_map(|(i, c)| {
                         g.character(c).map(|c| GqlPositionedChar {
                             value: c.value.clone(),
-                            ordinality: nth_edge(order, i),
+                            ordinality: nth_edge(order_cardinality, i),
                         })
                     })
                     .collect()
@@ -1829,8 +1829,8 @@ impl GqlFunctor {
     async fn name(&self) -> &str {
         &self.inner.name
     }
-    async fn order(&self) -> i32 {
-        self.inner.order as i32
+    async fn order_cardinality(&self) -> i32 {
+        self.inner.order_cardinality as i32
     }
     async fn source_ref(&self) -> &str {
         &self.inner.source_ref
@@ -1879,7 +1879,7 @@ impl CharacterInput {
 pub struct VocabularyInput {
     pub id: Option<String>,
     pub name: String,
-    pub order: i32,
+    pub order_cardinality: i32,
     pub terms: Vec<String>,
     pub connectives: Vec<String>,
 }
@@ -1890,13 +1890,13 @@ impl VocabularyInput {
             Some(id) => Vocabulary::new(
                 id,
                 self.name,
-                self.order as u8,
+                self.order_cardinality as u8,
                 self.terms,
                 self.connectives,
             ),
             None => Vocabulary::with_auto_id(
                 self.name,
-                self.order as u8,
+                self.order_cardinality as u8,
                 self.terms,
                 self.connectives,
             ),
@@ -1908,7 +1908,7 @@ impl VocabularyInput {
 pub struct SystemInput {
     pub id: Option<String>,
     pub name: String,
-    pub order: i32,
+    pub order_cardinality: i32,
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
@@ -1917,11 +1917,11 @@ pub struct SystemInput {
 }
 
 /// Author a System from custom **values** — the in-app editor input. `terms` has
-/// `order` entries; `connectives` has C(order,2). Metadata is optional (defaults).
+/// `order_cardinality` entries; `connectives` has C(order_cardinality,2). Metadata is optional (defaults).
 #[derive(InputObject)]
 pub struct AuthorSystemInput {
     pub name: String,
-    pub order: i32,
+    pub order_cardinality: i32,
     pub terms: Vec<String>,
     pub connectives: Vec<String>,
     pub coherence: Option<String>,
@@ -1935,7 +1935,7 @@ impl SystemInput {
             Some(id) => System::new(
                 id,
                 self.name,
-                self.order as u8,
+                self.order_cardinality as u8,
                 self.coherence,
                 self.term_designation,
                 self.connective_designation,
@@ -1944,7 +1944,7 @@ impl SystemInput {
             ),
             None => System::with_auto_id(
                 self.name,
-                self.order as u8,
+                self.order_cardinality as u8,
                 self.coherence,
                 self.term_designation,
                 self.connective_designation,
@@ -1976,7 +1976,7 @@ impl SequenceInput {
 pub struct FunctorInput {
     pub id: Option<String>,
     pub name: String,
-    pub order: i32,
+    pub order_cardinality: i32,
     pub source_ref: String,
     pub target_ref: String,
     /// The object map: `permutation[i]` is the 1-based target ordinality of source
@@ -1999,7 +1999,7 @@ impl FunctorInput {
         Functor::new(
             id,
             self.name,
-            self.order as u8,
+            self.order_cardinality as u8,
             self.source_ref,
             self.target_ref,
             permutation,
@@ -2203,8 +2203,8 @@ impl GqlReference {
     }
 
     /// Resolve the System behind the target address (`system:<id>[#…]`) — carries
-    /// the order, name and coherence/designation values, so the browser can
-    /// group references by order and show each perspective's value side by side.
+    /// the order_cardinality, name and coherence/designation values, so the browser can
+    /// group references by order_cardinality and show each perspective's value side by side.
     async fn target_system(&self, ctx: &Context<'_>) -> Option<GqlSystem> {
         let rest = self.inner.target.strip_prefix("system:")?;
         let id = rest.split('#').next().unwrap_or(rest);
@@ -2272,7 +2272,7 @@ pub fn create_schema_with_store(graph: SharedGraph, store: Option<PathBuf>) -> S
 /// One law's reading of a triad — the Controller (mimic form) applied to a system.
 #[derive(SimpleObject)]
 pub struct GqlLawReading {
-    /// Bennett's name for the law (expansion / identity / order / interaction / …).
+    /// Bennett's name for the law (expansion / identity / order_cardinality / interaction / …).
     pub law: String,
     /// Hexad ordinality 1..=6 (1 red identity … 5 purple interaction … 6 orange concentration).
     pub hexad_position: i32,

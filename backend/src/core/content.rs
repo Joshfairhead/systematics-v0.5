@@ -1,7 +1,7 @@
 //! GraphContent — the serialisable data layer.
 //!
-//! The combinatoric substrate (Order, Ordinality, Point, Line, Segment, and the
-//! topological/geometric vocabulary ref-lists) is deterministic from the Order
+//! The combinatoric substrate (OrderCardinality, Ordinality, Point, Line, Segment, and the
+//! topological/geometric vocabulary ref-lists) is deterministic from the OrderCardinality
 //! and lives in code. Everything *data-like* — coordinates, characters,
 //! semantic vocabularies, and perspectives — is content, and it round-trips through
 //! this one struct. Both the canonical seed (`data/canonical.json`) and the
@@ -18,7 +18,7 @@ use super::systems::System;
 use super::vocabularies::Vocabulary;
 
 /// A portable slice of the data layer. Applied onto a substrate to populate it;
-/// snapshotted back out to persist. (Grammars are deterministic per Order and
+/// snapshotted back out to persist. (Grammars are deterministic per OrderCardinality and
 /// seeded in code, so they are not part of persisted content.)
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct GraphContent {
@@ -42,7 +42,7 @@ pub struct GraphContent {
     #[serde(default)]
     pub references: Vec<Reference>,
     /// Same-grammar functors (ordinality permutations between systems of one
-    /// Order). User-created transforms, persisted like systems/references.
+    /// OrderCardinality). User-created transforms, persisted like systems/references.
     #[serde(default)]
     pub functors: Vec<Functor>,
     /// Ordered series of member addresses (the container triad's `+` pole).

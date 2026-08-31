@@ -153,7 +153,7 @@ fn architectural_monad_registry_loads() {
         .sequence("sequence_architectural_monad")
         .expect("Architectural Monad registry loaded from its module");
     // A **bucket**: the architecture systems grouped for sorting (several triads,
-    // so it is not an order-linear sequence). Order does not matter here.
+    // so it is not an order_cardinality-linear sequence). OrderCardinality does not matter here.
     assert_eq!(
         monad.members,
         vec![

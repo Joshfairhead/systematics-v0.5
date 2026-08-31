@@ -9,17 +9,17 @@ use std::collections::{BTreeSet, HashMap, HashSet};
 
 use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
 
-/// Standard order labels (the invariant systematics names).
+/// Standard order_cardinality labels (the invariant systematics names).
 const ORDER_NAMES: [&str; 12] = [
     "Monad", "Dyad", "Triad", "Tetrad", "Pentad", "Hexad", "Heptad", "Octad",
     "Ennead", "Decad", "Undecad", "Dodecad",
 ];
 
-pub fn order_name(order: i32) -> String {
+pub fn order_name(order_cardinality: i32) -> String {
     ORDER_NAMES
-        .get((order - 1) as usize)
+        .get((order_cardinality - 1) as usize)
         .map(|s| s.to_string())
-        .unwrap_or_else(|| format!("order {order}"))
+        .unwrap_or_else(|| format!("order_cardinality {order_cardinality}"))
 }
 
 // -- small field accessors (references carry Option-wrapped nested data) --
@@ -36,7 +36,7 @@ pub fn loc(r: &ReferenceView) -> String {
     r.lookup.as_ref().map(|l| l.locator.clone()).unwrap_or_default()
 }
 pub fn order_of(r: &ReferenceView) -> Option<i32> {
-    r.target_system.as_ref().map(|s| s.order)
+    r.target_system.as_ref().map(|s| s.order_cardinality)
 }
 pub fn frag(r: &ReferenceView) -> String {
     r.target_fragment.clone().unwrap_or_default()
@@ -113,7 +113,7 @@ pub fn build_triples(
     };
     for s in systems {
         base(&s.id, "name", s.name.clone(), String::new()); // scope to a *specific* system
-        base(&s.id, "order", order_name(s.order), String::new());
+        base(&s.id, "order_cardinality", order_name(s.order_cardinality), String::new());
         // Terms/connectives carry their GRAPH ordinality (node index / base–target edge),
         // supplied by the backend — terms anchor to nodes, connectives to edges.
         for term in &s.terms {
@@ -160,14 +160,14 @@ pub fn build_triples(
 }
 
 /// The distinct **predicates** present in the data (auto-discovered): a friendly lead
-/// order (name · order · source), then the rest alphabetically.
+/// order_cardinality (name · order_cardinality · source), then the rest alphabetically.
 pub fn all_predicates(triples: &[Triple]) -> Vec<String> {
     let mut set: BTreeSet<String> = BTreeSet::new();
     for t in triples {
         set.insert(t.predicate.clone());
     }
     let mut out: Vec<String> = Vec::new();
-    for lead in ["name", "order", "source"] {
+    for lead in ["name", "order_cardinality", "source"] {
         if set.remove(lead) {
             out.push(lead.to_string());
         }
@@ -177,7 +177,7 @@ pub fn all_predicates(triples: &[Triple]) -> Vec<String> {
 }
 
 /// Subjects that satisfy every constraint **except** `skip` — the current filter
-/// context for a drill-down (so picking `order=Triad` narrows `term` to triadic terms).
+/// context for a drill-down (so picking `order_cardinality=Triad` narrows `term` to triadic terms).
 pub fn subjects_passing_except(
     triples: &[Triple],
     constraints: &HashMap<String, HashSet<String>>,

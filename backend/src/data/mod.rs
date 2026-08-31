@@ -1,11 +1,11 @@
 //! Seed the property graph.
 //!
-//! Emits substrate entries (Order, Ordinality, Point, Line, Coordinate, Segment,
+//! Emits substrate entries (OrderCardinality, Ordinality, Point, Line, Coordinate, Segment,
 //! Character) followed by the canonical Topological / Geometric / Semantic
-//! Vocabularies and one Canonical Perspective per Order.
+//! Vocabularies and one Canonical Perspective per OrderCardinality.
 
 use crate::core::{
-    Entry, Geometry, Template, GraphContent, Graph, Line, Order, Point, Ordinality,
+    Entry, Geometry, Template, GraphContent, Graph, Line, OrderCardinality, Point, Ordinality,
     Segment, Topology,
 };
 
@@ -50,7 +50,7 @@ static EMBEDDED_MODULES: include_dir::Dir<'static> =
 /// the modules are kept out of the user store yet stay editable / re-exportable
 /// (unlike the canonical seed, which is marked with `mark_canonical`).
 ///
-/// Source resolution, in order:
+/// Source resolution, in order_cardinality:
 ///   1. `$SYSTEMATICS_DATA/perspectives` if that env var is set,
 ///   2. the source tree (`$CARGO_MANIFEST_DIR/data/perspectives`) — present when
 ///      the binary runs on its build machine (local dev, `cargo test`, CI), so
@@ -117,7 +117,7 @@ fn load_embedded_modules(graph: &mut Graph) -> usize {
 
 /// Build the complete graph with all systems (1-12).
 ///
-/// The combinatoric substrate (Order, Ordinality, Point, Line, Segment, and the
+/// The combinatoric substrate (OrderCardinality, Ordinality, Point, Line, Segment, and the
 /// topological/geometric vocabulary ref-lists) is computed here; the data layer
 /// (coordinates, characters, semantic vocabularies, perspectives) is applied from
 /// the canonical seed and then marked canonical so later user additions can be
@@ -147,7 +147,7 @@ pub fn build_graph() -> Graph {
 
 fn add_orders(graph: &mut Graph) {
     for i in 1..=12u8 {
-        graph.add_entry(Entry::Order(Order::new(i)));
+        graph.add_entry(Entry::OrderCardinality(OrderCardinality::new(i)));
     }
 }
 
@@ -158,28 +158,28 @@ fn add_positions(graph: &mut Graph) {
 }
 
 /// Emit the combinatoric substrate: Points, Lines, Segments, and the
-/// topological/geometric vocabulary ref-lists. All derivable from the Order,
+/// topological/geometric vocabulary ref-lists. All derivable from the OrderCardinality,
 /// so this stays in code. Coordinates (the geometric *values*) are data and
 /// come from the canonical seed.
 fn add_substrate_combinatorics(graph: &mut Graph) {
-    for order in 1..=12u8 {
-        for ordinality in 1..=order {
-            graph.add_entry(Entry::Point(Point::new(order, ordinality)));
+    for order_cardinality in 1..=12u8 {
+        for ordinality in 1..=order_cardinality {
+            graph.add_entry(Entry::Point(Point::new(order_cardinality, ordinality)));
         }
-        for p1 in 1..=order {
-            for p2 in (p1 + 1)..=order {
-                graph.add_entry(Entry::Line(Line::new(order, p1, p2)));
+        for p1 in 1..=order_cardinality {
+            for p2 in (p1 + 1)..=order_cardinality {
+                graph.add_entry(Entry::Line(Line::new(order_cardinality, p1, p2)));
             }
         }
-        for p1 in 1..=order {
-            for p2 in (p1 + 1)..=order {
-                graph.add_entry(Entry::Segment(Segment::new(order, p1, p2)));
+        for p1 in 1..=order_cardinality {
+            for p2 in (p1 + 1)..=order_cardinality {
+                graph.add_entry(Entry::Segment(Segment::new(order_cardinality, p1, p2)));
             }
         }
-        graph.add_topological_vocab(Topology::canonical_for(order));
-        graph.add_geometric_vocab(Geometry::canonical_for(order));
-        // The complete-graph structure for this Order (deterministic).
-        graph.add_template(Template::for_order(order));
+        graph.add_topological_vocab(Topology::canonical_for(order_cardinality));
+        graph.add_geometric_vocab(Geometry::canonical_for(order_cardinality));
+        // The complete-graph structure for this OrderCardinality (deterministic).
+        graph.add_template(Template::for_order(order_cardinality));
     }
 }
 
@@ -201,26 +201,26 @@ pub fn build_canonical_from_tables() -> GraphContent {
     let mut content = GraphContent::default();
     let mut have_char = std::collections::HashSet::new();
 
-    for order in 1..=12u8 {
+    for order_cardinality in 1..=12u8 {
         // Coordinates (the geometric values).
-        for (idx, coord) in get_coordinates(order).iter().enumerate() {
+        for (idx, coord) in get_coordinates(order_cardinality).iter().enumerate() {
             content
                 .coordinates
-                .push(Coordinate::from_point3d(order, (idx + 1) as u8, *coord));
+                .push(Coordinate::from_point3d(order_cardinality, (idx + 1) as u8, *coord));
         }
 
         // Word triad: term/connective Characters + Vocabulary + System.
         push_triadic_system(
             &mut content,
             &mut have_char,
-            &format!("Canonical {}", canonical_system_name(order)),
-            order,
-            &get_term_character_slugs(order),
-            &get_canonical_connective_slugs(order),
+            &format!("Canonical {}", canonical_system_name(order_cardinality)),
+            order_cardinality,
+            &get_term_character_slugs(order_cardinality),
+            &get_canonical_connective_slugs(order_cardinality),
         );
 
         // Hex colour characters + the canonical colour Vocabulary.
-        let hex_codes = get_colours(order);
+        let hex_codes = get_colours(order_cardinality);
         let mut colour_ids = Vec::new();
         for hex in &hex_codes {
             let id = format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase());
@@ -232,8 +232,8 @@ pub fn build_canonical_from_tables() -> GraphContent {
             colour_ids.push(id);
         }
         content.vocabularies.push(Vocabulary::with_auto_id(
-            format!("Canonical Colours {}", canonical_system_name(order)),
-            order,
+            format!("Canonical Colours {}", canonical_system_name(order_cardinality)),
+            order_cardinality,
             colour_ids,
             vec![],
         ));
@@ -243,15 +243,15 @@ pub fn build_canonical_from_tables() -> GraphContent {
 }
 
 /// Shared construction primitive: push term/connective word Characters, then a
-/// `Vocabulary` and a `System` over `grammar_{order}`, with metadata inherited
-/// from the order. Reused for every canonical order AND the Citation triad — the
+/// `Vocabulary` and a `System` over `grammar_{order_cardinality}`, with metadata inherited
+/// from the order_cardinality. Reused for every canonical order_cardinality AND the Citation triad — the
 /// homoiconic bootstrap: the same builder that makes any system makes the system
 /// that *describes* citation.
 fn push_triadic_system(
     content: &mut GraphContent,
     have_char: &mut std::collections::HashSet<String>,
     name: &str,
-    order: u8,
+    order_cardinality: u8,
     term_slugs: &[String],
     connective_slugs: &[String],
 ) {
@@ -268,16 +268,16 @@ fn push_triadic_system(
         .iter()
         .map(|s| format!("char_word_{}", s))
         .collect();
-    let vocab = Vocabulary::with_auto_id(name, order, term_char_ids, connective_char_ids);
+    let vocab = Vocabulary::with_auto_id(name, order_cardinality, term_char_ids, connective_char_ids);
     let vocab_id = vocab.id.clone();
     content.vocabularies.push(vocab);
     content.systems.push(System::with_auto_id(
         name,
-        order,
-        canonical_coherence(order),
-        canonical_term_designation(order),
-        canonical_connective_designation(order),
-        format!("grammar_{}", order),
+        order_cardinality,
+        canonical_coherence(order_cardinality),
+        canonical_term_designation(order_cardinality),
+        canonical_connective_designation(order_cardinality),
+        format!("grammar_{}", order_cardinality),
         &vocab_id,
     ));
 }
@@ -285,10 +285,10 @@ fn push_triadic_system(
 /// Build the Citation triad as its own content bundle (`data/citation.json`):
 /// **Source / Artefact / Lookup** as the three impulses of a K3, with the
 /// **citation-query** edges (user, 2026-08-18): the three connectives are
-/// **Search · Sort · Filter**, in canonical edge order over nodes
+/// **Search · Sort · Filter**, in canonical edge order_cardinality over nodes
 /// 1=source · 2=artefact · 3=lookup — (1,2) source–artefact = **Sort**,
 /// (1,3) source–lookup = **Search**, (2,3) artefact–lookup = **Filter**.
-/// Metadata inherits order 3 (Dynamism / Impulses / Acts).
+/// Metadata inherits order_cardinality 3 (Dynamism / Impulses / Acts).
 pub fn build_citation_from_tables() -> GraphContent {
     let mut content = GraphContent::default();
     let mut have_char = std::collections::HashSet::new();
@@ -308,10 +308,10 @@ fn slugs(xs: &[&str]) -> Vec<String> {
     xs.iter().map(|s| s.to_string()).collect()
 }
 
-/// `C(order, 2)` placeholder edge slugs for a `K_order` whose connectives aren't
+/// `C(order_cardinality, 2)` placeholder edge slugs for a `K_order` whose connectives aren't
 /// yet named (used by the architecture/graph-theory scaffold systems).
-fn edge_slugs(prefix: &str, order: usize) -> Vec<String> {
-    let count = order * order.saturating_sub(1) / 2;
+fn edge_slugs(prefix: &str, order_cardinality: usize) -> Vec<String> {
+    let count = order_cardinality * order_cardinality.saturating_sub(1) / 2;
     (1..=count).map(|i| format!("{prefix}_edge_{i}")).collect()
 }
 
@@ -371,7 +371,7 @@ fn push_metadata_dodecad(
 /// Build the author-contributed and systematics-core **fragments** as their own
 /// bundle (`data/fragments.json`). Source of the author triads: **Josh Fairhead**
 /// (see `docs/fragments.md`). Each is a real K_n system (terms + named/placeholder
-/// connectives) so it resolves in the graph; metadata inherits the canonical order.
+/// connectives) so it resolves in the graph; metadata inherits the canonical order_cardinality.
 ///
 /// Maths triad term positions (theorems=1, lemmas=2, proofs=3) fix the named edges
 /// onto the K3 lines (1,2)(1,3)(2,3): bili · φ · Fibonacci. The Determining-
@@ -469,16 +469,16 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["perspective_node_1", "perspective_node_2", "perspective_node_3"]),
         &slugs(&["subject", "predicate", "object"]),
     );
-    // Order · Ordinality · Location triad [WIP] — the topological anchor. `order ×
+    // OrderCardinality · Ordinality · Location triad [WIP] — the topological anchor. `order_cardinality ×
     // ordinality = location`; most triples attach to a location (e.g. Location ·
     // Term-character · Source; Lines = Location · Connection · Location). May fold
     // into a pentad.
     push_triadic_system(
         &mut content,
         &mut have_char,
-        "Order Ordinality Location",
+        "OrderCardinality Ordinality Location",
         3,
-        &slugs(&["order", "ordinality", "location"]),
+        &slugs(&["order_cardinality", "ordinality", "location"]),
         &slugs(&["opl_edge_1", "opl_edge_2", "opl_edge_3"]),
     );
     // Data Object triad [WIP] — the reference triple: key (+) · value (−) ·
@@ -523,7 +523,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["retrieve", "augment", "generate"]),
         &slugs(&["comp_edge_1", "comp_edge_2", "comp_edge_3"]),
     );
-    // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order 1);
+    // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order_cardinality 1);
     // the dyad (key · value) is ALSO called "Data" (data = a key:value tag) and
     // links to the Data monad. (Two "Data" systems, orders 1 and 2.)
     push_triadic_system(&mut content, &mut have_char, "Data", 1, &slugs(&["data"]), &slugs(&[]));
@@ -592,7 +592,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
     );
     // Identification triad [Ouspensky, The Fourth Way] — Like (+) · Dislike (−) ·
     // Identification (=): like and dislike are both identification. Edges (user,
-    // 2026-08-27), canonical order (1,2),(1,3),(2,3): (1,3) Like–Identification =
+    // 2026-08-27), canonical order_cardinality (1,2),(1,3),(2,3): (1,3) Like–Identification =
     // Attraction, (2,3) Dislike–Identification = Repulsion; (1,2) Like–Dislike TBD.
     push_triadic_system(
         &mut content,
@@ -662,7 +662,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
     // Semantic Projection (+) · Structural Topology (−) · Graph Template (=). Matrix
     // names (validated 2026-08-26): Line graph (+) · Adjacency graph (−) · Incidence
     // graph (=). Its edges are the **category-theory axioms**, grounded in incidence
-    // `B` (edge order (1,2),(1,3),(2,3) over the nodes above):
+    // `B` (edge order_cardinality (1,2),(1,3),(2,3) over the nodes above):
     //   (1,2) Line–Adjacency      = identity      (duals, same up to iso — an orbital)
     //   (1,3) Line–Incidence      = associativity (A·B = B·L, assoc. of B·Bᵀ·B)
     //   (2,3) Adjacency–Incidence = composition   (A = B·Bᵀ)
@@ -675,21 +675,21 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["identity", "associativity", "composition"]),
     );
     // The dyad on each construction node: what that impulse defines.
-    // Graph Template (=) → order · size.
-    push_triadic_system(&mut content, &mut have_char, "Order Size", 2, &slugs(&["order", "size"]), &edge_slugs("os", 2));
+    // Graph Template (=) → order_cardinality · size.
+    push_triadic_system(&mut content, &mut have_char, "OrderCardinality Size", 2, &slugs(&["order_cardinality", "size"]), &edge_slugs("os", 2));
     // Structural Topology (−) → vertex · edge (the adjacency pair).
     push_triadic_system(&mut content, &mut have_char, "Vertex Edge", 2, &slugs(&["vertex", "edge"]), &edge_slugs("ve", 2));
     // Semantic Projection (+) → term · connective (the characters).
     push_triadic_system(&mut content, &mut have_char, "Term Connective", 2, &slugs(&["term", "connective"]), &edge_slugs("tc", 2));
     // Navigation dyad [architecture / graph-theory monad]: path · distance.
     push_triadic_system(&mut content, &mut have_char, "Path Distance", 2, &slugs(&["path", "distance"]), &edge_slugs("pd", 2));
-    // Graph-theory holding heptad — terms to sort later (order=#nodes, size=#edges).
+    // Graph-theory holding heptad — terms to sort later (order_cardinality=#nodes, size=#edges).
     push_triadic_system(
         &mut content,
         &mut have_char,
         "Graph Theory",
         7,
-        &slugs(&["order", "degree", "index", "adjacency", "neighbourhood", "location", "ordinality"]),
+        &slugs(&["order_cardinality", "degree", "index", "adjacency", "neighbourhood", "location", "ordinality"]),
         &edge_slugs("gt", 7),
     );
     // Topology · Geometry · Ordinality · Location tetrad — the topology/geometry split
@@ -703,7 +703,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("tg", 4),
     );
     // Provenance pentad (generalises the citation triad): Source · Distributer ·
-    // Expression · Artefact · Lookup (user swapped artefact/expression order).
+    // Expression · Artefact · Lookup (user swapped artefact/expression order_cardinality).
     push_triadic_system(
         &mut content,
         &mut have_char,
@@ -714,8 +714,8 @@ pub fn build_fragments_from_tables() -> GraphContent {
     );
 
     // The six laws of three as a Hexad — the Controller laid out as DATA (the laws
-    // named as nodes). Terms in Hexad-ordinality order (1 identity · 2 expansion ·
-    // 3 order · 4 freedom · 5 interaction[SPO] · 6 concentration), matching
+    // named as nodes). Terms in Hexad-ordinality order_cardinality (1 identity · 2 expansion ·
+    // 3 order_cardinality · 4 freedom · 5 interaction[SPO] · 6 concentration), matching
     // `core::laws::Law::HEXAD`. Edges = the S₃ group relations between laws, TBD →
     // placeholder for now. The morphism logic (permutation/read/compose) lives in
     // `core/laws.rs`; this seed is the in-graph, addressable form of the same six.
@@ -727,7 +727,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&[
             "identity",
             "expansion",
-            "order",
+            "order_cardinality",
             "freedom",
             "interaction",
             "concentration",
@@ -760,7 +760,7 @@ pub fn build_fragments_from_tables() -> GraphContent {
     );
 
     // Metadata dodecads (user, 2026-08-20; composed-from-source 2026-08-27) — the 12
-    // values per metadata dimension as order-12 systems, to fill the view's metadata
+    // values per metadata dimension as order_cardinality-12 systems, to fill the view's metadata
     // sections. **Composed from the single source** (`core::hexadicsystems`) so they
     // can't drift from the hexad; designations 9–12 are still "Needs Research". Edges
     // TBD → placeholder.
@@ -793,9 +793,9 @@ pub fn build_fragments_from_tables() -> GraphContent {
 // Canonical vocabulary data
 // =============================================================================
 
-/// Term-character values in ordinality order for each canonical system.
-fn get_term_characters(order: u8) -> Vec<&'static str> {
-    match order {
+/// Term-character values in ordinality order_cardinality for each canonical system.
+fn get_term_characters(order_cardinality: u8) -> Vec<&'static str> {
+    match order_cardinality {
         1 => vec!["Unity"],
         2 => vec!["Essence", "Existence"],
         3 => vec!["Will", "Function", "Being"],
@@ -854,13 +854,13 @@ fn get_term_characters(order: u8) -> Vec<&'static str> {
     }
 }
 
-fn get_term_character_slugs(order: u8) -> Vec<String> {
-    get_term_characters(order).into_iter().map(slugify).collect()
+fn get_term_character_slugs(order_cardinality: u8) -> Vec<String> {
+    get_term_characters(order_cardinality).into_iter().map(slugify).collect()
 }
 
-/// Canonical connective slugs in canonical topological order (p1 < p2).
-fn get_canonical_connective_slugs(order: u8) -> Vec<String> {
-    match order {
+/// Canonical connective slugs in canonical topological order_cardinality (p1 < p2).
+fn get_canonical_connective_slugs(order_cardinality: u8) -> Vec<String> {
+    match order_cardinality {
         1 => vec![],
         2 => vec!["force_1_needs_research".into()],
         3 => vec![
@@ -889,7 +889,7 @@ fn get_canonical_connective_slugs(order: u8) -> Vec<String> {
             "form".into(),
         ],
         _ => {
-            let prefix = match order {
+            let prefix = match order_cardinality {
                 6 => "step",
                 7 => "interval",
                 8 => "component",
@@ -899,7 +899,7 @@ fn get_canonical_connective_slugs(order: u8) -> Vec<String> {
                 12 => "harmony",
                 _ => return vec![],
             };
-            let n = order as usize;
+            let n = order_cardinality as usize;
             let count = n * (n - 1) / 2;
             (1..=count)
                 .map(|i| format!("{}_{}_needs_research", prefix, i))
@@ -925,8 +925,8 @@ fn word_from_slug(slug: &str) -> String {
         .join(" ")
 }
 
-pub fn canonical_system_name(order: u8) -> &'static str {
-    match order {
+pub fn canonical_system_name(order_cardinality: u8) -> &'static str {
+    match order_cardinality {
         1 => "Monad",
         2 => "Dyad",
         3 => "Triad",
@@ -945,24 +945,24 @@ pub fn canonical_system_name(order: u8) -> &'static str {
 
 // The canonical metadata is single-sourced in `core::hexadicsystems` (the hexad model);
 // these seed-side helpers delegate to it.
-fn canonical_coherence(order: u8) -> &'static str {
-    crate::core::hexadicsystems::coherence(order)
+fn canonical_coherence(order_cardinality: u8) -> &'static str {
+    crate::core::hexadicsystems::coherence(order_cardinality)
 }
 
-fn canonical_term_designation(order: u8) -> &'static str {
-    crate::core::hexadicsystems::term_designation(order)
+fn canonical_term_designation(order_cardinality: u8) -> &'static str {
+    crate::core::hexadicsystems::term_designation(order_cardinality)
 }
 
-fn canonical_connective_designation(order: u8) -> &'static str {
-    crate::core::hexadicsystems::connective_designation(order)
+fn canonical_connective_designation(order_cardinality: u8) -> &'static str {
+    crate::core::hexadicsystems::connective_designation(order_cardinality)
 }
 
 // =============================================================================
 // Coordinate data — same geometry as the pre-refactor codebase.
 // =============================================================================
 
-fn get_coordinates(order: u8) -> Vec<Point3d> {
-    match order {
+fn get_coordinates(order_cardinality: u8) -> Vec<Point3d> {
+    match order_cardinality {
         1 => vec![Point3d::new(0.0, 0.0, 0.0)],
         2 => vec![
             Point3d::new(-1.0, 0.0, 0.0),
@@ -1083,7 +1083,7 @@ fn get_coordinates(order: u8) -> Vec<Point3d> {
     }
 }
 
-fn get_colours(order: u8) -> Vec<&'static str> {
+fn get_colours(order_cardinality: u8) -> Vec<&'static str> {
     const RED: &str = "#FF0000";
     const BLUE: &str = "#0000FF";
     const YELLOW: &str = "#FFFF00";
@@ -1097,7 +1097,7 @@ fn get_colours(order: u8) -> Vec<&'static str> {
     const SILVER: &str = "#C0C0C0";
     const GOLD: &str = "#FFD700";
 
-    match order {
+    match order_cardinality {
         1 => vec![RED],
         2 => vec![RED, BLUE],
         3 => vec![RED, BLUE, YELLOW],
@@ -1128,8 +1128,8 @@ mod tests {
     #[test]
     fn test_build_graph_substrate() {
         let g = build_graph();
-        assert!(g.order(1).is_some());
-        assert!(g.order(12).is_some());
+        assert!(g.order_cardinality(1).is_some());
+        assert!(g.order_cardinality(12).is_some());
         assert!(g.point(3, 1).is_some());
         assert!(g.line(3, 1, 2).is_some());
         assert!(g.coordinate(3, 1).is_some());
@@ -1140,21 +1140,21 @@ mod tests {
     #[test]
     fn test_build_graph_canonical_systems() {
         let g = build_graph();
-        for order in 1..=12u8 {
-            assert!(g.topology_for_order(order).is_some());
-            assert!(g.geometry_for_order(order).is_some());
-            assert!(g.template_for_order(order).is_some());
-            let name = format!("Canonical {}", canonical_system_name(order));
+        for order_cardinality in 1..=12u8 {
+            assert!(g.topology_for_order(order_cardinality).is_some());
+            assert!(g.geometry_for_order(order_cardinality).is_some());
+            assert!(g.template_for_order(order_cardinality).is_some());
+            let name = format!("Canonical {}", canonical_system_name(order_cardinality));
             let vocab_id = format!(
                 "vocab_{}_{}",
                 name.to_lowercase().replace(' ', "_"),
-                order
+                order_cardinality
             );
             assert!(g.vocabulary(&vocab_id).is_some());
             let system_id = format!(
                 "system_{}_{}",
                 name.to_lowercase().replace(' ', "_"),
-                order
+                order_cardinality
             );
             assert!(g.system(&system_id).is_some());
             assert!(

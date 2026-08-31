@@ -114,7 +114,7 @@ impl Component for ApiGraphView {
                         class={ classes!("designation", "designation-term", term_tip.is_some().then_some("cited")) }
                         title={ term_tip.clone() }
                     >
-                        { format!("{} {}", system.order, system.term_designation) }
+                        { format!("{} {}", system.order_cardinality, system.term_designation) }
                     </span>
                     <span
                         class={ classes!("designation", "designation-connective", conn_tip.is_some().then_some("cited")) }
@@ -497,7 +497,7 @@ impl ApiGraphView {
                         fill="white"
                         stroke="black"
                         stroke-width="1"
-                        paint-order="stroke"
+                        paint-order_cardinality="stroke"
                         style="font-size: 12px; font-weight: bold; pointer-events: none; user-select: none;"
                     >
                         { ordinality }

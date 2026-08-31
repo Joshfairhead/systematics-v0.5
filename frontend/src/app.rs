@@ -21,7 +21,7 @@ pub enum ViewMode {
     Table,
 }
 
-/// The header's selectable system keys, in order 1→12. Order 0 is **Nullad**
+/// The header's selectable system keys, in order_cardinality 1→12. OrderCardinality 0 is **Nullad**
 /// (key `"nullad"`), prepended in the selector — the unbounded "all", which has
 /// no single system to render or filter to.
 const ORDER_KEYS: [&str; 12] = [
@@ -29,7 +29,7 @@ const ORDER_KEYS: [&str; 12] = [
     "ennead", "decad", "undecad", "dodecad",
 ];
 
-/// The order a header key filters/selects, or `None` for Nullad ("all").
+/// The order_cardinality a header key filters/selects, or `None` for Nullad ("all").
 fn order_for_key(key: &str) -> Option<i32> {
     ORDER_KEYS
         .iter()
@@ -37,11 +37,11 @@ fn order_for_key(key: &str) -> Option<i32> {
         .map(|i| i as i32 + 1)
 }
 
-/// The header key for a system of the given order (inverse of `order_for_key`);
+/// The header key for a system of the given order_cardinality (inverse of `order_for_key`);
 /// falls back to Nullad for out-of-range orders.
-fn key_for_order(order: i32) -> String {
+fn key_for_order(order_cardinality: i32) -> String {
     ORDER_KEYS
-        .get((order - 1) as usize)
+        .get((order_cardinality - 1) as usize)
         .map(|s| s.to_string())
         .unwrap_or_else(|| "nullad".to_string())
 }
@@ -99,7 +99,7 @@ pub enum ApiAppMsg {
     ToggleEditing,
     /// All sequences/monads loaded.
     SequencesLoaded(Vec<SequenceView>),
-    /// Enter a monad/sequence (member addresses) — navigate its members by order.
+    /// Enter a monad/sequence (member addresses) — navigate its members by order_cardinality.
     ViewSequence(Vec<String>),
     /// Delete a Sequence/Monad by id (e.g. a stray Extract monad), then refresh.
     DeleteSequence(String),
@@ -122,7 +122,7 @@ pub struct ApiApp {
     /// How the main pane represents the selection (graph canvas vs data browser).
     mode: ViewMode,
     /// The header's currently selected system key (`"nullad"`, `"monad"`, …).
-    /// Drives both which graph renders and which order the data view filters to.
+    /// Drives both which graph renders and which order_cardinality the data view filters to.
     selected_key: String,
     /// Every citation in the graph (enriched), loaded lazily on first entry to
     /// the References view — powers the browser's table + compare matrix.
@@ -140,32 +140,32 @@ pub struct ApiApp {
     /// Every Sequence / Monad in the graph — shown as rows in the data view.
     sequences: Vec<SequenceView>,
     /// When navigating inside a monad/sequence: its member addresses. Header
-    /// order buttons then load the member of that order (not the canonical one).
+    /// order_cardinality buttons then load the member of that order_cardinality (not the canonical one).
     active_sequence: Option<Vec<String>>,
-    /// When a **bucket** monad is entered (a group, not an order-linear sequence),
+    /// When a **bucket** monad is entered (a group, not an order_cardinality-linear sequence),
     /// the data view is scoped to just these member addresses — the "group for
     /// sorting" the Architectural Monad provides. `None` = no scope (whole registry).
     scope_members: Option<Vec<String>>,
 }
 
 impl ApiApp {
-    /// The order of a system by id (canonical `self.systems` or `instance_systems`).
+    /// The order_cardinality of a system by id (canonical `self.systems` or `instance_systems`).
     fn system_order(&self, id: &str) -> Option<i32> {
         self.systems
             .iter()
             .find(|s| s.system_id == id)
-            .map(|s| s.order)
-            .or_else(|| self.instance_systems.iter().find(|s| s.id == id).map(|s| s.order))
+            .map(|s| s.order_cardinality)
+            .or_else(|| self.instance_systems.iter().find(|s| s.id == id).map(|s| s.order_cardinality))
     }
-    /// The sequence member (system id) whose resolved order matches, if any.
-    fn sequence_member_for_order(&self, members: &[String], order: i32) -> Option<String> {
+    /// The sequence member (system id) whose resolved order_cardinality matches, if any.
+    fn sequence_member_for_order(&self, members: &[String], order_cardinality: i32) -> Option<String> {
         members
             .iter()
             .filter_map(|m| m.strip_prefix("system:"))
-            .find(|id| self.system_order(id) == Some(order))
+            .find(|id| self.system_order(id) == Some(order_cardinality))
             .map(|id| id.to_string())
     }
-    /// The distinct orders of a sequence's *system* members, in ascending order.
+    /// The distinct orders of a sequence's *system* members, in ascending order_cardinality.
     fn member_orders(&self, members: &[String]) -> Vec<i32> {
         let mut orders: Vec<i32> = members
             .iter()
@@ -176,16 +176,16 @@ impl ApiApp {
         orders.dedup();
         orders
     }
-    /// An **ordered core-sequence** has at most one member per order, so the header
-    /// can step it order-by-order (Monad→Dyad→Triad). A **bucket** (e.g. the
+    /// An **ordered core-sequence** has at most one member per order_cardinality, so the header
+    /// can step it order_cardinality-by-order_cardinality (Monad→Dyad→Triad). A **bucket** (e.g. the
     /// Architectural Monad — several triads) fails this and is treated as a group.
     fn is_order_navigable(&self, members: &[String]) -> bool {
         let system_members = members.iter().filter(|m| m.starts_with("system:")).count();
         system_members > 0 && self.member_orders(members).len() == system_members
     }
     /// The header keys reachable in the current context. `None` when not in a
-    /// sequence (canonical: all enabled). In an order-navigable sequence, only the
-    /// member orders are enabled. In a bucket, no order button is enabled (it is a
+    /// sequence (canonical: all enabled). In an order_cardinality-navigable sequence, only the
+    /// member orders are enabled. In a bucket, no order_cardinality button is enabled (it is a
     /// group, not a path — you filter it in the table; Nullad exits).
     fn enabled_order_keys(&self) -> Option<Vec<String>> {
         let members = self.active_sequence.as_ref()?;
@@ -300,7 +300,7 @@ impl Component for ApiApp {
         match msg {
             ApiAppMsg::SelectSystem(name) => {
                 // The header buttons drive both views: which graph to render, and
-                // which order the data view filters to. Set the key optimistically
+                // which order_cardinality the data view filters to. Set the key optimistically
                 // so the highlight and the data filter update immediately.
                 self.selected_key = name.clone();
                 self.breadcrumbs.clear();
@@ -309,7 +309,7 @@ impl Component for ApiApp {
                 if name == "nullad" {
                     // Nullad = the unbounded "all", and the reset: clicking it drops
                     // any monad context and scope, back to the whole registry. No
-                    // single system to render (blank canvas in graph mode), no order
+                    // single system to render (blank canvas in graph mode), no order_cardinality
                     // filter and no member-scope in data mode.
                     self.active_sequence = None; // leave any monad context
                     self.scope_members = None; // drop any bucket scope
@@ -319,14 +319,14 @@ impl Component for ApiApp {
                     return true;
                 }
 
-                // Inside an *order-navigable* monad/sequence: the header navigates its
-                // members by order (e.g. Monad(CT)→Dyad = Container·Operations, not
-                // canonical). Buckets (several members of the same order) aren't
-                // order-linear — their order buttons are greyed, so this is skipped.
+                // Inside an *order_cardinality-navigable* monad/sequence: the header navigates its
+                // members by order_cardinality (e.g. Monad(CT)→Dyad = Container·Operations, not
+                // canonical). Buckets (several members of the same order_cardinality) aren't
+                // order_cardinality-linear — their order_cardinality buttons are greyed, so this is skipped.
                 if let Some(members) = self.active_sequence.clone() {
                     if self.is_order_navigable(&members) {
-                    if let Some(order) = order_for_key(&name) {
-                        if let Some(id) = self.sequence_member_for_order(&members, order) {
+                    if let Some(order_cardinality) = order_for_key(&name) {
+                        if let Some(id) = self.sequence_member_for_order(&members, order_cardinality) {
                             self.loading = true;
                             let link = ctx.link().clone();
                             let client = self.graphql_client.clone();
@@ -339,7 +339,7 @@ impl Component for ApiApp {
                             return true;
                         }
                     }
-                    // No member at this order → leave the monad, fall to canonical.
+                    // No member at this order_cardinality → leave the monad, fall to canonical.
                     self.active_sequence = None;
                     }
                 }
@@ -423,7 +423,7 @@ impl Component for ApiApp {
                 );
                 for sys in &systems {
                     web_sys::console::log_1(
-                        &format!("  - order {} ({})", sys.order, sys.display_name()).into(),
+                        &format!("  - order_cardinality {} ({})", sys.order_cardinality, sys.display_name()).into(),
                     );
                 }
 
@@ -435,8 +435,8 @@ impl Component for ApiApp {
             ApiAppMsg::SystemLoaded(system) => {
                 self.loading = false;
                 let system_id = system.system_id.clone();
-                // Sync the header highlight to the order now on the canvas.
-                self.selected_key = key_for_order(system.order);
+                // Sync the header highlight to the order_cardinality now on the canvas.
+                self.selected_key = key_for_order(system.order_cardinality);
                 self.selected_system = Some(*system);
                 // Prefetch citations for the new system (hover tooltips).
                 self.system_references = vec![];
@@ -551,7 +551,7 @@ impl Component for ApiApp {
                 self.breadcrumbs.clear();
                 if self.is_order_navigable(&members) {
                     // Ordered core-sequence (Monad(CT), Data): enter it in the graph;
-                    // the header then steps its members by order, greying the rest.
+                    // the header then steps its members by order_cardinality, greying the rest.
                     self.mode = ViewMode::Graph;
                     self.scope_members = None;
                     let first = members
@@ -571,10 +571,10 @@ impl Component for ApiApp {
                     }
                 } else {
                     // Bucket (Architectural Monad — several triads): not a path but a
-                    // group. Scope the Table to its members for sorting; the order
-                    // buttons are greyed (no single order to step to). Nullad exits.
+                    // group. Scope the Table to its members for sorting; the order_cardinality
+                    // buttons are greyed (no single order_cardinality to step to). Nullad exits.
                     self.mode = ViewMode::Table;
-                    self.selected_key = "nullad".to_string(); // drop any order filter
+                    self.selected_key = "nullad".to_string(); // drop any order_cardinality filter
                     self.active_sequence = Some(members.clone());
                     self.scope_members = Some(members);
                     self.selected_system = None;
@@ -662,13 +662,13 @@ impl Component for ApiApp {
                 let client = self.graphql_client.clone();
                 spawn_local(async move {
                     match client
-                        .author_system(&req.name, req.order, req.terms, req.connectives)
+                        .author_system(&req.name, req.order_cardinality, req.terms, req.connectives)
                         .await
                     {
                         Ok(sys) => {
                             link.send_message(ApiAppMsg::MonadExtracted(format!(
-                                "Authored system “{}” → {} (order {})",
-                                sys.name, sys.id, sys.order
+                                "Authored system “{}” → {} (order_cardinality {})",
+                                sys.name, sys.id, sys.order_cardinality
                             )));
                             // Load the authored system so the graph updates to it.
                             match client.fetch_rendered_by_id(&sys.id).await {
@@ -701,12 +701,12 @@ impl Component for ApiApp {
         let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
         let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
         let on_delete_rows = ctx.link().callback(ApiAppMsg::DeleteRows);
-        // Canonical term/connective values per order — the editor's prefill source.
+        // Canonical term/connective values per order_cardinality — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
             .systems
             .iter()
             .map(|s| SystemTemplate {
-                order: s.order,
+                order_cardinality: s.order_cardinality,
                 terms: s.terms.iter().map(|t| t.value.clone()).collect(),
                 connectives: s.connectives.iter().map(|c| c.character_value.clone()).collect(),
             })
@@ -719,7 +719,7 @@ impl Component for ApiApp {
             .map(|s| InstanceSystem {
                 id: s.system_id.clone(),
                 name: s.name.clone(),
-                order: s.order,
+                order_cardinality: s.order_cardinality,
                 // Canonical systems carry graph positions: term.ordinality (node) and
                 // connective base–target (edge) — the same source the graph view uses.
                 terms: s
@@ -747,11 +747,11 @@ impl Component for ApiApp {
                 let mut v: Vec<RawElement> = s
                     .terms
                     .iter()
-                    .map(|t| RawElement { name: t.value.clone(), order: s.order, is_edge: false })
+                    .map(|t| RawElement { name: t.value.clone(), order_cardinality: s.order_cardinality, is_edge: false })
                     .collect();
                 v.extend(s.connectives.iter().map(|c| RawElement {
                     name: c.character_value.clone(),
-                    order: s.order,
+                    order_cardinality: s.order_cardinality,
                     is_edge: true,
                 }));
                 v

@@ -1,7 +1,7 @@
 //! Validation: the **Controller can rebuild the graph**. The existing seeded graph
 //! is the ground truth (the working models — visualisation + correct assignments);
 //! the substrate's `generate_topology` (the controller's topology generator) must
-//! reproduce each order's topology — its vertices and its undirected edges — from
+//! reproduce each order_cardinality's topology — its vertices and its undirected edges — from
 //! the graph rules alone. As anchoring (terms / geometry / colour) is added, this
 //! rebuild check extends to more of the graph.
 
@@ -17,13 +17,13 @@ fn tail(id: &str) -> u8 {
 fn controller_rebuilds_the_topology_of_every_seeded_order() {
     let graph = data::build_graph();
 
-    for order in 1..=12u8 {
+    for order_cardinality in 1..=12u8 {
         let topo = graph
-            .topology_for_order(order)
-            .unwrap_or_else(|| panic!("order {order} has a seeded topology"));
+            .topology_for_order(order_cardinality)
+            .unwrap_or_else(|| panic!("order_cardinality {order_cardinality} has a seeded topology"));
 
         // Ground truth from the seeded topological vocabulary: points → vertex
-        // positions, lines (`line_{order}_{lo}_{hi}`) → undirected edges.
+        // positions, lines (`line_{order_cardinality}_{lo}_{hi}`) → undirected edges.
         let mut gt_positions: Vec<u8> = topo.points.iter().map(|p| tail(p)).collect();
         gt_positions.sort_unstable();
         let mut gt_edges: Vec<(u8, u8)> = topo
@@ -39,65 +39,65 @@ fn controller_rebuilds_the_topology_of_every_seeded_order() {
         gt_edges.sort_unstable();
 
         // The controller's rebuild, generated from the graph rules (the Template).
-        let rebuilt = generate_topology(order);
+        let rebuilt = generate_topology(order_cardinality);
         let mut rb_positions: Vec<u8> = rebuilt.elements.iter().map(|e| e.index).collect();
         rb_positions.sort_unstable();
         let mut rb_edges: Vec<(u8, u8)> = rebuilt.links.iter().map(|l| l.endpoints).collect();
         rb_edges.sort_unstable();
 
-        assert_eq!(rb_positions, gt_positions, "order {order}: vertices must match");
-        assert_eq!(rb_edges, gt_edges, "order {order}: edges must match");
+        assert_eq!(rb_positions, gt_positions, "order_cardinality {order_cardinality}: vertices must match");
+        assert_eq!(rb_edges, gt_edges, "order_cardinality {order_cardinality}: edges must match");
     }
 }
 
 /// The Controller must also rebuild the graph's **semantics** — the term assignments
 /// at their canonical positions — for **every full seeded system, beyond the triad**
 /// (tetrad … dodecad). For each system whose vocabulary is complete (`terms.len() ==
-/// order`), `compose_system` from its real terms and check each lands on its vertex.
+/// order_cardinality`), `compose_system` from its real terms and check each lands on its vertex.
 #[test]
 fn controller_rebuilds_term_assignments_beyond_the_triad() {
     let graph = data::build_graph();
     let mut checked_orders = std::collections::BTreeSet::new();
 
     for sys in graph.systems.iter() {
-        let order = sys.order;
+        let order_cardinality = sys.order_cardinality;
         let Some(vocab) = graph.vocabulary(&sys.vocabulary_ref) else {
             continue;
         };
-        // only full systems (a complete vocabulary for the order).
-        if vocab.terms.len() != order as usize {
+        // only full systems (a complete vocabulary for the order_cardinality).
+        if vocab.terms.len() != order_cardinality as usize {
             continue;
         }
         let value = |cid: &String| graph.character(cid).map(|c| c.value.clone()).unwrap_or_default();
         let terms: Vec<String> = vocab.terms.iter().map(value).collect();
         let connectives: Vec<String> = vocab.connectives.iter().map(value).collect();
 
-        let hg = compose_system(order, &terms, &connectives);
+        let hg = compose_system(order_cardinality, &terms, &connectives);
 
         for (i, term) in terms.iter().enumerate() {
             let pos = (i + 1) as u8;
             let anchored = hg
                 .data
                 .iter()
-                .find(|d| d.id == format!("term_{order}_{pos}"))
-                .unwrap_or_else(|| panic!("{} order {order}: term at {pos}", sys.id));
+                .find(|d| d.id == format!("term_{order_cardinality}_{pos}"))
+                .unwrap_or_else(|| panic!("{} order_cardinality {order_cardinality}: term at {pos}", sys.id));
             assert_eq!(&anchored.character, term, "{} term at vertex {pos}", sys.id);
             assert!(
                 hg.links.iter().any(|l| {
-                    l.base == format!("el_{order}_{pos}")
-                        && l.target == format!("term_{order}_{pos}")
+                    l.base == format!("el_{order_cardinality}_{pos}")
+                        && l.target == format!("term_{order_cardinality}_{pos}")
                 }),
-                "{} term_{order}_{pos} must anchor to vertex el_{order}_{pos}",
+                "{} term_{order_cardinality}_{pos} must anchor to vertex el_{order_cardinality}_{pos}",
                 sys.id
             );
         }
-        checked_orders.insert(order);
+        checked_orders.insert(order_cardinality);
     }
 
     // proves it rebuilds well beyond the triad, across many orders.
     assert!(
         checked_orders.iter().filter(|&&o| o >= 4).count() >= 3,
-        "should rebuild systems of order ≥ 4 (beyond the triad); orders checked: {checked_orders:?}"
+        "should rebuild systems of order_cardinality ≥ 4 (beyond the triad); orders checked: {checked_orders:?}"
     );
 }
 
