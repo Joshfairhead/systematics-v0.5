@@ -266,14 +266,14 @@
       "value": "Perspective Node 3"
     },
     {
-      "id": "char_word_order",
+      "id": "char_word_order_cardinality",
       "kind": "word",
-      "value": "Order"
+      "value": "Order Cardinality"
     },
     {
-      "id": "char_word_position",
+      "id": "char_word_ordinality",
       "kind": "word",
-      "value": "Position"
+      "value": "Ordinality"
     },
     {
       "id": "char_word_location",
@@ -2294,6 +2294,2166 @@
       "id": "char_word_cdes_edge_66",
       "kind": "word",
       "value": "Cdes Edge 66"
+    },
+    {
+      "id": "char_word_quintessence",
+      "kind": "word",
+      "value": "Quintessence"
+    },
+    {
+      "id": "char_word_value_nature",
+      "kind": "word",
+      "value": "Value Nature"
+    },
+    {
+      "id": "char_word_factual_nature",
+      "kind": "word",
+      "value": "Factual Nature"
+    },
+    {
+      "id": "char_word_end",
+      "kind": "word",
+      "value": "End"
+    },
+    {
+      "id": "char_word_es5_edge_1",
+      "kind": "word",
+      "value": "Es5 Edge 1"
+    },
+    {
+      "id": "char_word_what_i_might_become",
+      "kind": "word",
+      "value": "What I Might Become"
+    },
+    {
+      "id": "char_word_what_i_inescapably_am",
+      "kind": "word",
+      "value": "What I Inescapably Am"
+    },
+    {
+      "id": "char_word_reality_of_fulfilment",
+      "kind": "word",
+      "value": "Reality Of Fulfilment"
+    },
+    {
+      "id": "char_word_substantiality_of_meaning",
+      "kind": "word",
+      "value": "Substantiality Of Meaning"
+    },
+    {
+      "id": "char_word_realisation_of_material_potential",
+      "kind": "word",
+      "value": "Realisation Of Material Potential"
+    },
+    {
+      "id": "char_word_range_of_potential_in_the_world",
+      "kind": "word",
+      "value": "Range Of Potential In The World"
+    },
+    {
+      "id": "char_word_inner_levels_of_existence",
+      "kind": "word",
+      "value": "Inner Levels Of Existence"
+    },
+    {
+      "id": "char_word_condition_of_fulfilment",
+      "kind": "word",
+      "value": "Condition Of Fulfilment"
+    },
+    {
+      "id": "char_word_actuality_of_fulfilment",
+      "kind": "word",
+      "value": "Actuality Of Fulfilment"
+    },
+    {
+      "id": "char_word_universal_field",
+      "kind": "word",
+      "value": "Universal Field"
+    },
+    {
+      "id": "char_word_elemental_complexes",
+      "kind": "word",
+      "value": "Elemental Complexes"
+    },
+    {
+      "id": "char_word_elemental_structures",
+      "kind": "word",
+      "value": "Elemental Structures"
+    },
+    {
+      "id": "char_word_soil_and_ocean",
+      "kind": "word",
+      "value": "Soil And Ocean"
+    },
+    {
+      "id": "char_word_phytovegetation",
+      "kind": "word",
+      "value": "Phytovegetation"
+    },
+    {
+      "id": "char_word_germ_cells",
+      "kind": "word",
+      "value": "Germ Cells"
+    },
+    {
+      "id": "char_word_animals",
+      "kind": "word",
+      "value": "Animals"
+    },
+    {
+      "id": "char_word_humans",
+      "kind": "word",
+      "value": "Humans"
+    },
+    {
+      "id": "char_word_planets",
+      "kind": "word",
+      "value": "Planets"
+    },
+    {
+      "id": "char_word_stars_and_solar_systems",
+      "kind": "word",
+      "value": "Stars And Solar Systems"
+    },
+    {
+      "id": "char_word_galaxies",
+      "kind": "word",
+      "value": "Galaxies"
+    },
+    {
+      "id": "char_word_unfathomable_totality",
+      "kind": "word",
+      "value": "Unfathomable Totality"
+    },
+    {
+      "id": "char_word_pot_edge_1",
+      "kind": "word",
+      "value": "Pot Edge 1"
+    },
+    {
+      "id": "char_word_pot_edge_2",
+      "kind": "word",
+      "value": "Pot Edge 2"
+    },
+    {
+      "id": "char_word_pot_edge_3",
+      "kind": "word",
+      "value": "Pot Edge 3"
+    },
+    {
+      "id": "char_word_pot_edge_4",
+      "kind": "word",
+      "value": "Pot Edge 4"
+    },
+    {
+      "id": "char_word_pot_edge_5",
+      "kind": "word",
+      "value": "Pot Edge 5"
+    },
+    {
+      "id": "char_word_pot_edge_6",
+      "kind": "word",
+      "value": "Pot Edge 6"
+    },
+    {
+      "id": "char_word_pot_edge_7",
+      "kind": "word",
+      "value": "Pot Edge 7"
+    },
+    {
+      "id": "char_word_pot_edge_8",
+      "kind": "word",
+      "value": "Pot Edge 8"
+    },
+    {
+      "id": "char_word_pot_edge_9",
+      "kind": "word",
+      "value": "Pot Edge 9"
+    },
+    {
+      "id": "char_word_pot_edge_10",
+      "kind": "word",
+      "value": "Pot Edge 10"
+    },
+    {
+      "id": "char_word_pot_edge_11",
+      "kind": "word",
+      "value": "Pot Edge 11"
+    },
+    {
+      "id": "char_word_pot_edge_12",
+      "kind": "word",
+      "value": "Pot Edge 12"
+    },
+    {
+      "id": "char_word_pot_edge_13",
+      "kind": "word",
+      "value": "Pot Edge 13"
+    },
+    {
+      "id": "char_word_pot_edge_14",
+      "kind": "word",
+      "value": "Pot Edge 14"
+    },
+    {
+      "id": "char_word_pot_edge_15",
+      "kind": "word",
+      "value": "Pot Edge 15"
+    },
+    {
+      "id": "char_word_pot_edge_16",
+      "kind": "word",
+      "value": "Pot Edge 16"
+    },
+    {
+      "id": "char_word_pot_edge_17",
+      "kind": "word",
+      "value": "Pot Edge 17"
+    },
+    {
+      "id": "char_word_pot_edge_18",
+      "kind": "word",
+      "value": "Pot Edge 18"
+    },
+    {
+      "id": "char_word_pot_edge_19",
+      "kind": "word",
+      "value": "Pot Edge 19"
+    },
+    {
+      "id": "char_word_pot_edge_20",
+      "kind": "word",
+      "value": "Pot Edge 20"
+    },
+    {
+      "id": "char_word_pot_edge_21",
+      "kind": "word",
+      "value": "Pot Edge 21"
+    },
+    {
+      "id": "char_word_pot_edge_22",
+      "kind": "word",
+      "value": "Pot Edge 22"
+    },
+    {
+      "id": "char_word_pot_edge_23",
+      "kind": "word",
+      "value": "Pot Edge 23"
+    },
+    {
+      "id": "char_word_pot_edge_24",
+      "kind": "word",
+      "value": "Pot Edge 24"
+    },
+    {
+      "id": "char_word_pot_edge_25",
+      "kind": "word",
+      "value": "Pot Edge 25"
+    },
+    {
+      "id": "char_word_pot_edge_26",
+      "kind": "word",
+      "value": "Pot Edge 26"
+    },
+    {
+      "id": "char_word_pot_edge_27",
+      "kind": "word",
+      "value": "Pot Edge 27"
+    },
+    {
+      "id": "char_word_pot_edge_28",
+      "kind": "word",
+      "value": "Pot Edge 28"
+    },
+    {
+      "id": "char_word_pot_edge_29",
+      "kind": "word",
+      "value": "Pot Edge 29"
+    },
+    {
+      "id": "char_word_pot_edge_30",
+      "kind": "word",
+      "value": "Pot Edge 30"
+    },
+    {
+      "id": "char_word_pot_edge_31",
+      "kind": "word",
+      "value": "Pot Edge 31"
+    },
+    {
+      "id": "char_word_pot_edge_32",
+      "kind": "word",
+      "value": "Pot Edge 32"
+    },
+    {
+      "id": "char_word_pot_edge_33",
+      "kind": "word",
+      "value": "Pot Edge 33"
+    },
+    {
+      "id": "char_word_pot_edge_34",
+      "kind": "word",
+      "value": "Pot Edge 34"
+    },
+    {
+      "id": "char_word_pot_edge_35",
+      "kind": "word",
+      "value": "Pot Edge 35"
+    },
+    {
+      "id": "char_word_pot_edge_36",
+      "kind": "word",
+      "value": "Pot Edge 36"
+    },
+    {
+      "id": "char_word_pot_edge_37",
+      "kind": "word",
+      "value": "Pot Edge 37"
+    },
+    {
+      "id": "char_word_pot_edge_38",
+      "kind": "word",
+      "value": "Pot Edge 38"
+    },
+    {
+      "id": "char_word_pot_edge_39",
+      "kind": "word",
+      "value": "Pot Edge 39"
+    },
+    {
+      "id": "char_word_pot_edge_40",
+      "kind": "word",
+      "value": "Pot Edge 40"
+    },
+    {
+      "id": "char_word_pot_edge_41",
+      "kind": "word",
+      "value": "Pot Edge 41"
+    },
+    {
+      "id": "char_word_pot_edge_42",
+      "kind": "word",
+      "value": "Pot Edge 42"
+    },
+    {
+      "id": "char_word_pot_edge_43",
+      "kind": "word",
+      "value": "Pot Edge 43"
+    },
+    {
+      "id": "char_word_pot_edge_44",
+      "kind": "word",
+      "value": "Pot Edge 44"
+    },
+    {
+      "id": "char_word_pot_edge_45",
+      "kind": "word",
+      "value": "Pot Edge 45"
+    },
+    {
+      "id": "char_word_pot_edge_46",
+      "kind": "word",
+      "value": "Pot Edge 46"
+    },
+    {
+      "id": "char_word_pot_edge_47",
+      "kind": "word",
+      "value": "Pot Edge 47"
+    },
+    {
+      "id": "char_word_pot_edge_48",
+      "kind": "word",
+      "value": "Pot Edge 48"
+    },
+    {
+      "id": "char_word_pot_edge_49",
+      "kind": "word",
+      "value": "Pot Edge 49"
+    },
+    {
+      "id": "char_word_pot_edge_50",
+      "kind": "word",
+      "value": "Pot Edge 50"
+    },
+    {
+      "id": "char_word_pot_edge_51",
+      "kind": "word",
+      "value": "Pot Edge 51"
+    },
+    {
+      "id": "char_word_pot_edge_52",
+      "kind": "word",
+      "value": "Pot Edge 52"
+    },
+    {
+      "id": "char_word_pot_edge_53",
+      "kind": "word",
+      "value": "Pot Edge 53"
+    },
+    {
+      "id": "char_word_pot_edge_54",
+      "kind": "word",
+      "value": "Pot Edge 54"
+    },
+    {
+      "id": "char_word_pot_edge_55",
+      "kind": "word",
+      "value": "Pot Edge 55"
+    },
+    {
+      "id": "char_word_pot_edge_56",
+      "kind": "word",
+      "value": "Pot Edge 56"
+    },
+    {
+      "id": "char_word_pot_edge_57",
+      "kind": "word",
+      "value": "Pot Edge 57"
+    },
+    {
+      "id": "char_word_pot_edge_58",
+      "kind": "word",
+      "value": "Pot Edge 58"
+    },
+    {
+      "id": "char_word_pot_edge_59",
+      "kind": "word",
+      "value": "Pot Edge 59"
+    },
+    {
+      "id": "char_word_pot_edge_60",
+      "kind": "word",
+      "value": "Pot Edge 60"
+    },
+    {
+      "id": "char_word_pot_edge_61",
+      "kind": "word",
+      "value": "Pot Edge 61"
+    },
+    {
+      "id": "char_word_pot_edge_62",
+      "kind": "word",
+      "value": "Pot Edge 62"
+    },
+    {
+      "id": "char_word_pot_edge_63",
+      "kind": "word",
+      "value": "Pot Edge 63"
+    },
+    {
+      "id": "char_word_pot_edge_64",
+      "kind": "word",
+      "value": "Pot Edge 64"
+    },
+    {
+      "id": "char_word_pot_edge_65",
+      "kind": "word",
+      "value": "Pot Edge 65"
+    },
+    {
+      "id": "char_word_pot_edge_66",
+      "kind": "word",
+      "value": "Pot Edge 66"
+    },
+    {
+      "id": "char_word_zero_point_energy",
+      "kind": "word",
+      "value": "Zero Point Energy"
+    },
+    {
+      "id": "char_word_patterning_energy",
+      "kind": "word",
+      "value": "Patterning Energy"
+    },
+    {
+      "id": "char_word_cohesive_energy",
+      "kind": "word",
+      "value": "Cohesive Energy"
+    },
+    {
+      "id": "char_word_adaptive_energy",
+      "kind": "word",
+      "value": "Adaptive Energy"
+    },
+    {
+      "id": "char_word_constructive_energy",
+      "kind": "word",
+      "value": "Constructive Energy"
+    },
+    {
+      "id": "char_word_organismic_energy",
+      "kind": "word",
+      "value": "Organismic Energy"
+    },
+    {
+      "id": "char_word_regenerative_energy",
+      "kind": "word",
+      "value": "Regenerative Energy"
+    },
+    {
+      "id": "char_word_sensitive_energy",
+      "kind": "word",
+      "value": "Sensitive Energy"
+    },
+    {
+      "id": "char_word_conscious_energy",
+      "kind": "word",
+      "value": "Conscious Energy"
+    },
+    {
+      "id": "char_word_creative_energy",
+      "kind": "word",
+      "value": "Creative Energy"
+    },
+    {
+      "id": "char_word_unitive_energy",
+      "kind": "word",
+      "value": "Unitive Energy"
+    },
+    {
+      "id": "char_word_transcendent_energy",
+      "kind": "word",
+      "value": "Transcendent Energy"
+    },
+    {
+      "id": "char_word_energy_h_edge_1",
+      "kind": "word",
+      "value": "Energy H Edge 1"
+    },
+    {
+      "id": "char_word_energy_h_edge_2",
+      "kind": "word",
+      "value": "Energy H Edge 2"
+    },
+    {
+      "id": "char_word_energy_h_edge_3",
+      "kind": "word",
+      "value": "Energy H Edge 3"
+    },
+    {
+      "id": "char_word_energy_h_edge_4",
+      "kind": "word",
+      "value": "Energy H Edge 4"
+    },
+    {
+      "id": "char_word_energy_h_edge_5",
+      "kind": "word",
+      "value": "Energy H Edge 5"
+    },
+    {
+      "id": "char_word_energy_h_edge_6",
+      "kind": "word",
+      "value": "Energy H Edge 6"
+    },
+    {
+      "id": "char_word_energy_h_edge_7",
+      "kind": "word",
+      "value": "Energy H Edge 7"
+    },
+    {
+      "id": "char_word_energy_h_edge_8",
+      "kind": "word",
+      "value": "Energy H Edge 8"
+    },
+    {
+      "id": "char_word_energy_h_edge_9",
+      "kind": "word",
+      "value": "Energy H Edge 9"
+    },
+    {
+      "id": "char_word_energy_h_edge_10",
+      "kind": "word",
+      "value": "Energy H Edge 10"
+    },
+    {
+      "id": "char_word_energy_h_edge_11",
+      "kind": "word",
+      "value": "Energy H Edge 11"
+    },
+    {
+      "id": "char_word_energy_h_edge_12",
+      "kind": "word",
+      "value": "Energy H Edge 12"
+    },
+    {
+      "id": "char_word_energy_h_edge_13",
+      "kind": "word",
+      "value": "Energy H Edge 13"
+    },
+    {
+      "id": "char_word_energy_h_edge_14",
+      "kind": "word",
+      "value": "Energy H Edge 14"
+    },
+    {
+      "id": "char_word_energy_h_edge_15",
+      "kind": "word",
+      "value": "Energy H Edge 15"
+    },
+    {
+      "id": "char_word_energy_h_edge_16",
+      "kind": "word",
+      "value": "Energy H Edge 16"
+    },
+    {
+      "id": "char_word_energy_h_edge_17",
+      "kind": "word",
+      "value": "Energy H Edge 17"
+    },
+    {
+      "id": "char_word_energy_h_edge_18",
+      "kind": "word",
+      "value": "Energy H Edge 18"
+    },
+    {
+      "id": "char_word_energy_h_edge_19",
+      "kind": "word",
+      "value": "Energy H Edge 19"
+    },
+    {
+      "id": "char_word_energy_h_edge_20",
+      "kind": "word",
+      "value": "Energy H Edge 20"
+    },
+    {
+      "id": "char_word_energy_h_edge_21",
+      "kind": "word",
+      "value": "Energy H Edge 21"
+    },
+    {
+      "id": "char_word_energy_h_edge_22",
+      "kind": "word",
+      "value": "Energy H Edge 22"
+    },
+    {
+      "id": "char_word_energy_h_edge_23",
+      "kind": "word",
+      "value": "Energy H Edge 23"
+    },
+    {
+      "id": "char_word_energy_h_edge_24",
+      "kind": "word",
+      "value": "Energy H Edge 24"
+    },
+    {
+      "id": "char_word_energy_h_edge_25",
+      "kind": "word",
+      "value": "Energy H Edge 25"
+    },
+    {
+      "id": "char_word_energy_h_edge_26",
+      "kind": "word",
+      "value": "Energy H Edge 26"
+    },
+    {
+      "id": "char_word_energy_h_edge_27",
+      "kind": "word",
+      "value": "Energy H Edge 27"
+    },
+    {
+      "id": "char_word_energy_h_edge_28",
+      "kind": "word",
+      "value": "Energy H Edge 28"
+    },
+    {
+      "id": "char_word_energy_h_edge_29",
+      "kind": "word",
+      "value": "Energy H Edge 29"
+    },
+    {
+      "id": "char_word_energy_h_edge_30",
+      "kind": "word",
+      "value": "Energy H Edge 30"
+    },
+    {
+      "id": "char_word_energy_h_edge_31",
+      "kind": "word",
+      "value": "Energy H Edge 31"
+    },
+    {
+      "id": "char_word_energy_h_edge_32",
+      "kind": "word",
+      "value": "Energy H Edge 32"
+    },
+    {
+      "id": "char_word_energy_h_edge_33",
+      "kind": "word",
+      "value": "Energy H Edge 33"
+    },
+    {
+      "id": "char_word_energy_h_edge_34",
+      "kind": "word",
+      "value": "Energy H Edge 34"
+    },
+    {
+      "id": "char_word_energy_h_edge_35",
+      "kind": "word",
+      "value": "Energy H Edge 35"
+    },
+    {
+      "id": "char_word_energy_h_edge_36",
+      "kind": "word",
+      "value": "Energy H Edge 36"
+    },
+    {
+      "id": "char_word_energy_h_edge_37",
+      "kind": "word",
+      "value": "Energy H Edge 37"
+    },
+    {
+      "id": "char_word_energy_h_edge_38",
+      "kind": "word",
+      "value": "Energy H Edge 38"
+    },
+    {
+      "id": "char_word_energy_h_edge_39",
+      "kind": "word",
+      "value": "Energy H Edge 39"
+    },
+    {
+      "id": "char_word_energy_h_edge_40",
+      "kind": "word",
+      "value": "Energy H Edge 40"
+    },
+    {
+      "id": "char_word_energy_h_edge_41",
+      "kind": "word",
+      "value": "Energy H Edge 41"
+    },
+    {
+      "id": "char_word_energy_h_edge_42",
+      "kind": "word",
+      "value": "Energy H Edge 42"
+    },
+    {
+      "id": "char_word_energy_h_edge_43",
+      "kind": "word",
+      "value": "Energy H Edge 43"
+    },
+    {
+      "id": "char_word_energy_h_edge_44",
+      "kind": "word",
+      "value": "Energy H Edge 44"
+    },
+    {
+      "id": "char_word_energy_h_edge_45",
+      "kind": "word",
+      "value": "Energy H Edge 45"
+    },
+    {
+      "id": "char_word_energy_h_edge_46",
+      "kind": "word",
+      "value": "Energy H Edge 46"
+    },
+    {
+      "id": "char_word_energy_h_edge_47",
+      "kind": "word",
+      "value": "Energy H Edge 47"
+    },
+    {
+      "id": "char_word_energy_h_edge_48",
+      "kind": "word",
+      "value": "Energy H Edge 48"
+    },
+    {
+      "id": "char_word_energy_h_edge_49",
+      "kind": "word",
+      "value": "Energy H Edge 49"
+    },
+    {
+      "id": "char_word_energy_h_edge_50",
+      "kind": "word",
+      "value": "Energy H Edge 50"
+    },
+    {
+      "id": "char_word_energy_h_edge_51",
+      "kind": "word",
+      "value": "Energy H Edge 51"
+    },
+    {
+      "id": "char_word_energy_h_edge_52",
+      "kind": "word",
+      "value": "Energy H Edge 52"
+    },
+    {
+      "id": "char_word_energy_h_edge_53",
+      "kind": "word",
+      "value": "Energy H Edge 53"
+    },
+    {
+      "id": "char_word_energy_h_edge_54",
+      "kind": "word",
+      "value": "Energy H Edge 54"
+    },
+    {
+      "id": "char_word_energy_h_edge_55",
+      "kind": "word",
+      "value": "Energy H Edge 55"
+    },
+    {
+      "id": "char_word_energy_h_edge_56",
+      "kind": "word",
+      "value": "Energy H Edge 56"
+    },
+    {
+      "id": "char_word_energy_h_edge_57",
+      "kind": "word",
+      "value": "Energy H Edge 57"
+    },
+    {
+      "id": "char_word_energy_h_edge_58",
+      "kind": "word",
+      "value": "Energy H Edge 58"
+    },
+    {
+      "id": "char_word_energy_h_edge_59",
+      "kind": "word",
+      "value": "Energy H Edge 59"
+    },
+    {
+      "id": "char_word_energy_h_edge_60",
+      "kind": "word",
+      "value": "Energy H Edge 60"
+    },
+    {
+      "id": "char_word_energy_h_edge_61",
+      "kind": "word",
+      "value": "Energy H Edge 61"
+    },
+    {
+      "id": "char_word_energy_h_edge_62",
+      "kind": "word",
+      "value": "Energy H Edge 62"
+    },
+    {
+      "id": "char_word_energy_h_edge_63",
+      "kind": "word",
+      "value": "Energy H Edge 63"
+    },
+    {
+      "id": "char_word_energy_h_edge_64",
+      "kind": "word",
+      "value": "Energy H Edge 64"
+    },
+    {
+      "id": "char_word_energy_h_edge_65",
+      "kind": "word",
+      "value": "Energy H Edge 65"
+    },
+    {
+      "id": "char_word_energy_h_edge_66",
+      "kind": "word",
+      "value": "Energy H Edge 66"
+    },
+    {
+      "id": "char_word_dispersive_energy",
+      "kind": "word",
+      "value": "Dispersive Energy"
+    },
+    {
+      "id": "char_word_directed_energy",
+      "kind": "word",
+      "value": "Directed Energy"
+    },
+    {
+      "id": "char_word_plastic_energy",
+      "kind": "word",
+      "value": "Plastic Energy"
+    },
+    {
+      "id": "char_word_vital_energy",
+      "kind": "word",
+      "value": "Vital Energy"
+    },
+    {
+      "id": "char_word_automatic_energy",
+      "kind": "word",
+      "value": "Automatic Energy"
+    },
+    {
+      "id": "char_word_energy_b_edge_1",
+      "kind": "word",
+      "value": "Energy B Edge 1"
+    },
+    {
+      "id": "char_word_energy_b_edge_2",
+      "kind": "word",
+      "value": "Energy B Edge 2"
+    },
+    {
+      "id": "char_word_energy_b_edge_3",
+      "kind": "word",
+      "value": "Energy B Edge 3"
+    },
+    {
+      "id": "char_word_energy_b_edge_4",
+      "kind": "word",
+      "value": "Energy B Edge 4"
+    },
+    {
+      "id": "char_word_energy_b_edge_5",
+      "kind": "word",
+      "value": "Energy B Edge 5"
+    },
+    {
+      "id": "char_word_energy_b_edge_6",
+      "kind": "word",
+      "value": "Energy B Edge 6"
+    },
+    {
+      "id": "char_word_energy_b_edge_7",
+      "kind": "word",
+      "value": "Energy B Edge 7"
+    },
+    {
+      "id": "char_word_energy_b_edge_8",
+      "kind": "word",
+      "value": "Energy B Edge 8"
+    },
+    {
+      "id": "char_word_energy_b_edge_9",
+      "kind": "word",
+      "value": "Energy B Edge 9"
+    },
+    {
+      "id": "char_word_energy_b_edge_10",
+      "kind": "word",
+      "value": "Energy B Edge 10"
+    },
+    {
+      "id": "char_word_energy_b_edge_11",
+      "kind": "word",
+      "value": "Energy B Edge 11"
+    },
+    {
+      "id": "char_word_energy_b_edge_12",
+      "kind": "word",
+      "value": "Energy B Edge 12"
+    },
+    {
+      "id": "char_word_energy_b_edge_13",
+      "kind": "word",
+      "value": "Energy B Edge 13"
+    },
+    {
+      "id": "char_word_energy_b_edge_14",
+      "kind": "word",
+      "value": "Energy B Edge 14"
+    },
+    {
+      "id": "char_word_energy_b_edge_15",
+      "kind": "word",
+      "value": "Energy B Edge 15"
+    },
+    {
+      "id": "char_word_energy_b_edge_16",
+      "kind": "word",
+      "value": "Energy B Edge 16"
+    },
+    {
+      "id": "char_word_energy_b_edge_17",
+      "kind": "word",
+      "value": "Energy B Edge 17"
+    },
+    {
+      "id": "char_word_energy_b_edge_18",
+      "kind": "word",
+      "value": "Energy B Edge 18"
+    },
+    {
+      "id": "char_word_energy_b_edge_19",
+      "kind": "word",
+      "value": "Energy B Edge 19"
+    },
+    {
+      "id": "char_word_energy_b_edge_20",
+      "kind": "word",
+      "value": "Energy B Edge 20"
+    },
+    {
+      "id": "char_word_energy_b_edge_21",
+      "kind": "word",
+      "value": "Energy B Edge 21"
+    },
+    {
+      "id": "char_word_energy_b_edge_22",
+      "kind": "word",
+      "value": "Energy B Edge 22"
+    },
+    {
+      "id": "char_word_energy_b_edge_23",
+      "kind": "word",
+      "value": "Energy B Edge 23"
+    },
+    {
+      "id": "char_word_energy_b_edge_24",
+      "kind": "word",
+      "value": "Energy B Edge 24"
+    },
+    {
+      "id": "char_word_energy_b_edge_25",
+      "kind": "word",
+      "value": "Energy B Edge 25"
+    },
+    {
+      "id": "char_word_energy_b_edge_26",
+      "kind": "word",
+      "value": "Energy B Edge 26"
+    },
+    {
+      "id": "char_word_energy_b_edge_27",
+      "kind": "word",
+      "value": "Energy B Edge 27"
+    },
+    {
+      "id": "char_word_energy_b_edge_28",
+      "kind": "word",
+      "value": "Energy B Edge 28"
+    },
+    {
+      "id": "char_word_energy_b_edge_29",
+      "kind": "word",
+      "value": "Energy B Edge 29"
+    },
+    {
+      "id": "char_word_energy_b_edge_30",
+      "kind": "word",
+      "value": "Energy B Edge 30"
+    },
+    {
+      "id": "char_word_energy_b_edge_31",
+      "kind": "word",
+      "value": "Energy B Edge 31"
+    },
+    {
+      "id": "char_word_energy_b_edge_32",
+      "kind": "word",
+      "value": "Energy B Edge 32"
+    },
+    {
+      "id": "char_word_energy_b_edge_33",
+      "kind": "word",
+      "value": "Energy B Edge 33"
+    },
+    {
+      "id": "char_word_energy_b_edge_34",
+      "kind": "word",
+      "value": "Energy B Edge 34"
+    },
+    {
+      "id": "char_word_energy_b_edge_35",
+      "kind": "word",
+      "value": "Energy B Edge 35"
+    },
+    {
+      "id": "char_word_energy_b_edge_36",
+      "kind": "word",
+      "value": "Energy B Edge 36"
+    },
+    {
+      "id": "char_word_energy_b_edge_37",
+      "kind": "word",
+      "value": "Energy B Edge 37"
+    },
+    {
+      "id": "char_word_energy_b_edge_38",
+      "kind": "word",
+      "value": "Energy B Edge 38"
+    },
+    {
+      "id": "char_word_energy_b_edge_39",
+      "kind": "word",
+      "value": "Energy B Edge 39"
+    },
+    {
+      "id": "char_word_energy_b_edge_40",
+      "kind": "word",
+      "value": "Energy B Edge 40"
+    },
+    {
+      "id": "char_word_energy_b_edge_41",
+      "kind": "word",
+      "value": "Energy B Edge 41"
+    },
+    {
+      "id": "char_word_energy_b_edge_42",
+      "kind": "word",
+      "value": "Energy B Edge 42"
+    },
+    {
+      "id": "char_word_energy_b_edge_43",
+      "kind": "word",
+      "value": "Energy B Edge 43"
+    },
+    {
+      "id": "char_word_energy_b_edge_44",
+      "kind": "word",
+      "value": "Energy B Edge 44"
+    },
+    {
+      "id": "char_word_energy_b_edge_45",
+      "kind": "word",
+      "value": "Energy B Edge 45"
+    },
+    {
+      "id": "char_word_energy_b_edge_46",
+      "kind": "word",
+      "value": "Energy B Edge 46"
+    },
+    {
+      "id": "char_word_energy_b_edge_47",
+      "kind": "word",
+      "value": "Energy B Edge 47"
+    },
+    {
+      "id": "char_word_energy_b_edge_48",
+      "kind": "word",
+      "value": "Energy B Edge 48"
+    },
+    {
+      "id": "char_word_energy_b_edge_49",
+      "kind": "word",
+      "value": "Energy B Edge 49"
+    },
+    {
+      "id": "char_word_energy_b_edge_50",
+      "kind": "word",
+      "value": "Energy B Edge 50"
+    },
+    {
+      "id": "char_word_energy_b_edge_51",
+      "kind": "word",
+      "value": "Energy B Edge 51"
+    },
+    {
+      "id": "char_word_energy_b_edge_52",
+      "kind": "word",
+      "value": "Energy B Edge 52"
+    },
+    {
+      "id": "char_word_energy_b_edge_53",
+      "kind": "word",
+      "value": "Energy B Edge 53"
+    },
+    {
+      "id": "char_word_energy_b_edge_54",
+      "kind": "word",
+      "value": "Energy B Edge 54"
+    },
+    {
+      "id": "char_word_energy_b_edge_55",
+      "kind": "word",
+      "value": "Energy B Edge 55"
+    },
+    {
+      "id": "char_word_energy_b_edge_56",
+      "kind": "word",
+      "value": "Energy B Edge 56"
+    },
+    {
+      "id": "char_word_energy_b_edge_57",
+      "kind": "word",
+      "value": "Energy B Edge 57"
+    },
+    {
+      "id": "char_word_energy_b_edge_58",
+      "kind": "word",
+      "value": "Energy B Edge 58"
+    },
+    {
+      "id": "char_word_energy_b_edge_59",
+      "kind": "word",
+      "value": "Energy B Edge 59"
+    },
+    {
+      "id": "char_word_energy_b_edge_60",
+      "kind": "word",
+      "value": "Energy B Edge 60"
+    },
+    {
+      "id": "char_word_energy_b_edge_61",
+      "kind": "word",
+      "value": "Energy B Edge 61"
+    },
+    {
+      "id": "char_word_energy_b_edge_62",
+      "kind": "word",
+      "value": "Energy B Edge 62"
+    },
+    {
+      "id": "char_word_energy_b_edge_63",
+      "kind": "word",
+      "value": "Energy B Edge 63"
+    },
+    {
+      "id": "char_word_energy_b_edge_64",
+      "kind": "word",
+      "value": "Energy B Edge 64"
+    },
+    {
+      "id": "char_word_energy_b_edge_65",
+      "kind": "word",
+      "value": "Energy B Edge 65"
+    },
+    {
+      "id": "char_word_energy_b_edge_66",
+      "kind": "word",
+      "value": "Energy B Edge 66"
+    },
+    {
+      "id": "char_word_anabolic",
+      "kind": "word",
+      "value": "Anabolic"
+    },
+    {
+      "id": "char_word_catabolic",
+      "kind": "word",
+      "value": "Catabolic"
+    },
+    {
+      "id": "char_word_work_edge_1",
+      "kind": "word",
+      "value": "Work Edge 1"
+    },
+    {
+      "id": "char_word_tabs",
+      "kind": "word",
+      "value": "Tabs"
+    },
+    {
+      "id": "char_word_panes",
+      "kind": "word",
+      "value": "Panes"
+    },
+    {
+      "id": "char_word_agents",
+      "kind": "word",
+      "value": "Agents"
+    },
+    {
+      "id": "char_word_wksp_edge_1",
+      "kind": "word",
+      "value": "Wksp Edge 1"
+    },
+    {
+      "id": "char_word_wksp_edge_2",
+      "kind": "word",
+      "value": "Wksp Edge 2"
+    },
+    {
+      "id": "char_word_wksp_edge_3",
+      "kind": "word",
+      "value": "Wksp Edge 3"
+    },
+    {
+      "id": "char_word_total_content_of_a_moment_of_awareness",
+      "kind": "word",
+      "value": "Total Content Of A Moment Of Awareness"
+    },
+    {
+      "id": "char_word_the_12_energies",
+      "kind": "word",
+      "value": "The 12 Energies"
+    },
+    {
+      "id": "char_word_the_12_sources_of_the_world_mandala",
+      "kind": "word",
+      "value": "The 12 Sources Of The World Mandala"
+    },
+    {
+      "id": "char_word_the_12_values",
+      "kind": "word",
+      "value": "The 12 Values"
+    },
+    {
+      "id": "char_word_the_12_potencies",
+      "kind": "word",
+      "value": "The 12 Potencies"
+    },
+    {
+      "id": "char_word_the_12_levels_of_society",
+      "kind": "word",
+      "value": "The 12 Levels Of Society"
+    },
+    {
+      "id": "char_word_dodp_edge_1",
+      "kind": "word",
+      "value": "Dodp Edge 1"
+    },
+    {
+      "id": "char_word_dodp_edge_2",
+      "kind": "word",
+      "value": "Dodp Edge 2"
+    },
+    {
+      "id": "char_word_dodp_edge_3",
+      "kind": "word",
+      "value": "Dodp Edge 3"
+    },
+    {
+      "id": "char_word_dodp_edge_4",
+      "kind": "word",
+      "value": "Dodp Edge 4"
+    },
+    {
+      "id": "char_word_dodp_edge_5",
+      "kind": "word",
+      "value": "Dodp Edge 5"
+    },
+    {
+      "id": "char_word_dodp_edge_6",
+      "kind": "word",
+      "value": "Dodp Edge 6"
+    },
+    {
+      "id": "char_word_dodp_edge_7",
+      "kind": "word",
+      "value": "Dodp Edge 7"
+    },
+    {
+      "id": "char_word_dodp_edge_8",
+      "kind": "word",
+      "value": "Dodp Edge 8"
+    },
+    {
+      "id": "char_word_dodp_edge_9",
+      "kind": "word",
+      "value": "Dodp Edge 9"
+    },
+    {
+      "id": "char_word_dodp_edge_10",
+      "kind": "word",
+      "value": "Dodp Edge 10"
+    },
+    {
+      "id": "char_word_ideal",
+      "kind": "word",
+      "value": "Ideal"
+    },
+    {
+      "id": "char_word_ground",
+      "kind": "word",
+      "value": "Ground"
+    },
+    {
+      "id": "char_word_directive",
+      "kind": "word",
+      "value": "Directive"
+    },
+    {
+      "id": "char_word_instrumental",
+      "kind": "word",
+      "value": "Instrumental"
+    },
+    {
+      "id": "char_word_motivational_imperative",
+      "kind": "word",
+      "value": "Motivational Imperative"
+    },
+    {
+      "id": "char_word_receptive_regard",
+      "kind": "word",
+      "value": "Receptive Regard"
+    },
+    {
+      "id": "char_word_effectual_compatibility",
+      "kind": "word",
+      "value": "Effectual Compatibility"
+    },
+    {
+      "id": "char_word_material_mastery",
+      "kind": "word",
+      "value": "Material Mastery"
+    },
+    {
+      "id": "char_word_technical_power",
+      "kind": "word",
+      "value": "Technical Power"
+    },
+    {
+      "id": "char_word_demonstrable_activity",
+      "kind": "word",
+      "value": "Demonstrable Activity"
+    },
+    {
+      "id": "char_word_dependents",
+      "kind": "word",
+      "value": "Dependents"
+    },
+    {
+      "id": "char_word_producers",
+      "kind": "word",
+      "value": "Producers"
+    },
+    {
+      "id": "char_word_craftsmen",
+      "kind": "word",
+      "value": "Craftsmen"
+    },
+    {
+      "id": "char_word_psychostatic_leaders",
+      "kind": "word",
+      "value": "Psychostatic Leaders"
+    },
+    {
+      "id": "char_word_candidates",
+      "kind": "word",
+      "value": "Candidates"
+    },
+    {
+      "id": "char_word_specialists",
+      "kind": "word",
+      "value": "Specialists"
+    },
+    {
+      "id": "char_word_counsellors",
+      "kind": "word",
+      "value": "Counsellors"
+    },
+    {
+      "id": "char_word_psychokinetic_initiates",
+      "kind": "word",
+      "value": "Psychokinetic Initiates"
+    },
+    {
+      "id": "char_word_guides",
+      "kind": "word",
+      "value": "Guides"
+    },
+    {
+      "id": "char_word_saints",
+      "kind": "word",
+      "value": "Saints"
+    },
+    {
+      "id": "char_word_prophets",
+      "kind": "word",
+      "value": "Prophets"
+    },
+    {
+      "id": "char_word_psychoteleios_messengers",
+      "kind": "word",
+      "value": "Psychoteleios Messengers"
+    },
+    {
+      "id": "char_word_soc_edge_1",
+      "kind": "word",
+      "value": "Soc Edge 1"
+    },
+    {
+      "id": "char_word_soc_edge_2",
+      "kind": "word",
+      "value": "Soc Edge 2"
+    },
+    {
+      "id": "char_word_soc_edge_3",
+      "kind": "word",
+      "value": "Soc Edge 3"
+    },
+    {
+      "id": "char_word_soc_edge_4",
+      "kind": "word",
+      "value": "Soc Edge 4"
+    },
+    {
+      "id": "char_word_soc_edge_5",
+      "kind": "word",
+      "value": "Soc Edge 5"
+    },
+    {
+      "id": "char_word_soc_edge_6",
+      "kind": "word",
+      "value": "Soc Edge 6"
+    },
+    {
+      "id": "char_word_soc_edge_7",
+      "kind": "word",
+      "value": "Soc Edge 7"
+    },
+    {
+      "id": "char_word_soc_edge_8",
+      "kind": "word",
+      "value": "Soc Edge 8"
+    },
+    {
+      "id": "char_word_soc_edge_9",
+      "kind": "word",
+      "value": "Soc Edge 9"
+    },
+    {
+      "id": "char_word_soc_edge_10",
+      "kind": "word",
+      "value": "Soc Edge 10"
+    },
+    {
+      "id": "char_word_soc_edge_11",
+      "kind": "word",
+      "value": "Soc Edge 11"
+    },
+    {
+      "id": "char_word_soc_edge_12",
+      "kind": "word",
+      "value": "Soc Edge 12"
+    },
+    {
+      "id": "char_word_soc_edge_13",
+      "kind": "word",
+      "value": "Soc Edge 13"
+    },
+    {
+      "id": "char_word_soc_edge_14",
+      "kind": "word",
+      "value": "Soc Edge 14"
+    },
+    {
+      "id": "char_word_soc_edge_15",
+      "kind": "word",
+      "value": "Soc Edge 15"
+    },
+    {
+      "id": "char_word_soc_edge_16",
+      "kind": "word",
+      "value": "Soc Edge 16"
+    },
+    {
+      "id": "char_word_soc_edge_17",
+      "kind": "word",
+      "value": "Soc Edge 17"
+    },
+    {
+      "id": "char_word_soc_edge_18",
+      "kind": "word",
+      "value": "Soc Edge 18"
+    },
+    {
+      "id": "char_word_soc_edge_19",
+      "kind": "word",
+      "value": "Soc Edge 19"
+    },
+    {
+      "id": "char_word_soc_edge_20",
+      "kind": "word",
+      "value": "Soc Edge 20"
+    },
+    {
+      "id": "char_word_soc_edge_21",
+      "kind": "word",
+      "value": "Soc Edge 21"
+    },
+    {
+      "id": "char_word_soc_edge_22",
+      "kind": "word",
+      "value": "Soc Edge 22"
+    },
+    {
+      "id": "char_word_soc_edge_23",
+      "kind": "word",
+      "value": "Soc Edge 23"
+    },
+    {
+      "id": "char_word_soc_edge_24",
+      "kind": "word",
+      "value": "Soc Edge 24"
+    },
+    {
+      "id": "char_word_soc_edge_25",
+      "kind": "word",
+      "value": "Soc Edge 25"
+    },
+    {
+      "id": "char_word_soc_edge_26",
+      "kind": "word",
+      "value": "Soc Edge 26"
+    },
+    {
+      "id": "char_word_soc_edge_27",
+      "kind": "word",
+      "value": "Soc Edge 27"
+    },
+    {
+      "id": "char_word_soc_edge_28",
+      "kind": "word",
+      "value": "Soc Edge 28"
+    },
+    {
+      "id": "char_word_soc_edge_29",
+      "kind": "word",
+      "value": "Soc Edge 29"
+    },
+    {
+      "id": "char_word_soc_edge_30",
+      "kind": "word",
+      "value": "Soc Edge 30"
+    },
+    {
+      "id": "char_word_soc_edge_31",
+      "kind": "word",
+      "value": "Soc Edge 31"
+    },
+    {
+      "id": "char_word_soc_edge_32",
+      "kind": "word",
+      "value": "Soc Edge 32"
+    },
+    {
+      "id": "char_word_soc_edge_33",
+      "kind": "word",
+      "value": "Soc Edge 33"
+    },
+    {
+      "id": "char_word_soc_edge_34",
+      "kind": "word",
+      "value": "Soc Edge 34"
+    },
+    {
+      "id": "char_word_soc_edge_35",
+      "kind": "word",
+      "value": "Soc Edge 35"
+    },
+    {
+      "id": "char_word_soc_edge_36",
+      "kind": "word",
+      "value": "Soc Edge 36"
+    },
+    {
+      "id": "char_word_soc_edge_37",
+      "kind": "word",
+      "value": "Soc Edge 37"
+    },
+    {
+      "id": "char_word_soc_edge_38",
+      "kind": "word",
+      "value": "Soc Edge 38"
+    },
+    {
+      "id": "char_word_soc_edge_39",
+      "kind": "word",
+      "value": "Soc Edge 39"
+    },
+    {
+      "id": "char_word_soc_edge_40",
+      "kind": "word",
+      "value": "Soc Edge 40"
+    },
+    {
+      "id": "char_word_soc_edge_41",
+      "kind": "word",
+      "value": "Soc Edge 41"
+    },
+    {
+      "id": "char_word_soc_edge_42",
+      "kind": "word",
+      "value": "Soc Edge 42"
+    },
+    {
+      "id": "char_word_soc_edge_43",
+      "kind": "word",
+      "value": "Soc Edge 43"
+    },
+    {
+      "id": "char_word_soc_edge_44",
+      "kind": "word",
+      "value": "Soc Edge 44"
+    },
+    {
+      "id": "char_word_soc_edge_45",
+      "kind": "word",
+      "value": "Soc Edge 45"
+    },
+    {
+      "id": "char_word_soc_edge_46",
+      "kind": "word",
+      "value": "Soc Edge 46"
+    },
+    {
+      "id": "char_word_soc_edge_47",
+      "kind": "word",
+      "value": "Soc Edge 47"
+    },
+    {
+      "id": "char_word_soc_edge_48",
+      "kind": "word",
+      "value": "Soc Edge 48"
+    },
+    {
+      "id": "char_word_soc_edge_49",
+      "kind": "word",
+      "value": "Soc Edge 49"
+    },
+    {
+      "id": "char_word_soc_edge_50",
+      "kind": "word",
+      "value": "Soc Edge 50"
+    },
+    {
+      "id": "char_word_soc_edge_51",
+      "kind": "word",
+      "value": "Soc Edge 51"
+    },
+    {
+      "id": "char_word_soc_edge_52",
+      "kind": "word",
+      "value": "Soc Edge 52"
+    },
+    {
+      "id": "char_word_soc_edge_53",
+      "kind": "word",
+      "value": "Soc Edge 53"
+    },
+    {
+      "id": "char_word_soc_edge_54",
+      "kind": "word",
+      "value": "Soc Edge 54"
+    },
+    {
+      "id": "char_word_soc_edge_55",
+      "kind": "word",
+      "value": "Soc Edge 55"
+    },
+    {
+      "id": "char_word_soc_edge_56",
+      "kind": "word",
+      "value": "Soc Edge 56"
+    },
+    {
+      "id": "char_word_soc_edge_57",
+      "kind": "word",
+      "value": "Soc Edge 57"
+    },
+    {
+      "id": "char_word_soc_edge_58",
+      "kind": "word",
+      "value": "Soc Edge 58"
+    },
+    {
+      "id": "char_word_soc_edge_59",
+      "kind": "word",
+      "value": "Soc Edge 59"
+    },
+    {
+      "id": "char_word_soc_edge_60",
+      "kind": "word",
+      "value": "Soc Edge 60"
+    },
+    {
+      "id": "char_word_soc_edge_61",
+      "kind": "word",
+      "value": "Soc Edge 61"
+    },
+    {
+      "id": "char_word_soc_edge_62",
+      "kind": "word",
+      "value": "Soc Edge 62"
+    },
+    {
+      "id": "char_word_soc_edge_63",
+      "kind": "word",
+      "value": "Soc Edge 63"
+    },
+    {
+      "id": "char_word_soc_edge_64",
+      "kind": "word",
+      "value": "Soc Edge 64"
+    },
+    {
+      "id": "char_word_soc_edge_65",
+      "kind": "word",
+      "value": "Soc Edge 65"
+    },
+    {
+      "id": "char_word_soc_edge_66",
+      "kind": "word",
+      "value": "Soc Edge 66"
+    },
+    {
+      "id": "char_word_contingency",
+      "kind": "word",
+      "value": "Contingency"
+    },
+    {
+      "id": "char_word_conflict",
+      "kind": "word",
+      "value": "Conflict"
+    },
+    {
+      "id": "char_word_concern",
+      "kind": "word",
+      "value": "Concern"
+    },
+    {
+      "id": "char_word_joy",
+      "kind": "word",
+      "value": "Joy"
+    },
+    {
+      "id": "char_word_hope",
+      "kind": "word",
+      "value": "Hope"
+    },
+    {
+      "id": "char_word_need",
+      "kind": "word",
+      "value": "Need"
+    },
+    {
+      "id": "char_word_discernment",
+      "kind": "word",
+      "value": "Discernment"
+    },
+    {
+      "id": "char_word_serenity",
+      "kind": "word",
+      "value": "Serenity"
+    },
+    {
+      "id": "char_word_transcendence",
+      "kind": "word",
+      "value": "Transcendence"
+    },
+    {
+      "id": "char_word_holiness",
+      "kind": "word",
+      "value": "Holiness"
+    },
+    {
+      "id": "char_word_love",
+      "kind": "word",
+      "value": "Love"
+    },
+    {
+      "id": "char_word_fulfillment",
+      "kind": "word",
+      "value": "Fulfillment"
+    },
+    {
+      "id": "char_word_val_edge_1",
+      "kind": "word",
+      "value": "Val Edge 1"
+    },
+    {
+      "id": "char_word_val_edge_2",
+      "kind": "word",
+      "value": "Val Edge 2"
+    },
+    {
+      "id": "char_word_val_edge_3",
+      "kind": "word",
+      "value": "Val Edge 3"
+    },
+    {
+      "id": "char_word_val_edge_4",
+      "kind": "word",
+      "value": "Val Edge 4"
+    },
+    {
+      "id": "char_word_val_edge_5",
+      "kind": "word",
+      "value": "Val Edge 5"
+    },
+    {
+      "id": "char_word_val_edge_6",
+      "kind": "word",
+      "value": "Val Edge 6"
+    },
+    {
+      "id": "char_word_val_edge_7",
+      "kind": "word",
+      "value": "Val Edge 7"
+    },
+    {
+      "id": "char_word_val_edge_8",
+      "kind": "word",
+      "value": "Val Edge 8"
+    },
+    {
+      "id": "char_word_val_edge_9",
+      "kind": "word",
+      "value": "Val Edge 9"
+    },
+    {
+      "id": "char_word_val_edge_10",
+      "kind": "word",
+      "value": "Val Edge 10"
+    },
+    {
+      "id": "char_word_val_edge_11",
+      "kind": "word",
+      "value": "Val Edge 11"
+    },
+    {
+      "id": "char_word_val_edge_12",
+      "kind": "word",
+      "value": "Val Edge 12"
+    },
+    {
+      "id": "char_word_val_edge_13",
+      "kind": "word",
+      "value": "Val Edge 13"
+    },
+    {
+      "id": "char_word_val_edge_14",
+      "kind": "word",
+      "value": "Val Edge 14"
+    },
+    {
+      "id": "char_word_val_edge_15",
+      "kind": "word",
+      "value": "Val Edge 15"
+    },
+    {
+      "id": "char_word_val_edge_16",
+      "kind": "word",
+      "value": "Val Edge 16"
+    },
+    {
+      "id": "char_word_val_edge_17",
+      "kind": "word",
+      "value": "Val Edge 17"
+    },
+    {
+      "id": "char_word_val_edge_18",
+      "kind": "word",
+      "value": "Val Edge 18"
+    },
+    {
+      "id": "char_word_val_edge_19",
+      "kind": "word",
+      "value": "Val Edge 19"
+    },
+    {
+      "id": "char_word_val_edge_20",
+      "kind": "word",
+      "value": "Val Edge 20"
+    },
+    {
+      "id": "char_word_val_edge_21",
+      "kind": "word",
+      "value": "Val Edge 21"
+    },
+    {
+      "id": "char_word_val_edge_22",
+      "kind": "word",
+      "value": "Val Edge 22"
+    },
+    {
+      "id": "char_word_val_edge_23",
+      "kind": "word",
+      "value": "Val Edge 23"
+    },
+    {
+      "id": "char_word_val_edge_24",
+      "kind": "word",
+      "value": "Val Edge 24"
+    },
+    {
+      "id": "char_word_val_edge_25",
+      "kind": "word",
+      "value": "Val Edge 25"
+    },
+    {
+      "id": "char_word_val_edge_26",
+      "kind": "word",
+      "value": "Val Edge 26"
+    },
+    {
+      "id": "char_word_val_edge_27",
+      "kind": "word",
+      "value": "Val Edge 27"
+    },
+    {
+      "id": "char_word_val_edge_28",
+      "kind": "word",
+      "value": "Val Edge 28"
+    },
+    {
+      "id": "char_word_val_edge_29",
+      "kind": "word",
+      "value": "Val Edge 29"
+    },
+    {
+      "id": "char_word_val_edge_30",
+      "kind": "word",
+      "value": "Val Edge 30"
+    },
+    {
+      "id": "char_word_val_edge_31",
+      "kind": "word",
+      "value": "Val Edge 31"
+    },
+    {
+      "id": "char_word_val_edge_32",
+      "kind": "word",
+      "value": "Val Edge 32"
+    },
+    {
+      "id": "char_word_val_edge_33",
+      "kind": "word",
+      "value": "Val Edge 33"
+    },
+    {
+      "id": "char_word_val_edge_34",
+      "kind": "word",
+      "value": "Val Edge 34"
+    },
+    {
+      "id": "char_word_val_edge_35",
+      "kind": "word",
+      "value": "Val Edge 35"
+    },
+    {
+      "id": "char_word_val_edge_36",
+      "kind": "word",
+      "value": "Val Edge 36"
+    },
+    {
+      "id": "char_word_val_edge_37",
+      "kind": "word",
+      "value": "Val Edge 37"
+    },
+    {
+      "id": "char_word_val_edge_38",
+      "kind": "word",
+      "value": "Val Edge 38"
+    },
+    {
+      "id": "char_word_val_edge_39",
+      "kind": "word",
+      "value": "Val Edge 39"
+    },
+    {
+      "id": "char_word_val_edge_40",
+      "kind": "word",
+      "value": "Val Edge 40"
+    },
+    {
+      "id": "char_word_val_edge_41",
+      "kind": "word",
+      "value": "Val Edge 41"
+    },
+    {
+      "id": "char_word_val_edge_42",
+      "kind": "word",
+      "value": "Val Edge 42"
+    },
+    {
+      "id": "char_word_val_edge_43",
+      "kind": "word",
+      "value": "Val Edge 43"
+    },
+    {
+      "id": "char_word_val_edge_44",
+      "kind": "word",
+      "value": "Val Edge 44"
+    },
+    {
+      "id": "char_word_val_edge_45",
+      "kind": "word",
+      "value": "Val Edge 45"
+    },
+    {
+      "id": "char_word_val_edge_46",
+      "kind": "word",
+      "value": "Val Edge 46"
+    },
+    {
+      "id": "char_word_val_edge_47",
+      "kind": "word",
+      "value": "Val Edge 47"
+    },
+    {
+      "id": "char_word_val_edge_48",
+      "kind": "word",
+      "value": "Val Edge 48"
+    },
+    {
+      "id": "char_word_val_edge_49",
+      "kind": "word",
+      "value": "Val Edge 49"
+    },
+    {
+      "id": "char_word_val_edge_50",
+      "kind": "word",
+      "value": "Val Edge 50"
+    },
+    {
+      "id": "char_word_val_edge_51",
+      "kind": "word",
+      "value": "Val Edge 51"
+    },
+    {
+      "id": "char_word_val_edge_52",
+      "kind": "word",
+      "value": "Val Edge 52"
+    },
+    {
+      "id": "char_word_val_edge_53",
+      "kind": "word",
+      "value": "Val Edge 53"
+    },
+    {
+      "id": "char_word_val_edge_54",
+      "kind": "word",
+      "value": "Val Edge 54"
+    },
+    {
+      "id": "char_word_val_edge_55",
+      "kind": "word",
+      "value": "Val Edge 55"
+    },
+    {
+      "id": "char_word_val_edge_56",
+      "kind": "word",
+      "value": "Val Edge 56"
+    },
+    {
+      "id": "char_word_val_edge_57",
+      "kind": "word",
+      "value": "Val Edge 57"
+    },
+    {
+      "id": "char_word_val_edge_58",
+      "kind": "word",
+      "value": "Val Edge 58"
+    },
+    {
+      "id": "char_word_val_edge_59",
+      "kind": "word",
+      "value": "Val Edge 59"
+    },
+    {
+      "id": "char_word_val_edge_60",
+      "kind": "word",
+      "value": "Val Edge 60"
+    },
+    {
+      "id": "char_word_val_edge_61",
+      "kind": "word",
+      "value": "Val Edge 61"
+    },
+    {
+      "id": "char_word_val_edge_62",
+      "kind": "word",
+      "value": "Val Edge 62"
+    },
+    {
+      "id": "char_word_val_edge_63",
+      "kind": "word",
+      "value": "Val Edge 63"
+    },
+    {
+      "id": "char_word_val_edge_64",
+      "kind": "word",
+      "value": "Val Edge 64"
+    },
+    {
+      "id": "char_word_val_edge_65",
+      "kind": "word",
+      "value": "Val Edge 65"
+    },
+    {
+      "id": "char_word_val_edge_66",
+      "kind": "word",
+      "value": "Val Edge 66"
     }
   ],
   "coordinates": [],
@@ -2427,12 +4587,12 @@
       ]
     },
     {
-      "id": "vocab_order_position_location_3",
-      "name": "Order Position Location",
+      "id": "vocab_ordercardinality_ordinality_location_3",
+      "name": "OrderCardinality Ordinality Location",
       "order": 3,
       "terms": [
-        "char_word_order",
-        "char_word_position",
+        "char_word_order_cardinality",
+        "char_word_ordinality",
         "char_word_location"
       ],
       "connectives": [
@@ -2683,11 +4843,11 @@
       ]
     },
     {
-      "id": "vocab_order_size_2",
-      "name": "Order Size",
+      "id": "vocab_ordercardinality_size_2",
+      "name": "OrderCardinality Size",
       "order": 2,
       "terms": [
-        "char_word_order",
+        "char_word_order_cardinality",
         "char_word_size"
       ],
       "connectives": [
@@ -2735,13 +4895,13 @@
       "name": "Graph Theory",
       "order": 7,
       "terms": [
-        "char_word_order",
+        "char_word_order_cardinality",
         "char_word_degree",
         "char_word_index",
         "char_word_adjacency",
         "char_word_neighbourhood",
         "char_word_location",
-        "char_word_position"
+        "char_word_ordinality"
       ],
       "connectives": [
         "char_word_gt_edge_1",
@@ -2774,7 +4934,7 @@
       "terms": [
         "char_word_topology",
         "char_word_geometry",
-        "char_word_position",
+        "char_word_ordinality",
         "char_word_location"
       ],
       "connectives": [
@@ -2817,7 +4977,7 @@
       "terms": [
         "char_word_identity",
         "char_word_expansion",
-        "char_word_order",
+        "char_word_order_cardinality",
         "char_word_freedom",
         "char_word_interaction",
         "char_word_concentration"
@@ -3130,6 +5290,544 @@
         "char_word_cdes_edge_65",
         "char_word_cdes_edge_66"
       ]
+    },
+    {
+      "id": "vocab_elementary_systematics_pentad_5",
+      "name": "Elementary Systematics Pentad",
+      "order": 5,
+      "terms": [
+        "char_word_quintessence",
+        "char_word_source",
+        "char_word_value_nature",
+        "char_word_factual_nature",
+        "char_word_end"
+      ],
+      "connectives": [
+        "char_word_es5_edge_1",
+        "char_word_what_i_might_become",
+        "char_word_what_i_inescapably_am",
+        "char_word_reality_of_fulfilment",
+        "char_word_substantiality_of_meaning",
+        "char_word_realisation_of_material_potential",
+        "char_word_range_of_potential_in_the_world",
+        "char_word_inner_levels_of_existence",
+        "char_word_condition_of_fulfilment",
+        "char_word_actuality_of_fulfilment"
+      ]
+    },
+    {
+      "id": "vocab_potency_12",
+      "name": "Potency",
+      "order": 12,
+      "terms": [
+        "char_word_universal_field",
+        "char_word_elemental_complexes",
+        "char_word_elemental_structures",
+        "char_word_soil_and_ocean",
+        "char_word_phytovegetation",
+        "char_word_germ_cells",
+        "char_word_animals",
+        "char_word_humans",
+        "char_word_planets",
+        "char_word_stars_and_solar_systems",
+        "char_word_galaxies",
+        "char_word_unfathomable_totality"
+      ],
+      "connectives": [
+        "char_word_pot_edge_1",
+        "char_word_pot_edge_2",
+        "char_word_pot_edge_3",
+        "char_word_pot_edge_4",
+        "char_word_pot_edge_5",
+        "char_word_pot_edge_6",
+        "char_word_pot_edge_7",
+        "char_word_pot_edge_8",
+        "char_word_pot_edge_9",
+        "char_word_pot_edge_10",
+        "char_word_pot_edge_11",
+        "char_word_pot_edge_12",
+        "char_word_pot_edge_13",
+        "char_word_pot_edge_14",
+        "char_word_pot_edge_15",
+        "char_word_pot_edge_16",
+        "char_word_pot_edge_17",
+        "char_word_pot_edge_18",
+        "char_word_pot_edge_19",
+        "char_word_pot_edge_20",
+        "char_word_pot_edge_21",
+        "char_word_pot_edge_22",
+        "char_word_pot_edge_23",
+        "char_word_pot_edge_24",
+        "char_word_pot_edge_25",
+        "char_word_pot_edge_26",
+        "char_word_pot_edge_27",
+        "char_word_pot_edge_28",
+        "char_word_pot_edge_29",
+        "char_word_pot_edge_30",
+        "char_word_pot_edge_31",
+        "char_word_pot_edge_32",
+        "char_word_pot_edge_33",
+        "char_word_pot_edge_34",
+        "char_word_pot_edge_35",
+        "char_word_pot_edge_36",
+        "char_word_pot_edge_37",
+        "char_word_pot_edge_38",
+        "char_word_pot_edge_39",
+        "char_word_pot_edge_40",
+        "char_word_pot_edge_41",
+        "char_word_pot_edge_42",
+        "char_word_pot_edge_43",
+        "char_word_pot_edge_44",
+        "char_word_pot_edge_45",
+        "char_word_pot_edge_46",
+        "char_word_pot_edge_47",
+        "char_word_pot_edge_48",
+        "char_word_pot_edge_49",
+        "char_word_pot_edge_50",
+        "char_word_pot_edge_51",
+        "char_word_pot_edge_52",
+        "char_word_pot_edge_53",
+        "char_word_pot_edge_54",
+        "char_word_pot_edge_55",
+        "char_word_pot_edge_56",
+        "char_word_pot_edge_57",
+        "char_word_pot_edge_58",
+        "char_word_pot_edge_59",
+        "char_word_pot_edge_60",
+        "char_word_pot_edge_61",
+        "char_word_pot_edge_62",
+        "char_word_pot_edge_63",
+        "char_word_pot_edge_64",
+        "char_word_pot_edge_65",
+        "char_word_pot_edge_66"
+      ]
+    },
+    {
+      "id": "vocab_levels_of_energy_12",
+      "name": "Levels of Energy",
+      "order": 12,
+      "terms": [
+        "char_word_zero_point_energy",
+        "char_word_patterning_energy",
+        "char_word_cohesive_energy",
+        "char_word_adaptive_energy",
+        "char_word_constructive_energy",
+        "char_word_organismic_energy",
+        "char_word_regenerative_energy",
+        "char_word_sensitive_energy",
+        "char_word_conscious_energy",
+        "char_word_creative_energy",
+        "char_word_unitive_energy",
+        "char_word_transcendent_energy"
+      ],
+      "connectives": [
+        "char_word_energy_h_edge_1",
+        "char_word_energy_h_edge_2",
+        "char_word_energy_h_edge_3",
+        "char_word_energy_h_edge_4",
+        "char_word_energy_h_edge_5",
+        "char_word_energy_h_edge_6",
+        "char_word_energy_h_edge_7",
+        "char_word_energy_h_edge_8",
+        "char_word_energy_h_edge_9",
+        "char_word_energy_h_edge_10",
+        "char_word_energy_h_edge_11",
+        "char_word_energy_h_edge_12",
+        "char_word_energy_h_edge_13",
+        "char_word_energy_h_edge_14",
+        "char_word_energy_h_edge_15",
+        "char_word_energy_h_edge_16",
+        "char_word_energy_h_edge_17",
+        "char_word_energy_h_edge_18",
+        "char_word_energy_h_edge_19",
+        "char_word_energy_h_edge_20",
+        "char_word_energy_h_edge_21",
+        "char_word_energy_h_edge_22",
+        "char_word_energy_h_edge_23",
+        "char_word_energy_h_edge_24",
+        "char_word_energy_h_edge_25",
+        "char_word_energy_h_edge_26",
+        "char_word_energy_h_edge_27",
+        "char_word_energy_h_edge_28",
+        "char_word_energy_h_edge_29",
+        "char_word_energy_h_edge_30",
+        "char_word_energy_h_edge_31",
+        "char_word_energy_h_edge_32",
+        "char_word_energy_h_edge_33",
+        "char_word_energy_h_edge_34",
+        "char_word_energy_h_edge_35",
+        "char_word_energy_h_edge_36",
+        "char_word_energy_h_edge_37",
+        "char_word_energy_h_edge_38",
+        "char_word_energy_h_edge_39",
+        "char_word_energy_h_edge_40",
+        "char_word_energy_h_edge_41",
+        "char_word_energy_h_edge_42",
+        "char_word_energy_h_edge_43",
+        "char_word_energy_h_edge_44",
+        "char_word_energy_h_edge_45",
+        "char_word_energy_h_edge_46",
+        "char_word_energy_h_edge_47",
+        "char_word_energy_h_edge_48",
+        "char_word_energy_h_edge_49",
+        "char_word_energy_h_edge_50",
+        "char_word_energy_h_edge_51",
+        "char_word_energy_h_edge_52",
+        "char_word_energy_h_edge_53",
+        "char_word_energy_h_edge_54",
+        "char_word_energy_h_edge_55",
+        "char_word_energy_h_edge_56",
+        "char_word_energy_h_edge_57",
+        "char_word_energy_h_edge_58",
+        "char_word_energy_h_edge_59",
+        "char_word_energy_h_edge_60",
+        "char_word_energy_h_edge_61",
+        "char_word_energy_h_edge_62",
+        "char_word_energy_h_edge_63",
+        "char_word_energy_h_edge_64",
+        "char_word_energy_h_edge_65",
+        "char_word_energy_h_edge_66"
+      ]
+    },
+    {
+      "id": "vocab_levels_of_energy_(bennett)_12",
+      "name": "Levels of Energy (Bennett)",
+      "order": 12,
+      "terms": [
+        "char_word_dispersive_energy",
+        "char_word_directed_energy",
+        "char_word_cohesive_energy",
+        "char_word_plastic_energy",
+        "char_word_constructive_energy",
+        "char_word_vital_energy",
+        "char_word_automatic_energy",
+        "char_word_sensitive_energy",
+        "char_word_conscious_energy",
+        "char_word_creative_energy",
+        "char_word_unitive_energy",
+        "char_word_transcendent_energy"
+      ],
+      "connectives": [
+        "char_word_energy_b_edge_1",
+        "char_word_energy_b_edge_2",
+        "char_word_energy_b_edge_3",
+        "char_word_energy_b_edge_4",
+        "char_word_energy_b_edge_5",
+        "char_word_energy_b_edge_6",
+        "char_word_energy_b_edge_7",
+        "char_word_energy_b_edge_8",
+        "char_word_energy_b_edge_9",
+        "char_word_energy_b_edge_10",
+        "char_word_energy_b_edge_11",
+        "char_word_energy_b_edge_12",
+        "char_word_energy_b_edge_13",
+        "char_word_energy_b_edge_14",
+        "char_word_energy_b_edge_15",
+        "char_word_energy_b_edge_16",
+        "char_word_energy_b_edge_17",
+        "char_word_energy_b_edge_18",
+        "char_word_energy_b_edge_19",
+        "char_word_energy_b_edge_20",
+        "char_word_energy_b_edge_21",
+        "char_word_energy_b_edge_22",
+        "char_word_energy_b_edge_23",
+        "char_word_energy_b_edge_24",
+        "char_word_energy_b_edge_25",
+        "char_word_energy_b_edge_26",
+        "char_word_energy_b_edge_27",
+        "char_word_energy_b_edge_28",
+        "char_word_energy_b_edge_29",
+        "char_word_energy_b_edge_30",
+        "char_word_energy_b_edge_31",
+        "char_word_energy_b_edge_32",
+        "char_word_energy_b_edge_33",
+        "char_word_energy_b_edge_34",
+        "char_word_energy_b_edge_35",
+        "char_word_energy_b_edge_36",
+        "char_word_energy_b_edge_37",
+        "char_word_energy_b_edge_38",
+        "char_word_energy_b_edge_39",
+        "char_word_energy_b_edge_40",
+        "char_word_energy_b_edge_41",
+        "char_word_energy_b_edge_42",
+        "char_word_energy_b_edge_43",
+        "char_word_energy_b_edge_44",
+        "char_word_energy_b_edge_45",
+        "char_word_energy_b_edge_46",
+        "char_word_energy_b_edge_47",
+        "char_word_energy_b_edge_48",
+        "char_word_energy_b_edge_49",
+        "char_word_energy_b_edge_50",
+        "char_word_energy_b_edge_51",
+        "char_word_energy_b_edge_52",
+        "char_word_energy_b_edge_53",
+        "char_word_energy_b_edge_54",
+        "char_word_energy_b_edge_55",
+        "char_word_energy_b_edge_56",
+        "char_word_energy_b_edge_57",
+        "char_word_energy_b_edge_58",
+        "char_word_energy_b_edge_59",
+        "char_word_energy_b_edge_60",
+        "char_word_energy_b_edge_61",
+        "char_word_energy_b_edge_62",
+        "char_word_energy_b_edge_63",
+        "char_word_energy_b_edge_64",
+        "char_word_energy_b_edge_65",
+        "char_word_energy_b_edge_66"
+      ]
+    },
+    {
+      "id": "vocab_work_2",
+      "name": "Work",
+      "order": 2,
+      "terms": [
+        "char_word_anabolic",
+        "char_word_catabolic"
+      ],
+      "connectives": [
+        "char_word_work_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_workspace_3",
+      "name": "Workspace",
+      "order": 3,
+      "terms": [
+        "char_word_tabs",
+        "char_word_panes",
+        "char_word_agents"
+      ],
+      "connectives": [
+        "char_word_wksp_edge_1",
+        "char_word_wksp_edge_2",
+        "char_word_wksp_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_total_content_of_a_moment_of_awareness_1",
+      "name": "Total Content of a Moment of Awareness",
+      "order": 1,
+      "terms": [
+        "char_word_total_content_of_a_moment_of_awareness"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_dodecads_pentad_5",
+      "name": "Dodecads Pentad",
+      "order": 5,
+      "terms": [
+        "char_word_the_12_energies",
+        "char_word_the_12_sources_of_the_world_mandala",
+        "char_word_the_12_values",
+        "char_word_the_12_potencies",
+        "char_word_the_12_levels_of_society"
+      ],
+      "connectives": [
+        "char_word_dodp_edge_1",
+        "char_word_dodp_edge_2",
+        "char_word_dodp_edge_3",
+        "char_word_dodp_edge_4",
+        "char_word_dodp_edge_5",
+        "char_word_dodp_edge_6",
+        "char_word_dodp_edge_7",
+        "char_word_dodp_edge_8",
+        "char_word_dodp_edge_9",
+        "char_word_dodp_edge_10"
+      ]
+    },
+    {
+      "id": "vocab_tetrad_(hodgson)_4",
+      "name": "Tetrad (Hodgson)",
+      "order": 4,
+      "terms": [
+        "char_word_ideal",
+        "char_word_ground",
+        "char_word_directive",
+        "char_word_instrumental"
+      ],
+      "connectives": [
+        "char_word_motivational_imperative",
+        "char_word_receptive_regard",
+        "char_word_effectual_compatibility",
+        "char_word_material_mastery",
+        "char_word_technical_power",
+        "char_word_demonstrable_activity"
+      ]
+    },
+    {
+      "id": "vocab_society_12",
+      "name": "Society",
+      "order": 12,
+      "terms": [
+        "char_word_dependents",
+        "char_word_producers",
+        "char_word_craftsmen",
+        "char_word_psychostatic_leaders",
+        "char_word_candidates",
+        "char_word_specialists",
+        "char_word_counsellors",
+        "char_word_psychokinetic_initiates",
+        "char_word_guides",
+        "char_word_saints",
+        "char_word_prophets",
+        "char_word_psychoteleios_messengers"
+      ],
+      "connectives": [
+        "char_word_soc_edge_1",
+        "char_word_soc_edge_2",
+        "char_word_soc_edge_3",
+        "char_word_soc_edge_4",
+        "char_word_soc_edge_5",
+        "char_word_soc_edge_6",
+        "char_word_soc_edge_7",
+        "char_word_soc_edge_8",
+        "char_word_soc_edge_9",
+        "char_word_soc_edge_10",
+        "char_word_soc_edge_11",
+        "char_word_soc_edge_12",
+        "char_word_soc_edge_13",
+        "char_word_soc_edge_14",
+        "char_word_soc_edge_15",
+        "char_word_soc_edge_16",
+        "char_word_soc_edge_17",
+        "char_word_soc_edge_18",
+        "char_word_soc_edge_19",
+        "char_word_soc_edge_20",
+        "char_word_soc_edge_21",
+        "char_word_soc_edge_22",
+        "char_word_soc_edge_23",
+        "char_word_soc_edge_24",
+        "char_word_soc_edge_25",
+        "char_word_soc_edge_26",
+        "char_word_soc_edge_27",
+        "char_word_soc_edge_28",
+        "char_word_soc_edge_29",
+        "char_word_soc_edge_30",
+        "char_word_soc_edge_31",
+        "char_word_soc_edge_32",
+        "char_word_soc_edge_33",
+        "char_word_soc_edge_34",
+        "char_word_soc_edge_35",
+        "char_word_soc_edge_36",
+        "char_word_soc_edge_37",
+        "char_word_soc_edge_38",
+        "char_word_soc_edge_39",
+        "char_word_soc_edge_40",
+        "char_word_soc_edge_41",
+        "char_word_soc_edge_42",
+        "char_word_soc_edge_43",
+        "char_word_soc_edge_44",
+        "char_word_soc_edge_45",
+        "char_word_soc_edge_46",
+        "char_word_soc_edge_47",
+        "char_word_soc_edge_48",
+        "char_word_soc_edge_49",
+        "char_word_soc_edge_50",
+        "char_word_soc_edge_51",
+        "char_word_soc_edge_52",
+        "char_word_soc_edge_53",
+        "char_word_soc_edge_54",
+        "char_word_soc_edge_55",
+        "char_word_soc_edge_56",
+        "char_word_soc_edge_57",
+        "char_word_soc_edge_58",
+        "char_word_soc_edge_59",
+        "char_word_soc_edge_60",
+        "char_word_soc_edge_61",
+        "char_word_soc_edge_62",
+        "char_word_soc_edge_63",
+        "char_word_soc_edge_64",
+        "char_word_soc_edge_65",
+        "char_word_soc_edge_66"
+      ]
+    },
+    {
+      "id": "vocab_values_12",
+      "name": "Values",
+      "order": 12,
+      "terms": [
+        "char_word_contingency",
+        "char_word_conflict",
+        "char_word_concern",
+        "char_word_joy",
+        "char_word_hope",
+        "char_word_need",
+        "char_word_discernment",
+        "char_word_serenity",
+        "char_word_transcendence",
+        "char_word_holiness",
+        "char_word_love",
+        "char_word_fulfillment"
+      ],
+      "connectives": [
+        "char_word_val_edge_1",
+        "char_word_val_edge_2",
+        "char_word_val_edge_3",
+        "char_word_val_edge_4",
+        "char_word_val_edge_5",
+        "char_word_val_edge_6",
+        "char_word_val_edge_7",
+        "char_word_val_edge_8",
+        "char_word_val_edge_9",
+        "char_word_val_edge_10",
+        "char_word_val_edge_11",
+        "char_word_val_edge_12",
+        "char_word_val_edge_13",
+        "char_word_val_edge_14",
+        "char_word_val_edge_15",
+        "char_word_val_edge_16",
+        "char_word_val_edge_17",
+        "char_word_val_edge_18",
+        "char_word_val_edge_19",
+        "char_word_val_edge_20",
+        "char_word_val_edge_21",
+        "char_word_val_edge_22",
+        "char_word_val_edge_23",
+        "char_word_val_edge_24",
+        "char_word_val_edge_25",
+        "char_word_val_edge_26",
+        "char_word_val_edge_27",
+        "char_word_val_edge_28",
+        "char_word_val_edge_29",
+        "char_word_val_edge_30",
+        "char_word_val_edge_31",
+        "char_word_val_edge_32",
+        "char_word_val_edge_33",
+        "char_word_val_edge_34",
+        "char_word_val_edge_35",
+        "char_word_val_edge_36",
+        "char_word_val_edge_37",
+        "char_word_val_edge_38",
+        "char_word_val_edge_39",
+        "char_word_val_edge_40",
+        "char_word_val_edge_41",
+        "char_word_val_edge_42",
+        "char_word_val_edge_43",
+        "char_word_val_edge_44",
+        "char_word_val_edge_45",
+        "char_word_val_edge_46",
+        "char_word_val_edge_47",
+        "char_word_val_edge_48",
+        "char_word_val_edge_49",
+        "char_word_val_edge_50",
+        "char_word_val_edge_51",
+        "char_word_val_edge_52",
+        "char_word_val_edge_53",
+        "char_word_val_edge_54",
+        "char_word_val_edge_55",
+        "char_word_val_edge_56",
+        "char_word_val_edge_57",
+        "char_word_val_edge_58",
+        "char_word_val_edge_59",
+        "char_word_val_edge_60",
+        "char_word_val_edge_61",
+        "char_word_val_edge_62",
+        "char_word_val_edge_63",
+        "char_word_val_edge_64",
+        "char_word_val_edge_65",
+        "char_word_val_edge_66"
+      ]
     }
   ],
   "systems": [
@@ -3214,14 +5912,14 @@
       "vocabulary_ref": "vocab_perspective_3"
     },
     {
-      "id": "system_order_position_location_3",
-      "name": "Order Position Location",
+      "id": "system_ordercardinality_ordinality_location_3",
+      "name": "OrderCardinality Ordinality Location",
       "order": 3,
       "coherence": "Dynamism",
       "term_designation": "Impulses",
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
-      "vocabulary_ref": "vocab_order_position_location_3"
+      "vocabulary_ref": "vocab_ordercardinality_ordinality_location_3"
     },
     {
       "id": "system_data_object_3",
@@ -3394,14 +6092,14 @@
       "vocabulary_ref": "vocab_graph_construction_3"
     },
     {
-      "id": "system_order_size_2",
-      "name": "Order Size",
+      "id": "system_ordercardinality_size_2",
+      "name": "OrderCardinality Size",
       "order": 2,
       "coherence": "Complementarity",
       "term_designation": "Poles",
       "connective_designation": "Force",
       "grammar_ref": "grammar_2",
-      "vocabulary_ref": "vocab_order_size_2"
+      "vocabulary_ref": "vocab_ordercardinality_size_2"
     },
     {
       "id": "system_vertex_edge_2",
@@ -3522,6 +6220,116 @@
       "connective_designation": "Needs Research",
       "grammar_ref": "grammar_12",
       "vocabulary_ref": "vocab_connective_designations_12"
+    },
+    {
+      "id": "system_elementary_systematics_pentad_5",
+      "name": "Elementary Systematics Pentad",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_elementary_systematics_pentad_5"
+    },
+    {
+      "id": "system_potency_12",
+      "name": "Potency",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_potency_12"
+    },
+    {
+      "id": "system_levels_of_energy_12",
+      "name": "Levels of Energy",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_levels_of_energy_12"
+    },
+    {
+      "id": "system_levels_of_energy_(bennett)_12",
+      "name": "Levels of Energy (Bennett)",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_levels_of_energy_(bennett)_12"
+    },
+    {
+      "id": "system_work_2",
+      "name": "Work",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_work_2"
+    },
+    {
+      "id": "system_workspace_3",
+      "name": "Workspace",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_workspace_3"
+    },
+    {
+      "id": "system_total_content_of_a_moment_of_awareness_1",
+      "name": "Total Content of a Moment of Awareness",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_total_content_of_a_moment_of_awareness_1"
+    },
+    {
+      "id": "system_dodecads_pentad_5",
+      "name": "Dodecads Pentad",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_dodecads_pentad_5"
+    },
+    {
+      "id": "system_tetrad_(hodgson)_4",
+      "name": "Tetrad (Hodgson)",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_tetrad_(hodgson)_4"
+    },
+    {
+      "id": "system_society_12",
+      "name": "Society",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_society_12"
+    },
+    {
+      "id": "system_values_12",
+      "name": "Values",
+      "order": 12,
+      "coherence": "Perfection",
+      "term_designation": "Needs Research",
+      "connective_designation": "Needs Research",
+      "grammar_ref": "grammar_12",
+      "vocabulary_ref": "vocab_values_12"
     }
   ],
   "perspectives": [],

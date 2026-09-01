@@ -103,13 +103,14 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 39 fragments + 3 module-owned = 55.
-    // Fragments grew 35 → 39 (2026-08-27): the Ouspensky Emotion tetrad + the AI-agent
-    // harness cluster (Harness Engineering, Harness Loop, Agent).
+    // Total systems = 12 canonical + 1 citation + 50 fragments + 3 module-owned = 66.
+    // Fragments grew 39 → 50 (2026-09-01): the Elementary Systematics pentad, Potency,
+    // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
+    // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, and Values.
     assert_eq!(
         graph.systems.len(),
-        55,
-        "expected 12 canonical + 1 citation + 39 fragment + 3 module systems"
+        66,
+        "expected 12 canonical + 1 citation + 50 fragment + 3 module systems"
     );
 }
 

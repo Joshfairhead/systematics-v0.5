@@ -86,34 +86,34 @@
       "value": "Instrumental"
     },
     {
-      "id": "char_word_motivational_imperative",
+      "id": "char_word_realisation",
       "kind": "word",
-      "value": "Motivational Imperative"
+      "value": "Realisation"
     },
     {
-      "id": "char_word_receptive_regard",
+      "id": "char_word_participation",
       "kind": "word",
-      "value": "Receptive Regard"
+      "value": "Participation"
     },
     {
-      "id": "char_word_effectual_compatibility",
+      "id": "char_word_transformation",
       "kind": "word",
-      "value": "Effectual Compatibility"
+      "value": "Transformation"
     },
     {
-      "id": "char_word_material_mastery",
+      "id": "char_word_perception",
       "kind": "word",
-      "value": "Material Mastery"
+      "value": "Perception"
     },
     {
-      "id": "char_word_technical_power",
+      "id": "char_word_conservation",
       "kind": "word",
-      "value": "Technical Power"
+      "value": "Conservation"
     },
     {
-      "id": "char_word_demonstrable_activity",
+      "id": "char_word_understanding",
       "kind": "word",
-      "value": "Demonstrable Activity"
+      "value": "Understanding"
     },
     {
       "id": "char_hex_099902",
@@ -2352,12 +2352,12 @@
         "char_word_instrumental"
       ],
       "connectives": [
-        "char_word_motivational_imperative",
-        "char_word_receptive_regard",
-        "char_word_effectual_compatibility",
-        "char_word_material_mastery",
-        "char_word_technical_power",
-        "char_word_demonstrable_activity"
+        "char_word_realisation",
+        "char_word_participation",
+        "char_word_transformation",
+        "char_word_perception",
+        "char_word_conservation",
+        "char_word_understanding"
       ]
     },
     {
@@ -3047,5 +3047,7 @@
   "sources": [],
   "artefacts": [],
   "lookups": [],
-  "references": []
+  "references": [],
+  "functors": [],
+  "sequences": []
 }
