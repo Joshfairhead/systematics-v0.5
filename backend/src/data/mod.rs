@@ -943,6 +943,49 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("val", 12),
     );
 
+    // ---- Holochain architecture, recorded as systems (refactor deferred to v0.6) ----
+
+    // Holochain Zomes — a dyad of integrity (static) / coordinator (dynamic).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Holochain Zomes",
+        2,
+        &slugs(&["integrity", "coordinator"]),
+        &edge_slugs("hcz", 2),
+    );
+
+    // Integrity zome — a triad: validation rules · entries · links (the static schema).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Integrity Zome",
+        3,
+        &slugs(&["validation_rules", "entries", "links"]),
+        &edge_slugs("intz", 3),
+    );
+
+    // Coordinator zome — a triad: function calls (+) · signal handlers (−) · host calls (=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Coordinator Zome",
+        3,
+        &slugs(&["function_calls", "signal_handlers", "host_calls"]),
+        &edge_slugs("coordz", 3),
+    );
+
+    // Holochain Link — a triad: base (content address / identity) · type (namespace /
+    // composition) · target (topological anchor: cardinality + ordinality).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Holochain Link",
+        3,
+        &slugs(&["base", "type", "target"]),
+        &edge_slugs("hcl", 3),
+    );
+
     content
 }
 

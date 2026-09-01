@@ -1530,3 +1530,43 @@ here** with: its terms (nouns → nodes), its connectives (verbs → edges), the
 location, and its status. Keep the code's names aligned to the schema. Companion
 docs: `docs/architecture-pentad.md` (the pentad in depth) and
 `docs/plans/architecture-run.md` (the 1→12 run, exploratory).
+
+---
+
+## Holochain refactor — TO DO (deferred to **systematics-v0.6**) [user, 2026-09-01]
+
+**This is the foundational refactor; it happens in a fresh project (systematics-v0.6),
+not here.** Recorded here (and dogfooded as in-graph systems: *Holochain Zomes*,
+*Integrity Zome*, *Coordinator Zome*, *Holochain Link*) so the plan is captured.
+
+**The substrate already maps 1:1.** `SubstrateStore` is content-addressed elements +
+`base–type–target` `HyperLink`s; `compose_from_store*` reads only the element/link API.
+So the migration is: swap the in-memory store for the DHT (`create_entry` / `create_link`),
+`compose_*` unchanged.
+
+**`base · type · target` (the Link triad):**
+- **base** = content address — hashing it *is* an identity function (our `content_id`).
+- **type** = a namespace — akin to composition (our `link_type`).
+- **target** = the topological anchor (cardinality + ordinality).
+
+**Zome structure (dyad of static / dynamic):**
+- **Integrity zome (static)** = a triad of **validation rules · entries · links**.
+- **Coordinator zome (dynamic)** = a triad of **function-calls (+) · signal-handlers (−)
+  · host-calls (=)**.
+
+**Two integrity zomes, in order:**
+1. **Topological space (first).** Define vertices + edges: **vertex = an entry** with
+   ordinality (adjacency matrix?); **edge = a link** with ordinality (line graph?).
+   **Validation = order + size** (cardinals) ⇒ K_n — order 3/size 3 = K₃, order 4/size 6
+   = K₄, … The cardinality bounds the vertex ordinals (K₃ ⇒ 1,2,3). *Open:* whether to
+   combine the entry/link matrices via an **incidence matrix**.
+2. **Vocabulary space (second).** Systems constrained by the topology. Archetypal form
+   (system type · coherence · term-designation · connective-designation · term-characters
+   · connective-characters) + an instance **name** (e.g. "Canonical Triad"). Each term /
+   connective character is **mapped to a vertex / edge** — mapping rule TBD (adjacency /
+   line graph / incidence candidates). Also **add the World Mandala dodecad** once ready
+   and wire clickable dodecad↔pentad links.
+
+**Rule of realisation:** `monad X  ‖  P + Q  ‖  A + B + C` (`‖` = the same situation at
+monad / dyad / triad articulation). Abstract → concrete (1 → 12) is itself an act of
+**realisation** — the dyad realised as a triad, etc.

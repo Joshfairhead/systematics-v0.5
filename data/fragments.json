@@ -4454,6 +4454,111 @@
       "id": "char_word_val_edge_66",
       "kind": "word",
       "value": "Val Edge 66"
+    },
+    {
+      "id": "char_word_integrity",
+      "kind": "word",
+      "value": "Integrity"
+    },
+    {
+      "id": "char_word_coordinator",
+      "kind": "word",
+      "value": "Coordinator"
+    },
+    {
+      "id": "char_word_hcz_edge_1",
+      "kind": "word",
+      "value": "Hcz Edge 1"
+    },
+    {
+      "id": "char_word_validation_rules",
+      "kind": "word",
+      "value": "Validation Rules"
+    },
+    {
+      "id": "char_word_entries",
+      "kind": "word",
+      "value": "Entries"
+    },
+    {
+      "id": "char_word_links",
+      "kind": "word",
+      "value": "Links"
+    },
+    {
+      "id": "char_word_intz_edge_1",
+      "kind": "word",
+      "value": "Intz Edge 1"
+    },
+    {
+      "id": "char_word_intz_edge_2",
+      "kind": "word",
+      "value": "Intz Edge 2"
+    },
+    {
+      "id": "char_word_intz_edge_3",
+      "kind": "word",
+      "value": "Intz Edge 3"
+    },
+    {
+      "id": "char_word_function_calls",
+      "kind": "word",
+      "value": "Function Calls"
+    },
+    {
+      "id": "char_word_signal_handlers",
+      "kind": "word",
+      "value": "Signal Handlers"
+    },
+    {
+      "id": "char_word_host_calls",
+      "kind": "word",
+      "value": "Host Calls"
+    },
+    {
+      "id": "char_word_coordz_edge_1",
+      "kind": "word",
+      "value": "Coordz Edge 1"
+    },
+    {
+      "id": "char_word_coordz_edge_2",
+      "kind": "word",
+      "value": "Coordz Edge 2"
+    },
+    {
+      "id": "char_word_coordz_edge_3",
+      "kind": "word",
+      "value": "Coordz Edge 3"
+    },
+    {
+      "id": "char_word_base",
+      "kind": "word",
+      "value": "Base"
+    },
+    {
+      "id": "char_word_type",
+      "kind": "word",
+      "value": "Type"
+    },
+    {
+      "id": "char_word_target",
+      "kind": "word",
+      "value": "Target"
+    },
+    {
+      "id": "char_word_hcl_edge_1",
+      "kind": "word",
+      "value": "Hcl Edge 1"
+    },
+    {
+      "id": "char_word_hcl_edge_2",
+      "kind": "word",
+      "value": "Hcl Edge 2"
+    },
+    {
+      "id": "char_word_hcl_edge_3",
+      "kind": "word",
+      "value": "Hcl Edge 3"
     }
   ],
   "coordinates": [],
@@ -5828,6 +5933,63 @@
         "char_word_val_edge_65",
         "char_word_val_edge_66"
       ]
+    },
+    {
+      "id": "vocab_holochain_zomes_2",
+      "name": "Holochain Zomes",
+      "order": 2,
+      "terms": [
+        "char_word_integrity",
+        "char_word_coordinator"
+      ],
+      "connectives": [
+        "char_word_hcz_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_integrity_zome_3",
+      "name": "Integrity Zome",
+      "order": 3,
+      "terms": [
+        "char_word_validation_rules",
+        "char_word_entries",
+        "char_word_links"
+      ],
+      "connectives": [
+        "char_word_intz_edge_1",
+        "char_word_intz_edge_2",
+        "char_word_intz_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_coordinator_zome_3",
+      "name": "Coordinator Zome",
+      "order": 3,
+      "terms": [
+        "char_word_function_calls",
+        "char_word_signal_handlers",
+        "char_word_host_calls"
+      ],
+      "connectives": [
+        "char_word_coordz_edge_1",
+        "char_word_coordz_edge_2",
+        "char_word_coordz_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_holochain_link_3",
+      "name": "Holochain Link",
+      "order": 3,
+      "terms": [
+        "char_word_base",
+        "char_word_type",
+        "char_word_target"
+      ],
+      "connectives": [
+        "char_word_hcl_edge_1",
+        "char_word_hcl_edge_2",
+        "char_word_hcl_edge_3"
+      ]
     }
   ],
   "systems": [
@@ -6330,6 +6492,46 @@
       "connective_designation": "Needs Research",
       "grammar_ref": "grammar_12",
       "vocabulary_ref": "vocab_values_12"
+    },
+    {
+      "id": "system_holochain_zomes_2",
+      "name": "Holochain Zomes",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_holochain_zomes_2"
+    },
+    {
+      "id": "system_integrity_zome_3",
+      "name": "Integrity Zome",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_integrity_zome_3"
+    },
+    {
+      "id": "system_coordinator_zome_3",
+      "name": "Coordinator Zome",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_coordinator_zome_3"
+    },
+    {
+      "id": "system_holochain_link_3",
+      "name": "Holochain Link",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_holochain_link_3"
     }
   ],
   "perspectives": [],
