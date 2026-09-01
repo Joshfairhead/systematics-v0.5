@@ -669,10 +669,78 @@ pub fn compose_from_store(
 /// the JSON. JSON becomes import/export only (the legacy device).
 pub fn ingest_from_graph(graph: &Graph) -> SubstrateStore {
     let mut store = SubstrateStore::default();
+    // 1. Characters → content-addressed value elements.
     for c in graph.characters(None) {
         store.ingest(&c.kind, &c.value);
     }
+    // 2. Each system → a **system element** (its cardinality) + **structure links**:
+    //    `term@{ordinality}` and `connective@{a}-{b}` links from the system to the value
+    //    elements. This is the system's *structure* in the substrate, so it composes
+    //    fully from the store — no graph needed at compose time (JSON → export-only).
+    for system in &graph.systems {
+        let Some(vocab) = graph.vocabulary(&system.vocabulary_ref) else {
+            continue;
+        };
+        let sys_el = format!("system:{}", system.id);
+        store.elements.push(DataElement {
+            id: sys_el.clone(),
+            kind: "system".to_string(),
+            character: system.order_cardinality.to_string(),
+        });
+        for (idx, r) in vocab.terms.iter().enumerate() {
+            if let Some(c) = graph.character(r) {
+                store.links.push(HyperLink {
+                    id: format!("{sys_el}#term@{}", idx + 1),
+                    base: sys_el.clone(),
+                    target: SubstrateStore::content_id(&c.kind, &c.value),
+                    link_type: format!("term@{}", idx + 1),
+                });
+            }
+        }
+        for ((a, b), r) in Template::for_order(system.order_cardinality)
+            .edges()
+            .into_iter()
+            .zip(vocab.connectives.iter())
+        {
+            if let Some(c) = graph.character(r) {
+                store.links.push(HyperLink {
+                    id: format!("{sys_el}#connective@{a}-{b}"),
+                    base: sys_el.clone(),
+                    target: SubstrateStore::content_id(&c.kind, &c.value),
+                    link_type: format!("connective@{a}-{b}"),
+                });
+            }
+        }
+    }
     store
+}
+
+/// **Compose a system PURELY from the store** — the full substrate-as-data-source path.
+/// Reads *everything* from the store: the system element gives its cardinality; the
+/// `term@n` / `connective@{a}-{b}` links give the ordered value content-ids; those
+/// resolve to their character values in the store; the topology is generated. No graph
+/// is consulted — the Controller composes the Model entirely from the substrate.
+pub fn compose_from_store_by_system(
+    store: &SubstrateStore,
+    system_element_id: &str,
+) -> Option<Hypergraph> {
+    let cardinality: u8 = store.get(system_element_id)?.character.parse().ok()?;
+    let target_for = |link_type: &str| -> Option<String> {
+        store
+            .links
+            .iter()
+            .find(|l| l.base == system_element_id && l.link_type == link_type)
+            .map(|l| l.target.clone())
+    };
+    let term_ids: Vec<String> = (1..=cardinality)
+        .filter_map(|i| target_for(&format!("term@{i}")))
+        .collect();
+    let connective_ids: Vec<String> = Template::for_order(cardinality)
+        .edges()
+        .into_iter()
+        .filter_map(|(a, b)| target_for(&format!("connective@{a}-{b}")))
+        .collect();
+    Some(compose_from_store(store, cardinality, &term_ids, &connective_ids))
 }
 
 /// **Compose a seeded system from the store** — the substrate-as-data-source path for a

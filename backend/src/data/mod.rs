@@ -786,6 +786,206 @@ pub fn build_fragments_from_tables() -> GraphContent {
         crate::core::hexadicsystems::connective_designation,
     );
 
+    // ---- Systematics library additions (user, 2026-09-01) ----
+
+    // Elementary Systematics **pentad** (JGB) — 1 Quintessence · 2 Source · 3 Value
+    // Nature · 4 Factual Nature · 5 End. Edges in canonical K5 order; (1,2) TBD.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Elementary Systematics Pentad",
+        5,
+        &slugs(&["quintessence", "source", "value_nature", "factual_nature", "end"]),
+        &slugs(&[
+            "es5_edge_1",                        // (1,2) quintessence–source (TBD)
+            "what_i_might_become",               // (1,3)
+            "what_i_inescapably_am",             // (1,4)
+            "reality_of_fulfilment",             // (1,5)
+            "substantiality_of_meaning",         // (2,3)
+            "realisation_of_material_potential", // (2,4)
+            "range_of_potential_in_the_world",   // (2,5)
+            "inner_levels_of_existence",         // (3,4)
+            "condition_of_fulfilment",           // (3,5)
+            "actuality_of_fulfilment",           // (4,5)
+        ]),
+    );
+
+    // Potency dodecad (Bennett) — the 12 grades of potency.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Potency",
+        12,
+        &slugs(&[
+            "universal_field", "elemental_complexes", "elemental_structures",
+            "soil_and_ocean", "phytovegetation", "germ_cells", "animals", "humans",
+            "planets", "stars_and_solar_systems", "galaxies", "unfathomable_totality",
+        ]),
+        &edge_slugs("pot", 12),
+    );
+
+    // Levels of Energy — Hodgson articulation (e6/e7 corrected per the slides: e6
+    // organismic = animal body, e7 regenerative = germinal).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Levels of Energy",
+        12,
+        &slugs(&[
+            "zero_point_energy", "patterning_energy", "cohesive_energy",
+            "adaptive_energy", "constructive_energy", "organismic_energy",
+            "regenerative_energy", "sensitive_energy", "conscious_energy",
+            "creative_energy", "unitive_energy", "transcendent_energy",
+        ]),
+        &edge_slugs("energy_h", 12),
+    );
+
+    // Levels of Energy — Bennett originals (where they differ from Hodgson).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Levels of Energy (Bennett)",
+        12,
+        &slugs(&[
+            "dispersive_energy", "directed_energy", "cohesive_energy",
+            "plastic_energy", "constructive_energy", "vital_energy",
+            "automatic_energy", "sensitive_energy", "conscious_energy",
+            "creative_energy", "unitive_energy", "transcendent_energy",
+        ]),
+        &edge_slugs("energy_b", 12),
+    );
+
+    // Work — a dyad of anabolic / catabolic.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Work",
+        2,
+        &slugs(&["anabolic", "catabolic"]),
+        &edge_slugs("work", 2),
+    );
+
+    // Workspace — a triad of tabs · panes · agents (the app's own workspace).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Workspace",
+        3,
+        &slugs(&["tabs", "panes", "agents"]),
+        &edge_slugs("wksp", 3),
+    );
+
+    // Monad — the total content of a moment of awareness.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Total Content of a Moment of Awareness",
+        1,
+        &slugs(&["total_content_of_a_moment_of_awareness"]),
+        &edge_slugs("moment", 1),
+    );
+
+    // A **pentad of dodecads** — names the five 12-fold systems (nodes not yet linked to
+    // their dodecads; naming only for now).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Dodecads Pentad",
+        5,
+        &slugs(&[
+            "the_12_energies",
+            "the_12_sources_of_the_world_mandala",
+            "the_12_values",
+            "the_12_potencies",
+            "the_12_levels_of_society",
+        ]),
+        &edge_slugs("dodp", 5),
+    );
+
+    // Tetrad (Hodgson) — preserves the previous canonical tetrad edges (from Hodgson's
+    // book) now that the canonical Tetrad carries the JGB / Elementary-Systematics edges.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Tetrad (Hodgson)",
+        4,
+        &slugs(&["ideal", "ground", "directive", "instrumental"]),
+        &slugs(&[
+            "motivational_imperative", "receptive_regard", "effectual_compatibility",
+            "material_mastery", "technical_power", "demonstrable_activity",
+        ]),
+    );
+
+    // Society dodecad (Bennett) — the 12 grades of society, ordinality 1→12.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Society",
+        12,
+        &slugs(&[
+            "dependents", "producers", "craftsmen", "psychostatic_leaders", "candidates",
+            "specialists", "counsellors", "psychokinetic_initiates", "guides", "saints",
+            "prophets", "psychoteleios_messengers",
+        ]),
+        &edge_slugs("soc", 12),
+    );
+
+    // Values dodecad (Bennett) — the 12 values, ordinality 1→12.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Values",
+        12,
+        &slugs(&[
+            "contingency", "conflict", "concern", "joy", "hope", "need", "discernment",
+            "serenity", "transcendence", "holiness", "love", "fulfillment",
+        ]),
+        &edge_slugs("val", 12),
+    );
+
+    // ---- Holochain architecture, recorded as systems (refactor deferred to v0.6) ----
+
+    // Holochain Zomes — a dyad of integrity (static) / coordinator (dynamic).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Holochain Zomes",
+        2,
+        &slugs(&["integrity", "coordinator"]),
+        &edge_slugs("hcz", 2),
+    );
+
+    // Integrity zome — a triad: validation rules · entries · links (the static schema).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Integrity Zome",
+        3,
+        &slugs(&["validation_rules", "entries", "links"]),
+        &edge_slugs("intz", 3),
+    );
+
+    // Coordinator zome — a triad: function calls (+) · signal handlers (−) · host calls (=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Coordinator Zome",
+        3,
+        &slugs(&["function_calls", "signal_handlers", "host_calls"]),
+        &edge_slugs("coordz", 3),
+    );
+
+    // Holochain Link — a triad: base (content address / identity) · type (namespace /
+    // composition) · target (topological anchor: cardinality + ordinality).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Holochain Link",
+        3,
+        &slugs(&["base", "type", "target"]),
+        &edge_slugs("hcl", 3),
+    );
+
     content
 }
 
@@ -868,13 +1068,17 @@ fn get_canonical_connective_slugs(order_cardinality: u8) -> Vec<String> {
             "decision".into(),
             "consent".into(),
         ],
+        // Canonical tetrad edges from **Elementary Systematics** (JGB), in canonical
+        // edge order over 1=Ideal · 2=Ground · 3=Directive · 4=Instrumental:
+        //   (1,2) realisation · (1,3) participation · (1,4) transformation
+        //   (2,3) perception · (2,4) conservation · (3,4) understanding
         4 => vec![
-            "motivational_imperative".into(),
-            "receptive_regard".into(),
-            "effectual_compatibility".into(),
-            "material_mastery".into(),
-            "technical_power".into(),
-            "demonstrable_activity".into(),
+            "realisation".into(),
+            "participation".into(),
+            "transformation".into(),
+            "perception".into(),
+            "conservation".into(),
+            "understanding".into(),
         ],
         5 => vec![
             "quantitative_match".into(),

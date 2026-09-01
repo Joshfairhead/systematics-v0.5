@@ -4,7 +4,7 @@
 //! its term/connective values sourced from the substrate, not from the JSON.
 
 use systematics_backend::core::substrate::{
-    compose_system_from_store, ingest_from_graph, SubstrateStore,
+    compose_from_store_by_system, compose_system_from_store, ingest_from_graph, SubstrateStore,
 };
 use systematics_backend::data;
 
@@ -25,8 +25,9 @@ fn ingest_graph_then_compose_the_triad_from_the_store() {
         .iter()
         .map(|c| (c.kind.clone(), c.value.clone()))
         .collect();
-    assert_eq!(store.elements.len(), distinct.len(), "one element per distinct content");
-    assert!(store.elements.len() < n_chars, "content-addressing deduped shared values");
+    let char_els = store.elements.iter().filter(|e| e.kind != "system").count();
+    assert_eq!(char_els, distinct.len(), "one value element per distinct content");
+    assert!(char_els < n_chars, "content-addressing deduped shared values");
 
     // Compose the canonical triad FROM the store — values come from the substrate.
     let hg = compose_system_from_store(&graph, &store, "system_canonical_triad_3")
@@ -36,4 +37,23 @@ fn ingest_graph_then_compose_the_triad_from_the_store() {
     assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
     assert_eq!(hg.data.iter().find(|d| d.id == "term_3_3").unwrap().character, "Being");
     assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_1_2").unwrap().character, "Generation");
+}
+
+#[test]
+fn compose_the_triad_purely_from_the_substrate() {
+    // The prototype: a system composed with NO graph at compose time — structure and
+    // values both come from the store (the system element + its term@/connective@ links).
+    let graph = data::build_graph();
+    let store = ingest_from_graph(&graph);
+
+    let hg = compose_from_store_by_system(&store, "system:system_canonical_triad_3")
+        .expect("triad composes purely from the substrate store");
+    assert_eq!(hg.topology.elements.len(), 3);
+    assert_eq!(hg.topology.links.len(), 3);
+    assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
+    assert_eq!(hg.data.iter().find(|d| d.id == "term_3_2").unwrap().character, "Function");
+    assert_eq!(hg.data.iter().find(|d| d.id == "term_3_3").unwrap().character, "Being");
+    assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_1_2").unwrap().character, "Generation");
+    assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_1_3").unwrap().character, "Decision");
+    assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_2_3").unwrap().character, "Consent");
 }
