@@ -31,6 +31,9 @@ pub struct BrowserControlsProps {
     /// Pre-rendered operation buttons (Extract·Load·Transform) and New — pass-through.
     pub elt_btns: Html,
     pub new_btn: Html,
+    /// Import (store/load) file-picker — rendered beside Create. Pass-through.
+    #[prop_or_default]
+    pub import_btn: Html,
     /// Show the ELT operation bar (Extract·Load·Transform). Off in the prototype —
     /// the code stays wired, just hidden (Load returns with store/load).
     #[prop_or(false)]
@@ -89,6 +92,7 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
                     oninput={ on_search }
                 />
                 { props.new_btn.clone() }
+                { props.import_btn.clone() }
 
                 if props.show_query {
                     <div class="control-pop">

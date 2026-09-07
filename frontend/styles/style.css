@@ -460,6 +460,13 @@ body {
     font-weight: 600;
 }
 
+/* Export link styled as a toolbar button (it's an <a download>, not a <button>). */
+.export-btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
 /* System type + K-notation (e.g. "Triad · K3"), under the system name. */
 .graph-subtitle {
     font-size: 0.72rem;

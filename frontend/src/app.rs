@@ -1,4 +1,6 @@
-use crate::api::client::{GraphQLClient, InstanceSystem, PositionedChar, ReferenceView, SequenceView};
+use crate::api::client::{
+    GraphQLClient, InstanceSystem, PositionedChar, ReferenceView, SequenceView, SystemFile,
+};
 use crate::components::graph_view::ApiGraphView;
 use crate::components::reference_browser::{
     AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
@@ -864,6 +866,7 @@ impl Component for ApiApp {
                                             onclick={ on_toggle_editing.clone() }
                                             title="Update this system — name, node & edge labels"
                                         >{ if self.editing { "✎ Updating" } else { "✎ Update" } }</button>
+                                        { export_anchor(system) }
                                         if self.editing {
                                             <SystemEditor
                                                 key={ system.system_id.clone() }
@@ -891,6 +894,50 @@ impl Component for ApiApp {
                 </div>
             </div>
         }
+    }
+}
+
+/// Export (Store to file): serialize the loaded system into a bespoke per-system JSON
+/// and offer it as a download. Terms are emitted in ordinality order; connectives in
+/// edge order (base, target). The download link is a self-contained data URL, so no
+/// object-URL lifecycle to manage.
+fn export_anchor(system: &RenderedSystem) -> Html {
+    let mut terms: Vec<_> = system.terms.iter().collect();
+    terms.sort_by_key(|t| t.ordinality);
+    let mut conns: Vec<_> = system.connectives.iter().collect();
+    conns.sort_by_key(|c| (c.base_ordinality, c.target_ordinality));
+
+    let name = if system.system_name.is_empty() {
+        system.name.clone()
+    } else {
+        system.system_name.clone()
+    };
+    let file = SystemFile {
+        name: name.clone(),
+        order: system.order_cardinality,
+        terms: terms.iter().map(|t| t.value.clone()).collect(),
+        connectives: conns.iter().map(|c| c.character_value.clone()).collect(),
+    };
+    let json = serde_json::to_string_pretty(&file).unwrap_or_default();
+    let href = format!(
+        "data:application/json;charset=utf-8,{}",
+        String::from(js_sys::encode_uri_component(&json))
+    );
+    let slug: String = name
+        .trim()
+        .to_lowercase()
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c } else { '-' })
+        .collect();
+    let filename = format!("{}.json", if slug.is_empty() { "system".into() } else { slug });
+
+    html! {
+        <a
+            class="edit-toggle export-btn"
+            href={ href }
+            download={ filename }
+            title="Export — Store this system to a bespoke JSON file (store/load)"
+        >{ "Export ↧" }</a>
     }
 }
 

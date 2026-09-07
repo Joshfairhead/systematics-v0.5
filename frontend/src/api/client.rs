@@ -129,6 +129,17 @@ pub struct PositionedChar {
     pub ordinality: String,
 }
 
+/// The **bespoke per-system file format** for store/load (import/export). A single
+/// system as its own small JSON — deliberately simple; the composable format is a
+/// v0.6 target. Store writes it (export); Load reads it (import).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SystemFile {
+    pub name: String,
+    pub order: i32,
+    pub terms: Vec<String>,
+    pub connectives: Vec<String>,
+}
+
 /// A non-canonical System the Load control can browse (id, display name, order_cardinality).
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct InstanceSystem {

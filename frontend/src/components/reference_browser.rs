@@ -24,7 +24,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
-use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
+use crate::api::client::{InstanceSystem, ReferenceView, SequenceView, SystemFile};
 use crate::components::browser_controls::{BrowserControls, ChipItem, PredItem};
 use crate::components::inspector::{Inspector, ObjCite, PosGroup, PredGroup};
 // The SPO triple store + query API live in their own module (swappable spike).
@@ -385,15 +385,37 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         && ed_terms.iter().all(|t| !t.trim().is_empty())
         && ed_conns.iter().all(|c| !c.trim().is_empty());
 
-    // Load opens the OS file browser to pick a JSON system file (import format TBD).
-    let on_file = Callback::from(move |e: Event| {
-        let input = e.target_unchecked_into::<HtmlInputElement>();
-        if let Some(f) = input.files().and_then(|fs| fs.get(0)) {
-            web_sys::console::log_1(
-                &format!("Load: {} ({} bytes) — JSON import TBD", f.name(), f.size()).into(),
-            );
-        }
-    });
+    // Load (import): read a bespoke per-system JSON file and **Store** it via on_author
+    // (create/overwrite). Store = write, Load = read — this is Load-from-file → Store.
+    let on_file = {
+        let on_author = props.on_author.clone();
+        Callback::from(move |e: Event| {
+            let input = e.target_unchecked_into::<HtmlInputElement>();
+            let Some(file) = input.files().and_then(|fs| fs.get(0)) else {
+                return;
+            };
+            let on_author = on_author.clone();
+            let text = wasm_bindgen_futures::JsFuture::from(file.text());
+            wasm_bindgen_futures::spawn_local(async move {
+                match text.await {
+                    Ok(js) => match serde_json::from_str::<SystemFile>(&js.as_string().unwrap_or_default()) {
+                        Ok(sf) => on_author.emit(AuthorRequest {
+                            name: sf.name,
+                            order_cardinality: sf.order,
+                            terms: sf.terms,
+                            connectives: sf.connectives,
+                        }),
+                        Err(err) => web_sys::console::log_1(
+                            &format!("Import: invalid system JSON — {err}").into(),
+                        ),
+                    },
+                    Err(_) => web_sys::console::log_1(&"Import: could not read file".into()),
+                }
+            });
+            // Reset so the same file can be re-imported.
+            input.set_value("");
+        })
+    };
     let can_extract = !extract_members.is_empty();
     let on_extract_click = {
         let on_extract = props.on_extract.clone();
@@ -416,16 +438,20 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             title="Create — author a system from custom terms/connectives"
         >{ if *editor_open { "Create ▴" } else { "Create ▾" } }</button>
     };
-    // Extract · Load · Transform (right of the search bar) — the operation edge.
+    // Import (Load): a file-picker that reads a bespoke per-system JSON and Stores it.
+    // Lives beside Create in the control bar (the ELT bar is hidden in the prototype).
+    let import_btn = html! {
+        <label class="elt-btn" title="Import — Load a system from a bespoke JSON file (store/load)">
+            { "Import ↥" }
+            <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
+        </label>
+    };
+    // Extract · Transform (the old ELT operation edge) — kept but hidden (show_elt=false).
     let elt_btns = html! {
         <>
             <button class="elt-btn" disabled={ !can_extract } onclick={ on_extract_click } title={ extract_title }>
                 { format!("Extract ({})", extract_members.len()) }
             </button>
-            <label class="elt-btn" title="Load — open a JSON system file (import format TBD)">
-                { "Load ↥" }
-                <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
-            </label>
             <button class="elt-btn" disabled=true title="Transform — apply a Functor to a loaded system. Not yet wired.">
                 { "Transform" }
             </button>
@@ -484,6 +510,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 inspect: &inspect,
                 selected: &selected,
                 new_btn,
+                import_btn,
                 elt_btns,
                 editor_form,
             }) }
@@ -526,9 +553,10 @@ struct TableCtx<'a> {
     inspect: &'a UseStateHandle<Option<String>>,
     /// Selected row addresses (row-select CRUD).
     selected: &'a UseStateHandle<HashSet<String>>,
-    /// New toggle (placed left of Sort); ELT buttons (right of search); and the
+    /// Create toggle; Import file-picker (store/load); ELT buttons (hidden); and the
     /// editor plane that folds under the control bar. Pre-rendered in the body.
     new_btn: Html,
+    import_btn: Html,
     elt_btns: Html,
     editor_form: Html,
 }
@@ -555,6 +583,7 @@ fn table_view(ctx: TableCtx) -> Html {
         inspect,
         selected,
         new_btn,
+        import_btn,
         elt_btns,
         editor_form,
     } = ctx;
@@ -843,6 +872,7 @@ fn table_view(ctx: TableCtx) -> Html {
             <BrowserControls
                 elt_btns={ elt_btns }
                 new_btn={ new_btn }
+                import_btn={ import_btn }
                 search={ (**search).clone() }
                 on_search={ on_search }
                 sort_open={ **sort_open }
