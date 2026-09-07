@@ -103,15 +103,19 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 54 fragments + 3 module-owned = 70.
-    // Fragments grew 39 → 54 (2026-09-01): the Elementary Systematics pentad, Potency,
+    // Total systems = 12 canonical + 1 citation + 61 fragments + 3 module-owned = 77.
+    // Fragments grew 39 → 55 (2026-09-01): the Elementary Systematics pentad, Potency,
     // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
-    // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, and the four
-    // Holochain-architecture systems (Holochain Zomes, Integrity/Coordinator Zome, Link).
+    // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, the four Holochain-
+    // architecture systems (Holochain Zomes, Integrity/Coordinator Zome, Link), and the
+    // Graph Products tetrad (Cartesian/Tensor/Strong/Lexicographic = ground/instrument/
+    // directive/goal). Then 55 → 61 (2026-09-07): the Knowledge, Discourse, Common Noun
+    // and Verbs triads, and the two registry tetrads (Field of Action = Store/Read/Graph/
+    // List; Registry Core = Store/Read/Sort/Filter).
     assert_eq!(
         graph.systems.len(),
-        70,
-        "expected 12 canonical + 1 citation + 54 fragment + 3 module systems"
+        77,
+        "expected 12 canonical + 1 citation + 61 fragment + 3 module systems"
     );
 }
 

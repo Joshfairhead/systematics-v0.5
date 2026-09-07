@@ -986,6 +986,89 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("hcl", 3),
     );
 
+    // Graph Products (user, 2026-09-01) — the four ways to combine two graphs, by
+    // increasing richness = the realisation direction ground→goal (−− → ++), and the
+    // operational vocabulary for the coalescence / tensor-product arc:
+    //   Cartesian (ground −−, the lattice) · Tensor (instrument −+, the categorical
+    //   product) · Strong (directive +−) · Lexicographic (goal ++, node→subsystem =
+    //   realisation). Relates to the architecture tetrad (Substrate/Model/View/Controller).
+    //   Our K_n topologies are **lexicographically organised**: complete graphs are
+    //   closed under the lexicographic product, K_m[K_n] = K_{mn} (e.g. K2[K4] = K8, 28
+    //   edges) — a node of K2 realised as a whole K4.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Graph Products",
+        4,
+        &slugs(&["cartesian", "tensor", "strong", "lexicographic"]),
+        &edge_slugs("gprod", 4),
+    );
+
+    // Knowledge triad (user, 2026-09-07) — belief(−) · knowledge(=) · truth(+),
+    // ordered +/−/= onto K3 positions 1/2/3: truth(1) · belief(2) · knowledge(3).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Knowledge",
+        3,
+        &slugs(&["truth", "belief", "knowledge"]),
+        &edge_slugs("know", 3),
+    );
+
+    // Discourse triad (user, 2026-09-07) — vocabulary(−) · grammar(+) · language(=);
+    // Language = Grammar + Vocabulary reconciled (the ontology dyad → triad).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Discourse",
+        3,
+        &slugs(&["grammar", "vocabulary", "language"]),
+        &edge_slugs("disc", 3),
+    );
+
+    // Common Noun triad (user, 2026-09-07) — people(+) · places(−) · things(=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Common Noun",
+        3,
+        &slugs(&["people", "places", "things"]),
+        &edge_slugs("noun", 3),
+    );
+
+    // Verbs triad (user, 2026-09-07) — actions(+) · states(−) · occurrences(=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Verbs",
+        3,
+        &slugs(&["actions", "states", "occurrences"]),
+        &edge_slugs("verb", 3),
+    );
+
+    // Registry — Field of Action tetrad (user, 2026-09-07) — the app IS a registry
+    // with two views + store/read operations. Store (ideal) · Read (ground) ·
+    // Graph (directive) · List (instrumental), onto the K4 tetrad positions 1–4.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Field of Action",
+        4,
+        &slugs(&["store", "read", "graph", "list"]),
+        &edge_slugs("foa", 4),
+    );
+
+    // Registry — Core tetrad (user, 2026-09-07) — the alternative registry tetrad:
+    // Store · Read · Sort · Filter as the core components (store=ideal, read=ground).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Registry Core",
+        4,
+        &slugs(&["store", "read", "sort", "filter"]),
+        &edge_slugs("reg", 4),
+    );
+
     content
 }
 

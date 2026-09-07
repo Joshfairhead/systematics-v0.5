@@ -4559,6 +4559,261 @@
       "id": "char_word_hcl_edge_3",
       "kind": "word",
       "value": "Hcl Edge 3"
+    },
+    {
+      "id": "char_word_cartesian",
+      "kind": "word",
+      "value": "Cartesian"
+    },
+    {
+      "id": "char_word_tensor",
+      "kind": "word",
+      "value": "Tensor"
+    },
+    {
+      "id": "char_word_strong",
+      "kind": "word",
+      "value": "Strong"
+    },
+    {
+      "id": "char_word_lexicographic",
+      "kind": "word",
+      "value": "Lexicographic"
+    },
+    {
+      "id": "char_word_gprod_edge_1",
+      "kind": "word",
+      "value": "Gprod Edge 1"
+    },
+    {
+      "id": "char_word_gprod_edge_2",
+      "kind": "word",
+      "value": "Gprod Edge 2"
+    },
+    {
+      "id": "char_word_gprod_edge_3",
+      "kind": "word",
+      "value": "Gprod Edge 3"
+    },
+    {
+      "id": "char_word_gprod_edge_4",
+      "kind": "word",
+      "value": "Gprod Edge 4"
+    },
+    {
+      "id": "char_word_gprod_edge_5",
+      "kind": "word",
+      "value": "Gprod Edge 5"
+    },
+    {
+      "id": "char_word_gprod_edge_6",
+      "kind": "word",
+      "value": "Gprod Edge 6"
+    },
+    {
+      "id": "char_word_truth",
+      "kind": "word",
+      "value": "Truth"
+    },
+    {
+      "id": "char_word_belief",
+      "kind": "word",
+      "value": "Belief"
+    },
+    {
+      "id": "char_word_knowledge",
+      "kind": "word",
+      "value": "Knowledge"
+    },
+    {
+      "id": "char_word_know_edge_1",
+      "kind": "word",
+      "value": "Know Edge 1"
+    },
+    {
+      "id": "char_word_know_edge_2",
+      "kind": "word",
+      "value": "Know Edge 2"
+    },
+    {
+      "id": "char_word_know_edge_3",
+      "kind": "word",
+      "value": "Know Edge 3"
+    },
+    {
+      "id": "char_word_grammar",
+      "kind": "word",
+      "value": "Grammar"
+    },
+    {
+      "id": "char_word_vocabulary",
+      "kind": "word",
+      "value": "Vocabulary"
+    },
+    {
+      "id": "char_word_language",
+      "kind": "word",
+      "value": "Language"
+    },
+    {
+      "id": "char_word_disc_edge_1",
+      "kind": "word",
+      "value": "Disc Edge 1"
+    },
+    {
+      "id": "char_word_disc_edge_2",
+      "kind": "word",
+      "value": "Disc Edge 2"
+    },
+    {
+      "id": "char_word_disc_edge_3",
+      "kind": "word",
+      "value": "Disc Edge 3"
+    },
+    {
+      "id": "char_word_people",
+      "kind": "word",
+      "value": "People"
+    },
+    {
+      "id": "char_word_places",
+      "kind": "word",
+      "value": "Places"
+    },
+    {
+      "id": "char_word_things",
+      "kind": "word",
+      "value": "Things"
+    },
+    {
+      "id": "char_word_noun_edge_1",
+      "kind": "word",
+      "value": "Noun Edge 1"
+    },
+    {
+      "id": "char_word_noun_edge_2",
+      "kind": "word",
+      "value": "Noun Edge 2"
+    },
+    {
+      "id": "char_word_noun_edge_3",
+      "kind": "word",
+      "value": "Noun Edge 3"
+    },
+    {
+      "id": "char_word_actions",
+      "kind": "word",
+      "value": "Actions"
+    },
+    {
+      "id": "char_word_occurrences",
+      "kind": "word",
+      "value": "Occurrences"
+    },
+    {
+      "id": "char_word_verb_edge_1",
+      "kind": "word",
+      "value": "Verb Edge 1"
+    },
+    {
+      "id": "char_word_verb_edge_2",
+      "kind": "word",
+      "value": "Verb Edge 2"
+    },
+    {
+      "id": "char_word_verb_edge_3",
+      "kind": "word",
+      "value": "Verb Edge 3"
+    },
+    {
+      "id": "char_word_store",
+      "kind": "word",
+      "value": "Store"
+    },
+    {
+      "id": "char_word_read",
+      "kind": "word",
+      "value": "Read"
+    },
+    {
+      "id": "char_word_graph",
+      "kind": "word",
+      "value": "Graph"
+    },
+    {
+      "id": "char_word_list",
+      "kind": "word",
+      "value": "List"
+    },
+    {
+      "id": "char_word_foa_edge_1",
+      "kind": "word",
+      "value": "Foa Edge 1"
+    },
+    {
+      "id": "char_word_foa_edge_2",
+      "kind": "word",
+      "value": "Foa Edge 2"
+    },
+    {
+      "id": "char_word_foa_edge_3",
+      "kind": "word",
+      "value": "Foa Edge 3"
+    },
+    {
+      "id": "char_word_foa_edge_4",
+      "kind": "word",
+      "value": "Foa Edge 4"
+    },
+    {
+      "id": "char_word_foa_edge_5",
+      "kind": "word",
+      "value": "Foa Edge 5"
+    },
+    {
+      "id": "char_word_foa_edge_6",
+      "kind": "word",
+      "value": "Foa Edge 6"
+    },
+    {
+      "id": "char_word_sort",
+      "kind": "word",
+      "value": "Sort"
+    },
+    {
+      "id": "char_word_filter",
+      "kind": "word",
+      "value": "Filter"
+    },
+    {
+      "id": "char_word_reg_edge_1",
+      "kind": "word",
+      "value": "Reg Edge 1"
+    },
+    {
+      "id": "char_word_reg_edge_2",
+      "kind": "word",
+      "value": "Reg Edge 2"
+    },
+    {
+      "id": "char_word_reg_edge_3",
+      "kind": "word",
+      "value": "Reg Edge 3"
+    },
+    {
+      "id": "char_word_reg_edge_4",
+      "kind": "word",
+      "value": "Reg Edge 4"
+    },
+    {
+      "id": "char_word_reg_edge_5",
+      "kind": "word",
+      "value": "Reg Edge 5"
+    },
+    {
+      "id": "char_word_reg_edge_6",
+      "kind": "word",
+      "value": "Reg Edge 6"
     }
   ],
   "coordinates": [],
@@ -5990,6 +6245,123 @@
         "char_word_hcl_edge_2",
         "char_word_hcl_edge_3"
       ]
+    },
+    {
+      "id": "vocab_graph_products_4",
+      "name": "Graph Products",
+      "order": 4,
+      "terms": [
+        "char_word_cartesian",
+        "char_word_tensor",
+        "char_word_strong",
+        "char_word_lexicographic"
+      ],
+      "connectives": [
+        "char_word_gprod_edge_1",
+        "char_word_gprod_edge_2",
+        "char_word_gprod_edge_3",
+        "char_word_gprod_edge_4",
+        "char_word_gprod_edge_5",
+        "char_word_gprod_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_knowledge_3",
+      "name": "Knowledge",
+      "order": 3,
+      "terms": [
+        "char_word_truth",
+        "char_word_belief",
+        "char_word_knowledge"
+      ],
+      "connectives": [
+        "char_word_know_edge_1",
+        "char_word_know_edge_2",
+        "char_word_know_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_discourse_3",
+      "name": "Discourse",
+      "order": 3,
+      "terms": [
+        "char_word_grammar",
+        "char_word_vocabulary",
+        "char_word_language"
+      ],
+      "connectives": [
+        "char_word_disc_edge_1",
+        "char_word_disc_edge_2",
+        "char_word_disc_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_common_noun_3",
+      "name": "Common Noun",
+      "order": 3,
+      "terms": [
+        "char_word_people",
+        "char_word_places",
+        "char_word_things"
+      ],
+      "connectives": [
+        "char_word_noun_edge_1",
+        "char_word_noun_edge_2",
+        "char_word_noun_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_verbs_3",
+      "name": "Verbs",
+      "order": 3,
+      "terms": [
+        "char_word_actions",
+        "char_word_states",
+        "char_word_occurrences"
+      ],
+      "connectives": [
+        "char_word_verb_edge_1",
+        "char_word_verb_edge_2",
+        "char_word_verb_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_field_of_action_4",
+      "name": "Field of Action",
+      "order": 4,
+      "terms": [
+        "char_word_store",
+        "char_word_read",
+        "char_word_graph",
+        "char_word_list"
+      ],
+      "connectives": [
+        "char_word_foa_edge_1",
+        "char_word_foa_edge_2",
+        "char_word_foa_edge_3",
+        "char_word_foa_edge_4",
+        "char_word_foa_edge_5",
+        "char_word_foa_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_registry_core_4",
+      "name": "Registry Core",
+      "order": 4,
+      "terms": [
+        "char_word_store",
+        "char_word_read",
+        "char_word_sort",
+        "char_word_filter"
+      ],
+      "connectives": [
+        "char_word_reg_edge_1",
+        "char_word_reg_edge_2",
+        "char_word_reg_edge_3",
+        "char_word_reg_edge_4",
+        "char_word_reg_edge_5",
+        "char_word_reg_edge_6"
+      ]
     }
   ],
   "systems": [
@@ -6532,6 +6904,76 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_holochain_link_3"
+    },
+    {
+      "id": "system_graph_products_4",
+      "name": "Graph Products",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_graph_products_4"
+    },
+    {
+      "id": "system_knowledge_3",
+      "name": "Knowledge",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_knowledge_3"
+    },
+    {
+      "id": "system_discourse_3",
+      "name": "Discourse",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_discourse_3"
+    },
+    {
+      "id": "system_common_noun_3",
+      "name": "Common Noun",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_common_noun_3"
+    },
+    {
+      "id": "system_verbs_3",
+      "name": "Verbs",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_verbs_3"
+    },
+    {
+      "id": "system_field_of_action_4",
+      "name": "Field of Action",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_field_of_action_4"
+    },
+    {
+      "id": "system_registry_core_4",
+      "name": "Registry Core",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_registry_core_4"
     }
   ],
   "perspectives": [],
