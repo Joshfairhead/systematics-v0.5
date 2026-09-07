@@ -1031,9 +1031,11 @@ impl MutationRoot {
         let sys_id = format!("system_{slug}_{order_cardinality}");
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        if graph.system(&sys_id).is_some() {
-            return Err(Error::new(format!("System '{sys_id}' already exists")));
-        }
+        // Store = write, with **overwrite** semantics: authoring a name+order that
+        // already exists UPDATES it in place rather than erroring. The char / vocab /
+        // system ids are deterministic from (slug, order), so `apply_content` upserts
+        // every one by id (see Graph::apply_content). This is the CRUD Update path —
+        // an edit overwrites; it does not fork. (Version control is deferred.)
 
         let mut characters = Vec::new();
         let mut term_ids = Vec::new();

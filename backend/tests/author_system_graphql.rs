@@ -40,6 +40,42 @@ async fn author_triad_from_values() {
 }
 
 #[tokio::test]
+async fn author_same_name_overwrites_in_place() {
+    // Store = write with overwrite: re-authoring an existing name+order UPDATES it
+    // (the CRUD Update path) rather than forking or erroring.
+    let schema = make_schema();
+    let author = |terms: &str| {
+        format!(
+            r#"mutation {{ authorSystem(input: {{ name: "Edit Me", orderCardinality: 3, terms: {terms}, connectives: ["e1","e2","e3"] }}) {{ id }} }}"#
+        )
+    };
+
+    let first = schema.execute(author(r#"["Alpha", "Beta", "Gamma"]"#)).await;
+    assert!(first.errors.is_empty(), "first author errors: {:?}", first.errors);
+
+    // Same name + order, different term values — must succeed (overwrite), not error.
+    let second = schema.execute(author(r#"["One", "Two", "Three"]"#)).await;
+    assert!(
+        second.errors.is_empty(),
+        "re-authoring the same system must overwrite, not error: {:?}",
+        second.errors
+    );
+
+    // The rendered system reflects the NEW values, and there is exactly one system id.
+    let r = schema
+        .execute(r#"{ renderSystem(systemId: "system_edit_me_3") { terms { value } } }"#)
+        .await;
+    let d = r.data.into_json().unwrap();
+    let terms: Vec<String> = d["renderSystem"]["terms"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["value"].as_str().unwrap().to_string())
+        .collect();
+    assert_eq!(terms, vec!["One", "Two", "Three"], "overwrite must replace the term values");
+}
+
+#[tokio::test]
 async fn author_rejects_wrong_arity() {
     let schema = make_schema();
     let m = r#"mutation { authorSystem(input: { name: "Bad", orderCardinality: 3, terms: ["a","b"], connectives: ["e1","e2","e3"] }) { id } }"#;
