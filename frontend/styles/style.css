@@ -460,6 +460,14 @@ body {
     font-weight: 600;
 }
 
+/* System type + K-notation (e.g. "Triad · K3"), under the system name. */
+.graph-subtitle {
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.6;
+    letter-spacing: 0.02em;
+}
+
 .designation {
     opacity: 0.8;
 }

@@ -862,8 +862,8 @@ impl Component for ApiApp {
                                         <button
                                             class={ if self.editing { "edit-toggle active" } else { "edit-toggle" } }
                                             onclick={ on_toggle_editing.clone() }
-                                            title="Edit this system — name, node & edge labels"
-                                        >{ if self.editing { "✎ Editing" } else { "✎ Edit" } }</button>
+                                            title="Update this system — name, node & edge labels"
+                                        >{ if self.editing { "✎ Updating" } else { "✎ Update" } }</button>
                                         if self.editing {
                                             <SystemEditor
                                                 key={ system.system_id.clone() }

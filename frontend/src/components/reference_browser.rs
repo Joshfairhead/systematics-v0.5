@@ -141,7 +141,7 @@ const ALL_COLS: [ColKey; 6] = [
 impl ColKey {
     fn label(self) -> &'static str {
         match self {
-            ColKey::OrderCardinality => "OrderCardinality",
+            ColKey::OrderCardinality => "Type",
             ColKey::Name => "Name",
             ColKey::Perspective => "Perspective",
             ColKey::Citation => "Citation",
@@ -281,7 +281,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let search = use_state(String::new);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
-    let visible_cols = use_state(|| vec![ColKey::OrderCardinality, ColKey::Name, ColKey::Citation]);
+    // Static list (prototype): Type · Name only. The Sort/Filter query controls are
+    // hidden (see BrowserControls `show_query`), so these columns don't change.
+    let visible_cols = use_state(|| vec![ColKey::OrderCardinality, ColKey::Name]);
     // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
@@ -411,8 +413,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         <button
             class={ classes!("elt-btn", (*editor_open).then_some("active")) }
             onclick={ toggle_editor.clone() }
-            title="New — author a system from custom terms/connectives"
-        >{ if *editor_open { "New ▴" } else { "New ▾" } }</button>
+            title="Create — author a system from custom terms/connectives"
+        >{ if *editor_open { "Create ▴" } else { "Create ▾" } }</button>
     };
     // Extract · Load · Transform (right of the search bar) — the operation edge.
     let elt_btns = html! {

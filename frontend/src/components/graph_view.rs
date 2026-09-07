@@ -93,6 +93,21 @@ impl Component for ApiGraphView {
         let conn_tip = tooltip_for(refs, &format!("system:{}#connective-designation", sid))
             .map(AttrValue::from);
 
+        // Canvas title = the system's own name; fall back to the order label when a
+        // response didn't carry `systemName` (older/partial selections).
+        let title = if system.system_name.is_empty() {
+            system.name.clone()
+        } else {
+            system.system_name.clone()
+        };
+        // The edge-labels switch reads the system's connective designation
+        // (Acts / Interplays / Mutualities …), not a generic "Edge Labels".
+        let edge_label = if system.connective_designation.is_empty() {
+            "Edge Labels".to_string()
+        } else {
+            system.connective_designation.clone()
+        };
+
         html! {
             <div class="graph-view">
                 // Compact single-line header. On display a system's terms /
@@ -101,7 +116,8 @@ impl Component for ApiGraphView {
                 // field names stay `terms`/`connectives`. Each metadata item is
                 // itself referenceable — hover shows its citation.
                 <header class="graph-header">
-                    <span class="graph-title">
+                    <span class="graph-title">{ title }</span>
+                    <span class="graph-subtitle">
                         { format!("{} · {}", system.name, system.k_notation()) }
                     </span>
                     <span
@@ -125,7 +141,7 @@ impl Component for ApiGraphView {
                 </header>
                 if let Some(on_toggle) = ctx.props().on_toggle_edge_labels.clone() {
                     <label class="edge-toggle-overlay">
-                        <span class="toggle-label">{ "Edge Labels" }</span>
+                        <span class="toggle-label">{ edge_label }</span>
                         <div class="toggle-switch">
                             <input
                                 type="checkbox"

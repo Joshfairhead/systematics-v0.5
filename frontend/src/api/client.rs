@@ -215,6 +215,7 @@ impl GraphQLClient {
         orderCardinality
         systemId
         name
+        systemName
         coherence
         termDesignation
         connectiveDesignation

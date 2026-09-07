@@ -31,6 +31,14 @@ pub struct BrowserControlsProps {
     /// Pre-rendered operation buttons (Extract·Load·Transform) and New — pass-through.
     pub elt_btns: Html,
     pub new_btn: Html,
+    /// Show the ELT operation bar (Extract·Load·Transform). Off in the prototype —
+    /// the code stays wired, just hidden (Load returns with store/load).
+    #[prop_or(false)]
+    pub show_elt: bool,
+    /// Show the Sort/Filter query controls. Off in the prototype — the list is
+    /// static (Type · Name); the query module is kept but hidden.
+    #[prop_or(false)]
+    pub show_query: bool,
     pub search: String,
     pub on_search: Callback<String>,
     // Sort (=) — which columns show.
@@ -70,7 +78,9 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
     html! {
         <>
             <div class="ref-controlbar">
-                { props.elt_btns.clone() }
+                if props.show_elt {
+                    { props.elt_btns.clone() }
+                }
                 <input
                     class="ref-search"
                     type="text"
@@ -80,47 +90,49 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
                 />
                 { props.new_btn.clone() }
 
-                <div class="control-pop">
-                    <button
-                        class={ classes!("control-btn", props.sort_open.then_some("active")) }
-                        onclick={ toggle_sort }
-                        title="Sort — which columns show"
-                    >{ format!("Sort ({visible_cols}) ▾") }</button>
-                    if props.sort_open {
-                        <div class="control-menu">
-                            <span class="facet-label">{ "columns" }</span>
-                            <div class="col-chips">
-                                { for props.columns.iter().map(|c| chip(c, &props.on_toggle_column)) }
+                if props.show_query {
+                    <div class="control-pop">
+                        <button
+                            class={ classes!("control-btn", props.sort_open.then_some("active")) }
+                            onclick={ toggle_sort }
+                            title="Sort — which columns show"
+                        >{ format!("Sort ({visible_cols}) ▾") }</button>
+                        if props.sort_open {
+                            <div class="control-menu">
+                                <span class="facet-label">{ "columns" }</span>
+                                <div class="col-chips">
+                                    { for props.columns.iter().map(|c| chip(c, &props.on_toggle_column)) }
+                                </div>
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
 
-                <div class="control-pop">
-                    <button
-                        class={ classes!("control-btn", (props.filter_active || props.filter_open).then_some("active")) }
-                        onclick={ toggle_filter }
-                        title="Filter — an SPO query: pick a predicate, then its objects"
-                    >{ if props.filter_active { "Filter ● ▾" } else { "Filter ▾" } }</button>
-                    if props.filter_open {
-                        <div class="control-menu">
-                            <span class="facet-label">{ "predicate (key), stackable" }</span>
-                            <div class="facet-tabs">
-                                { for props.predicates.iter().map(|p| pred_tab(p, &props.on_select_pred)) }
+                    <div class="control-pop">
+                        <button
+                            class={ classes!("control-btn", (props.filter_active || props.filter_open).then_some("active")) }
+                            onclick={ toggle_filter }
+                            title="Filter — an SPO query: pick a predicate, then its objects"
+                        >{ if props.filter_active { "Filter ● ▾" } else { "Filter ▾" } }</button>
+                        if props.filter_open {
+                            <div class="control-menu">
+                                <span class="facet-label">{ "predicate (key), stackable" }</span>
+                                <div class="facet-tabs">
+                                    { for props.predicates.iter().map(|p| pred_tab(p, &props.on_select_pred)) }
+                                </div>
+                                <span class="facet-label">
+                                    { format!("{} — objects (values)", props.active_pred_label) }
+                                </span>
+                                <div class="col-chips">
+                                    if props.objects.is_empty() {
+                                        <span class="facet-hint">{ "no values in the current scope" }</span>
+                                    } else {
+                                        { for props.objects.iter().map(|o| chip(o, &props.on_toggle_value)) }
+                                    }
+                                </div>
                             </div>
-                            <span class="facet-label">
-                                { format!("{} — objects (values)", props.active_pred_label) }
-                            </span>
-                            <div class="col-chips">
-                                if props.objects.is_empty() {
-                                    <span class="facet-hint">{ "no values in the current scope" }</span>
-                                } else {
-                                    { for props.objects.iter().map(|o| chip(o, &props.on_toggle_value)) }
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
 
                 <span class="ref-count">{ format!("{} shown", props.shown) }</span>
                 if props.sel_count > 0 {
