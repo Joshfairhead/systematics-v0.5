@@ -1,8 +1,11 @@
-//! In-graph system editor — edit a loaded system's name + node (term) and edge
-//! (connective) labels, then Save. v1 authors the edited values as a system
-//! (a fork via `authorSystem`); in-place update is a later refinement.
+//! System editor modal — edit a loaded system's name + node (term) and edge
+//! (connective) labels, then Save (authors via `authorSystem`, now overwrite).
 //!
-//! Mount with `key = system_id` so switching systems resets the fields.
+//! **Parked / unused module.** The graph view no longer mounts this modal — on-graph
+//! editing (Update mode in `graph_view`) replaced it, and the list view uses its own
+//! inline Create editor. Kept compiled but unused so it can be re-adopted as the
+//! list-view modal later. `allow(dead_code)` silences the not-constructed warning.
+#![allow(dead_code)]
 
 use systematics_middleware::RenderedSystem;
 use web_sys::HtmlInputElement;

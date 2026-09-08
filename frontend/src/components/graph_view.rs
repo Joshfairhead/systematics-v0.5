@@ -1,7 +1,17 @@
 use systematics_middleware::RenderedSystem;
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 use crate::api::client::ReferenceView;
+
+/// A single on-graph value edit — overwrite one term (by ordinality) or one
+/// connective (by its endpoints). The parent re-authors the whole system with this
+/// value applied (Store = write, overwrite), which also updates the list view.
+#[derive(Clone, PartialEq, Debug)]
+pub enum GraphEdit {
+    Term { ordinality: i32, value: String },
+    Connective { base: i32, target: i32, value: String },
+}
 
 /// Default colors for rendering
 const DEFAULT_NODE_COLOR: &str = "#4A90E2";
@@ -28,17 +38,33 @@ pub struct ApiGraphViewProps {
     /// Toggle the Canonical-override switch.
     #[prop_or_default]
     pub on_toggle_canonical: Option<Callback<()>>,
+    /// Update (edit) mode — on-graph editing. Click a node/edge to overwrite it.
+    #[prop_or_default]
+    pub editing: bool,
+    /// Toggle Update mode (rendered as an in-canvas overlay, under Canonical).
+    #[prop_or_default]
+    pub on_toggle_editing: Option<Callback<()>>,
+    /// Commit a single on-graph value edit (term or connective).
+    #[prop_or_default]
+    pub on_edit_value: Option<Callback<GraphEdit>>,
 }
 
 pub enum ApiGraphMsg {
     NodeClicked(usize),
-    #[allow(dead_code)]
     EdgeClicked(usize, usize),
+    /// The inline value editor's text changed.
+    DraftChanged(String),
+    /// Commit the current draft as an edit to the selected node/edge.
+    CommitEdit,
+    /// Abandon the current edit (clear the selection + draft).
+    CancelEdit,
 }
 
 pub struct ApiGraphView {
     selected_node: Option<usize>,
     selected_edge: Option<(usize, usize)>,
+    /// In-progress value for the inline editor (Update mode).
+    draft: String,
 }
 
 impl Component for ApiGraphView {
@@ -49,10 +75,12 @@ impl Component for ApiGraphView {
         Self {
             selected_node: None,
             selected_edge: None,
+            draft: String::new(),
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let system = &ctx.props().system;
         match msg {
             ApiGraphMsg::NodeClicked(idx) => {
                 // Toggle selection
@@ -60,6 +88,10 @@ impl Component for ApiGraphView {
                 if selecting {
                     self.selected_node = Some(idx);
                     self.selected_edge = None;
+                    // In Update mode, seed the inline editor with the term's value.
+                    if ctx.props().editing {
+                        self.draft = system.term_at((idx + 1) as i32).unwrap_or("").to_string();
+                    }
                 } else {
                     self.selected_node = None;
                 }
@@ -72,7 +104,50 @@ impl Component for ApiGraphView {
                 } else {
                     self.selected_edge = Some(edge);
                     self.selected_node = None;
+                    // In Update mode, seed the editor with this connective's value.
+                    if ctx.props().editing {
+                        let (b, t) = ((edge.0 + 1) as i32, (edge.1 + 1) as i32);
+                        self.draft = system
+                            .connectives
+                            .iter()
+                            .find(|c| {
+                                (c.base_ordinality.min(c.target_ordinality),
+                                 c.base_ordinality.max(c.target_ordinality)) == (b, t)
+                            })
+                            .map(|c| c.character_value.clone())
+                            .unwrap_or_default();
+                    }
                 }
+                true
+            }
+            ApiGraphMsg::DraftChanged(v) => {
+                self.draft = v;
+                true
+            }
+            ApiGraphMsg::CommitEdit => {
+                if let Some(cb) = ctx.props().on_edit_value.clone() {
+                    if let Some(idx) = self.selected_node {
+                        cb.emit(GraphEdit::Term {
+                            ordinality: (idx + 1) as i32,
+                            value: self.draft.clone(),
+                        });
+                    } else if let Some((a, b)) = self.selected_edge {
+                        cb.emit(GraphEdit::Connective {
+                            base: (a + 1) as i32,
+                            target: (b + 1) as i32,
+                            value: self.draft.clone(),
+                        });
+                    }
+                }
+                self.selected_node = None;
+                self.selected_edge = None;
+                self.draft.clear();
+                true
+            }
+            ApiGraphMsg::CancelEdit => {
+                self.selected_node = None;
+                self.selected_edge = None;
+                self.draft.clear();
                 true
             }
         }
@@ -106,6 +181,41 @@ impl Component for ApiGraphView {
             "Edge Labels".to_string()
         } else {
             system.connective_designation.clone()
+        };
+
+        // The inline on-graph value editor (Update mode). Shows when a node/edge is
+        // selected; otherwise a hint to pick one. Save re-authors the whole system.
+        let edit_panel = if ctx.props().editing {
+            let target = self
+                .selected_node
+                .map(|idx| format!("{} {}", system.term_designation, idx + 1))
+                .or_else(|| self.selected_edge.map(|(a, b)| format!("edge {}–{}", a + 1, b + 1)));
+            match target {
+                Some(label) => {
+                    let oninput = ctx.link().callback(|e: InputEvent| {
+                        ApiGraphMsg::DraftChanged(e.target_unchecked_into::<HtmlInputElement>().value())
+                    });
+                    let onsave = ctx.link().callback(|_| ApiGraphMsg::CommitEdit);
+                    let oncancel = ctx.link().callback(|_| ApiGraphMsg::CancelEdit);
+                    html! {
+                        <div class="graph-edit-panel">
+                            <span class="edit-panel-label">{ format!("Update {label}") }</span>
+                            <input
+                                class="edit-panel-input"
+                                value={ self.draft.clone() }
+                                oninput={ oninput }
+                            />
+                            <button class="edit-panel-save" onclick={ onsave }>{ "Save" }</button>
+                            <button class="edit-panel-cancel" onclick={ oncancel } title="Cancel">{ "✕" }</button>
+                        </div>
+                    }
+                }
+                None => html! {
+                    <div class="graph-edit-hint">{ "Update mode — click a node or edge to edit it" }</div>
+                },
+            }
+        } else {
+            html! {}
         };
 
         html! {
@@ -170,6 +280,24 @@ impl Component for ApiGraphView {
                         </label>
                     }
                 }
+
+                // Update-mode toggle — under the Canonical switch. On-graph editing:
+                // flip it on, then click a node/edge to overwrite its value.
+                if let Some(on_toggle) = ctx.props().on_toggle_editing.clone() {
+                    <label class="update-toggle-overlay">
+                        <span class="toggle-label">{ "Update" }</span>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={ ctx.props().editing }
+                                onclick={ Callback::from(move |_| on_toggle.emit(())) }
+                            />
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                }
+
+                { edit_panel }
 
                 <svg
                     class="graph-svg"
@@ -265,6 +393,10 @@ impl ApiGraphView {
                     DEFAULT_EDGE_COLOR
                 };
                 let stroke_width = if is_selected { 3.0 } else { 1.5 };
+                // Click the edge to select it (and, in Update mode, edit its connective).
+                let edge_click = ctx
+                    .link()
+                    .callback(move |_| ApiGraphMsg::EdgeClicked(from_idx, to_idx));
 
                 html! {
                     <g class="edge-group">
@@ -289,6 +421,7 @@ impl ApiGraphView {
                             stroke="transparent"
                             stroke-width="12"
                             style="cursor: pointer;"
+                            onclick={ edge_click }
                         />
                     </g>
                 }

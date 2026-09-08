@@ -1166,3 +1166,75 @@ button.row-open:hover {
     cursor: pointer;
 }
 
+/* Update (on-graph editing) toggle — stacked under the Canonical switch. */
+.update-toggle-overlay {
+    position: absolute;
+    top: 4.9rem;
+    right: 0.75rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Inline on-graph value editor (Update mode) — floats at the bottom of the canvas. */
+.graph-edit-panel,
+.graph-edit-hint {
+    position: absolute;
+    bottom: 0.9rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
+}
+
+.graph-edit-hint {
+    color: #666;
+    font-style: italic;
+}
+
+.edit-panel-label {
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.edit-panel-input {
+    padding: 0.25rem 0.45rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    min-width: 12rem;
+}
+
+.edit-panel-save,
+.edit-panel-cancel {
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f4f4f4;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.edit-panel-save {
+    background: #4A90E2;
+    color: #fff;
+    border-color: #4A90E2;
+}
+

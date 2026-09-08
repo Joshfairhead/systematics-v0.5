@@ -1,11 +1,10 @@
 use crate::api::client::{
     GraphQLClient, InstanceSystem, PositionedChar, ReferenceView, SequenceView, SystemFile,
 };
-use crate::components::graph_view::ApiGraphView;
+use crate::components::graph_view::{ApiGraphView, GraphEdit};
 use crate::components::reference_browser::{
     AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
 };
-use crate::components::system_editor::SystemEditor;
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
 use wasm_bindgen_futures::spawn_local;
@@ -97,8 +96,11 @@ pub enum ApiAppMsg {
     MonadExtracted(String),
     /// Author a new System from custom values (the in-app editor).
     AuthorSystem(AuthorRequest),
-    /// Toggle the in-graph system editor.
+    /// Toggle Update (on-graph editing) mode.
     ToggleEditing,
+    /// Commit an on-graph value edit (term/connective) → re-author the whole system
+    /// with that value applied (overwrite). Also updates the list view.
+    EditValue(GraphEdit),
     /// All sequences/monads loaded.
     SequencesLoaded(Vec<SequenceView>),
     /// Enter a monad/sequence (member addresses) — navigate its members by order_cardinality.
@@ -688,6 +690,60 @@ impl Component for ApiApp {
                 });
                 true
             }
+            ApiAppMsg::EditValue(edit) => {
+                // On-graph edit: take the loaded system's current values, apply the
+                // single change, and re-author the WHOLE system (overwrite). The name
+                // comes from `system_name` so the edit targets the same id (no fork).
+                let Some(system) = self.selected_system.as_ref() else {
+                    return false;
+                };
+                let mut terms: Vec<(i32, String)> = system
+                    .terms
+                    .iter()
+                    .map(|t| (t.ordinality, t.value.clone()))
+                    .collect();
+                terms.sort_by_key(|(o, _)| *o);
+                let mut conns: Vec<(i32, i32, String)> = system
+                    .connectives
+                    .iter()
+                    .map(|c| (c.base_ordinality, c.target_ordinality, c.character_value.clone()))
+                    .collect();
+                conns.sort_by_key(|(b, t, _)| (*b, *t));
+
+                match &edit {
+                    GraphEdit::Term { ordinality, value } => {
+                        for slot in terms.iter_mut() {
+                            if slot.0 == *ordinality {
+                                slot.1 = value.clone();
+                                break;
+                            }
+                        }
+                    }
+                    GraphEdit::Connective { base, target, value } => {
+                        let (lo, hi) = ((*base).min(*target), (*base).max(*target));
+                        for slot in conns.iter_mut() {
+                            if slot.0.min(slot.1) == lo && slot.0.max(slot.1) == hi {
+                                slot.2 = value.clone();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                let name = if system.system_name.is_empty() {
+                    system.name.clone()
+                } else {
+                    system.system_name.clone()
+                };
+                let req = AuthorRequest {
+                    name,
+                    order_cardinality: system.order_cardinality,
+                    terms: terms.into_iter().map(|(_, v)| v).collect(),
+                    connectives: conns.into_iter().map(|(_, _, v)| v).collect(),
+                };
+                ctx.link().send_message(ApiAppMsg::AuthorSystem(req));
+                false
+            }
         }
     }
 
@@ -703,6 +759,7 @@ impl Component for ApiApp {
         let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
         let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
         let on_delete_rows = ctx.link().callback(ApiAppMsg::DeleteRows);
+        let on_edit_value = ctx.link().callback(ApiAppMsg::EditValue);
         // Canonical term/connective values per order_cardinality — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
             .systems
@@ -861,19 +918,7 @@ impl Component for ApiApp {
                             } else if let Some(ref system) = self.selected_system {
                                 html! {
                                     <div class="graph-with-editor">
-                                        <button
-                                            class={ if self.editing { "edit-toggle active" } else { "edit-toggle" } }
-                                            onclick={ on_toggle_editing.clone() }
-                                            title="Update this system — name, node & edge labels"
-                                        >{ if self.editing { "✎ Updating" } else { "✎ Update" } }</button>
                                         { export_anchor(system) }
-                                        if self.editing {
-                                            <SystemEditor
-                                                key={ system.system_id.clone() }
-                                                system={ system.clone() }
-                                                on_author={ on_author.clone() }
-                                            />
-                                        }
                                         <ApiGraphView
                                             system={ system.clone() }
                                             on_navigate={ Some(on_navigate) }
@@ -882,6 +927,9 @@ impl Component for ApiApp {
                                             references={ self.system_references.clone() }
                                             show_canonical={ self.show_canonical }
                                             on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
+                                            editing={ self.editing }
+                                            on_toggle_editing={ Some(on_toggle_editing.clone()) }
+                                            on_edit_value={ Some(on_edit_value) }
                                         />
                                     </div>
                                 }
