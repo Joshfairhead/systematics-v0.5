@@ -771,6 +771,14 @@ impl Graph {
         self.entries.push(Entry::Character(character));
     }
 
+    /// Delete a Character entry by id. Returns whether one was removed.
+    pub fn delete_character(&mut self, id: &str) -> bool {
+        let before = self.entries.len();
+        self.entries
+            .retain(|e| !matches!(e, Entry::Character(c) if c.id == id));
+        self.entries.len() != before
+    }
+
     /// Upsert a Coordinate by id.
     pub fn upsert_coordinate(&mut self, coordinate: Coordinate) {
         let id = coordinate.id.clone();

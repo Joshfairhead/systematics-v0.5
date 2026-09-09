@@ -110,7 +110,8 @@ async fn create_theology_triad_end_to_end() {
     let data = resp.data.into_json().unwrap();
     assert_eq!(data["characterAtPoint"]["value"], "Omniscient");
 
-    // Clean up.
+    // Clean up. deleteSystem now cascades its vocabulary + owned characters, so the
+    // vocabulary is already gone — a separate deleteVocabulary would be a no-op.
     let cleanup = r#"
         mutation Cleanup($system: String!, $sv: String!) {
             g: deleteSystem(id: $system)
@@ -123,7 +124,7 @@ async fn create_theology_triad_end_to_end() {
     let resp = schema.execute(req).await;
     let data = resp.data.into_json().unwrap();
     assert_eq!(data["g"], true);
-    assert_eq!(data["s"], true);
+    assert_eq!(data["s"], false, "deleteSystem already cascaded the vocabulary");
 }
 
 #[tokio::test]

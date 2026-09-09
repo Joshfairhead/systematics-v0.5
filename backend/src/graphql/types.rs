@@ -1100,8 +1100,29 @@ impl MutationRoot {
     async fn delete_system(&self, ctx: &Context<'_>, id: String) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
+        // Capture the system's vocabulary + its characters before removal, to
+        // cascade-delete orphans (a deleted system shouldn't leave its nodes/edges
+        // behind). Characters still referenced by another vocabulary are kept (shared).
+        let vocab_info = graph.system(&id).and_then(|s| {
+            graph
+                .vocabulary(&s.vocabulary_ref)
+                .map(|v| (v.id.clone(), v.terms.clone(), v.connectives.clone()))
+        });
         let removed = graph.delete_system(&id).is_some();
         if removed {
+            if let Some((vocab_id, terms, conns)) = vocab_info {
+                graph.delete_vocabulary(&vocab_id);
+                let still_used: std::collections::HashSet<String> = graph
+                    .vocabularies
+                    .iter()
+                    .flat_map(|v| v.terms.iter().chain(v.connectives.iter()).cloned())
+                    .collect();
+                for cid in terms.iter().chain(conns.iter()) {
+                    if !still_used.contains(cid) {
+                        graph.delete_character(cid);
+                    }
+                }
+            }
             persist(ctx, &graph);
         }
         removed
