@@ -48,15 +48,16 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 17,
-        "expected 17 module files to load (14 sources + the Architecture Pentad \
-         + the Architectural Monad registry + the Blue Earth registry); got {modules}"
+        modules, 18,
+        "expected 18 module files to load (14 sources + the Architecture Pentad \
+         + the Architectural Monad, Blue Earth, and Interface State Model registries); \
+         got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
         15,
-        "15 perspectives from 17 modules — the Architectural Monad and Blue Earth \
-         modules carry only a Sequence, no perspective"
+        "15 perspectives from 18 modules — the Architectural Monad, Blue Earth and \
+         Interface State Model modules carry only a Sequence, no perspective"
     );
 }
 
@@ -103,7 +104,7 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 74 fragments + 3 module-owned = 90.
+    // Total systems = 12 canonical + 1 citation + 76 fragments + 3 module-owned = 92.
     // Fragments grew 39 → 55 (2026-09-01): the Elementary Systematics pentad, Potency,
     // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
     // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, the four Holochain-
@@ -115,11 +116,12 @@ fn module_owned_systems_present() {
     // Import/Export, Store/Load and Semantics/Syntax dyads; the Blue Earth monad, its
     // Hosting/Facilitation, Niche/National and Deals/Deployment dyads, Delivery and Impact
     // triads, and Blue Earth Strategy tetrad; and the Fitness/Exercise and Stretching/
-    // Mobility dyads plus the Physical Fitness pentad.
+    // Mobility dyads plus the Physical Fitness pentad. Then 74 → 76 (2026-09-09): the
+    // Interface State Model monad and the Viewing/Editing dyad.
     assert_eq!(
         graph.systems.len(),
-        90,
-        "expected 12 canonical + 1 citation + 74 fragment + 3 module systems"
+        92,
+        "expected 12 canonical + 1 citation + 76 fragment + 3 module systems"
     );
 }
 

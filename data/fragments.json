@@ -5084,6 +5084,26 @@
       "id": "char_word_fitpent_edge_10",
       "kind": "word",
       "value": "Fitpent Edge 10"
+    },
+    {
+      "id": "char_word_interface_state_model",
+      "kind": "word",
+      "value": "Interface State Model"
+    },
+    {
+      "id": "char_word_viewing",
+      "kind": "word",
+      "value": "Viewing"
+    },
+    {
+      "id": "char_word_editing",
+      "kind": "word",
+      "value": "Editing"
+    },
+    {
+      "id": "char_word_view_edit_edge_1",
+      "kind": "word",
+      "value": "View Edit Edge 1"
     }
   ],
   "coordinates": [],
@@ -6810,6 +6830,27 @@
         "char_word_fitpent_edge_9",
         "char_word_fitpent_edge_10"
       ]
+    },
+    {
+      "id": "vocab_interface_state_model_1",
+      "name": "Interface State Model",
+      "order": 1,
+      "terms": [
+        "char_word_interface_state_model"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_viewing_editing_2",
+      "name": "Viewing Editing",
+      "order": 2,
+      "terms": [
+        "char_word_viewing",
+        "char_word_editing"
+      ],
+      "connectives": [
+        "char_word_view_edit_edge_1"
+      ]
     }
   ],
   "systems": [
@@ -7552,6 +7593,26 @@
       "connective_designation": "Mutualities",
       "grammar_ref": "grammar_5",
       "vocabulary_ref": "vocab_physical_fitness_5"
+    },
+    {
+      "id": "system_interface_state_model_1",
+      "name": "Interface State Model",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_interface_state_model_1"
+    },
+    {
+      "id": "system_viewing_editing_2",
+      "name": "Viewing Editing",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_viewing_editing_2"
     }
   ],
   "perspectives": [],

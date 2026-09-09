@@ -1141,6 +1141,19 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("fitpent", 5),
     );
 
+    // Interface State Model (user, 2026-09-09) — the canvas state machine dogfooded as a
+    // system: a monad heading the Viewing/Editing dyad. Grouped by its own sequence
+    // (data/perspectives/interface_state_model.json). Viewing=read; Editing unfolds into
+    // create/update/delete (the CRUD tetrad) — that articulation is a later round.
+    push_triadic_system(
+        &mut content, &mut have_char, "Interface State Model", 1,
+        &slugs(&["interface_state_model"]), &edge_slugs("ism", 1),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Viewing Editing", 2,
+        &slugs(&["viewing", "editing"]), &edge_slugs("view_edit", 2),
+    );
+
     content
 }
 
