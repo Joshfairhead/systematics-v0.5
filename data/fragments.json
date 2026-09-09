@@ -4814,6 +4814,276 @@
       "id": "char_word_reg_edge_6",
       "kind": "word",
       "value": "Reg Edge 6"
+    },
+    {
+      "id": "char_word_import",
+      "kind": "word",
+      "value": "Import"
+    },
+    {
+      "id": "char_word_export",
+      "kind": "word",
+      "value": "Export"
+    },
+    {
+      "id": "char_word_impexp_edge_1",
+      "kind": "word",
+      "value": "Impexp Edge 1"
+    },
+    {
+      "id": "char_word_storeload_edge_1",
+      "kind": "word",
+      "value": "Storeload Edge 1"
+    },
+    {
+      "id": "char_word_semantics",
+      "kind": "word",
+      "value": "Semantics"
+    },
+    {
+      "id": "char_word_syntax",
+      "kind": "word",
+      "value": "Syntax"
+    },
+    {
+      "id": "char_word_semsyn_edge_1",
+      "kind": "word",
+      "value": "Semsyn Edge 1"
+    },
+    {
+      "id": "char_word_blue_earth",
+      "kind": "word",
+      "value": "Blue Earth"
+    },
+    {
+      "id": "char_word_hosting",
+      "kind": "word",
+      "value": "Hosting"
+    },
+    {
+      "id": "char_word_facilitation",
+      "kind": "word",
+      "value": "Facilitation"
+    },
+    {
+      "id": "char_word_behf_edge_1",
+      "kind": "word",
+      "value": "Behf Edge 1"
+    },
+    {
+      "id": "char_word_niche",
+      "kind": "word",
+      "value": "Niche"
+    },
+    {
+      "id": "char_word_national",
+      "kind": "word",
+      "value": "National"
+    },
+    {
+      "id": "char_word_benn_edge_1",
+      "kind": "word",
+      "value": "Benn Edge 1"
+    },
+    {
+      "id": "char_word_deal_making",
+      "kind": "word",
+      "value": "Deal Making"
+    },
+    {
+      "id": "char_word_deployment",
+      "kind": "word",
+      "value": "Deployment"
+    },
+    {
+      "id": "char_word_bedd_edge_1",
+      "kind": "word",
+      "value": "Bedd Edge 1"
+    },
+    {
+      "id": "char_word_coordination",
+      "kind": "word",
+      "value": "Coordination"
+    },
+    {
+      "id": "char_word_bedel_edge_1",
+      "kind": "word",
+      "value": "Bedel Edge 1"
+    },
+    {
+      "id": "char_word_bedel_edge_2",
+      "kind": "word",
+      "value": "Bedel Edge 2"
+    },
+    {
+      "id": "char_word_bedel_edge_3",
+      "kind": "word",
+      "value": "Bedel Edge 3"
+    },
+    {
+      "id": "char_word_systems_change",
+      "kind": "word",
+      "value": "Systems Change"
+    },
+    {
+      "id": "char_word_disruption",
+      "kind": "word",
+      "value": "Disruption"
+    },
+    {
+      "id": "char_word_funding",
+      "kind": "word",
+      "value": "Funding"
+    },
+    {
+      "id": "char_word_beimp_edge_1",
+      "kind": "word",
+      "value": "Beimp Edge 1"
+    },
+    {
+      "id": "char_word_beimp_edge_2",
+      "kind": "word",
+      "value": "Beimp Edge 2"
+    },
+    {
+      "id": "char_word_beimp_edge_3",
+      "kind": "word",
+      "value": "Beimp Edge 3"
+    },
+    {
+      "id": "char_word_bestrat_edge_1",
+      "kind": "word",
+      "value": "Bestrat Edge 1"
+    },
+    {
+      "id": "char_word_bestrat_edge_2",
+      "kind": "word",
+      "value": "Bestrat Edge 2"
+    },
+    {
+      "id": "char_word_bestrat_edge_3",
+      "kind": "word",
+      "value": "Bestrat Edge 3"
+    },
+    {
+      "id": "char_word_bestrat_edge_4",
+      "kind": "word",
+      "value": "Bestrat Edge 4"
+    },
+    {
+      "id": "char_word_bestrat_edge_5",
+      "kind": "word",
+      "value": "Bestrat Edge 5"
+    },
+    {
+      "id": "char_word_bestrat_edge_6",
+      "kind": "word",
+      "value": "Bestrat Edge 6"
+    },
+    {
+      "id": "char_word_fitness",
+      "kind": "word",
+      "value": "Fitness"
+    },
+    {
+      "id": "char_word_exercise",
+      "kind": "word",
+      "value": "Exercise"
+    },
+    {
+      "id": "char_word_fitex_edge_1",
+      "kind": "word",
+      "value": "Fitex Edge 1"
+    },
+    {
+      "id": "char_word_stretching",
+      "kind": "word",
+      "value": "Stretching"
+    },
+    {
+      "id": "char_word_mobility",
+      "kind": "word",
+      "value": "Mobility"
+    },
+    {
+      "id": "char_word_strmob_edge_1",
+      "kind": "word",
+      "value": "Strmob Edge 1"
+    },
+    {
+      "id": "char_word_body_composition",
+      "kind": "word",
+      "value": "Body Composition"
+    },
+    {
+      "id": "char_word_cardiorespiratory_endurance",
+      "kind": "word",
+      "value": "Cardiorespiratory Endurance"
+    },
+    {
+      "id": "char_word_flexibility_mobility",
+      "kind": "word",
+      "value": "Flexibility Mobility"
+    },
+    {
+      "id": "char_word_muscle_strength",
+      "kind": "word",
+      "value": "Muscle Strength"
+    },
+    {
+      "id": "char_word_muscle_endurance",
+      "kind": "word",
+      "value": "Muscle Endurance"
+    },
+    {
+      "id": "char_word_fitpent_edge_1",
+      "kind": "word",
+      "value": "Fitpent Edge 1"
+    },
+    {
+      "id": "char_word_fitpent_edge_2",
+      "kind": "word",
+      "value": "Fitpent Edge 2"
+    },
+    {
+      "id": "char_word_fitpent_edge_3",
+      "kind": "word",
+      "value": "Fitpent Edge 3"
+    },
+    {
+      "id": "char_word_fitpent_edge_4",
+      "kind": "word",
+      "value": "Fitpent Edge 4"
+    },
+    {
+      "id": "char_word_fitpent_edge_5",
+      "kind": "word",
+      "value": "Fitpent Edge 5"
+    },
+    {
+      "id": "char_word_fitpent_edge_6",
+      "kind": "word",
+      "value": "Fitpent Edge 6"
+    },
+    {
+      "id": "char_word_fitpent_edge_7",
+      "kind": "word",
+      "value": "Fitpent Edge 7"
+    },
+    {
+      "id": "char_word_fitpent_edge_8",
+      "kind": "word",
+      "value": "Fitpent Edge 8"
+    },
+    {
+      "id": "char_word_fitpent_edge_9",
+      "kind": "word",
+      "value": "Fitpent Edge 9"
+    },
+    {
+      "id": "char_word_fitpent_edge_10",
+      "kind": "word",
+      "value": "Fitpent Edge 10"
     }
   ],
   "coordinates": [],
@@ -6362,6 +6632,184 @@
         "char_word_reg_edge_5",
         "char_word_reg_edge_6"
       ]
+    },
+    {
+      "id": "vocab_import_export_2",
+      "name": "Import Export",
+      "order": 2,
+      "terms": [
+        "char_word_import",
+        "char_word_export"
+      ],
+      "connectives": [
+        "char_word_impexp_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_store_load_2",
+      "name": "Store Load",
+      "order": 2,
+      "terms": [
+        "char_word_store",
+        "char_word_load"
+      ],
+      "connectives": [
+        "char_word_storeload_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_semantics_syntax_2",
+      "name": "Semantics Syntax",
+      "order": 2,
+      "terms": [
+        "char_word_semantics",
+        "char_word_syntax"
+      ],
+      "connectives": [
+        "char_word_semsyn_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_blue_earth_1",
+      "name": "Blue Earth",
+      "order": 1,
+      "terms": [
+        "char_word_blue_earth"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_hosting_facilitation_2",
+      "name": "Hosting Facilitation",
+      "order": 2,
+      "terms": [
+        "char_word_hosting",
+        "char_word_facilitation"
+      ],
+      "connectives": [
+        "char_word_behf_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_niche_national_2",
+      "name": "Niche National",
+      "order": 2,
+      "terms": [
+        "char_word_niche",
+        "char_word_national"
+      ],
+      "connectives": [
+        "char_word_benn_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_deals_deployment_2",
+      "name": "Deals Deployment",
+      "order": 2,
+      "terms": [
+        "char_word_deal_making",
+        "char_word_deployment"
+      ],
+      "connectives": [
+        "char_word_bedd_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_delivery_3",
+      "name": "Delivery",
+      "order": 3,
+      "terms": [
+        "char_word_hosting",
+        "char_word_coordination",
+        "char_word_facilitation"
+      ],
+      "connectives": [
+        "char_word_bedel_edge_1",
+        "char_word_bedel_edge_2",
+        "char_word_bedel_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_impact_3",
+      "name": "Impact",
+      "order": 3,
+      "terms": [
+        "char_word_systems_change",
+        "char_word_disruption",
+        "char_word_funding"
+      ],
+      "connectives": [
+        "char_word_beimp_edge_1",
+        "char_word_beimp_edge_2",
+        "char_word_beimp_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_blue_earth_strategy_4",
+      "name": "Blue Earth Strategy",
+      "order": 4,
+      "terms": [
+        "char_word_national",
+        "char_word_niche",
+        "char_word_deal_making",
+        "char_word_deployment"
+      ],
+      "connectives": [
+        "char_word_bestrat_edge_1",
+        "char_word_bestrat_edge_2",
+        "char_word_bestrat_edge_3",
+        "char_word_bestrat_edge_4",
+        "char_word_bestrat_edge_5",
+        "char_word_bestrat_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_fitness_exercise_2",
+      "name": "Fitness Exercise",
+      "order": 2,
+      "terms": [
+        "char_word_fitness",
+        "char_word_exercise"
+      ],
+      "connectives": [
+        "char_word_fitex_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_stretching_mobility_2",
+      "name": "Stretching Mobility",
+      "order": 2,
+      "terms": [
+        "char_word_stretching",
+        "char_word_mobility"
+      ],
+      "connectives": [
+        "char_word_strmob_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_physical_fitness_5",
+      "name": "Physical Fitness",
+      "order": 5,
+      "terms": [
+        "char_word_body_composition",
+        "char_word_cardiorespiratory_endurance",
+        "char_word_flexibility_mobility",
+        "char_word_muscle_strength",
+        "char_word_muscle_endurance"
+      ],
+      "connectives": [
+        "char_word_fitpent_edge_1",
+        "char_word_fitpent_edge_2",
+        "char_word_fitpent_edge_3",
+        "char_word_fitpent_edge_4",
+        "char_word_fitpent_edge_5",
+        "char_word_fitpent_edge_6",
+        "char_word_fitpent_edge_7",
+        "char_word_fitpent_edge_8",
+        "char_word_fitpent_edge_9",
+        "char_word_fitpent_edge_10"
+      ]
     }
   ],
   "systems": [
@@ -6974,6 +7422,136 @@
       "connective_designation": "Interplays",
       "grammar_ref": "grammar_4",
       "vocabulary_ref": "vocab_registry_core_4"
+    },
+    {
+      "id": "system_import_export_2",
+      "name": "Import Export",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_import_export_2"
+    },
+    {
+      "id": "system_store_load_2",
+      "name": "Store Load",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_store_load_2"
+    },
+    {
+      "id": "system_semantics_syntax_2",
+      "name": "Semantics Syntax",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_semantics_syntax_2"
+    },
+    {
+      "id": "system_blue_earth_1",
+      "name": "Blue Earth",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_blue_earth_1"
+    },
+    {
+      "id": "system_hosting_facilitation_2",
+      "name": "Hosting Facilitation",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_hosting_facilitation_2"
+    },
+    {
+      "id": "system_niche_national_2",
+      "name": "Niche National",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_niche_national_2"
+    },
+    {
+      "id": "system_deals_deployment_2",
+      "name": "Deals Deployment",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_deals_deployment_2"
+    },
+    {
+      "id": "system_delivery_3",
+      "name": "Delivery",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_delivery_3"
+    },
+    {
+      "id": "system_impact_3",
+      "name": "Impact",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_impact_3"
+    },
+    {
+      "id": "system_blue_earth_strategy_4",
+      "name": "Blue Earth Strategy",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_blue_earth_strategy_4"
+    },
+    {
+      "id": "system_fitness_exercise_2",
+      "name": "Fitness Exercise",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_fitness_exercise_2"
+    },
+    {
+      "id": "system_stretching_mobility_2",
+      "name": "Stretching Mobility",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_stretching_mobility_2"
+    },
+    {
+      "id": "system_physical_fitness_5",
+      "name": "Physical Fitness",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_physical_fitness_5"
     }
   ],
   "perspectives": [],

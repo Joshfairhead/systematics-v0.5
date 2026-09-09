@@ -1069,6 +1069,78 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("reg", 4),
     );
 
+    // --- Store/load & compositional dyads (user, 2026-09-08) ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Import Export", 2,
+        &slugs(&["import", "export"]), &edge_slugs("impexp", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Store Load", 2,
+        &slugs(&["store", "load"]), &edge_slugs("storeload", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Semantics Syntax", 2,
+        &slugs(&["semantics", "syntax"]), &edge_slugs("semsyn", 2),
+    );
+
+    // --- Blue Earth (user, 2026-09-08): monad → dyads → triads → tetrad, grouped by
+    //     the Blue Earth sequence (data/perspectives/blue_earth.json). ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Blue Earth", 1,
+        &slugs(&["blue_earth"]), &edge_slugs("be", 1),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Hosting Facilitation", 2,
+        &slugs(&["hosting", "facilitation"]), &edge_slugs("behf", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Niche National", 2,
+        &slugs(&["niche", "national"]), &edge_slugs("benn", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Deals Deployment", 2,
+        &slugs(&["deal_making", "deployment"]), &edge_slugs("bedd", 2),
+    );
+    // Triad: hosting(+, 1) · coordination(−, 2) · facilitation(=, 3).
+    push_triadic_system(
+        &mut content, &mut have_char, "Delivery", 3,
+        &slugs(&["hosting", "coordination", "facilitation"]), &edge_slugs("bedel", 3),
+    );
+    // Triad: systems change(+, 1) · disruption(−, 2) · funding(=, 3).
+    push_triadic_system(
+        &mut content, &mut have_char, "Impact", 3,
+        &slugs(&["systems_change", "disruption", "funding"]), &edge_slugs("beimp", 3),
+    );
+    // Tetrad from the two dyads: Ideal=national · Ground=niche · Directive=deals ·
+    // Instrumental=deployment (canonical tetrad term order Ideal/Ground/Directive/Instrumental).
+    push_triadic_system(
+        &mut content, &mut have_char, "Blue Earth Strategy", 4,
+        &slugs(&["national", "niche", "deal_making", "deployment"]), &edge_slugs("bestrat", 4),
+    );
+
+    // --- Fitness (user, 2026-09-08) ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Fitness Exercise", 2,
+        &slugs(&["fitness", "exercise"]), &edge_slugs("fitex", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Stretching Mobility", 2,
+        &slugs(&["stretching", "mobility"]), &edge_slugs("strmob", 2),
+    );
+    // Pentad — health-related fitness. Performance fitness (power, agility, balance,
+    // coordination, speed, reaction time) are possible links (edges), TBD.
+    push_triadic_system(
+        &mut content, &mut have_char, "Physical Fitness", 5,
+        &slugs(&[
+            "body_composition",
+            "cardiorespiratory_endurance",
+            "flexibility_mobility",
+            "muscle_strength",
+            "muscle_endurance",
+        ]),
+        &edge_slugs("fitpent", 5),
+    );
+
     content
 }
 

@@ -1,0 +1,17 @@
+{
+  "sequences": [
+    {
+      "id": "sequence_blue_earth",
+      "name": "Blue Earth",
+      "members": [
+        "system:system_blue_earth_1",
+        "system:system_hosting_facilitation_2",
+        "system:system_niche_national_2",
+        "system:system_deals_deployment_2",
+        "system:system_delivery_3",
+        "system:system_impact_3",
+        "system:system_blue_earth_strategy_4"
+      ]
+    }
+  ]
+}

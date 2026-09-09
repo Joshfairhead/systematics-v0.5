@@ -48,15 +48,15 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 16,
-        "expected 16 module files to load (14 sources + the Architecture Pentad \
-         + the Architectural Monad registry); got {modules}"
+        modules, 17,
+        "expected 17 module files to load (14 sources + the Architecture Pentad \
+         + the Architectural Monad registry + the Blue Earth registry); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
         15,
-        "15 perspectives from 16 modules — the Architectural Monad module carries \
-         only a Sequence, no perspective"
+        "15 perspectives from 17 modules — the Architectural Monad and Blue Earth \
+         modules carry only a Sequence, no perspective"
     );
 }
 
@@ -103,7 +103,7 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 61 fragments + 3 module-owned = 77.
+    // Total systems = 12 canonical + 1 citation + 74 fragments + 3 module-owned = 90.
     // Fragments grew 39 → 55 (2026-09-01): the Elementary Systematics pentad, Potency,
     // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
     // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, the four Holochain-
@@ -111,11 +111,15 @@ fn module_owned_systems_present() {
     // Graph Products tetrad (Cartesian/Tensor/Strong/Lexicographic = ground/instrument/
     // directive/goal). Then 55 → 61 (2026-09-07): the Knowledge, Discourse, Common Noun
     // and Verbs triads, and the two registry tetrads (Field of Action = Store/Read/Graph/
-    // List; Registry Core = Store/Read/Sort/Filter).
+    // List; Registry Core = Store/Read/Sort/Filter). Then 61 → 74 (2026-09-08): the
+    // Import/Export, Store/Load and Semantics/Syntax dyads; the Blue Earth monad, its
+    // Hosting/Facilitation, Niche/National and Deals/Deployment dyads, Delivery and Impact
+    // triads, and Blue Earth Strategy tetrad; and the Fitness/Exercise and Stretching/
+    // Mobility dyads plus the Physical Fitness pentad.
     assert_eq!(
         graph.systems.len(),
-        77,
-        "expected 12 canonical + 1 citation + 61 fragment + 3 module systems"
+        90,
+        "expected 12 canonical + 1 citation + 74 fragment + 3 module systems"
     );
 }
 
