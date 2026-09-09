@@ -735,9 +735,13 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         system_id: system.id.clone(),
         name,
         system_name,
-        coherence: system.coherence.clone(),
-        term_designation: system.term_designation.clone(),
-        connective_designation: system.connective_designation.clone(),
+        // Coherence + designations are FIXED per order (canonical, no customisation for
+        // now): sourced from the single hexad model at render time so every system —
+        // including any legacy record that stored a custom coherence — shows the
+        // canonical value.
+        coherence: crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
+        term_designation: crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
+        connective_designation: crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
         terms,
         coordinates,
         colours,
@@ -1026,9 +1030,9 @@ impl MutationRoot {
             )));
         }
 
-        // Match the id scheme used by `with_auto_id` so char ids stay unique.
+        // Char ids are derived from the name slug (matching `with_auto_id`) so they stay
+        // unique and deterministic — the same (slug, order) re-authors onto the same ids.
         let slug = input.name.to_lowercase().replace(' ', "_");
-        let sys_id = format!("system_{slug}_{order_cardinality}");
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         // Store = write, with **overwrite** semantics: authoring a name+order that
@@ -1052,12 +1056,16 @@ impl MutationRoot {
         }
         let vocab = Vocabulary::with_auto_id(&input.name, order_cardinality, term_ids, conn_ids);
         let vocab_id = vocab.id.clone();
+        // Coherence + designations are FIXED per order (canonical, no customisation for
+        // now): source them from the single hexad model so authoring/editing never
+        // corrupts them (e.g. coherence showing "Custom", or a triad's edges reverting
+        // to the generic "Connectives"). The `input` overrides are intentionally ignored.
         let system = System::with_auto_id(
             &input.name,
             order_cardinality,
-            input.coherence.unwrap_or_else(|| "Custom".to_string()),
-            input.term_designation.unwrap_or_else(|| "Terms".to_string()),
-            input.connective_designation.unwrap_or_else(|| "Connectives".to_string()),
+            crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
+            crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
+            crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
             format!("grammar_{order_cardinality}"),
             &vocab_id,
         );
