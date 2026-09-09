@@ -22,6 +22,27 @@ pub enum ViewMode {
     Table,
 }
 
+/// The canvas **interface state model** — a small, data-model-independent state machine
+/// governing view vs edit (the data model will change later; this stays interface-side).
+///
+/// - **Viewing** — read-only. The Canonical sub-toggle chooses which labels show (a
+///   canonical seed / an instance's class vs its own values). A seed is *only* viewable.
+/// - **Editing** — on-graph editing of an *editable instance* (its nodes/edges/name
+///   overwrite in place). Create/fill/rename all live here.
+///
+/// Transitions (centralised so the flags can't drift into illegal combos, e.g. editing a
+/// canonical view):
+/// - navigate / load a system         → **Viewing** (`enter_viewing`)
+/// - Update on  (Viewing → Editing)   → drop the canonical view; if the current system is
+///   a canonical *seed*, first author a fresh `sketchNN` instance and edit that
+/// - Update off (Editing → Viewing)   → Viewing
+/// - Canonical on while Editing        → Viewing (canonical is read-only)
+#[derive(Clone, Copy, PartialEq)]
+pub enum CanvasMode {
+    Viewing,
+    Editing,
+}
+
 /// The header's selectable system keys, in order_cardinality 1→12. OrderCardinality 0 is **Nullad**
 /// (key `"nullad"`), prepended in the selector — the unbounded "all", which has
 /// no single system to render or filter to.
@@ -139,8 +160,8 @@ pub struct ApiApp {
     show_canonical: bool,
     /// Feedback from the last Extract (Nullad → Monad), shown in the data view.
     extract_note: Option<String>,
-    /// Whether the in-graph system editor is open.
-    editing: bool,
+    /// The canvas interface state (Viewing / Editing) — see `CanvasMode`.
+    canvas_mode: CanvasMode,
     /// Every Sequence / Monad in the graph — shown as rows in the data view.
     sequences: Vec<SequenceView>,
     /// When navigating inside a monad/sequence: its member addresses. Header
@@ -153,6 +174,11 @@ pub struct ApiApp {
 }
 
 impl ApiApp {
+    /// State-model transition: enter the read-only Viewing state. Called on every
+    /// navigation/load so Update never lingers on a newly-shown system.
+    fn enter_viewing(&mut self) {
+        self.canvas_mode = CanvasMode::Viewing;
+    }
     /// The next free "sketchNN" name — a starter name for a fresh instance so the user
     /// can go straight to editing nodes/edges without naming the system first.
     fn next_sketch_name(&self) -> String {
@@ -307,7 +333,7 @@ impl Component for ApiApp {
             instance_systems: vec![],
             show_canonical: false,
             extract_note: None,
-            editing: false,
+            canvas_mode: CanvasMode::Viewing,
             sequences: vec![],
             active_sequence: None,
             scope_members: None,
@@ -317,6 +343,8 @@ impl Component for ApiApp {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             ApiAppMsg::SelectSystem(name) => {
+                // Navigating to a system returns to the read-only Viewing state.
+                self.enter_viewing();
                 // The header buttons drive both views: which graph to render, and
                 // which order_cardinality the data view filters to. Set the key optimistically
                 // so the highlight and the data filter update immediately.
@@ -382,6 +410,7 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::NavigateToSystem(name) => {
+                self.enter_viewing();
                 // Add current system to breadcrumbs before navigating
                 if let Some(ref current) = self.selected_system {
                     self.breadcrumbs.push(Breadcrumb {
@@ -410,6 +439,7 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::NavigateBack => {
+                self.enter_viewing();
                 if let Some(breadcrumb) = self.breadcrumbs.pop() {
                     self.loading = true;
                     self.error = None;
@@ -521,6 +551,7 @@ impl Component for ApiApp {
                 // Load is the ELT triad's edge on the data view, so switch to the
                 // graph mode to reveal what was loaded. Loading a standalone system
                 // leaves any monad/bucket context (its grouping no longer applies).
+                self.enter_viewing();
                 self.mode = ViewMode::Graph;
                 self.active_sequence = None;
                 self.scope_members = None;
@@ -539,9 +570,9 @@ impl Component for ApiApp {
             }
             ApiAppMsg::ToggleCanonical => {
                 self.show_canonical = !self.show_canonical;
-                // Canonical view is read-only, so turning it on exits Update mode.
+                // Canonical view is read-only, so turning it on returns to Viewing.
                 if self.show_canonical {
-                    self.editing = false;
+                    self.canvas_mode = CanvasMode::Viewing;
                 }
                 true
             }
@@ -574,6 +605,7 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ViewSequence(members) => {
+                self.enter_viewing();
                 self.breadcrumbs.clear();
                 if self.is_order_navigable(&members) {
                     // Ordered core-sequence (Monad(CT), Data): enter it in the graph;
@@ -609,9 +641,11 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ToggleEditing => {
-                self.editing = !self.editing;
+                // Toggle Viewing ↔ Editing.
+                let entering = self.canvas_mode == CanvasMode::Viewing;
+                self.canvas_mode = if entering { CanvasMode::Editing } else { CanvasMode::Viewing };
                 // Entering Update is a state change out of the read-only canonical view.
-                if self.editing {
+                if entering {
                     self.show_canonical = false;
                     // Starting to edit a canonical SEED creates a fresh blank instance
                     // ("sketchNN") so the seed is never touched — the user goes straight
@@ -1053,7 +1087,7 @@ impl Component for ApiApp {
                                             references={ self.system_references.clone() }
                                             show_canonical={ self.show_canonical }
                                             on_toggle_canonical={ Some(on_toggle_canonical.clone()) }
-                                            editing={ self.editing }
+                                            editing={ self.canvas_mode == CanvasMode::Editing }
                                             on_toggle_editing={ Some(on_toggle_editing.clone()) }
                                             on_edit_value={ Some(on_edit_value) }
                                         />
