@@ -5,7 +5,8 @@
       "name": "Interface State Model",
       "members": [
         "system:system_interface_state_model_1",
-        "system:system_viewing_editing_2"
+        "system:system_viewing_editing_2",
+        "system:system_crud_4"
       ]
     }
   ]
