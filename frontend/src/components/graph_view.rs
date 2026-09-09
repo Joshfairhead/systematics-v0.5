@@ -184,6 +184,19 @@ impl Component for ApiGraphView {
         }
     }
 
+    fn changed(&mut self, ctx: &Context<Self>, _old: &Self::Properties) -> bool {
+        // Entering the blank create-flow (Canonical off + Update on) auto-opens the name
+        // box with a starter name ("sketch01") — the user names it first, no title click
+        // needed. (Auto-naming from the filled nodes is intent for a later round.)
+        let system = &ctx.props().system;
+        let blank = system.canonical_class.is_none() && !ctx.props().show_canonical;
+        if ctx.props().editing && blank && !self.renaming && self.draft.is_empty() {
+            self.renaming = true;
+            self.draft = "sketch01".to_string();
+        }
+        true
+    }
+
     fn view(&self, ctx: &Context<Self>) -> Html {
         let system = &ctx.props().system;
         let show_edge_labels = ctx.props().show_edge_labels;
@@ -359,23 +372,21 @@ impl Component for ApiGraphView {
                     </label>
                 }
 
-                // Update-mode toggle — under the Edge Labels switch. On-graph editing:
-                // flip it on, then click the name / a node / an edge. Shown only when the
-                // system is editable (a canonical seed shown canonically is read-only).
-                if editable {
-                    if let Some(on_toggle) = ctx.props().on_toggle_editing.clone() {
-                        <label class="update-toggle-overlay">
-                            <span class="toggle-label">{ "Update" }</span>
-                            <div class="toggle-switch">
-                                <input
-                                    type="checkbox"
-                                    checked={ ctx.props().editing }
-                                    onclick={ Callback::from(move |_| on_toggle.emit(())) }
-                                />
-                                <span class="slider"></span>
-                            </div>
-                        </label>
-                    }
+                // Update-mode toggle — under the Edge Labels switch. Always present;
+                // turning it on is a state change that drops the read-only canonical
+                // view (a canonical seed becomes a blank editable new instance).
+                if let Some(on_toggle) = ctx.props().on_toggle_editing.clone() {
+                    <label class="update-toggle-overlay">
+                        <span class="toggle-label">{ "Update" }</span>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={ ctx.props().editing }
+                                onclick={ Callback::from(move |_| on_toggle.emit(())) }
+                            />
+                            <span class="slider"></span>
+                        </div>
+                    </label>
                 }
 
                 { edit_panel }

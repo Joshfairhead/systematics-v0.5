@@ -525,6 +525,10 @@ impl Component for ApiApp {
             }
             ApiAppMsg::ToggleCanonical => {
                 self.show_canonical = !self.show_canonical;
+                // Canonical view is read-only, so turning it on exits Update mode.
+                if self.show_canonical {
+                    self.editing = false;
+                }
                 true
             }
             ApiAppMsg::ExtractMonad(req) => {
@@ -592,6 +596,11 @@ impl Component for ApiApp {
             }
             ApiAppMsg::ToggleEditing => {
                 self.editing = !self.editing;
+                // Entering Update is a state change out of the read-only canonical view:
+                // a canonical seed becomes a blank editable new instance.
+                if self.editing {
+                    self.show_canonical = false;
+                }
                 true
             }
             ApiAppMsg::SequencesLoaded(seqs) => {
@@ -624,6 +633,14 @@ impl Component for ApiApp {
                 // three collections so the table reflects the CRUD.
                 self.active_sequence = None;
                 self.scope_members = None;
+                // If the focused system was just deleted, drop it — otherwise its
+                // nodes/edges (derived from `selected_system`) linger as list rows.
+                if let Some(sys) = &self.selected_system {
+                    if addrs.iter().any(|a| a == &format!("system:{}", sys.system_id)) {
+                        self.selected_system = None;
+                        self.breadcrumbs.clear();
+                    }
+                }
                 self.extract_note = Some(format!("Deleting {} item(s)…", addrs.len()));
                 let link = ctx.link().clone();
                 let client = self.graphql_client.clone();
