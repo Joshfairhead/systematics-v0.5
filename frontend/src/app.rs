@@ -51,6 +51,22 @@ const ORDER_KEYS: [&str; 12] = [
     "ennead", "decad", "undecad", "dodecad",
 ];
 
+/// The index of edge `(base,target)` in canonical K_n edge order (1,2),(1,3),(2,3),…
+/// Used to place a single on-graph connective edit into the flat connectives vector.
+fn edge_index(order: i32, base: i32, target: i32) -> Option<usize> {
+    let (a, b) = (base.min(target), base.max(target));
+    let mut idx = 0usize;
+    for p1 in 1..=order {
+        for p2 in (p1 + 1)..=order {
+            if p1 == a && p2 == b {
+                return Some(idx);
+            }
+            idx += 1;
+        }
+    }
+    None
+}
+
 /// The order_cardinality a header key filters/selects, or `None` for Nullad ("all").
 fn order_for_key(key: &str) -> Option<i32> {
     ORDER_KEYS
@@ -641,43 +657,15 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ToggleEditing => {
-                // Toggle Viewing ↔ Editing.
+                // Toggle Viewing ↔ Editing. Entering Editing drops the read-only canonical
+                // view; a canonical seed becomes a blank editable template. The instance is
+                // created **lazily**, on the first data input (a name or a node/edge value)
+                // — see the `is_blank` branch of `EditValue`. So toggling Update and backing
+                // out leaves no stray system.
                 let entering = self.canvas_mode == CanvasMode::Viewing;
                 self.canvas_mode = if entering { CanvasMode::Editing } else { CanvasMode::Viewing };
-                // Entering Update is a state change out of the read-only canonical view.
                 if entering {
                     self.show_canonical = false;
-                    // Starting to edit a canonical SEED creates a fresh blank instance
-                    // ("sketchNN") so the seed is never touched — the user goes straight
-                    // to naming nodes/edges and can rename the system via the title.
-                    if let Some(sys) = &self.selected_system {
-                        if sys.canonical_class.is_none() {
-                            let name = self.next_sketch_name();
-                            let order = sys.order_cardinality;
-                            let n = order.max(0) as usize;
-                            let conn_count = n * n.saturating_sub(1) / 2;
-                            let terms = vec![String::new(); n];
-                            let connectives = vec![String::new(); conn_count];
-                            self.loading = true;
-                            let link = ctx.link().clone();
-                            let client = self.graphql_client.clone();
-                            spawn_local(async move {
-                                match client.author_system(&name, order, terms, connectives).await {
-                                    Ok(created) => {
-                                        if let Ok(system) = client.fetch_rendered_by_id(&created.id).await {
-                                            link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
-                                        }
-                                        if let Ok(instances) = client.fetch_instance_systems().await {
-                                            link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
-                                        }
-                                    }
-                                    Err(e) => link.send_message(ApiAppMsg::MonadExtracted(
-                                        format!("Create failed: {e}"),
-                                    )),
-                                }
-                            });
-                        }
-                    }
                 }
                 true
             }
@@ -798,35 +786,50 @@ impl Component for ApiApp {
                 };
 
                 // Blank mode (a canonical seed with Canonical switched off): the graph is a
-                // blank NEW instance. Only naming creates it — author a fresh system of
-                // that order with empty values (the seed is never touched). Value edits are
-                // ignored until it exists (then it's a normal editable custom system).
+                // blank NEW instance created **lazily** on the first data input. A name →
+                // that name; a node/edge value → an auto "sketchNN" name with that value
+                // applied. The seed is never touched; then it's a normal editable system.
                 let is_blank = system.canonical_class.is_none() && !self.show_canonical;
                 if is_blank {
-                    if let GraphEdit::Name { value } = &edit {
-                        let name = value.clone();
-                        let order = system.order_cardinality;
-                        let n = order.max(0) as usize;
-                        let conn_count = n * n.saturating_sub(1) / 2;
-                        let terms = vec![String::new(); n];
-                        let connectives = vec![String::new(); conn_count];
-                        let link = ctx.link().clone();
-                        let client = self.graphql_client.clone();
-                        spawn_local(async move {
-                            match client.author_system(&name, order, terms, connectives).await {
-                                Ok(sys) => {
-                                    if let Ok(system) = client.fetch_rendered_by_id(&sys.id).await {
-                                        link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
-                                    }
-                                    if let Ok(instances) = client.fetch_instance_systems().await {
-                                        link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
-                                    }
-                                }
-                                Err(e) => link
-                                    .send_message(ApiAppMsg::MonadExtracted(format!("Create failed: {e}"))),
+                    let order = system.order_cardinality;
+                    let n = order.max(0) as usize;
+                    let conn_count = n * n.saturating_sub(1) / 2;
+                    let mut terms = vec![String::new(); n];
+                    let mut connectives = vec![String::new(); conn_count];
+                    let name = match &edit {
+                        GraphEdit::Name { value } => value.clone(),
+                        GraphEdit::Term { ordinality, value } => {
+                            let i = (*ordinality as usize).saturating_sub(1);
+                            if i < terms.len() {
+                                terms[i] = value.clone();
                             }
-                        });
-                    }
+                            self.next_sketch_name()
+                        }
+                        GraphEdit::Connective { base, target, value } => {
+                            if let Some(i) = edge_index(order, *base, *target) {
+                                if i < connectives.len() {
+                                    connectives[i] = value.clone();
+                                }
+                            }
+                            self.next_sketch_name()
+                        }
+                    };
+                    let link = ctx.link().clone();
+                    let client = self.graphql_client.clone();
+                    spawn_local(async move {
+                        match client.author_system(&name, order, terms, connectives).await {
+                            Ok(sys) => {
+                                if let Ok(system) = client.fetch_rendered_by_id(&sys.id).await {
+                                    link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
+                                }
+                                if let Ok(instances) = client.fetch_instance_systems().await {
+                                    link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                                }
+                            }
+                            Err(e) => link
+                                .send_message(ApiAppMsg::MonadExtracted(format!("Create failed: {e}"))),
+                        }
+                    });
                     return false;
                 }
 

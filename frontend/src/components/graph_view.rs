@@ -96,9 +96,15 @@ impl Component for ApiGraphView {
                 if selecting {
                     self.selected_node = Some(idx);
                     self.selected_edge = None;
-                    // In Update mode, seed the inline editor with the term's value.
+                    // In Update mode, seed the inline editor with the term's value —
+                    // empty on a blank new instance (nothing to carry over from the seed).
                     if ctx.props().editing {
-                        self.draft = system.term_at((idx + 1) as i32).unwrap_or("").to_string();
+                        let blank = system.canonical_class.is_none() && !ctx.props().show_canonical;
+                        self.draft = if blank {
+                            String::new()
+                        } else {
+                            system.term_at((idx + 1) as i32).unwrap_or("").to_string()
+                        };
                     }
                 } else {
                     self.selected_node = None;
@@ -113,18 +119,24 @@ impl Component for ApiGraphView {
                 } else {
                     self.selected_edge = Some(edge);
                     self.selected_node = None;
-                    // In Update mode, seed the editor with this connective's value.
+                    // In Update mode, seed the editor with this connective's value —
+                    // empty on a blank new instance.
                     if ctx.props().editing {
+                        let blank = system.canonical_class.is_none() && !ctx.props().show_canonical;
                         let (b, t) = ((edge.0 + 1) as i32, (edge.1 + 1) as i32);
-                        self.draft = system
-                            .connectives
-                            .iter()
-                            .find(|c| {
-                                (c.base_ordinality.min(c.target_ordinality),
-                                 c.base_ordinality.max(c.target_ordinality)) == (b, t)
-                            })
-                            .map(|c| c.character_value.clone())
-                            .unwrap_or_default();
+                        self.draft = if blank {
+                            String::new()
+                        } else {
+                            system
+                                .connectives
+                                .iter()
+                                .find(|c| {
+                                    (c.base_ordinality.min(c.target_ordinality),
+                                     c.base_ordinality.max(c.target_ordinality)) == (b, t)
+                                })
+                                .map(|c| c.character_value.clone())
+                                .unwrap_or_default()
+                        };
                     }
                 }
                 true
@@ -258,20 +270,11 @@ impl Component for ApiGraphView {
             }
         };
 
-        // The on-graph editor (Update mode). A blank new-instance is named first (only
-        // rename is active until it exists); a custom system edits its name/nodes/edges.
-        // A canonical seed shown canonically is read-only (no panel).
-        let edit_panel = if blank {
-            if ctx.props().editing {
-                if self.renaming {
-                    input_panel("Name the new system".to_string(), self.draft.clone())
-                } else {
-                    html! { <div class="graph-edit-hint">{ "New system — click the title to name it, then click nodes/edges to fill it." }</div> }
-                }
-            } else {
-                html! { <div class="graph-edit-hint">{ "Blank template — turn on Update to author a new system." }</div> }
-            }
-        } else if editable && ctx.props().editing {
+        // The on-graph editor (Update mode). A blank new-instance and a custom system
+        // behave the same — click the name / a node / an edge to edit it. On a blank
+        // instance the first such edit lazily creates the system (app-side). A canonical
+        // seed shown canonically is read-only (no panel).
+        let edit_panel = if ctx.props().editing && (editable || blank) {
             let target = if self.renaming {
                 Some("system name".to_string())
             } else {
@@ -285,6 +288,8 @@ impl Component for ApiGraphView {
                     <div class="graph-edit-hint">{ "Update mode — click the name, a node, or an edge to edit it" }</div>
                 },
             }
+        } else if blank {
+            html! { <div class="graph-edit-hint">{ "Blank template — turn on Update to start a new system." }</div> }
         } else {
             html! {}
         };
