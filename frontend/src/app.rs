@@ -1093,6 +1093,7 @@ impl Component for ApiApp {
                                             editing={ self.canvas_mode == CanvasMode::Editing }
                                             on_toggle_editing={ Some(on_toggle_editing.clone()) }
                                             on_edit_value={ Some(on_edit_value) }
+                                            name_hint={ self.next_sketch_name() }
                                         />
                                     </div>
                                 }

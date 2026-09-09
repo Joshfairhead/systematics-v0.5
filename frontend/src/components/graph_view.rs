@@ -49,6 +49,10 @@ pub struct ApiGraphViewProps {
     /// Commit a single on-graph value edit (term or connective).
     #[prop_or_default]
     pub on_edit_value: Option<Callback<GraphEdit>>,
+    /// Suggested name for a brand-new (blank) instance — pre-fills the name box when
+    /// Update turns on. The parent supplies the next free "sketchNN".
+    #[prop_or_default]
+    pub name_hint: String,
 }
 
 pub enum ApiGraphMsg {
@@ -196,6 +200,27 @@ impl Component for ApiGraphView {
         }
     }
 
+    fn changed(&mut self, ctx: &Context<Self>, old: &Self::Properties) -> bool {
+        // When Update turns on, open the system-name box first (pre-filled): a fresh
+        // sketch name for a blank new instance, or the current name for a custom system.
+        // Clicking a node/edge then switches the panel to that element's value editor.
+        if ctx.props().editing && !old.editing {
+            let system = &ctx.props().system;
+            let blank = system.canonical_class.is_none() && !ctx.props().show_canonical;
+            self.selected_node = None;
+            self.selected_edge = None;
+            self.renaming = true;
+            self.draft = if blank {
+                ctx.props().name_hint.clone()
+            } else if system.system_name.is_empty() {
+                system.name.clone()
+            } else {
+                system.system_name.clone()
+            };
+        }
+        true
+    }
+
     fn view(&self, ctx: &Context<Self>) -> Html {
         let system = &ctx.props().system;
         let show_edge_labels = ctx.props().show_edge_labels;
@@ -276,7 +301,7 @@ impl Component for ApiGraphView {
         // seed shown canonically is read-only (no panel).
         let edit_panel = if ctx.props().editing && (editable || blank) {
             let target = if self.renaming {
-                Some("system name".to_string())
+                Some("name".to_string())
             } else {
                 self.selected_node
                     .map(|idx| format!("{} {}", system.term_designation, idx + 1))
