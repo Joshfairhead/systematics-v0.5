@@ -153,6 +153,20 @@ pub struct ApiApp {
 }
 
 impl ApiApp {
+    /// The next free "sketchNN" name — a starter name for a fresh instance so the user
+    /// can go straight to editing nodes/edges without naming the system first.
+    fn next_sketch_name(&self) -> String {
+        let existing: std::collections::HashSet<String> = self
+            .systems
+            .iter()
+            .map(|s| s.system_name.to_lowercase())
+            .chain(self.instance_systems.iter().map(|s| s.name.to_lowercase()))
+            .collect();
+        (1..=999)
+            .map(|i| format!("sketch{i:02}"))
+            .find(|n| !existing.contains(&n.to_lowercase()))
+            .unwrap_or_else(|| "sketch".to_string())
+    }
     /// The order_cardinality of a system by id (canonical `self.systems` or `instance_systems`).
     fn system_order(&self, id: &str) -> Option<i32> {
         self.systems
@@ -596,10 +610,40 @@ impl Component for ApiApp {
             }
             ApiAppMsg::ToggleEditing => {
                 self.editing = !self.editing;
-                // Entering Update is a state change out of the read-only canonical view:
-                // a canonical seed becomes a blank editable new instance.
+                // Entering Update is a state change out of the read-only canonical view.
                 if self.editing {
                     self.show_canonical = false;
+                    // Starting to edit a canonical SEED creates a fresh blank instance
+                    // ("sketchNN") so the seed is never touched — the user goes straight
+                    // to naming nodes/edges and can rename the system via the title.
+                    if let Some(sys) = &self.selected_system {
+                        if sys.canonical_class.is_none() {
+                            let name = self.next_sketch_name();
+                            let order = sys.order_cardinality;
+                            let n = order.max(0) as usize;
+                            let conn_count = n * n.saturating_sub(1) / 2;
+                            let terms = vec![String::new(); n];
+                            let connectives = vec![String::new(); conn_count];
+                            self.loading = true;
+                            let link = ctx.link().clone();
+                            let client = self.graphql_client.clone();
+                            spawn_local(async move {
+                                match client.author_system(&name, order, terms, connectives).await {
+                                    Ok(created) => {
+                                        if let Ok(system) = client.fetch_rendered_by_id(&created.id).await {
+                                            link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
+                                        }
+                                        if let Ok(instances) = client.fetch_instance_systems().await {
+                                            link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                                        }
+                                    }
+                                    Err(e) => link.send_message(ApiAppMsg::MonadExtracted(
+                                        format!("Create failed: {e}"),
+                                    )),
+                                }
+                            });
+                        }
+                    }
                 }
                 true
             }

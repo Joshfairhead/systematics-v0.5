@@ -184,19 +184,6 @@ impl Component for ApiGraphView {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>, _old: &Self::Properties) -> bool {
-        // Entering the blank create-flow (Canonical off + Update on) auto-opens the name
-        // box with a starter name ("sketch01") — the user names it first, no title click
-        // needed. (Auto-naming from the filled nodes is intent for a later round.)
-        let system = &ctx.props().system;
-        let blank = system.canonical_class.is_none() && !ctx.props().show_canonical;
-        if ctx.props().editing && blank && !self.renaming && self.draft.is_empty() {
-            self.renaming = true;
-            self.draft = "sketch01".to_string();
-        }
-        true
-    }
-
     fn view(&self, ctx: &Context<Self>) -> Html {
         let system = &ctx.props().system;
         let show_edge_labels = ctx.props().show_edge_labels;
