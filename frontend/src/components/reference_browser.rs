@@ -21,6 +21,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
+use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
@@ -298,6 +299,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let inspect = use_state(|| Option::<String>::None);
     // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
     let selected = use_state(HashSet::<String>::new);
+    // Transient notice (e.g. "select a system to export").
+    let notice = use_state(|| Option::<String>::None);
     // Editor: author a new System from custom values (the app-authored path).
     let editor_open = use_state(|| false);
     let ed_name = use_state(String::new);
@@ -438,13 +441,42 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             title="Create — author a system from custom terms/connectives"
         >{ if *editor_open { "Create ▴" } else { "Create ▾" } }</button>
     };
-    // Import (Load): a file-picker that reads a bespoke per-system JSON and Stores it.
-    // Lives beside Create in the control bar (the ELT bar is hidden in the prototype).
+    // Export (Store to file): download each checkbox-selected system as a bespoke JSON.
+    // If nothing is selected, show a notice (tick a system's box, same as delete).
+    let on_export = {
+        let selected = selected.clone();
+        let systems = props.instance_systems.clone();
+        let notice = notice.clone();
+        Callback::from(move |_: MouseEvent| {
+            let ids: Vec<String> = selected
+                .iter()
+                .filter_map(|a| a.strip_prefix("system:").map(|s| s.to_string()))
+                .collect();
+            if ids.is_empty() {
+                notice.set(Some("Select a system (tick its box) to export.".to_string()));
+                return;
+            }
+            notice.set(None);
+            for id in &ids {
+                if let Some(sys) = systems.iter().find(|s| &s.id == id) {
+                    download_system_json(sys);
+                }
+            }
+        })
+    };
+    // Store/Load controls beside Create (the ELT bar is hidden in the prototype):
+    //  · Load ↥ — import a system from a bespoke JSON file.
+    //  · Export ↧ — store the checkbox-selected system(s) to JSON files.
     let import_btn = html! {
-        <label class="elt-btn" title="Import — Load a system from a bespoke JSON file (store/load)">
-            { "Import ↥" }
-            <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
-        </label>
+        <>
+            <label class="elt-btn" title="Import — load a system from a bespoke JSON file (store/load)">
+                { "Import ↥" }
+                <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
+            </label>
+            <button class="elt-btn" onclick={ on_export } title="Export — store the selected system(s) to bespoke JSON files (tick a box first)">
+                { "Export ↧" }
+            </button>
+        </>
     };
     // Extract · Transform (the old ELT operation edge) — kept but hidden (show_elt=false).
     let elt_btns = html! {
@@ -489,6 +521,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
 
     html! {
         <div class="reference-browser">
+            if let Some(msg) = (*notice).clone() {
+                <div class="browser-notice">{ msg }</div>
+            }
             { table_view(TableCtx {
                 refs,
                 systems,
@@ -973,5 +1008,40 @@ fn citation_tags(r: &ReferenceView) -> Html {
             { artefact_tag.unwrap_or_default() }
             { locator_tag.unwrap_or_default() }
         </span>
+    }
+}
+
+/// Export (Store to file): serialize an instance system into a bespoke per-system JSON
+/// and trigger a browser download via a transient data-URL anchor. Terms/connectives
+/// come from the list system already in vocabulary order (the order authoring expects).
+fn download_system_json(sys: &InstanceSystem) {
+    let file = SystemFile {
+        name: sys.name.clone(),
+        order: sys.order_cardinality,
+        terms: sys.terms.iter().map(|t| t.value.clone()).collect(),
+        connectives: sys.connectives.iter().map(|c| c.value.clone()).collect(),
+    };
+    let json = serde_json::to_string_pretty(&file).unwrap_or_default();
+    let href = format!(
+        "data:application/json;charset=utf-8,{}",
+        String::from(js_sys::encode_uri_component(&json))
+    );
+    let slug: String = sys
+        .name
+        .trim()
+        .to_lowercase()
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c } else { '-' })
+        .collect();
+    let filename = format!("{}.json", if slug.is_empty() { "system".into() } else { slug });
+
+    if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
+        if let Ok(el) = doc.create_element("a") {
+            let _ = el.set_attribute("href", &href);
+            let _ = el.set_attribute("download", &filename);
+            if let Some(anchor) = el.dyn_ref::<web_sys::HtmlElement>() {
+                anchor.click();
+            }
+        }
     }
 }

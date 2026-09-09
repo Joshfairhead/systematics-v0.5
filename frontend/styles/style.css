@@ -460,6 +460,37 @@ body {
     font-weight: 600;
 }
 
+/* In Update mode the title is clickable to rename the system. */
+.graph-title.editable {
+    pointer-events: auto;
+    cursor: text;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    text-decoration-color: #4A90E2;
+}
+
+/* Transient notice in the browser (e.g. "select a system to export"). */
+.browser-notice {
+    margin: 0.4rem 0;
+    padding: 0.4rem 0.7rem;
+    background: #fff4e5;
+    border: 1px solid #f0c78a;
+    border-radius: 8px;
+    color: #8a5a00;
+    font-size: 0.85rem;
+}
+
+/* Transient notice above the list (e.g. "select a system to export"). */
+.browser-notice {
+    margin: 0.4rem 0.75rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+    background: rgba(226, 162, 74, 0.15);
+    border: 1px solid rgba(226, 162, 74, 0.5);
+    color: #8a5a12;
+    font-size: 0.82rem;
+}
+
 /* Export link styled as a toolbar button (it's an <a download>, not a <button>). */
 .export-btn {
     text-decoration: none;
@@ -505,7 +536,7 @@ body {
 /* Edge-labels toggle — overlay pinned inside the canvas, top-right */
 .edge-toggle-overlay {
     position: absolute;
-    top: 0.5rem;
+    top: 2.7rem;
     right: 0.75rem;
     z-index: 3;
     display: flex;
@@ -1151,7 +1182,7 @@ button.row-open:hover {
 }
 .canonical-toggle-overlay {
     position: absolute;
-    top: 2.7rem;
+    top: 0.5rem;
     right: 0.75rem;
     z-index: 3;
     display: flex;

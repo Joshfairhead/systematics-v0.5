@@ -11,6 +11,8 @@ use crate::api::client::ReferenceView;
 pub enum GraphEdit {
     Term { ordinality: i32, value: String },
     Connective { base: i32, target: i32, value: String },
+    /// Rename the system (re-author under the new name; the parent deletes the old).
+    Name { value: String },
 }
 
 /// Default colors for rendering
@@ -52,9 +54,11 @@ pub struct ApiGraphViewProps {
 pub enum ApiGraphMsg {
     NodeClicked(usize),
     EdgeClicked(usize, usize),
+    /// Start renaming the system (click the title in Update mode).
+    StartRename,
     /// The inline value editor's text changed.
     DraftChanged(String),
-    /// Commit the current draft as an edit to the selected node/edge.
+    /// Commit the current draft as an edit to the selected node/edge/name.
     CommitEdit,
     /// Abandon the current edit (clear the selection + draft).
     CancelEdit,
@@ -65,6 +69,8 @@ pub struct ApiGraphView {
     selected_edge: Option<(usize, usize)>,
     /// In-progress value for the inline editor (Update mode).
     draft: String,
+    /// True while editing the system's name (rather than a node/edge value).
+    renaming: bool,
 }
 
 impl Component for ApiGraphView {
@@ -76,6 +82,7 @@ impl Component for ApiGraphView {
             selected_node: None,
             selected_edge: None,
             draft: String::new(),
+            renaming: false,
         }
     }
 
@@ -84,6 +91,7 @@ impl Component for ApiGraphView {
         match msg {
             ApiGraphMsg::NodeClicked(idx) => {
                 // Toggle selection
+                self.renaming = false;
                 let selecting = self.selected_node != Some(idx);
                 if selecting {
                     self.selected_node = Some(idx);
@@ -98,6 +106,7 @@ impl Component for ApiGraphView {
                 true
             }
             ApiGraphMsg::EdgeClicked(from, to) => {
+                self.renaming = false;
                 let edge = if from < to { (from, to) } else { (to, from) };
                 if self.selected_edge == Some(edge) {
                     self.selected_edge = None;
@@ -120,13 +129,33 @@ impl Component for ApiGraphView {
                 }
                 true
             }
+            ApiGraphMsg::StartRename => {
+                // Click the title in Update mode → edit the system's name. In blank mode
+                // the draft starts empty (naming creates a fresh new instance).
+                self.renaming = true;
+                self.selected_node = None;
+                self.selected_edge = None;
+                let blank = system.canonical_class.is_none() && !ctx.props().show_canonical;
+                self.draft = if blank {
+                    String::new()
+                } else if system.system_name.is_empty() {
+                    system.name.clone()
+                } else {
+                    system.system_name.clone()
+                };
+                true
+            }
             ApiGraphMsg::DraftChanged(v) => {
                 self.draft = v;
                 true
             }
             ApiGraphMsg::CommitEdit => {
                 if let Some(cb) = ctx.props().on_edit_value.clone() {
-                    if let Some(idx) = self.selected_node {
+                    if self.renaming {
+                        if !self.draft.trim().is_empty() {
+                            cb.emit(GraphEdit::Name { value: self.draft.trim().to_string() });
+                        }
+                    } else if let Some(idx) = self.selected_node {
                         cb.emit(GraphEdit::Term {
                             ordinality: (idx + 1) as i32,
                             value: self.draft.clone(),
@@ -141,12 +170,14 @@ impl Component for ApiGraphView {
                 }
                 self.selected_node = None;
                 self.selected_edge = None;
+                self.renaming = false;
                 self.draft.clear();
                 true
             }
             ApiGraphMsg::CancelEdit => {
                 self.selected_node = None;
                 self.selected_edge = None;
+                self.renaming = false;
                 self.draft.clear();
                 true
             }
@@ -156,6 +187,30 @@ impl Component for ApiGraphView {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let system = &ctx.props().system;
         let show_edge_labels = ctx.props().show_edge_labels;
+
+        // Canonical systems (no canonical_class) default to the canonical view. Turning
+        // the Canonical switch OFF on one shows a **blank template** of that order for
+        // fresh input. The blank view is a preview only (editing is disabled) so it can
+        // never overwrite the canonical seed — author a new system via Create in the list.
+        let is_canonical = system.canonical_class.is_none();
+        let blank = is_canonical && !ctx.props().show_canonical;
+        // Editable when it's a custom/instance system, or a blank new-instance draft.
+        // A canonical seed shown canonically is READ-ONLY (no Update switch).
+        let editable = system.canonical_class.is_some() || blank;
+        let display_owned;
+        let display: &RenderedSystem = if blank {
+            let mut s = system.clone();
+            for t in &mut s.terms {
+                t.value.clear();
+            }
+            for c in &mut s.connectives {
+                c.character_value.clear();
+            }
+            display_owned = s;
+            &display_owned
+        } else {
+            system
+        };
 
         // The metadata elements (coherence + designations) are themselves
         // citable: hovering a header item shows its own reference, if any.
@@ -169,54 +224,74 @@ impl Component for ApiGraphView {
             .map(AttrValue::from);
 
         // Canvas title = the system's own name; fall back to the order label when a
-        // response didn't carry `systemName` (older/partial selections).
-        let title = if system.system_name.is_empty() {
+        // response didn't carry `systemName`. In blank mode it's a "New {Type}" prompt.
+        let title = if blank {
+            format!("New {}", system.name)
+        } else if system.system_name.is_empty() {
             system.name.clone()
         } else {
             system.system_name.clone()
         };
         // The edge-labels switch reads the system's connective designation
-        // (Acts / Interplays / Mutualities …), not a generic "Edge Labels".
-        let edge_label = if system.connective_designation.is_empty() {
-            "Edge Labels".to_string()
+        // (Acts / Interplays / Mutualities …). Beyond the octad (orders 9–12) the
+        // designation is still being researched, so fall back to a generic "Connectives".
+        let edge_label = if system.order_cardinality >= 9 || system.connective_designation.is_empty() {
+            "Connectives".to_string()
         } else {
             system.connective_designation.clone()
         };
 
-        // The inline on-graph value editor (Update mode). Shows when a node/edge is
-        // selected; otherwise a hint to pick one. Save re-authors the whole system.
-        let edit_panel = if ctx.props().editing {
-            let target = self
-                .selected_node
-                .map(|idx| format!("{} {}", system.term_designation, idx + 1))
-                .or_else(|| self.selected_edge.map(|(a, b)| format!("edge {}–{}", a + 1, b + 1)));
-            match target {
-                Some(label) => {
-                    let oninput = ctx.link().callback(|e: InputEvent| {
-                        ApiGraphMsg::DraftChanged(e.target_unchecked_into::<HtmlInputElement>().value())
-                    });
-                    let onsave = ctx.link().callback(|_| ApiGraphMsg::CommitEdit);
-                    let oncancel = ctx.link().callback(|_| ApiGraphMsg::CancelEdit);
-                    html! {
-                        <div class="graph-edit-panel">
-                            <span class="edit-panel-label">{ format!("Update {label}") }</span>
-                            <input
-                                class="edit-panel-input"
-                                value={ self.draft.clone() }
-                                oninput={ oninput }
-                            />
-                            <button class="edit-panel-save" onclick={ onsave }>{ "Save" }</button>
-                            <button class="edit-panel-cancel" onclick={ oncancel } title="Cancel">{ "✕" }</button>
-                        </div>
-                    }
+        // The shared inline input panel (draft + Save/Cancel) for a labelled edit.
+        let input_panel = |label: String, draft: String| -> Html {
+            let oninput = ctx.link().callback(|e: InputEvent| {
+                ApiGraphMsg::DraftChanged(e.target_unchecked_into::<HtmlInputElement>().value())
+            });
+            let onsave = ctx.link().callback(|_| ApiGraphMsg::CommitEdit);
+            let oncancel = ctx.link().callback(|_| ApiGraphMsg::CancelEdit);
+            html! {
+                <div class="graph-edit-panel">
+                    <span class="edit-panel-label">{ label }</span>
+                    <input class="edit-panel-input" value={ draft } oninput={ oninput } />
+                    <button class="edit-panel-save" onclick={ onsave }>{ "Save" }</button>
+                    <button class="edit-panel-cancel" onclick={ oncancel } title="Cancel">{ "✕" }</button>
+                </div>
+            }
+        };
+
+        // The on-graph editor (Update mode). A blank new-instance is named first (only
+        // rename is active until it exists); a custom system edits its name/nodes/edges.
+        // A canonical seed shown canonically is read-only (no panel).
+        let edit_panel = if blank {
+            if ctx.props().editing {
+                if self.renaming {
+                    input_panel("Name the new system".to_string(), self.draft.clone())
+                } else {
+                    html! { <div class="graph-edit-hint">{ "New system — click the title to name it, then click nodes/edges to fill it." }</div> }
                 }
+            } else {
+                html! { <div class="graph-edit-hint">{ "Blank template — turn on Update to author a new system." }</div> }
+            }
+        } else if editable && ctx.props().editing {
+            let target = if self.renaming {
+                Some("system name".to_string())
+            } else {
+                self.selected_node
+                    .map(|idx| format!("{} {}", system.term_designation, idx + 1))
+                    .or_else(|| self.selected_edge.map(|(a, b)| format!("edge {}–{}", a + 1, b + 1)))
+            };
+            match target {
+                Some(label) => input_panel(format!("Update {label}"), self.draft.clone()),
                 None => html! {
-                    <div class="graph-edit-hint">{ "Update mode — click a node or edge to edit it" }</div>
+                    <div class="graph-edit-hint">{ "Update mode — click the name, a node, or an edge to edit it" }</div>
                 },
             }
         } else {
             html! {}
         };
+
+        // In Update mode the title is clickable to rename the system. (The .editable
+        // class enables pointer events; otherwise the header ignores clicks.)
+        let title_click = ctx.link().callback(|_| ApiGraphMsg::StartRename);
 
         html! {
             <div class="graph-view">
@@ -226,7 +301,11 @@ impl Component for ApiGraphView {
                 // field names stay `terms`/`connectives`. Each metadata item is
                 // itself referenceable — hover shows its citation.
                 <header class="graph-header">
-                    <span class="graph-title">{ title }</span>
+                    <span
+                        class={ classes!("graph-title", ctx.props().editing.then_some("editable")) }
+                        onclick={ title_click }
+                        title={ if ctx.props().editing { "Click to rename" } else { "" } }
+                    >{ title }</span>
                     <span class="graph-subtitle">
                         { format!("{} · {}", system.name, system.k_notation()) }
                     </span>
@@ -263,38 +342,40 @@ impl Component for ApiGraphView {
                     </label>
                 }
 
-                // Canonical-override toggle — only when the system has a class
-                // (i.e. it's an instance). Flips node/edge labels to the class.
-                if system.canonical_class.is_some() {
-                    if let Some(on_toggle) = ctx.props().on_toggle_canonical.clone() {
-                        <label class="canonical-toggle-overlay">
-                            <span class="toggle-label">{ "Canonical" }</span>
+                // Canonical switch — the top switch, present for every system. For a
+                // canonical system it's ON by default (its own values); OFF shows a blank
+                // template. For an instance it flips node/edge labels to the class.
+                if let Some(on_toggle) = ctx.props().on_toggle_canonical.clone() {
+                    <label class="canonical-toggle-overlay">
+                        <span class="toggle-label">{ "Canonical" }</span>
+                        <div class="toggle-switch">
+                            <input
+                                type="checkbox"
+                                checked={ ctx.props().show_canonical }
+                                onclick={ Callback::from(move |_| on_toggle.emit(())) }
+                            />
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                }
+
+                // Update-mode toggle — under the Edge Labels switch. On-graph editing:
+                // flip it on, then click the name / a node / an edge. Shown only when the
+                // system is editable (a canonical seed shown canonically is read-only).
+                if editable {
+                    if let Some(on_toggle) = ctx.props().on_toggle_editing.clone() {
+                        <label class="update-toggle-overlay">
+                            <span class="toggle-label">{ "Update" }</span>
                             <div class="toggle-switch">
                                 <input
                                     type="checkbox"
-                                    checked={ ctx.props().show_canonical }
+                                    checked={ ctx.props().editing }
                                     onclick={ Callback::from(move |_| on_toggle.emit(())) }
                                 />
                                 <span class="slider"></span>
                             </div>
                         </label>
                     }
-                }
-
-                // Update-mode toggle — under the Canonical switch. On-graph editing:
-                // flip it on, then click a node/edge to overwrite its value.
-                if let Some(on_toggle) = ctx.props().on_toggle_editing.clone() {
-                    <label class="update-toggle-overlay">
-                        <span class="toggle-label">{ "Update" }</span>
-                        <div class="toggle-switch">
-                            <input
-                                type="checkbox"
-                                checked={ ctx.props().editing }
-                                onclick={ Callback::from(move |_| on_toggle.emit(())) }
-                            />
-                            <span class="slider"></span>
-                        </div>
-                    </label>
                 }
 
                 { edit_panel }
@@ -304,11 +385,11 @@ impl Component for ApiGraphView {
                     viewBox="0 0 800 800"
                     preserveAspectRatio="xMidYMid meet"
                 >
-                    { self.render_edges(ctx, system) }
+                    { self.render_edges(ctx, display) }
                     if show_edge_labels {
-                        { self.render_edge_labels(ctx, system) }
+                        { self.render_edge_labels(ctx, display) }
                     }
-                    { self.render_nodes(ctx, system) }
+                    { self.render_nodes(ctx, display) }
                 </svg>
             </div>
         }

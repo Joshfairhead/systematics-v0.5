@@ -1,5 +1,5 @@
 use crate::api::client::{
-    GraphQLClient, InstanceSystem, PositionedChar, ReferenceView, SequenceView, SystemFile,
+    GraphQLClient, InstanceSystem, PositionedChar, ReferenceView, SequenceView,
 };
 use crate::components::graph_view::{ApiGraphView, GraphEdit};
 use crate::components::reference_browser::{
@@ -439,6 +439,10 @@ impl Component for ApiApp {
             ApiAppMsg::SystemLoaded(system) => {
                 self.loading = false;
                 let system_id = system.system_id.clone();
+                // Default view is canonical: a canonical system (no canonical_class)
+                // loads with the Canonical switch ON; a custom/instance system shows
+                // its own values (switch off).
+                self.show_canonical = system.canonical_class.is_none();
                 // Sync the header highlight to the order_cardinality now on the canvas.
                 self.selected_key = key_for_order(system.order_cardinality);
                 self.selected_system = Some(*system);
@@ -697,6 +701,40 @@ impl Component for ApiApp {
                 let Some(system) = self.selected_system.as_ref() else {
                     return false;
                 };
+
+                // Blank mode (a canonical seed with Canonical switched off): the graph is a
+                // blank NEW instance. Only naming creates it — author a fresh system of
+                // that order with empty values (the seed is never touched). Value edits are
+                // ignored until it exists (then it's a normal editable custom system).
+                let is_blank = system.canonical_class.is_none() && !self.show_canonical;
+                if is_blank {
+                    if let GraphEdit::Name { value } = &edit {
+                        let name = value.clone();
+                        let order = system.order_cardinality;
+                        let n = order.max(0) as usize;
+                        let conn_count = n * n.saturating_sub(1) / 2;
+                        let terms = vec![String::new(); n];
+                        let connectives = vec![String::new(); conn_count];
+                        let link = ctx.link().clone();
+                        let client = self.graphql_client.clone();
+                        spawn_local(async move {
+                            match client.author_system(&name, order, terms, connectives).await {
+                                Ok(sys) => {
+                                    if let Ok(system) = client.fetch_rendered_by_id(&sys.id).await {
+                                        link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
+                                    }
+                                    if let Ok(instances) = client.fetch_instance_systems().await {
+                                        link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                                    }
+                                }
+                                Err(e) => link
+                                    .send_message(ApiAppMsg::MonadExtracted(format!("Create failed: {e}"))),
+                            }
+                        });
+                    }
+                    return false;
+                }
+
                 let mut terms: Vec<(i32, String)> = system
                     .terms
                     .iter()
@@ -709,6 +747,12 @@ impl Component for ApiApp {
                     .map(|c| (c.base_ordinality, c.target_ordinality, c.character_value.clone()))
                     .collect();
                 conns.sort_by_key(|(b, t, _)| (*b, *t));
+
+                let mut new_name = if system.system_name.is_empty() {
+                    system.name.clone()
+                } else {
+                    system.system_name.clone()
+                };
 
                 match &edit {
                     GraphEdit::Term { ordinality, value } => {
@@ -728,20 +772,42 @@ impl Component for ApiApp {
                             }
                         }
                     }
+                    GraphEdit::Name { value } => {
+                        new_name = value.clone();
+                    }
                 }
 
-                let name = if system.system_name.is_empty() {
-                    system.name.clone()
-                } else {
-                    system.system_name.clone()
-                };
-                let req = AuthorRequest {
-                    name,
-                    order_cardinality: system.order_cardinality,
-                    terms: terms.into_iter().map(|(_, v)| v).collect(),
-                    connectives: conns.into_iter().map(|(_, _, v)| v).collect(),
-                };
-                ctx.link().send_message(ApiAppMsg::AuthorSystem(req));
+                let order = system.order_cardinality;
+                let terms: Vec<String> = terms.into_iter().map(|(_, v)| v).collect();
+                let connectives: Vec<String> = conns.into_iter().map(|(_, _, v)| v).collect();
+
+                // A rename changes the id (derived from the name), so re-author under the
+                // new name and delete the old system. A value edit keeps the same id, so
+                // authoring overwrites in place (no old id to remove). Renaming a CANONICAL
+                // system forks a custom copy instead — the canonical is never deleted.
+                let old_id = system.system_id.clone();
+                let was_canonical = system.canonical_class.is_none();
+                let rename = matches!(edit, GraphEdit::Name { .. });
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    match client.author_system(&new_name, order, terms, connectives).await {
+                        Ok(sys) => {
+                            if rename && !was_canonical && sys.id != old_id {
+                                let _ = client.delete_system(&old_id).await;
+                            }
+                            if let Ok(system) = client.fetch_rendered_by_id(&sys.id).await {
+                                link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
+                            }
+                            if let Ok(instances) = client.fetch_instance_systems().await {
+                                link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                            }
+                        }
+                        Err(e) => {
+                            link.send_message(ApiAppMsg::MonadExtracted(format!("Update failed: {e}")))
+                        }
+                    }
+                });
                 false
             }
         }
@@ -918,7 +984,6 @@ impl Component for ApiApp {
                             } else if let Some(ref system) = self.selected_system {
                                 html! {
                                     <div class="graph-with-editor">
-                                        { export_anchor(system) }
                                         <ApiGraphView
                                             system={ system.clone() }
                                             on_navigate={ Some(on_navigate) }
@@ -942,50 +1007,6 @@ impl Component for ApiApp {
                 </div>
             </div>
         }
-    }
-}
-
-/// Export (Store to file): serialize the loaded system into a bespoke per-system JSON
-/// and offer it as a download. Terms are emitted in ordinality order; connectives in
-/// edge order (base, target). The download link is a self-contained data URL, so no
-/// object-URL lifecycle to manage.
-fn export_anchor(system: &RenderedSystem) -> Html {
-    let mut terms: Vec<_> = system.terms.iter().collect();
-    terms.sort_by_key(|t| t.ordinality);
-    let mut conns: Vec<_> = system.connectives.iter().collect();
-    conns.sort_by_key(|c| (c.base_ordinality, c.target_ordinality));
-
-    let name = if system.system_name.is_empty() {
-        system.name.clone()
-    } else {
-        system.system_name.clone()
-    };
-    let file = SystemFile {
-        name: name.clone(),
-        order: system.order_cardinality,
-        terms: terms.iter().map(|t| t.value.clone()).collect(),
-        connectives: conns.iter().map(|c| c.character_value.clone()).collect(),
-    };
-    let json = serde_json::to_string_pretty(&file).unwrap_or_default();
-    let href = format!(
-        "data:application/json;charset=utf-8,{}",
-        String::from(js_sys::encode_uri_component(&json))
-    );
-    let slug: String = name
-        .trim()
-        .to_lowercase()
-        .chars()
-        .map(|c| if c.is_alphanumeric() { c } else { '-' })
-        .collect();
-    let filename = format!("{}.json", if slug.is_empty() { "system".into() } else { slug });
-
-    html! {
-        <a
-            class="edit-toggle export-btn"
-            href={ href }
-            download={ filename }
-            title="Export — Store this system to a bespoke JSON file (store/load)"
-        >{ "Export ↧" }</a>
     }
 }
 

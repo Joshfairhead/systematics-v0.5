@@ -19,3 +19,4 @@ Thumbs.db
 # Runtime user store (canonical.json IS tracked; store.json is per-instance state)
 /data/store.json
 /backend/data/store.json
+/frontend/data/store.json
