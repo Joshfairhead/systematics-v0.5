@@ -1153,11 +1153,12 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &mut content, &mut have_char, "Viewing Editing", 2,
         &slugs(&["viewing", "editing"]), &edge_slugs("view_edit", 2),
     );
-    // The state model's tetrad: Create · Read · Update · Delete. Viewing = Read; Editing
-    // unfolds into Create/Update/Delete. A member of the Interface State Model sequence.
+    // The state model's tetrad (user order 1–4): Create · Delete · Update · Read.
+    // Viewing = Read; Editing unfolds into Create/Update/Delete. A member of the Interface
+    // State Model sequence.
     push_triadic_system(
         &mut content, &mut have_char, "CRUD", 4,
-        &slugs(&["create", "read", "update", "delete"]), &edge_slugs("crud", 4),
+        &slugs(&["create", "delete", "update", "read"]), &edge_slugs("crud", 4),
     );
 
     content

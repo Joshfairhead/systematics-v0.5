@@ -5111,14 +5111,14 @@
       "value": "Create"
     },
     {
-      "id": "char_word_update",
-      "kind": "word",
-      "value": "Update"
-    },
-    {
       "id": "char_word_delete",
       "kind": "word",
       "value": "Delete"
+    },
+    {
+      "id": "char_word_update",
+      "kind": "word",
+      "value": "Update"
     },
     {
       "id": "char_word_crud_edge_1",
@@ -6903,9 +6903,9 @@
       "order": 4,
       "terms": [
         "char_word_create",
-        "char_word_read",
+        "char_word_delete",
         "char_word_update",
-        "char_word_delete"
+        "char_word_read"
       ],
       "connectives": [
         "char_word_crud_edge_1",

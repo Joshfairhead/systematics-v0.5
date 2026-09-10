@@ -118,7 +118,7 @@ fn module_owned_systems_present() {
     // triads, and Blue Earth Strategy tetrad; and the Fitness/Exercise and Stretching/
     // Mobility dyads plus the Physical Fitness pentad. Then 74 → 76 (2026-09-09): the
     // Interface State Model monad and the Viewing/Editing dyad. Then 76 → 77 (2026-09-09):
-    // the CRUD tetrad (Create/Read/Update/Delete), the state model's tetrad articulation.
+    // the CRUD tetrad (Create/Delete/Update/Read, order 1–4), the state model's tetrad.
     assert_eq!(
         graph.systems.len(),
         93,

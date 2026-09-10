@@ -141,7 +141,7 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
                 if props.sel_count > 0 {
                     <button class="row-delete-btn" onclick={ delete_selected }
                         title="Delete the selected systems / monads / references">
-                        { "🗑 Delete" }
+                        { "Delete" }
                     </button>
                 }
             </div>
