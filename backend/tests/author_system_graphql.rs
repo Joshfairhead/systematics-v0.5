@@ -40,7 +40,7 @@ async fn author_triad_from_values() {
 }
 
 #[tokio::test]
-async fn compose_joins_selected_systems_into_a_kn() {
+async fn join_combines_selected_systems_into_a_kn() {
     // Composition (the assembly join): two monads → a dyad on the union of their distinct
     // terms, appended to the monad's sequence (its associations).
     let schema = make_schema();
@@ -55,16 +55,16 @@ async fn compose_joins_selected_systems_into_a_kn() {
     assert!(r.errors.is_empty(), "createSequence: {:?}", r.errors);
     let seq_id = r.data.into_json().unwrap()["createSequence"]["id"].as_str().unwrap().to_string();
 
-    let compose = format!(
-        r#"mutation {{ composeSystem(input:{{ name:"Essence Existence", members:["system:system_essence_1","system:system_existence_1"], sequenceRef:"{seq_id}" }}){{ id orderCardinality }} }}"#
+    let join = format!(
+        r#"mutation {{ joinSystems(input:{{ name:"Essence Existence", members:["system:system_essence_1","system:system_existence_1"], sequenceRef:"{seq_id}" }}){{ id orderCardinality }} }}"#
     );
-    let r = schema.execute(compose).await;
-    assert!(r.errors.is_empty(), "compose: {:?}", r.errors);
+    let r = schema.execute(join).await;
+    assert!(r.errors.is_empty(), "join: {:?}", r.errors);
     let d = r.data.into_json().unwrap();
-    assert_eq!(d["composeSystem"]["orderCardinality"], 2, "two distinct terms → a dyad");
-    let new_id = d["composeSystem"]["id"].as_str().unwrap().to_string();
+    assert_eq!(d["joinSystems"]["orderCardinality"], 2, "two distinct terms → a dyad");
+    let new_id = d["joinSystems"]["id"].as_str().unwrap().to_string();
 
-    // The composed dyad renders with the two distinct terms (order preserved).
+    // The joined dyad renders with the two distinct terms (order preserved).
     let r = schema
         .execute(format!(r#"{{ renderSystem(systemId:"{new_id}"){{ terms {{ value }} }} }}"#))
         .await;
@@ -87,7 +87,7 @@ async fn compose_joins_selected_systems_into_a_kn() {
                 .iter()
                 .any(|m| m.as_str() == Some(&format!("system:{new_id}")))
     });
-    assert!(appended, "composed system should be appended to the monad's sequence");
+    assert!(appended, "joined system should be appended to the monad's sequence");
 }
 
 #[tokio::test]

@@ -653,7 +653,7 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
 
     // --- The Controller composes the model, then resolves the view from it ---
     // Substrate-composed rather than hand-assembled: the "compose, don't load"
-    // convergence (JSON loading is a legacy device). `compose_system` is law-agnostic
+    // convergence (JSON loading is a legacy device). `join_systems` is law-agnostic
     // — it builds the complete model from the grammar-gated morphisms; the view is one
     // reading of it. Geometry (coordinates/colours/lines) is the render layer and stays
     // a direct read below.
@@ -751,7 +751,7 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
 }
 
 /// Build the `GraphContent` (characters + vocabulary + system) for a K_n from term and
-/// connective **values** — the shared build behind `authorSystem` and `composeSystem`.
+/// connective **values** — the shared build behind `authorSystem` and `joinSystems`.
 /// Char ids derive from the name slug (matching `with_auto_id`), so applying content for
 /// the same (slug, order) upserts onto the same ids (overwrite, not fork). Coherence and
 /// designations are fixed per order (canonical, from the single hexad model).
@@ -1075,7 +1075,7 @@ impl MutationRoot {
             )));
         }
 
-        // Build the K_n content (chars + vocab + system) — shared with composeSystem.
+        // Build the K_n content (chars + vocab + system) — shared with joinSystems.
         // Store = write with OVERWRITE semantics: char/vocab/system ids are deterministic
         // from (name slug, order), so re-authoring the same (slug, order) upserts onto the
         // same ids via `apply_content` (no fork). Version control deferred.
@@ -1088,14 +1088,14 @@ impl MutationRoot {
         Ok(GqlSystem::new(system))
     }
 
-    /// Compose (join) selected member systems into a K_k on the **union of their distinct
+    /// Join (addition) selected member systems into a K_k on the **union of their distinct
     /// term values** — the complete-graph completion (Kₘ + Kₙ = Kₘ₊ₙ). Connectives start
     /// blank (filled later via on-graph Update). Optionally appends the new system to a
     /// monad's sequence, so it shows up as an association of that monad.
-    async fn compose_system(
+    async fn join_systems(
         &self,
         ctx: &Context<'_>,
-        input: ComposeSystemInput,
+        input: JoinSystemsInput,
     ) -> async_graphql::Result<GqlSystem> {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
@@ -1120,7 +1120,7 @@ impl MutationRoot {
         let order = terms.len() as u8;
         if !(1..=12).contains(&order) {
             return Err(Error::new(format!(
-                "compose produced {order} distinct terms (need 1..=12)"
+                "join produced {order} distinct terms (need 1..=12)"
             )));
         }
         let expected_conn = Template::for_order(order).expected_connectives();
@@ -1128,7 +1128,7 @@ impl MutationRoot {
         let (content, system) = build_system_content(&input.name, order, &terms, &connectives);
         graph.apply_content(&content);
 
-        // Append the composed system to the monad's sequence (its associations), if given.
+        // Append the joined system to the monad's sequence (its associations), if given.
         if let Some(seq_id) = &input.sequence_ref {
             if let Some(seq) = graph.sequence(seq_id) {
                 let addr = format!("system:{}", system.id);
@@ -2072,11 +2072,11 @@ pub struct AuthorSystemInput {
     pub connective_designation: Option<String>,
 }
 
-/// Compose (join) selected member systems into a new K_k. `members` are `system:<id>`
+/// Join (addition) selected member systems into a new K_k. `members` are `system:<id>`
 /// addresses; the K_k is built on the **union of their distinct term values**. If
-/// `sequence_ref` is given, the composed system is appended to that monad's sequence.
+/// `sequence_ref` is given, the joined system is appended to that monad's sequence.
 #[derive(InputObject)]
-pub struct ComposeSystemInput {
+pub struct JoinSystemsInput {
     pub name: String,
     pub members: Vec<String>,
     #[graphql(default)]

@@ -207,9 +207,9 @@ struct AuthorSystemResponse {
 }
 
 #[derive(Deserialize, Debug)]
-struct ComposeSystemResponse {
-    #[serde(rename = "composeSystem")]
-    compose_system: Option<InstanceSystem>,
+struct JoinSystemsResponse {
+    #[serde(rename = "joinSystems")]
+    join_systems: Option<InstanceSystem>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -647,23 +647,23 @@ impl GraphQLClient {
             .ok_or_else(|| ApiError::ParseError("authorSystem returned no data".to_string()))
     }
 
-    /// Compose (join) selected member systems into a new K_k on the union of their
+    /// Join (addition) selected member systems into a new K_k on the union of their
     /// distinct terms. `sequence_ref` optionally appends it to a monad's sequence.
-    pub async fn compose_system(
+    pub async fn join_systems(
         &self,
         name: &str,
         members: Vec<String>,
         sequence_ref: Option<String>,
     ) -> Result<InstanceSystem, ApiError> {
         let query = r#"
-            mutation Compose($input: ComposeSystemInput!) {
-                composeSystem(input: $input) { id name orderCardinality }
+            mutation Join($input: JoinSystemsInput!) {
+                joinSystems(input: $input) { id name orderCardinality }
             }
         "#;
         let variables = serde_json::json!({
             "input": { "name": name, "members": members, "sequenceRef": sequence_ref }
         });
-        let response: GraphQLResponse<ComposeSystemResponse> =
+        let response: GraphQLResponse<JoinSystemsResponse> =
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
@@ -672,8 +672,8 @@ impl GraphQLClient {
         }
         response
             .data
-            .and_then(|d| d.compose_system)
-            .ok_or_else(|| ApiError::ParseError("composeSystem returned no data".to_string()))
+            .and_then(|d| d.join_systems)
+            .ok_or_else(|| ApiError::ParseError("joinSystems returned no data".to_string()))
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(
