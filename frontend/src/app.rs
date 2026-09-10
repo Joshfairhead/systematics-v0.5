@@ -3,7 +3,7 @@ use crate::api::client::{
 };
 use crate::components::graph_view::{ApiGraphView, GraphEdit};
 use crate::components::reference_browser::{
-    AuthorRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
+    AuthorRequest, ComposeRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
 };
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
@@ -129,6 +129,8 @@ pub enum ApiAppMsg {
     ToggleCanonical,
     /// Extract the current data-view selection into a Monad (Nullad → Monad).
     ExtractMonad(ExtractRequest),
+    /// Compose (join) the selected systems into a new K_k (the assembly operation).
+    ComposeSystems(ComposeRequest),
     /// Result feedback from the last Extract / author.
     MonadExtracted(String),
     /// Author a new System from custom values (the in-app editor).
@@ -616,6 +618,48 @@ impl Component for ApiApp {
                 });
                 true
             }
+            ApiAppMsg::ComposeSystems(req) => {
+                // Compose (join): assemble the selected systems into a new K_k. If we're
+                // inside a monad (bucket), append the composed system to that monad's
+                // sequence (its associations) — resolve the sequence id by matching the
+                // active members against the known sequences.
+                if req.members.len() < 2 {
+                    self.extract_note = Some("Select at least two systems to compose.".to_string());
+                    return true;
+                }
+                let sequence_ref = self.active_sequence.as_ref().and_then(|members| {
+                    self.sequences
+                        .iter()
+                        .find(|s| &s.members == members)
+                        .map(|s| s.id.clone())
+                });
+                self.extract_note = Some(format!("Composing {}…", req.name));
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    match client.compose_system(&req.name, req.members, sequence_ref).await {
+                        Ok(sys) => {
+                            link.send_message(ApiAppMsg::MonadExtracted(format!(
+                                "Composed “{}” → {} (order_cardinality {})",
+                                sys.name, sys.id, sys.order_cardinality
+                            )));
+                            // Load the composed system + refresh the registry lists.
+                            if let Ok(system) = client.fetch_rendered_by_id(&sys.id).await {
+                                link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
+                            }
+                            if let Ok(instances) = client.fetch_instance_systems().await {
+                                link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                            }
+                            if let Ok(seqs) = client.fetch_sequences().await {
+                                link.send_message(ApiAppMsg::SequencesLoaded(seqs));
+                            }
+                        }
+                        Err(e) => link
+                            .send_message(ApiAppMsg::MonadExtracted(format!("Compose failed: {e}"))),
+                    }
+                });
+                true
+            }
             ApiAppMsg::MonadExtracted(note) => {
                 self.extract_note = Some(note);
                 true
@@ -923,6 +967,7 @@ impl Component for ApiApp {
         let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
         let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
         let on_delete_rows = ctx.link().callback(ApiAppMsg::DeleteRows);
+        let on_compose = ctx.link().callback(ApiAppMsg::ComposeSystems);
         let on_edit_value = ctx.link().callback(ApiAppMsg::EditValue);
         // Canonical term/connective values per order_cardinality — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
@@ -1035,6 +1080,7 @@ impl Component for ApiApp {
                                 on_view_sequence={ on_view_sequence }
                                 on_delete_sequence={ on_delete_sequence }
                                 on_delete_rows={ on_delete_rows }
+                                on_compose={ on_compose }
                                 scope_ids={ self.scope_members.clone() }
                             />
                         } else if self.selected_key == "nullad" {

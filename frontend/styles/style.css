@@ -1138,6 +1138,21 @@ button.row-open:hover {
     background: rgba(214, 40, 118, 0.2);
 }
 
+/* Compose (join selected systems into a new K_n) — sits beside Delete on selection. */
+.row-compose-btn {
+    border: 1px solid rgba(74, 144, 226, 0.5);
+    background: rgba(74, 144, 226, 0.12);
+    color: #2f6fb3;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.row-compose-btn:hover {
+    background: rgba(74, 144, 226, 0.2);
+}
+
 .compare-matrix .compare-order {
     font-weight: 600;
     white-space: nowrap;

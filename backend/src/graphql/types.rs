@@ -750,6 +750,51 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
     })
 }
 
+/// Build the `GraphContent` (characters + vocabulary + system) for a K_n from term and
+/// connective **values** — the shared build behind `authorSystem` and `composeSystem`.
+/// Char ids derive from the name slug (matching `with_auto_id`), so applying content for
+/// the same (slug, order) upserts onto the same ids (overwrite, not fork). Coherence and
+/// designations are fixed per order (canonical, from the single hexad model).
+fn build_system_content(
+    name: &str,
+    order_cardinality: u8,
+    terms: &[String],
+    connectives: &[String],
+) -> (crate::core::content::GraphContent, System) {
+    let slug = name.to_lowercase().replace(' ', "_");
+    let mut characters = Vec::new();
+    let mut term_ids = Vec::new();
+    for (i, value) in terms.iter().enumerate() {
+        let id = format!("char_word_{slug}_t{}", i + 1);
+        characters.push(Character::new(id.clone(), "word", value.clone()));
+        term_ids.push(id);
+    }
+    let mut conn_ids = Vec::new();
+    for (j, value) in connectives.iter().enumerate() {
+        let id = format!("char_word_{slug}_c{}", j + 1);
+        characters.push(Character::new(id.clone(), "word", value.clone()));
+        conn_ids.push(id);
+    }
+    let vocab = Vocabulary::with_auto_id(name, order_cardinality, term_ids, conn_ids);
+    let vocab_id = vocab.id.clone();
+    let system = System::with_auto_id(
+        name,
+        order_cardinality,
+        crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
+        crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
+        crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
+        format!("grammar_{order_cardinality}"),
+        &vocab_id,
+    );
+    let content = crate::core::content::GraphContent {
+        characters,
+        vocabularies: vec![vocab],
+        systems: vec![system.clone()],
+        ..Default::default()
+    };
+    (content, system)
+}
+
 pub struct GqlRenderedSystem {
     inner: RenderedSystemData,
 }
@@ -1030,52 +1075,75 @@ impl MutationRoot {
             )));
         }
 
-        // Char ids are derived from the name slug (matching `with_auto_id`) so they stay
-        // unique and deterministic — the same (slug, order) re-authors onto the same ids.
-        let slug = input.name.to_lowercase().replace(' ', "_");
+        // Build the K_n content (chars + vocab + system) — shared with composeSystem.
+        // Store = write with OVERWRITE semantics: char/vocab/system ids are deterministic
+        // from (name slug, order), so re-authoring the same (slug, order) upserts onto the
+        // same ids via `apply_content` (no fork). Version control deferred.
+        let (content, system) =
+            build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        // Store = write, with **overwrite** semantics: authoring a name+order that
-        // already exists UPDATES it in place rather than erroring. The char / vocab /
-        // system ids are deterministic from (slug, order), so `apply_content` upserts
-        // every one by id (see Graph::apply_content). This is the CRUD Update path —
-        // an edit overwrites; it does not fork. (Version control is deferred.)
-
-        let mut characters = Vec::new();
-        let mut term_ids = Vec::new();
-        for (i, value) in input.terms.iter().enumerate() {
-            let id = format!("char_word_{slug}_t{}", i + 1);
-            characters.push(Character::new(id.clone(), "word", value.clone()));
-            term_ids.push(id);
-        }
-        let mut conn_ids = Vec::new();
-        for (j, value) in input.connectives.iter().enumerate() {
-            let id = format!("char_word_{slug}_c{}", j + 1);
-            characters.push(Character::new(id.clone(), "word", value.clone()));
-            conn_ids.push(id);
-        }
-        let vocab = Vocabulary::with_auto_id(&input.name, order_cardinality, term_ids, conn_ids);
-        let vocab_id = vocab.id.clone();
-        // Coherence + designations are FIXED per order (canonical, no customisation for
-        // now): source them from the single hexad model so authoring/editing never
-        // corrupts them (e.g. coherence showing "Custom", or a triad's edges reverting
-        // to the generic "Connectives"). The `input` overrides are intentionally ignored.
-        let system = System::with_auto_id(
-            &input.name,
-            order_cardinality,
-            crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
-            crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
-            crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
-            format!("grammar_{order_cardinality}"),
-            &vocab_id,
-        );
-        let content = crate::core::content::GraphContent {
-            characters,
-            vocabularies: vec![vocab],
-            systems: vec![system.clone()],
-            ..Default::default()
-        };
         graph.apply_content(&content);
+        persist(ctx, &graph);
+        Ok(GqlSystem::new(system))
+    }
+
+    /// Compose (join) selected member systems into a K_k on the **union of their distinct
+    /// term values** — the complete-graph completion (Kₘ + Kₙ = Kₘ₊ₙ). Connectives start
+    /// blank (filled later via on-graph Update). Optionally appends the new system to a
+    /// monad's sequence, so it shows up as an association of that monad.
+    async fn compose_system(
+        &self,
+        ctx: &Context<'_>,
+        input: ComposeSystemInput,
+    ) -> async_graphql::Result<GqlSystem> {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+
+        // Union of distinct term values across the selected member systems, in order.
+        let mut terms: Vec<String> = Vec::new();
+        let mut seen = std::collections::HashSet::new();
+        for addr in &input.members {
+            let id = addr.strip_prefix("system:").unwrap_or(addr);
+            if let Some(sys) = graph.system(id) {
+                if let Some(vocab) = graph.vocabulary(&sys.vocabulary_ref) {
+                    for cid in &vocab.terms {
+                        if let Some(c) = graph.character(cid) {
+                            if seen.insert(c.value.clone()) {
+                                terms.push(c.value.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let order = terms.len() as u8;
+        if !(1..=12).contains(&order) {
+            return Err(Error::new(format!(
+                "compose produced {order} distinct terms (need 1..=12)"
+            )));
+        }
+        let expected_conn = Template::for_order(order).expected_connectives();
+        let connectives = vec![String::new(); expected_conn];
+        let (content, system) = build_system_content(&input.name, order, &terms, &connectives);
+        graph.apply_content(&content);
+
+        // Append the composed system to the monad's sequence (its associations), if given.
+        if let Some(seq_id) = &input.sequence_ref {
+            if let Some(seq) = graph.sequence(seq_id) {
+                let addr = format!("system:{}", system.id);
+                if !seq.members.contains(&addr) {
+                    let mut members = seq.members.clone();
+                    members.push(addr);
+                    let updated = crate::core::sequences::Sequence::new(
+                        seq.id.clone(),
+                        seq.name.clone(),
+                        members,
+                    );
+                    graph.update_sequence(updated);
+                }
+            }
+        }
         persist(ctx, &graph);
         Ok(GqlSystem::new(system))
     }
@@ -2002,6 +2070,17 @@ pub struct AuthorSystemInput {
     pub coherence: Option<String>,
     pub term_designation: Option<String>,
     pub connective_designation: Option<String>,
+}
+
+/// Compose (join) selected member systems into a new K_k. `members` are `system:<id>`
+/// addresses; the K_k is built on the **union of their distinct term values**. If
+/// `sequence_ref` is given, the composed system is appended to that monad's sequence.
+#[derive(InputObject)]
+pub struct ComposeSystemInput {
+    pub name: String,
+    pub members: Vec<String>,
+    #[graphql(default)]
+    pub sequence_ref: Option<String>,
 }
 
 impl SystemInput {

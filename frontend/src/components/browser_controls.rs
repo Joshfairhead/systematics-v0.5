@@ -62,6 +62,12 @@ pub struct BrowserControlsProps {
     pub shown: usize,
     pub sel_count: usize,
     pub on_delete_selected: Callback<()>,
+    /// Number of selected *systems* (composable); Compose shows when ≥2.
+    #[prop_or_default]
+    pub compose_count: usize,
+    /// Compose (join) the selected systems into a new K_k.
+    #[prop_or_default]
+    pub on_compose_selected: Callback<()>,
 }
 
 #[function_component(BrowserControls)]
@@ -77,6 +83,7 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
     let toggle_sort = emit_unit(&props.on_toggle_sort);
     let toggle_filter = emit_unit(&props.on_toggle_filter);
     let delete_selected = emit_unit(&props.on_delete_selected);
+    let compose_selected = emit_unit(&props.on_compose_selected);
 
     html! {
         <>
@@ -138,6 +145,12 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
                     </div>
                 }
 
+                if props.compose_count >= 2 {
+                    <button class="row-compose-btn" onclick={ compose_selected }
+                        title="Compose — join the selected systems into a new K_n on their combined terms">
+                        { "Compose" }
+                    </button>
+                }
                 if props.sel_count > 0 {
                     <button class="row-delete-btn" onclick={ delete_selected }
                         title="Delete the selected systems / monads / references">

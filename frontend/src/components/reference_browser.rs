@@ -63,6 +63,9 @@ pub struct ReferenceBrowserProps {
     /// Delete selected rows by address (`system:` / `sequence:` / `reference:`).
     #[prop_or_default]
     pub on_delete_rows: Callback<Vec<String>>,
+    /// Compose (join) the selected systems into a new K_k (the assembly operation).
+    #[prop_or_default]
+    pub on_compose: Callback<ComposeRequest>,
     /// When a **bucket** monad is entered, scope the table to just these member
     /// addresses (`system:<id>`). `None` = no scope (the whole registry).
     #[prop_or_default]
@@ -111,6 +114,15 @@ pub struct AuthorRequest {
 /// plus the selected member addresses (`system:<id>`, …).
 #[derive(Clone, PartialEq)]
 pub struct ExtractRequest {
+    pub name: String,
+    pub members: Vec<String>,
+}
+
+/// A request to Compose (join) the selected systems into a new K_k on the union of
+/// their distinct terms. `name` is provisional (rename later); `members` are the
+/// selected `system:<id>` addresses.
+#[derive(Clone, PartialEq)]
+pub struct ComposeRequest {
     pub name: String,
     pub members: Vec<String>,
 }
@@ -533,6 +545,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 on_view_sequence: &props.on_view_sequence,
                 on_delete_sequence: &props.on_delete_sequence,
                 on_delete_rows: &props.on_delete_rows,
+                on_compose: &props.on_compose,
                 filter_order,
                 scope,
                 search: &search,
@@ -570,6 +583,8 @@ struct TableCtx<'a> {
     on_delete_sequence: &'a Callback<String>,
     /// Delete selected rows by address (row-select CRUD).
     on_delete_rows: &'a Callback<Vec<String>>,
+    /// Compose (join) the selected systems into a new K_k.
+    on_compose: &'a Callback<ComposeRequest>,
     /// OrderCardinality filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     /// Bucket scope — when a bucket monad is entered, show only its members.
@@ -606,6 +621,7 @@ fn table_view(ctx: TableCtx) -> Html {
         on_view_sequence,
         on_delete_sequence,
         on_delete_rows,
+        on_compose,
         filter_order,
         scope,
         search,
@@ -897,6 +913,33 @@ fn table_view(ctx: TableCtx) -> Html {
             selected.set(HashSet::new());
         })
     };
+    // Compose (join): assemble the selected systems into a new K_k. The provisional
+    // name joins the selected systems' names (rename later on the canvas).
+    let on_compose_selected = {
+        let selected = selected.clone();
+        let on_compose = on_compose.clone();
+        let systems = systems.to_vec();
+        Callback::from(move |_: ()| {
+            let members: Vec<String> = selected
+                .iter()
+                .filter(|a| a.starts_with("system:"))
+                .cloned()
+                .collect();
+            if members.len() < 2 {
+                return;
+            }
+            let name = members
+                .iter()
+                .filter_map(|a| a.strip_prefix("system:"))
+                .filter_map(|id| systems.iter().find(|s| s.id == id).map(|s| s.name.clone()))
+                .collect::<Vec<_>>()
+                .join(" ");
+            on_compose.emit(ComposeRequest { name, members });
+            selected.set(HashSet::new());
+        })
+    };
+    // Count only the composable (system) selections — Compose shows when ≥2.
+    let compose_count = selected.iter().filter(|a| a.starts_with("system:")).count();
     let sel_count = selected.len();
 
     html! {
@@ -925,6 +968,8 @@ fn table_view(ctx: TableCtx) -> Html {
                 shown={ rows.len() }
                 sel_count={ sel_count }
                 on_delete_selected={ on_delete_selected }
+                compose_count={ compose_count }
+                on_compose_selected={ on_compose_selected }
             />
 
             // Data-entry plane — folds down under the control bar when New is open.

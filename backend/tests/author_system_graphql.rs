@@ -40,6 +40,57 @@ async fn author_triad_from_values() {
 }
 
 #[tokio::test]
+async fn compose_joins_selected_systems_into_a_kn() {
+    // Composition (the assembly join): two monads → a dyad on the union of their distinct
+    // terms, appended to the monad's sequence (its associations).
+    let schema = make_schema();
+    for (n, t) in [("Essence", "Essence"), ("Existence", "Existence")] {
+        let m = format!(
+            r#"mutation {{ authorSystem(input:{{name:"{n}",orderCardinality:1,terms:["{t}"],connectives:[]}}){{id}} }}"#
+        );
+        assert!(schema.execute(m).await.errors.is_empty(), "author {n}");
+    }
+    let seq = r#"mutation { createSequence(input:{name:"Unity Assoc", members:["system:system_essence_1","system:system_existence_1"]}){ id } }"#;
+    let r = schema.execute(seq).await;
+    assert!(r.errors.is_empty(), "createSequence: {:?}", r.errors);
+    let seq_id = r.data.into_json().unwrap()["createSequence"]["id"].as_str().unwrap().to_string();
+
+    let compose = format!(
+        r#"mutation {{ composeSystem(input:{{ name:"Essence Existence", members:["system:system_essence_1","system:system_existence_1"], sequenceRef:"{seq_id}" }}){{ id orderCardinality }} }}"#
+    );
+    let r = schema.execute(compose).await;
+    assert!(r.errors.is_empty(), "compose: {:?}", r.errors);
+    let d = r.data.into_json().unwrap();
+    assert_eq!(d["composeSystem"]["orderCardinality"], 2, "two distinct terms → a dyad");
+    let new_id = d["composeSystem"]["id"].as_str().unwrap().to_string();
+
+    // The composed dyad renders with the two distinct terms (order preserved).
+    let r = schema
+        .execute(format!(r#"{{ renderSystem(systemId:"{new_id}"){{ terms {{ value }} }} }}"#))
+        .await;
+    let terms: Vec<String> = r.data.into_json().unwrap()["renderSystem"]["terms"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["value"].as_str().unwrap().to_string())
+        .collect();
+    assert_eq!(terms, vec!["Essence", "Existence"]);
+
+    // …and it's now an association (member) of the monad's sequence.
+    let r = schema.execute(r#"{ sequences { id members } }"#).await;
+    let seqs = r.data.into_json().unwrap();
+    let appended = seqs["sequences"].as_array().unwrap().iter().any(|s| {
+        s["id"] == serde_json::json!(seq_id)
+            && s["members"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|m| m.as_str() == Some(&format!("system:{new_id}")))
+    });
+    assert!(appended, "composed system should be appended to the monad's sequence");
+}
+
+#[tokio::test]
 async fn author_same_name_overwrites_in_place() {
     // Store = write with overwrite: re-authoring an existing name+order UPDATES it
     // (the CRUD Update path) rather than forking or erroring.
