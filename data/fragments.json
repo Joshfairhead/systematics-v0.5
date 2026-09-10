@@ -5149,6 +5149,256 @@
       "id": "char_word_crud_edge_6",
       "kind": "word",
       "value": "Crud Edge 6"
+    },
+    {
+      "id": "char_word_performance",
+      "kind": "word",
+      "value": "Performance"
+    },
+    {
+      "id": "char_word_processing",
+      "kind": "word",
+      "value": "Processing"
+    },
+    {
+      "id": "char_word_properties",
+      "kind": "word",
+      "value": "Properties"
+    },
+    {
+      "id": "char_word_structure",
+      "kind": "word",
+      "value": "Structure"
+    },
+    {
+      "id": "char_word_engineer",
+      "kind": "word",
+      "value": "Engineer"
+    },
+    {
+      "id": "char_word_matsci_edge_2",
+      "kind": "word",
+      "value": "Matsci Edge 2"
+    },
+    {
+      "id": "char_word_matsci_edge_3",
+      "kind": "word",
+      "value": "Matsci Edge 3"
+    },
+    {
+      "id": "char_word_matsci_edge_4",
+      "kind": "word",
+      "value": "Matsci Edge 4"
+    },
+    {
+      "id": "char_word_matsci_edge_5",
+      "kind": "word",
+      "value": "Matsci Edge 5"
+    },
+    {
+      "id": "char_word_scientist",
+      "kind": "word",
+      "value": "Scientist"
+    },
+    {
+      "id": "char_word_efficacy",
+      "kind": "word",
+      "value": "Efficacy"
+    },
+    {
+      "id": "char_word_attributes",
+      "kind": "word",
+      "value": "Attributes"
+    },
+    {
+      "id": "char_word_representations",
+      "kind": "word",
+      "value": "Representations"
+    },
+    {
+      "id": "char_word_methods",
+      "kind": "word",
+      "value": "Methods"
+    },
+    {
+      "id": "char_word_infsci_edge_1",
+      "kind": "word",
+      "value": "Infsci Edge 1"
+    },
+    {
+      "id": "char_word_infsci_edge_2",
+      "kind": "word",
+      "value": "Infsci Edge 2"
+    },
+    {
+      "id": "char_word_infsci_edge_3",
+      "kind": "word",
+      "value": "Infsci Edge 3"
+    },
+    {
+      "id": "char_word_infsci_edge_4",
+      "kind": "word",
+      "value": "Infsci Edge 4"
+    },
+    {
+      "id": "char_word_infsci_edge_5",
+      "kind": "word",
+      "value": "Infsci Edge 5"
+    },
+    {
+      "id": "char_word_infsci_edge_6",
+      "kind": "word",
+      "value": "Infsci Edge 6"
+    },
+    {
+      "id": "char_word_findable",
+      "kind": "word",
+      "value": "Findable"
+    },
+    {
+      "id": "char_word_accessible",
+      "kind": "word",
+      "value": "Accessible"
+    },
+    {
+      "id": "char_word_interoperable",
+      "kind": "word",
+      "value": "Interoperable"
+    },
+    {
+      "id": "char_word_reusable",
+      "kind": "word",
+      "value": "Reusable"
+    },
+    {
+      "id": "char_word_fair_edge_1",
+      "kind": "word",
+      "value": "Fair Edge 1"
+    },
+    {
+      "id": "char_word_fair_edge_2",
+      "kind": "word",
+      "value": "Fair Edge 2"
+    },
+    {
+      "id": "char_word_fair_edge_3",
+      "kind": "word",
+      "value": "Fair Edge 3"
+    },
+    {
+      "id": "char_word_fair_edge_4",
+      "kind": "word",
+      "value": "Fair Edge 4"
+    },
+    {
+      "id": "char_word_fair_edge_5",
+      "kind": "word",
+      "value": "Fair Edge 5"
+    },
+    {
+      "id": "char_word_fair_edge_6",
+      "kind": "word",
+      "value": "Fair Edge 6"
+    },
+    {
+      "id": "char_word_facilitating",
+      "kind": "word",
+      "value": "Facilitating"
+    },
+    {
+      "id": "char_word_coordinating",
+      "kind": "word",
+      "value": "Coordinating"
+    },
+    {
+      "id": "char_word_conv_edge_1",
+      "kind": "word",
+      "value": "Conv Edge 1"
+    },
+    {
+      "id": "char_word_conv_edge_2",
+      "kind": "word",
+      "value": "Conv Edge 2"
+    },
+    {
+      "id": "char_word_conv_edge_3",
+      "kind": "word",
+      "value": "Conv Edge 3"
+    },
+    {
+      "id": "char_word_delegators",
+      "kind": "word",
+      "value": "Delegators"
+    },
+    {
+      "id": "char_word_validators",
+      "kind": "word",
+      "value": "Validators"
+    },
+    {
+      "id": "char_word_stakeholders",
+      "kind": "word",
+      "value": "Stakeholders"
+    },
+    {
+      "id": "char_word_pos_edge_1",
+      "kind": "word",
+      "value": "Pos Edge 1"
+    },
+    {
+      "id": "char_word_pos_edge_2",
+      "kind": "word",
+      "value": "Pos Edge 2"
+    },
+    {
+      "id": "char_word_pos_edge_3",
+      "kind": "word",
+      "value": "Pos Edge 3"
+    },
+    {
+      "id": "char_word_standardisation",
+      "kind": "word",
+      "value": "Standardisation"
+    },
+    {
+      "id": "char_word_representation",
+      "kind": "word",
+      "value": "Representation"
+    },
+    {
+      "id": "char_word_interpretation",
+      "kind": "word",
+      "value": "Interpretation"
+    },
+    {
+      "id": "char_word_sem_edge_1",
+      "kind": "word",
+      "value": "Sem Edge 1"
+    },
+    {
+      "id": "char_word_sem_edge_2",
+      "kind": "word",
+      "value": "Sem Edge 2"
+    },
+    {
+      "id": "char_word_sem_edge_3",
+      "kind": "word",
+      "value": "Sem Edge 3"
+    },
+    {
+      "id": "char_word_assembly",
+      "kind": "word",
+      "value": "Assembly"
+    },
+    {
+      "id": "char_word_decomposition",
+      "kind": "word",
+      "value": "Decomposition"
+    },
+    {
+      "id": "char_word_asmdec_edge_1",
+      "kind": "word",
+      "value": "Asmdec Edge 1"
     }
   ],
   "coordinates": [],
@@ -6915,6 +7165,120 @@
         "char_word_crud_edge_5",
         "char_word_crud_edge_6"
       ]
+    },
+    {
+      "id": "vocab_material_science_4",
+      "name": "Material Science",
+      "order": 4,
+      "terms": [
+        "char_word_performance",
+        "char_word_processing",
+        "char_word_properties",
+        "char_word_structure"
+      ],
+      "connectives": [
+        "char_word_engineer",
+        "char_word_matsci_edge_2",
+        "char_word_matsci_edge_3",
+        "char_word_matsci_edge_4",
+        "char_word_matsci_edge_5",
+        "char_word_scientist"
+      ]
+    },
+    {
+      "id": "vocab_information_science_4",
+      "name": "Information Science",
+      "order": 4,
+      "terms": [
+        "char_word_efficacy",
+        "char_word_attributes",
+        "char_word_representations",
+        "char_word_methods"
+      ],
+      "connectives": [
+        "char_word_infsci_edge_1",
+        "char_word_infsci_edge_2",
+        "char_word_infsci_edge_3",
+        "char_word_infsci_edge_4",
+        "char_word_infsci_edge_5",
+        "char_word_infsci_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_fair_4",
+      "name": "FAIR",
+      "order": 4,
+      "terms": [
+        "char_word_findable",
+        "char_word_accessible",
+        "char_word_interoperable",
+        "char_word_reusable"
+      ],
+      "connectives": [
+        "char_word_fair_edge_1",
+        "char_word_fair_edge_2",
+        "char_word_fair_edge_3",
+        "char_word_fair_edge_4",
+        "char_word_fair_edge_5",
+        "char_word_fair_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_convening_3",
+      "name": "Convening",
+      "order": 3,
+      "terms": [
+        "char_word_hosting",
+        "char_word_facilitating",
+        "char_word_coordinating"
+      ],
+      "connectives": [
+        "char_word_conv_edge_1",
+        "char_word_conv_edge_2",
+        "char_word_conv_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_proof_of_stake_3",
+      "name": "Proof of Stake",
+      "order": 3,
+      "terms": [
+        "char_word_delegators",
+        "char_word_validators",
+        "char_word_stakeholders"
+      ],
+      "connectives": [
+        "char_word_pos_edge_1",
+        "char_word_pos_edge_2",
+        "char_word_pos_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_semiotics_3",
+      "name": "Semiotics",
+      "order": 3,
+      "terms": [
+        "char_word_standardisation",
+        "char_word_representation",
+        "char_word_interpretation"
+      ],
+      "connectives": [
+        "char_word_sem_edge_1",
+        "char_word_sem_edge_2",
+        "char_word_sem_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_assembly_decomposition_2",
+      "name": "Assembly Decomposition",
+      "order": 2,
+      "terms": [
+        "char_word_assembly",
+        "char_word_decomposition"
+      ],
+      "connectives": [
+        "char_word_asmdec_edge_1"
+      ]
     }
   ],
   "systems": [
@@ -7687,6 +8051,76 @@
       "connective_designation": "Interplays",
       "grammar_ref": "grammar_4",
       "vocabulary_ref": "vocab_crud_4"
+    },
+    {
+      "id": "system_material_science_4",
+      "name": "Material Science",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_material_science_4"
+    },
+    {
+      "id": "system_information_science_4",
+      "name": "Information Science",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_information_science_4"
+    },
+    {
+      "id": "system_fair_4",
+      "name": "FAIR",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_fair_4"
+    },
+    {
+      "id": "system_convening_3",
+      "name": "Convening",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_convening_3"
+    },
+    {
+      "id": "system_proof_of_stake_3",
+      "name": "Proof of Stake",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_proof_of_stake_3"
+    },
+    {
+      "id": "system_semiotics_3",
+      "name": "Semiotics",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_semiotics_3"
+    },
+    {
+      "id": "system_assembly_decomposition_2",
+      "name": "Assembly Decomposition",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_assembly_decomposition_2"
     }
   ],
   "perspectives": [],

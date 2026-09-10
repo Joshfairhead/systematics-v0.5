@@ -1161,6 +1161,51 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["create", "delete", "update", "read"]), &edge_slugs("crud", 4),
     );
 
+    // --- Library systems (user, 2026-09-10) ---
+    // Material Science tetrad (the materials tetrahedron): Performance · Processing ·
+    // Properties · Structure. The Engineer edge joins Performance–Processing (edge 1,2);
+    // the Scientist edge joins Properties–Structure (edge 3,4); the rest are placeholders.
+    push_triadic_system(
+        &mut content, &mut have_char, "Material Science", 4,
+        &slugs(&["performance", "processing", "properties", "structure"]),
+        &slugs(&["engineer", "matsci_edge_2", "matsci_edge_3", "matsci_edge_4", "matsci_edge_5", "scientist"]),
+    );
+    // Information Science tetrad: Efficacy · Attributes · Representations · Methods
+    // (workflows), characterised by evaluations.
+    push_triadic_system(
+        &mut content, &mut have_char, "Information Science", 4,
+        &slugs(&["efficacy", "attributes", "representations", "methods"]),
+        &edge_slugs("infsci", 4),
+    );
+    // FAIR data principles tetrad: Findable · Accessible · Interoperable · Reusable.
+    push_triadic_system(
+        &mut content, &mut have_char, "FAIR", 4,
+        &slugs(&["findable", "accessible", "interoperable", "reusable"]),
+        &edge_slugs("fair", 4),
+    );
+    // Convening triad: Hosting · Facilitating · Coordinating.
+    push_triadic_system(
+        &mut content, &mut have_char, "Convening", 3,
+        &slugs(&["hosting", "facilitating", "coordinating"]), &edge_slugs("conv", 3),
+    );
+    // Proof of Stake triad: Delegators(+) · Validators(−) · Stakeholders(=).
+    push_triadic_system(
+        &mut content, &mut have_char, "Proof of Stake", 3,
+        &slugs(&["delegators", "validators", "stakeholders"]), &edge_slugs("pos", 3),
+    );
+    // The Interface State Model's (tentative) triad: Standardisation(+) · Representation(−)
+    // · Interpretation(=). Named "Semiotics"; a member of the Interface State Model sequence.
+    push_triadic_system(
+        &mut content, &mut have_char, "Semiotics", 3,
+        &slugs(&["standardisation", "representation", "interpretation"]), &edge_slugs("sem", 3),
+    );
+    // Decomposition / Assembly dyad — the compose operation's poles (parallels Sort/Filter).
+    // Assembly(+) builds up; Decomposition(−) breaks down.
+    push_triadic_system(
+        &mut content, &mut have_char, "Assembly Decomposition", 2,
+        &slugs(&["assembly", "decomposition"]), &edge_slugs("asmdec", 2),
+    );
+
     content
 }
 

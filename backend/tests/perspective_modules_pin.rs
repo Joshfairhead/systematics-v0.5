@@ -104,7 +104,7 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 77 fragments + 3 module-owned = 93.
+    // Total systems = 12 canonical + 1 citation + 84 fragments + 3 module-owned = 100.
     // Fragments grew 39 → 55 (2026-09-01): the Elementary Systematics pentad, Potency,
     // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
     // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, the four Holochain-
@@ -119,10 +119,13 @@ fn module_owned_systems_present() {
     // Mobility dyads plus the Physical Fitness pentad. Then 74 → 76 (2026-09-09): the
     // Interface State Model monad and the Viewing/Editing dyad. Then 76 → 77 (2026-09-09):
     // the CRUD tetrad (Create/Delete/Update/Read, order 1–4), the state model's tetrad.
+    // Then 77 → 84 (2026-09-10): the Material Science, Information Science and FAIR tetrads,
+    // the Convening and Proof of Stake triads, the Semiotics triad (the Interface State
+    // Model's), and the Assembly/Decomposition dyad.
     assert_eq!(
         graph.systems.len(),
-        93,
-        "expected 12 canonical + 1 citation + 77 fragment + 3 module systems"
+        100,
+        "expected 12 canonical + 1 citation + 84 fragment + 3 module systems"
     );
 }
 
