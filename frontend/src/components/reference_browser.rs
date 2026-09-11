@@ -648,6 +648,22 @@ fn table_view(ctx: TableCtx) -> Html {
         .filter(|row| in_scope(row, scope))
         .filter(|row| passes_constraints(row, spo_constraints, triples))
         .collect();
+    // Pragmatic Nullad (compositional assembly): in the un-scoped registry, a system that
+    // is a **component of a monad** (a member of some sequence) is shown *inside* that
+    // monad, not as a loose top-level row. Monad heads (sequence rows) + systems not yet in
+    // any monad remain the entry points. (When scoped to a bucket, `in_scope` already
+    // limits rows to that monad's members, so this only applies at the Nullad level.)
+    if scope.is_none() {
+        let contained: HashSet<&str> = seqs
+            .iter()
+            .flat_map(|s| s.members.iter())
+            .filter_map(|m| m.strip_prefix("system:"))
+            .collect();
+        rows.retain(|r| match r {
+            Row::Sys(s) => !contained.contains(s.id.as_str()),
+            _ => true,
+        });
+    }
     // A reference is **metadata on its subject system**, not a peer row. If the
     // system it cites is already shown, fold the reference away (this is what made
     // a whole-system citation appear as a second, duplicate "system"). References
