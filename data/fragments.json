@@ -5399,6 +5399,106 @@
       "id": "char_word_asmdec_edge_1",
       "kind": "word",
       "value": "Asmdec Edge 1"
+    },
+    {
+      "id": "char_word_blue_earth_ventures",
+      "kind": "word",
+      "value": "Blue Earth Ventures"
+    },
+    {
+      "id": "char_word_world",
+      "kind": "word",
+      "value": "World"
+    },
+    {
+      "id": "char_word_businesses",
+      "kind": "word",
+      "value": "Businesses"
+    },
+    {
+      "id": "char_word_bevwb_edge_1",
+      "kind": "word",
+      "value": "Bevwb Edge 1"
+    },
+    {
+      "id": "char_word_find",
+      "kind": "word",
+      "value": "Find"
+    },
+    {
+      "id": "char_word_fund",
+      "kind": "word",
+      "value": "Fund"
+    },
+    {
+      "id": "char_word_support",
+      "kind": "word",
+      "value": "Support"
+    },
+    {
+      "id": "char_word_bevbk_edge_1",
+      "kind": "word",
+      "value": "Bevbk Edge 1"
+    },
+    {
+      "id": "char_word_bevbk_edge_2",
+      "kind": "word",
+      "value": "Bevbk Edge 2"
+    },
+    {
+      "id": "char_word_bevbk_edge_3",
+      "kind": "word",
+      "value": "Bevbk Edge 3"
+    },
+    {
+      "id": "char_word_founders",
+      "kind": "word",
+      "value": "Founders"
+    },
+    {
+      "id": "char_word_investors",
+      "kind": "word",
+      "value": "Investors"
+    },
+    {
+      "id": "char_word_corporate",
+      "kind": "word",
+      "value": "Corporate"
+    },
+    {
+      "id": "char_word_opportunities",
+      "kind": "word",
+      "value": "Opportunities"
+    },
+    {
+      "id": "char_word_bevve_edge_1",
+      "kind": "word",
+      "value": "Bevve Edge 1"
+    },
+    {
+      "id": "char_word_bevve_edge_2",
+      "kind": "word",
+      "value": "Bevve Edge 2"
+    },
+    {
+      "id": "char_word_bevve_edge_3",
+      "kind": "word",
+      "value": "Bevve Edge 3"
+    },
+    {
+      "id": "char_word_bevve_edge_4",
+      "kind": "word",
+      "value": "Bevve Edge 4"
+    },
+    {
+      "id": "char_word_bevve_edge_5",
+      "kind": "word",
+      "value": "Bevve Edge 5"
+    },
+    {
+      "id": "char_word_bevve_edge_6",
+      "kind": "word",
+      "value": "Bevve Edge 6"
     }
   ],
   "coordinates": [],
@@ -7279,6 +7379,61 @@
       "connectives": [
         "char_word_asmdec_edge_1"
       ]
+    },
+    {
+      "id": "vocab_blue_earth_ventures_1",
+      "name": "Blue Earth Ventures",
+      "order": 1,
+      "terms": [
+        "char_word_blue_earth_ventures"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_world_businesses_2",
+      "name": "World Businesses",
+      "order": 2,
+      "terms": [
+        "char_word_world",
+        "char_word_businesses"
+      ],
+      "connectives": [
+        "char_word_bevwb_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_backing_3",
+      "name": "Backing",
+      "order": 3,
+      "terms": [
+        "char_word_find",
+        "char_word_fund",
+        "char_word_support"
+      ],
+      "connectives": [
+        "char_word_bevbk_edge_1",
+        "char_word_bevbk_edge_2",
+        "char_word_bevbk_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_venture_ecosystem_4",
+      "name": "Venture Ecosystem",
+      "order": 4,
+      "terms": [
+        "char_word_founders",
+        "char_word_investors",
+        "char_word_corporate",
+        "char_word_opportunities"
+      ],
+      "connectives": [
+        "char_word_bevve_edge_1",
+        "char_word_bevve_edge_2",
+        "char_word_bevve_edge_3",
+        "char_word_bevve_edge_4",
+        "char_word_bevve_edge_5",
+        "char_word_bevve_edge_6"
+      ]
     }
   ],
   "systems": [
@@ -8121,6 +8276,46 @@
       "connective_designation": "Force",
       "grammar_ref": "grammar_2",
       "vocabulary_ref": "vocab_assembly_decomposition_2"
+    },
+    {
+      "id": "system_blue_earth_ventures_1",
+      "name": "Blue Earth Ventures",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_blue_earth_ventures_1"
+    },
+    {
+      "id": "system_world_businesses_2",
+      "name": "World Businesses",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_world_businesses_2"
+    },
+    {
+      "id": "system_backing_3",
+      "name": "Backing",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_backing_3"
+    },
+    {
+      "id": "system_venture_ecosystem_4",
+      "name": "Venture Ecosystem",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_venture_ecosystem_4"
     }
   ],
   "perspectives": [],

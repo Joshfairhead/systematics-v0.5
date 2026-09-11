@@ -1206,6 +1206,28 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &slugs(&["assembly", "decomposition"]), &edge_slugs("asmdec", 2),
     );
 
+    // --- Blue Earth Ventures (user, 2026-09-11): a monad heading a sequence
+    //     (data/perspectives/blue_earth_ventures.json). ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Blue Earth Ventures", 1,
+        &slugs(&["blue_earth_ventures"]), &edge_slugs("bev", 1),
+    );
+    // Dyad: World(+) · Businesses(−).
+    push_triadic_system(
+        &mut content, &mut have_char, "World Businesses", 2,
+        &slugs(&["world", "businesses"]), &edge_slugs("bevwb", 2),
+    );
+    // Triad: Find(+) · Fund(−) · Support(=).
+    push_triadic_system(
+        &mut content, &mut have_char, "Backing", 3,
+        &slugs(&["find", "fund", "support"]), &edge_slugs("bevbk", 3),
+    );
+    // Tetrad: Founders · Investors · Corporate · Opportunities.
+    push_triadic_system(
+        &mut content, &mut have_char, "Venture Ecosystem", 4,
+        &slugs(&["founders", "investors", "corporate", "opportunities"]), &edge_slugs("bevve", 4),
+    );
+
     content
 }
 

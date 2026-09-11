@@ -48,16 +48,16 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 18,
-        "expected 18 module files to load (14 sources + the Architecture Pentad \
-         + the Architectural Monad, Blue Earth, and Interface State Model registries); \
-         got {modules}"
+        modules, 19,
+        "expected 19 module files to load (14 sources + the Architecture Pentad \
+         + the Architectural Monad, Blue Earth, Interface State Model, and Blue Earth \
+         Ventures registries); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
         15,
-        "15 perspectives from 18 modules — the Architectural Monad, Blue Earth and \
-         Interface State Model modules carry only a Sequence, no perspective"
+        "15 perspectives from 19 modules — the Architectural Monad, Blue Earth, Interface \
+         State Model and Blue Earth Ventures modules carry only a Sequence, no perspective"
     );
 }
 
@@ -104,7 +104,7 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 84 fragments + 3 module-owned = 100.
+    // Total systems = 12 canonical + 1 citation + 88 fragments + 3 module-owned = 104.
     // Fragments grew 39 → 55 (2026-09-01): the Elementary Systematics pentad, Potency,
     // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
     // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, the four Holochain-
@@ -121,11 +121,13 @@ fn module_owned_systems_present() {
     // the CRUD tetrad (Create/Delete/Update/Read, order 1–4), the state model's tetrad.
     // Then 77 → 84 (2026-09-10): the Material Science, Information Science and FAIR tetrads,
     // the Convening and Proof of Stake triads, the Semiotics triad (the Interface State
-    // Model's), and the Assembly/Decomposition dyad.
+    // Model's), and the Assembly/Decomposition dyad. Then 84 → 88 (2026-09-11): the Blue
+    // Earth Ventures monad, its World/Businesses dyad, Backing triad, and Venture Ecosystem
+    // tetrad.
     assert_eq!(
         graph.systems.len(),
-        100,
-        "expected 12 canonical + 1 citation + 84 fragment + 3 module systems"
+        104,
+        "expected 12 canonical + 1 citation + 88 fragment + 3 module systems"
     );
 }
 

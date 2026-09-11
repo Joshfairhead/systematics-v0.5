@@ -1,0 +1,14 @@
+{
+  "sequences": [
+    {
+      "id": "sequence_blue_earth_ventures",
+      "name": "Blue Earth Ventures",
+      "members": [
+        "system:system_blue_earth_ventures_1",
+        "system:system_world_businesses_2",
+        "system:system_backing_3",
+        "system:system_venture_ecosystem_4"
+      ]
+    }
+  ]
+}

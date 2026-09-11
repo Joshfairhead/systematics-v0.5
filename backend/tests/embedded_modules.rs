@@ -24,8 +24,8 @@ fn embedded_modules_are_complete_without_a_filesystem() {
     }
 
     assert_eq!(
-        modules, 18,
-        "the deployed binary must serve all 18 modules from the embedded copy"
+        modules, 19,
+        "the deployed binary must serve all 19 modules from the embedded copy"
     );
     assert_eq!(
         graph.references.len(),
