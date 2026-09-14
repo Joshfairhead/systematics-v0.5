@@ -43,4 +43,3 @@
 - **Assembly surface.** Drag-and-drop composition/decomposition over a monad's components,
   with the edge-colouring from [compositional-model](compositional-model.md) making the
   construction legible.
-</content>

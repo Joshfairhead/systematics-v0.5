@@ -40,4 +40,3 @@ orders the counts diverge (a tetrad has 4 nodes but 6 edges = `n(n-1)/2`), so th
 node↔edge bijection is **special to the triad**; the general-order form of the duality (and
 whether it becomes a line-graph / dual-graph relation, or the `node_i ↔ e_(n+1−i)` reversal
 only holds on the triad) is to be pinned down in the rebuild.
-</content>

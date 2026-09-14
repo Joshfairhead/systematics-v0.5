@@ -73,4 +73,3 @@ A fully-articulated triad names its 3 nodes *and* its 3 edges, both following th
 
 (In the v0.5 prototype these were seeded with the node/edge distinction blurred; the rebuild
 should treat nodes and edges as separately-articulated 123 series.)
-</content>

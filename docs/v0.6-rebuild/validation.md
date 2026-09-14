@@ -52,4 +52,3 @@ and each connective to an edge (t1→v1 … tn→vn, c1→e1 … cm→em), and a
 designations for that order. The **six laws** are the associative orderings of the
 edge-serialisation over a triad (v1·e1·v2·e2·v3·e3 = 123 *order*; v1·e3·v3·e2·v2·e1 = 132
 *interaction*; etc.).
-</content>

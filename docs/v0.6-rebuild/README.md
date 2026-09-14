@@ -49,4 +49,3 @@ links for context.
 Registry of systems; two views (graph/list); store/load; CRUD with on-graph editing; the
 interface state model (Viewing/Editing → CRUD); join & decompose (proof-of-concept, flaky —
 see operations doc); the seeded library of systems as example content.
-</content>

@@ -76,4 +76,3 @@ Kept verbatim (including original phrasing/typos) so nothing is lost in paraphra
 > 123 for both nodes and edges:
 > Sponsors, participants, stakeholders as nodes, hosting, coordinating, facilitating as edges.
 > Startups, corporates, investors as nodes, supporting, finding, investing as edges.
-</content>
