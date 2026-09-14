@@ -68,6 +68,9 @@ pub struct BrowserControlsProps {
     /// Join (addition) the selected systems into a new K_k.
     #[prop_or_default]
     pub on_join_selected: Callback<()>,
+    /// Decompose the single selected system into its faces (shows when exactly 1 system).
+    #[prop_or_default]
+    pub on_decompose_selected: Callback<()>,
 }
 
 #[function_component(BrowserControls)]
@@ -84,6 +87,7 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
     let toggle_filter = emit_unit(&props.on_toggle_filter);
     let delete_selected = emit_unit(&props.on_delete_selected);
     let join_selected = emit_unit(&props.on_join_selected);
+    let decompose_selected = emit_unit(&props.on_decompose_selected);
 
     html! {
         <>
@@ -149,6 +153,12 @@ pub fn browser_controls(props: &BrowserControlsProps) -> Html {
                     <button class="row-join-btn" onclick={ join_selected }
                         title="Join (addition) — combine the selected systems into a new K_n on their combined terms">
                         { "Join" }
+                    </button>
+                }
+                if props.join_count == 1 {
+                    <button class="row-join-btn" onclick={ decompose_selected }
+                        title="Decompose — break the selected system into its faces (a tetrad → its 6 dyads + 4 triads)">
+                        { "Decompose" }
                     </button>
                 }
                 if props.sel_count > 0 {

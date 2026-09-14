@@ -66,6 +66,9 @@ pub struct ReferenceBrowserProps {
     /// Join (addition) the selected systems into a new K_k (the assembly operation).
     #[prop_or_default]
     pub on_join: Callback<JoinRequest>,
+    /// Decompose a single selected system into its faces (the inverse of Join).
+    #[prop_or_default]
+    pub on_decompose: Callback<DecomposeRequest>,
     /// When a **bucket** monad is entered, scope the table to just these member
     /// addresses (`system:<id>`). `None` = no scope (the whole registry).
     #[prop_or_default]
@@ -125,6 +128,12 @@ pub struct ExtractRequest {
 pub struct JoinRequest {
     pub name: String,
     pub members: Vec<String>,
+}
+
+/// A request to Decompose a single selected system into its faces (the inverse of Join).
+#[derive(Clone, PartialEq)]
+pub struct DecomposeRequest {
+    pub system_ref: String,
 }
 
 
@@ -546,6 +555,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 on_delete_sequence: &props.on_delete_sequence,
                 on_delete_rows: &props.on_delete_rows,
                 on_join: &props.on_join,
+                on_decompose: &props.on_decompose,
                 filter_order,
                 scope,
                 search: &search,
@@ -585,6 +595,7 @@ struct TableCtx<'a> {
     on_delete_rows: &'a Callback<Vec<String>>,
     /// Join (addition) the selected systems into a new K_k.
     on_join: &'a Callback<JoinRequest>,
+    on_decompose: &'a Callback<DecomposeRequest>,
     /// OrderCardinality filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     /// Bucket scope — when a bucket monad is entered, show only its members.
@@ -622,6 +633,7 @@ fn table_view(ctx: TableCtx) -> Html {
         on_delete_sequence,
         on_delete_rows,
         on_join,
+        on_decompose,
         filter_order,
         scope,
         search,
@@ -954,6 +966,18 @@ fn table_view(ctx: TableCtx) -> Html {
             selected.set(HashSet::new());
         })
     };
+    // Decompose (subtraction): break the single selected system into its faces.
+    let on_decompose_selected = {
+        let selected = selected.clone();
+        let on_decompose = on_decompose.clone();
+        Callback::from(move |_: ()| {
+            let mut sys = selected.iter().filter(|a| a.starts_with("system:"));
+            if let (Some(system_ref), None) = (sys.next().cloned(), sys.next()) {
+                on_decompose.emit(DecomposeRequest { system_ref });
+                selected.set(HashSet::new());
+            }
+        })
+    };
     // Count only the joinable (system) selections — Join shows when ≥2.
     let join_count = selected.iter().filter(|a| a.starts_with("system:")).count();
     let sel_count = selected.len();
@@ -986,6 +1010,7 @@ fn table_view(ctx: TableCtx) -> Html {
                 on_delete_selected={ on_delete_selected }
                 join_count={ join_count }
                 on_join_selected={ on_join_selected }
+                on_decompose_selected={ on_decompose_selected }
             />
 
             // Data-entry plane — folds down under the control bar when New is open.

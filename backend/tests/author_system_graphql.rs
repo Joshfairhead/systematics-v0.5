@@ -91,6 +91,25 @@ async fn join_combines_selected_systems_into_a_kn() {
 }
 
 #[tokio::test]
+async fn decompose_tetrad_into_dyads_and_triads() {
+    // Decomposition (the inverse of join): a tetrad → its 6 dyads (2-subsets) + 4 triads
+    // (3-subsets) — the complete-subgraph faces.
+    let schema = make_schema();
+    let m = r#"mutation { authorSystem(input:{name:"Quad",orderCardinality:4,terms:["A","B","C","D"],connectives:["e1","e2","e3","e4","e5","e6"]}){id} }"#;
+    assert!(schema.execute(m).await.errors.is_empty(), "author tetrad");
+
+    let d = schema
+        .execute(r#"mutation { decomposeSystem(input:{ systemRef:"system:system_quad_4" }){ id orderCardinality } }"#)
+        .await;
+    assert!(d.errors.is_empty(), "decompose: {:?}", d.errors);
+    let faces = d.data.into_json().unwrap()["decomposeSystem"].as_array().unwrap().clone();
+    assert_eq!(faces.len(), 10, "tetrad decomposes into 10 faces");
+    let dyads = faces.iter().filter(|f| f["orderCardinality"] == 2).count();
+    let triads = faces.iter().filter(|f| f["orderCardinality"] == 3).count();
+    assert_eq!((dyads, triads), (6, 4), "6 dyads + 4 triads");
+}
+
+#[tokio::test]
 async fn author_same_name_overwrites_in_place() {
     // Store = write with overwrite: re-authoring an existing name+order UPDATES it
     // (the CRUD Update path) rather than forking or erroring.

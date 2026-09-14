@@ -213,6 +213,12 @@ struct JoinSystemsResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct DecomposeSystemResponse {
+    #[serde(rename = "decomposeSystem")]
+    decompose_system: Option<Vec<InstanceSystem>>,
+}
+
+#[derive(Deserialize, Debug)]
 struct RenderSystemResponse {
     #[serde(rename = "renderSystem")]
     render_system: Option<RenderedSystem>,
@@ -674,6 +680,31 @@ impl GraphQLClient {
             .data
             .and_then(|d| d.join_systems)
             .ok_or_else(|| ApiError::ParseError("joinSystems returned no data".to_string()))
+    }
+
+    /// Decompose a system into its faces (Kₖ on each k-subset of its terms). Returns the
+    /// faces produced; `sequence_ref` appends them to a monad's sequence.
+    pub async fn decompose_system(
+        &self,
+        system_ref: &str,
+        sequence_ref: Option<String>,
+    ) -> Result<Vec<InstanceSystem>, ApiError> {
+        let query = r#"
+            mutation Decompose($input: DecomposeSystemInput!) {
+                decomposeSystem(input: $input) { id name orderCardinality }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "systemRef": system_ref, "sequenceRef": sequence_ref }
+        });
+        let response: GraphQLResponse<DecomposeSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.and_then(|d| d.decompose_system).unwrap_or_default())
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(

@@ -1148,6 +1148,84 @@ impl MutationRoot {
         Ok(GqlSystem::new(system))
     }
 
+    /// Decompose (subtraction) a system into its **faces** — every complete subgraph Kₖ on
+    /// a k-subset of its terms, for 2 ≤ k ≤ n−1 (a tetrad → its 6 dyads + 4 triads). The
+    /// inverse of `joinSystems`; connectives start blank (a first cut — inheriting the
+    /// parent's sub-edges is a refinement). Faces are appended to the monad's sequence if
+    /// `sequence_ref` is given. Limited to order ≤ 6 to bound the face count.
+    async fn decompose_system(
+        &self,
+        ctx: &Context<'_>,
+        input: DecomposeSystemInput,
+    ) -> async_graphql::Result<Vec<GqlSystem>> {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+
+        let id = input.system_ref.strip_prefix("system:").unwrap_or(&input.system_ref);
+        let term_values: Vec<String> = {
+            let sys = graph
+                .system(id)
+                .ok_or_else(|| Error::new(format!("System '{id}' not found")))?;
+            let vocab = graph
+                .vocabulary(&sys.vocabulary_ref)
+                .ok_or_else(|| Error::new("system has no vocabulary"))?;
+            vocab
+                .terms
+                .iter()
+                .filter_map(|c| graph.character(c).map(|c| c.value.clone()))
+                .collect()
+        };
+        let n = term_values.len();
+        if n < 3 {
+            return Err(Error::new("nothing to decompose (need order ≥ 3)"));
+        }
+        if n > 6 {
+            return Err(Error::new(format!("decompose is limited to order ≤ 6 (got {n})")));
+        }
+
+        // Every k-subset (2 ≤ k ≤ n−1) as a complete-subgraph face, via bitmask enumeration.
+        let mut created = Vec::new();
+        let mut contents = Vec::new();
+        for mask in 1u32..(1u32 << n) {
+            let k = mask.count_ones() as usize;
+            if k < 2 || k >= n {
+                continue;
+            }
+            let subset: Vec<String> = (0..n)
+                .filter(|i| mask & (1 << i) != 0)
+                .map(|i| term_values[i].clone())
+                .collect();
+            let name = subset.join(" ");
+            let expected_conn = Template::for_order(k as u8).expected_connectives();
+            let connectives = vec![String::new(); expected_conn];
+            let (content, system) = build_system_content(&name, k as u8, &subset, &connectives);
+            contents.push(content);
+            created.push(system);
+        }
+        for c in &contents {
+            graph.apply_content(c);
+        }
+        if let Some(seq_id) = &input.sequence_ref {
+            if let Some(seq) = graph.sequence(seq_id) {
+                let mut members = seq.members.clone();
+                for s in &created {
+                    let addr = format!("system:{}", s.id);
+                    if !members.contains(&addr) {
+                        members.push(addr);
+                    }
+                }
+                let updated = crate::core::sequences::Sequence::new(
+                    seq.id.clone(),
+                    seq.name.clone(),
+                    members,
+                );
+                graph.update_sequence(updated);
+            }
+        }
+        persist(ctx, &graph);
+        Ok(created.into_iter().map(GqlSystem::new).collect())
+    }
+
     async fn update_system(
         &self,
         ctx: &Context<'_>,
@@ -2079,6 +2157,16 @@ pub struct AuthorSystemInput {
 pub struct JoinSystemsInput {
     pub name: String,
     pub members: Vec<String>,
+    #[graphql(default)]
+    pub sequence_ref: Option<String>,
+}
+
+/// Decompose a system into its faces (every complete-subgraph Kₖ on a k-subset of its
+/// terms). `system_ref` is a `system:<id>` address; faces are appended to `sequence_ref`
+/// (the monad) if given.
+#[derive(InputObject)]
+pub struct DecomposeSystemInput {
+    pub system_ref: String,
     #[graphql(default)]
     pub sequence_ref: Option<String>,
 }

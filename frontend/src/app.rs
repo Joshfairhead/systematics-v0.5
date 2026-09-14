@@ -3,7 +3,8 @@ use crate::api::client::{
 };
 use crate::components::graph_view::{ApiGraphView, GraphEdit};
 use crate::components::reference_browser::{
-    AuthorRequest, JoinRequest, ExtractRequest, RawElement, ReferenceBrowser, SystemTemplate,
+    AuthorRequest, DecomposeRequest, ExtractRequest, JoinRequest, RawElement, ReferenceBrowser,
+    SystemTemplate,
 };
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
 use systematics_middleware::RenderedSystem;
@@ -131,6 +132,8 @@ pub enum ApiAppMsg {
     ExtractMonad(ExtractRequest),
     /// Join (addition) the selected systems into a new K_k (the assembly operation).
     JoinSystems(JoinRequest),
+    /// Decompose a system into its faces (the inverse of Join).
+    DecomposeSystem(DecomposeRequest),
     /// Result feedback from the last Extract / author.
     MonadExtracted(String),
     /// Author a new System from custom values (the in-app editor).
@@ -660,6 +663,38 @@ impl Component for ApiApp {
                 });
                 true
             }
+            ApiAppMsg::DecomposeSystem(req) => {
+                // Decompose (subtraction): break the system into its faces. If inside a
+                // monad (bucket), append the faces to that monad's sequence (its components).
+                let sequence_ref = self.active_sequence.as_ref().and_then(|members| {
+                    self.sequences
+                        .iter()
+                        .find(|s| &s.members == members)
+                        .map(|s| s.id.clone())
+                });
+                self.extract_note = Some("Decomposing…".to_string());
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    match client.decompose_system(&req.system_ref, sequence_ref).await {
+                        Ok(faces) => {
+                            link.send_message(ApiAppMsg::MonadExtracted(format!(
+                                "Decomposed into {} face(s).",
+                                faces.len()
+                            )));
+                            if let Ok(instances) = client.fetch_instance_systems().await {
+                                link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
+                            }
+                            if let Ok(seqs) = client.fetch_sequences().await {
+                                link.send_message(ApiAppMsg::SequencesLoaded(seqs));
+                            }
+                        }
+                        Err(e) => link
+                            .send_message(ApiAppMsg::MonadExtracted(format!("Decompose failed: {e}"))),
+                    }
+                });
+                true
+            }
             ApiAppMsg::MonadExtracted(note) => {
                 self.extract_note = Some(note);
                 true
@@ -968,6 +1003,7 @@ impl Component for ApiApp {
         let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
         let on_delete_rows = ctx.link().callback(ApiAppMsg::DeleteRows);
         let on_join = ctx.link().callback(ApiAppMsg::JoinSystems);
+        let on_decompose = ctx.link().callback(ApiAppMsg::DecomposeSystem);
         let on_edit_value = ctx.link().callback(ApiAppMsg::EditValue);
         // Canonical term/connective values per order_cardinality — the editor's prefill source.
         let templates: Vec<SystemTemplate> = self
@@ -1081,6 +1117,7 @@ impl Component for ApiApp {
                                 on_delete_sequence={ on_delete_sequence }
                                 on_delete_rows={ on_delete_rows }
                                 on_join={ on_join }
+                                on_decompose={ on_decompose }
                                 scope_ids={ self.scope_members.clone() }
                             />
                         } else if self.selected_key == "nullad" {
