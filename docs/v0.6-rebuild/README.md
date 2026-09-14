@@ -25,6 +25,9 @@ links for context.
   (Graph=System, Cardinality=Coherence, Order=TermDesignation, Size=ConnectiveDesignation,
   VertexOrdinality=TermPosition, EdgeSeriality=ConnectivePosition), saved as hexads, and how
   a topology instance is checked against a system instance.
+- **[node-edge-inversion.md](node-edge-inversion.md)** — the node↔edge duality: express a
+  triad as nodes then invert to edges (`node_i ↔ e_(n+1−i)`, "walking the path backwards");
+  why Composition · Associativity · Identity live on the edges; special to the triad.
 - **[operations-and-workflows.md](operations-and-workflows.md)** — the operations
   (conjunction/disjunction = the assembly join / decompose, as a *drag-and-drop* surface not
   a select-and-button POC; store/load; CRUD) and the creation/navigation workflows (define a

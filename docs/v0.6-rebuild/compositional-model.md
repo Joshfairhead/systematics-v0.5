@@ -10,9 +10,10 @@ composing small pure functions. Two primitives suffice to build every complete g
 2. **link vertex to all others** — given a new vertex and an existing set of vertices, add an
    edge from the new vertex to each existing one.
 
-*(Open question the user raised: is "a set of vertices" valid in category theory — do sets
-exist there? To resolve in the rebuild. The pragmatic reading is a finite ordered collection;
-the categorical framing may be an object + its morphisms.)*
+**Categorical framing (user, 2026-09-11):** linking a node to several nodes *is* a valid
+operation — an **epi- or endo-morphism, or a functor**. So "link node to a set of nodes" is a
+morphism (the earlier worry about whether "sets" exist in CT is resolved: the operation is the
+morphism, not the set). See also [node-edge-inversion](node-edge-inversion.md).
 
 ## Sequential generation (the generative principle)
 Generate nodes sequentially, and link them sequentially — 2 links to 1 first; then 3 links to

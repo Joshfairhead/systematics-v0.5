@@ -20,8 +20,10 @@ These pairs are asserted equivalent (topology term ↔ system term):
 
 Reading: **coherence ↔ cardinality**; **term/connective designations ↔ order/size**; term and
 connective *designations* relate to the coherence attribute, while *order and size* relate to
-cardinality. (Category-theory triad for the operations themselves: Composition(+) ·
-Associativity(−) · Identity(=) — layout to be corrected in the CT triad.)
+cardinality. The category-theory triad for the operations themselves —
+**Composition(+) · Associativity(−) · Identity(=)** — is correct, but its terms are **probably
+edges** (connectives), not nodes; see [node-edge-inversion](node-edge-inversion.md) for the
+node↔edge duality that places them there.
 
 ## Topology instance validation (worked: K4)
 ```
