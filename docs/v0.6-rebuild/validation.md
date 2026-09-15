@@ -47,6 +47,16 @@ correct, but its terms are **probably edges** (connectives), not nodes; see
 > `systematicsHexad(cardinality)`, `equivalenceHexad(cardinality)` (topology + system + pairs +
 > mismatches), and `validateSystemEquivalence(id)` for a stored instance.
 
+> **The hexads want to *be* K6s (homoiconic end-state).** Each hexad is itself a **K6** whose six
+> facet-names are its **terms** (nodes), acting as **field keys** — topology: {cardinality,
+> eigenvalue, order, size, vertex ordinality, edge ordinality}; systematics: {system, coherence,
+> term designation, connective designation, term cardinality, connective cardinality}. A concrete
+> system fills those keys with **values** for its cardinality (key↔value, per the reference-tuple
+> store). Today they are Rust structs; the rebuild should hold them **in-graph** — the schema
+> represented in the same graph it describes (a *self-seeding hexadic monad*: terms = its own
+> field-names). Representing graphs-as-self-describing-data is, in effect, "writing a new
+> language" — which is exactly the homoiconic goal.
+
 ## Topology instance validation (worked: K4)
 ```
 Cardinality       = (4,6)          (order, size) — identifies K4 = Tetrad

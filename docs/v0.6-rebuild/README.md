@@ -22,9 +22,13 @@ links for context.
   construction of complete graphs: create-vertex + link-to-all, the handshaking-lemma
   generative sequence, path-vs-circuit choices, sequential edge structure + colouring.
 - **[validation.md](validation.md)** — the archetype ↔ instance validation: the equivalences
-  (Graph=System, Cardinality=Coherence, Order=TermDesignation, Size=ConnectiveDesignation,
-  VertexOrdinality=TermPosition, EdgeSeriality=ConnectivePosition), saved as hexads, and how
-  a topology instance is checked against a system instance.
+  (Cardinality=System, Eigenvalue=Coherence, Order=TermDesignation, Size=ConnectiveDesignation,
+  VertexOrdinality=TermOrdinality, EdgeOrdinality=ConnectiveOrdinality), the two faces as
+  book-matched hexads, and how a topology instance is checked against a system instance.
+- **[comparing-systems.md](comparing-systems.md)** — relating two systems: structural/spectral
+  (Laplacian=within/coherence, adjacency=between/products; distinguishes orders, blind within an
+  order) vs semantic/functorial (same-order, different content); cross-order = containment
+  (`K4 ⊃ 4·K3`). A breadcrumb for parked products/functor work.
 - **[node-edge-inversion.md](node-edge-inversion.md)** — the node↔edge duality: express a
   triad as nodes then invert to edges (`node_i ↔ e_(n+1−i)`, "walking the path backwards");
   why Composition · Associativity · Identity live on the edges; special to the triad.
