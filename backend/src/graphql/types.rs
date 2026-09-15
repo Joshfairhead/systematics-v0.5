@@ -369,6 +369,46 @@ impl QueryRoot {
         crate::core::hexadicsystems::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
     }
 
+    /// The **archetype equivalence** for a cardinality — the six paired dimensions that
+    /// assert a topology facet equivalent to a vocabulary/system facet (Graph↔System,
+    /// Cardinality↔Coherence, Order↔TermDesignation, Size↔ConnectiveDesignation,
+    /// VertexOrdinality↔TermPosition, EdgeSeriality↔ConnectivePosition). The mapping,
+    /// made first-class. See `docs/v0.6-rebuild/validation.md`.
+    async fn archetype_equivalence(&self, cardinality: i32) -> Vec<GqlEquivalencePair> {
+        crate::core::equivalence::equivalence(cardinality.clamp(0, 255) as u8)
+            .into_iter()
+            .map(GqlEquivalencePair::from)
+            .collect()
+    }
+
+    /// Validate a stored system **instance** against its archetype equivalence: the
+    /// vocabulary face (coherence + designations) must match the canonical value for the
+    /// system's order, and the term/connective counts must serialise the vertex ordinalities
+    /// (`1..n`) / edge serialities (`1..C(n,2)`) — terms anchoring to vertices, connectives
+    /// to edges. Empty vec = the instance conforms; otherwise the mismatches.
+    async fn validate_system_equivalence(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
+        let g = graph_snapshot(ctx).await;
+        let Some(sys) = g.system(&id) else {
+            return vec![format!("no system '{id}'")];
+        };
+        let (n_terms, n_conns) = g
+            .vocabulary(&sys.vocabulary_ref)
+            .map(|v| (v.terms.len(), v.connectives.len()))
+            .unwrap_or((0, 0));
+        let term_positions: Vec<i32> = (1..=n_terms as i32).collect();
+        let connective_positions: Vec<i32> = (1..=n_conns as i32).collect();
+        crate::core::equivalence::validate_instance(
+            sys.order_cardinality,
+            &sys.coherence,
+            &sys.term_designation,
+            &sys.connective_designation,
+            &term_positions,
+            &connective_positions,
+        )
+        .err()
+        .unwrap_or_default()
+    }
+
     /// **Compose a system PURELY from the substrate** — the prototype. Ingest the graph's
     /// characters + each system's structure into a content-addressed store, then compose
     /// the requested system from the store *alone* (no graph at compose time): its
@@ -2550,6 +2590,29 @@ impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad
             connective_designation: h.connective_designation,
             term_cardinality: h.term_cardinality as i32,
             connective_cardinality: h.connective_cardinality as i32,
+        }
+    }
+}
+
+/// One paired dimension of the **archetype equivalence** — a topology facet asserted
+/// equivalent to a vocabulary/system facet at a given cardinality (Graph↔System,
+/// Cardinality↔Coherence, Order↔TermDesignation, Size↔ConnectiveDesignation,
+/// VertexOrdinality↔TermPosition, EdgeSeriality↔ConnectivePosition).
+#[derive(SimpleObject)]
+pub struct GqlEquivalencePair {
+    pub topology: String,
+    pub system: String,
+    pub topology_value: String,
+    pub system_value: String,
+}
+
+impl From<crate::core::equivalence::EquivalencePair> for GqlEquivalencePair {
+    fn from(p: crate::core::equivalence::EquivalencePair) -> Self {
+        Self {
+            topology: p.topology.to_string(),
+            system: p.system.to_string(),
+            topology_value: p.topology_value,
+            system_value: p.system_value,
         }
     }
 }
