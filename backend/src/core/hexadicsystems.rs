@@ -80,37 +80,55 @@ pub fn systematics_hexad(cardinality: u8) -> SystematicsHexad {
 
 /// The **topology hexad** — a system's six *structural* facets, the geometric peer of
 /// [`SystematicsHexad`]. Book-matched field-for-field (see `core::equivalence`):
-/// `graph ↔ name`, `cardinality ↔ coherence`, `order ↔ term_designation`,
-/// `size ↔ connective_designation`, `vertex_ordinality ↔ term positions`,
-/// `edge_seriality ↔ connective positions`. Both hexads are derived from the one
+/// `cardinality ↔ name` (a K_n *is* its cardinality — "K4" is just notation for `(4,6)`),
+/// `eigenvalue ↔ coherence` *(proposed)*, `order ↔ term_designation`,
+/// `size ↔ connective_designation`, `vertex_ordinality ↔ term ordinality`,
+/// `edge_ordinality ↔ connective ordinality`. Both hexads are derived from the one
 /// cardinality, so `order == term_cardinality` and `size == connective_cardinality`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TopologyHexad {
-    /// The complete graph `K_n`, e.g. "K3".
-    pub graph: String,
-    /// The `(order, size)` pair as text, e.g. "(3,3)".
+    /// The `(order, size)` pair that identifies the complete graph, e.g. "(4,6)". Replaces the
+    /// "K_n" label (K4 *is* cardinality `(4,6)`). Book-matches `System` (the name).
     pub cardinality: String,
-    /// Order `n` — the vertex cardinality `|V|`.
+    /// The graph's **eigenvalue** — the Laplacian spectrum of `K_n`: `0` (×1, the null space =
+    /// the monad/unity) and `n` (×`n-1`, the algebraic connectivity). The spectral *quality* of
+    /// the graph; **proposed** to book-match `Coherence` (the spectrum is settled, the
+    /// correspondence is not).
+    pub eigenvalue: String,
+    /// Order `n` — the vertex cardinality `|V|`. Book-matches the term designation.
     pub order: u8,
-    /// Size `C(n,2)` — the edge cardinality `|E|`.
+    /// Size `C(n,2)` — the edge cardinality `|E|`. Book-matches the connective designation.
     pub size: u8,
-    /// Vertex ordinalities `1..=n`.
+    /// Vertex ordinalities `1..=n` — placements of the vertices. Book-matches term ordinality.
     pub vertex_ordinality: Vec<u8>,
-    /// Edge serialities `1..=size`.
-    pub edge_seriality: Vec<u8>,
+    /// Edge ordinalities `1..=size` — placements of the edges. Book-matches connective ordinality.
+    /// (Not "seriality": *seriality* is the six-laws *arrangement* of ordinalities — 123, 132, … —
+    /// a Controller-level concept, not a per-edge facet.)
+    pub edge_ordinality: Vec<u8>,
+}
+
+/// The graph **eigenvalue** facet — the Laplacian spectrum of `K_n`: `0` (×1, the null space =
+/// the monad/unity) and `n` (×`n-1`, the algebraic connectivity). Settled math; its
+/// correspondence to *coherence* is **proposed** (see `core::equivalence`).
+fn laplacian_spectrum(n: u8) -> String {
+    match n {
+        0 => "—".to_string(),
+        1 => "0".to_string(),
+        _ => format!("0 (×1), {n} (×{})", n - 1),
+    }
 }
 
 /// The canonical topology hexad for a cardinality (order `n`): the K_n structural facets,
-/// all derived from the one number — e.g. `3 → {K3, (3,3), 3, 3, [1,2,3], [1,2,3]}`.
+/// all derived from the one number — e.g. `3 → {(3,3), [0,3,3], 3, 3, [1,2,3], [1,2,3]}`.
 pub fn topology_hexad(cardinality: u8) -> TopologyHexad {
     let size = edge_cardinality(cardinality);
     TopologyHexad {
-        graph: format!("K{cardinality}"),
         cardinality: format!("({cardinality},{size})"),
+        eigenvalue: laplacian_spectrum(cardinality),
         order: cardinality,
         size,
         vertex_ordinality: (1..=cardinality).collect(),
-        edge_seriality: (1..=size).collect(),
+        edge_ordinality: (1..=size).collect(),
     }
 }
 

@@ -17,7 +17,7 @@ async fn equivalence_hexad_book_matches_the_two_hexads() {
     let schema = make_schema();
     let q = r#"{
         equivalenceHexad(cardinality: 3) {
-            topology { graph cardinality order size vertexOrdinality edgeSeriality }
+            topology { cardinality eigenvalue order size vertexOrdinality edgeOrdinality }
             system { name coherence termDesignation connectiveDesignation }
             pairs { topology system topologyValue systemValue }
             mismatches
@@ -29,8 +29,8 @@ async fn equivalence_hexad_book_matches_the_two_hexads() {
     let h = &d["equivalenceHexad"];
 
     // Topology face.
-    assert_eq!(h["topology"]["graph"], "K3");
     assert_eq!(h["topology"]["cardinality"], "(3,3)");
+    assert_eq!(h["topology"]["eigenvalue"], "0 (×1), 3 (×2)");
     assert_eq!(h["topology"]["order"], 3);
     assert_eq!(h["topology"]["size"], 3);
     assert_eq!(h["topology"]["vertexOrdinality"], serde_json::json!([1, 2, 3]));
@@ -51,18 +51,20 @@ async fn equivalence_hexad_book_matches_the_two_hexads() {
             .unwrap_or_else(|| panic!("missing dimension {topology}"))
             .clone()
     };
-    let graph = find("Graph");
-    assert_eq!(graph["system"], "System");
-    assert_eq!(graph["topologyValue"], "K3");
-    assert_eq!(graph["systemValue"], "Triad");
-
+    // Cardinality (3,3) ↔ System (Triad).
     let card = find("Cardinality");
-    assert_eq!(card["system"], "Coherence");
+    assert_eq!(card["system"], "System");
     assert_eq!(card["topologyValue"], "(3,3)");
-    assert_eq!(card["systemValue"], "Dynamism");
+    assert_eq!(card["systemValue"], "Triad");
+
+    // Eigenvalue ↔ Coherence (Dynamism).
+    let ev = find("Eigenvalue");
+    assert_eq!(ev["system"], "Coherence");
+    assert_eq!(ev["systemValue"], "Dynamism");
 
     assert_eq!(find("Order")["systemValue"], "Impulses");
     assert_eq!(find("Size")["systemValue"], "Acts");
+    assert_eq!(find("VertexOrdinality")["system"], "TermOrdinality");
     assert_eq!(find("VertexOrdinality")["systemValue"], "term1..term3");
 }
 

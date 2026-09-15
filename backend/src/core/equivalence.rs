@@ -4,18 +4,21 @@
 //! and lets us validate that a concrete instance's two faces agree. See
 //! `docs/v0.6-rebuild/validation.md`.
 //!
-//! | topology (TopologyHexad) | vocabulary (SystematicsHexad) | example (n = 3) |
-//! |--------------------------|-------------------------------|-----------------|
-//! | Graph                    | System (name)                 | K3 = Triad      |
-//! | Cardinality              | Coherence                     | (3,3) = Dynamism|
-//! | Order                    | Term designation              | 3 = Impulses    |
-//! | Size                     | Connective designation        | 3 = Acts        |
-//! | Vertex ordinality        | Term position                 | 1 = term1       |
-//! | Edge seriality           | Connective position           | 1 = connective1 |
+//! | topology (TopologyHexad) | vocabulary (SystematicsHexad) | example (n = 3)  |
+//! |--------------------------|-------------------------------|------------------|
+//! | Cardinality              | System (name)                 | (3,3) = Triad    |
+//! | Eigenvalue *(proposed)*  | Coherence                     | 0,3,3 = Dynamism |
+//! | Order                    | Term designation              | 3 = Impulses     |
+//! | Size                     | Connective designation        | 3 = Acts         |
+//! | Vertex ordinality        | Term ordinality               | 1 = term1        |
+//! | Edge ordinality          | Connective ordinality         | 1 = connective1  |
 //!
 //! Topology and vocabulary are two faces of one archetype: validating an instance is
 //! checking they agree (all derived from the one cardinality) and that terms anchor to
-//! vertices and connectives to edges (position = ordinality/seriality).
+//! vertices and connectives to edges (ordinality = placement). A K_n *is* its cardinality
+//! (`(4,6)` = K4 = Tetrad), so cardinality book-matches the system name; the graph's
+//! spectral *quality* (eigenvalue) book-matches coherence. **Seriality** is not a facet here —
+//! it is the six-laws *arrangement* of the ordinalities (123, 132, …); see the Controller.
 
 use super::hexadicsystems::{
     edge_cardinality, systematics_hexad, topology_hexad, SystematicsHexad, TopologyHexad,
@@ -24,9 +27,9 @@ use super::hexadicsystems::{
 /// One paired dimension of the archetype, with the value each face takes at order `n`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct EquivalencePair {
-    /// The topology-face name: Graph, Cardinality, Order, Size, VertexOrdinality, EdgeSeriality.
+    /// The topology-face name: Cardinality, Eigenvalue, Order, Size, VertexOrdinality, EdgeOrdinality.
     pub topology: &'static str,
-    /// The vocabulary/system-face name: System, Coherence, TermDesignation, …
+    /// The vocabulary/system-face name: System, Coherence, TermDesignation, …, ConnectiveOrdinality.
     pub system: &'static str,
     /// The topology value at this order (e.g. "K3", "(3,3)", "3", "1..3").
     pub topology_value: String,
@@ -73,15 +76,15 @@ impl EquivalenceHexad {
         let s = &self.system;
         vec![
             EquivalencePair {
-                topology: "Graph",
+                topology: "Cardinality",
                 system: "System",
-                topology_value: t.graph.clone(),
+                topology_value: t.cardinality.clone(),
                 system_value: s.name.clone(),
             },
             EquivalencePair {
-                topology: "Cardinality",
+                topology: "Eigenvalue",
                 system: "Coherence",
-                topology_value: t.cardinality.clone(),
+                topology_value: t.eigenvalue.clone(),
                 system_value: s.coherence.clone(),
             },
             EquivalencePair {
@@ -98,14 +101,14 @@ impl EquivalenceHexad {
             },
             EquivalencePair {
                 topology: "VertexOrdinality",
-                system: "TermPosition",
+                system: "TermOrdinality",
                 topology_value: serial(&t.vertex_ordinality),
                 system_value: labelled("term", s.term_cardinality),
             },
             EquivalencePair {
-                topology: "EdgeSeriality",
-                system: "ConnectivePosition",
-                topology_value: serial(&t.edge_seriality),
+                topology: "EdgeOrdinality",
+                system: "ConnectiveOrdinality",
+                topology_value: serial(&t.edge_ordinality),
                 system_value: labelled("connective", s.connective_cardinality),
             },
         ]
@@ -133,15 +136,15 @@ impl EquivalenceHexad {
         }
         if t.vertex_ordinality.len() != s.term_cardinality as usize {
             errs.push(format!(
-                "VertexOrdinality↔TermPosition: {} vertex ordinalities ≠ {} terms",
+                "VertexOrdinality↔TermOrdinality: {} vertex ordinalities ≠ {} terms",
                 t.vertex_ordinality.len(),
                 s.term_cardinality
             ));
         }
-        if t.edge_seriality.len() != s.connective_cardinality as usize {
+        if t.edge_ordinality.len() != s.connective_cardinality as usize {
             errs.push(format!(
-                "EdgeSeriality↔ConnectivePosition: {} edge serialities ≠ {} connectives",
-                t.edge_seriality.len(),
+                "EdgeOrdinality↔ConnectiveOrdinality: {} edge ordinalities ≠ {} connectives",
+                t.edge_ordinality.len(),
                 s.connective_cardinality
             ));
         }
@@ -161,11 +164,11 @@ pub fn equivalence(order: u8) -> Vec<EquivalencePair> {
 
 /// Validate a system **instance** against the archetype for its order — the topology ↔
 /// vocabulary equivalence, checked:
-/// - Cardinality ↔ Coherence, Order ↔ TermDesignation, Size ↔ ConnectiveDesignation
+/// - Eigenvalue ↔ Coherence, Order ↔ TermDesignation, Size ↔ ConnectiveDesignation
 ///   (the vocabulary face must match the canonical value for `order`);
-/// - VertexOrdinality ↔ TermPosition, EdgeSeriality ↔ ConnectivePosition (the term positions
-///   must serialise the vertex ordinalities `1..n`, the connective positions the edge
-///   serialities `1..C(n,2)` — i.e. terms anchor to vertices and connectives to edges).
+/// - VertexOrdinality ↔ TermOrdinality, EdgeOrdinality ↔ ConnectiveOrdinality (the term
+///   ordinalities must run `1..n` over the vertices, the connective ordinalities `1..C(n,2)`
+///   over the edges — i.e. terms anchor to vertices and connectives to edges).
 ///
 /// Returns the mismatches (empty ⇒ the instance conforms to its archetype).
 pub fn validate_instance(
@@ -173,8 +176,8 @@ pub fn validate_instance(
     coherence: &str,
     term_designation: &str,
     connective_designation: &str,
-    term_positions: &[i32],
-    connective_positions: &[i32],
+    term_ordinalities: &[i32],
+    connective_ordinalities: &[i32],
 ) -> Result<(), Vec<String>> {
     let h = systematics_hexad(order);
     let size = edge_cardinality(order);
@@ -182,7 +185,7 @@ pub fn validate_instance(
 
     if !coherence.eq_ignore_ascii_case(&h.coherence) {
         errs.push(format!(
-            "Cardinality↔Coherence: '{coherence}' ≠ '{}' for K{order}",
+            "Eigenvalue↔Coherence: '{coherence}' ≠ '{}' for K{order}",
             h.coherence
         ));
     }
@@ -200,15 +203,15 @@ pub fn validate_instance(
     }
 
     let want_terms: Vec<i32> = (1..=order as i32).collect();
-    if term_positions != want_terms.as_slice() {
+    if term_ordinalities != want_terms.as_slice() {
         errs.push(format!(
-            "VertexOrdinality↔TermPosition: term positions {term_positions:?} ≠ vertex ordinalities {want_terms:?}"
+            "VertexOrdinality↔TermOrdinality: term ordinalities {term_ordinalities:?} ≠ vertex ordinalities {want_terms:?}"
         ));
     }
     let want_conns: Vec<i32> = (1..=size as i32).collect();
-    if connective_positions != want_conns.as_slice() {
+    if connective_ordinalities != want_conns.as_slice() {
         errs.push(format!(
-            "EdgeSeriality↔ConnectivePosition: connective positions {connective_positions:?} ≠ edge serialities {want_conns:?}"
+            "EdgeOrdinality↔ConnectiveOrdinality: connective ordinalities {connective_ordinalities:?} ≠ edge ordinalities {want_conns:?}"
         ));
     }
 
@@ -231,13 +234,17 @@ mod tests {
     fn triad_equivalence_pairs() {
         let e = equivalence(3);
         assert_eq!(e.len(), 6, "six paired dimensions");
-        let g = pair(&e, "Graph");
-        assert_eq!((g.system, g.topology_value.as_str(), g.system_value.as_str()), ("System", "K3", "Triad"));
+        // Cardinality (3,3) ↔ System (Triad).
         let c = pair(&e, "Cardinality");
-        assert_eq!((c.system, c.topology_value.as_str(), c.system_value.as_str()), ("Coherence", "(3,3)", "Dynamism"));
+        assert_eq!((c.system, c.topology_value.as_str(), c.system_value.as_str()), ("System", "(3,3)", "Triad"));
+        // Eigenvalue (Laplacian spectrum) ↔ Coherence (Dynamism).
+        let ev = pair(&e, "Eigenvalue");
+        assert_eq!((ev.system, ev.system_value.as_str()), ("Coherence", "Dynamism"));
+        assert_eq!(ev.topology_value, "0 (×1), 3 (×2)");
         assert_eq!(pair(&e, "Order").system_value, "Impulses");       // 3 → Impulses
         assert_eq!(pair(&e, "Size").system_value, "Acts");            // 3 → Acts
-        // positions book-match: vertex ordinalities 1..3 ↔ term1..term3.
+        // ordinalities book-match: vertex ordinalities 1..3 ↔ term1..term3.
+        assert_eq!(pair(&e, "VertexOrdinality").system, "TermOrdinality");
         assert_eq!(pair(&e, "VertexOrdinality").topology_value, "1..3");
         assert_eq!(pair(&e, "VertexOrdinality").system_value, "term1..term3");
     }
@@ -245,13 +252,18 @@ mod tests {
     #[test]
     fn tetrad_cardinality_is_four_six() {
         let e = equivalence(4);
+        // Cardinality (4,6) ↔ System (Tetrad).
         assert_eq!(pair(&e, "Cardinality").topology_value, "(4,6)");
-        assert_eq!(pair(&e, "Cardinality").system_value, "Activity Field");
+        assert_eq!(pair(&e, "Cardinality").system_value, "Tetrad");
+        // Eigenvalue ↔ Coherence (Activity Field).
+        assert_eq!(pair(&e, "Eigenvalue").system_value, "Activity Field");
+        assert_eq!(pair(&e, "Eigenvalue").topology_value, "0 (×1), 4 (×3)");
         assert_eq!(pair(&e, "Size").topology_value, "6");
         assert_eq!(pair(&e, "Size").system_value, "Interplays");
         // six edges ↔ connective1..connective6.
-        assert_eq!(pair(&e, "EdgeSeriality").topology_value, "1..6");
-        assert_eq!(pair(&e, "EdgeSeriality").system_value, "connective1..connective6");
+        assert_eq!(pair(&e, "EdgeOrdinality").system, "ConnectiveOrdinality");
+        assert_eq!(pair(&e, "EdgeOrdinality").topology_value, "1..6");
+        assert_eq!(pair(&e, "EdgeOrdinality").system_value, "connective1..connective6");
     }
 
     #[test]
@@ -274,14 +286,14 @@ mod tests {
     fn wrong_coherence_fails() {
         let errs = validate_instance(3, "Complementarity", "Impulses", "Acts", &[1, 2, 3], &[1, 2, 3])
             .unwrap_err();
-        assert!(errs.iter().any(|e| e.contains("Cardinality↔Coherence")));
+        assert!(errs.iter().any(|e| e.contains("Eigenvalue↔Coherence")));
     }
 
     #[test]
-    fn misanchored_positions_fail() {
-        // Only two term positions for a triad ⇒ terms don't anchor to the three vertices.
+    fn misanchored_ordinalities_fail() {
+        // Only two term ordinalities for a triad ⇒ terms don't anchor to the three vertices.
         let errs = validate_instance(3, "Dynamism", "Impulses", "Acts", &[1, 2], &[1, 2, 3])
             .unwrap_err();
-        assert!(errs.iter().any(|e| e.contains("VertexOrdinality↔TermPosition")));
+        assert!(errs.iter().any(|e| e.contains("VertexOrdinality↔TermOrdinality")));
     }
 }
