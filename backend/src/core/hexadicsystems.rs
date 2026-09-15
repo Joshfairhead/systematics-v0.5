@@ -48,7 +48,7 @@ pub fn connective_designation(order_cardinality: u8) -> &'static str {
 }
 
 /// `|E| = C(n, 2)` — the connective (edge) cardinality for order_cardinality `n`.
-fn edge_cardinality(order_cardinality: u8) -> u8 {
+pub fn edge_cardinality(order_cardinality: u8) -> u8 {
     let n = order_cardinality as usize;
     (n * n.saturating_sub(1) / 2) as u8
 }
@@ -75,6 +75,42 @@ pub fn systematics_hexad(cardinality: u8) -> SystematicsHexad {
         connective_designation: connective_designation(cardinality).to_string(),
         term_cardinality: cardinality,
         connective_cardinality: edge_cardinality(cardinality),
+    }
+}
+
+/// The **topology hexad** — a system's six *structural* facets, the geometric peer of
+/// [`SystematicsHexad`]. Book-matched field-for-field (see `core::equivalence`):
+/// `graph ↔ name`, `cardinality ↔ coherence`, `order ↔ term_designation`,
+/// `size ↔ connective_designation`, `vertex_ordinality ↔ term positions`,
+/// `edge_seriality ↔ connective positions`. Both hexads are derived from the one
+/// cardinality, so `order == term_cardinality` and `size == connective_cardinality`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TopologyHexad {
+    /// The complete graph `K_n`, e.g. "K3".
+    pub graph: String,
+    /// The `(order, size)` pair as text, e.g. "(3,3)".
+    pub cardinality: String,
+    /// Order `n` — the vertex cardinality `|V|`.
+    pub order: u8,
+    /// Size `C(n,2)` — the edge cardinality `|E|`.
+    pub size: u8,
+    /// Vertex ordinalities `1..=n`.
+    pub vertex_ordinality: Vec<u8>,
+    /// Edge serialities `1..=size`.
+    pub edge_seriality: Vec<u8>,
+}
+
+/// The canonical topology hexad for a cardinality (order `n`): the K_n structural facets,
+/// all derived from the one number — e.g. `3 → {K3, (3,3), 3, 3, [1,2,3], [1,2,3]}`.
+pub fn topology_hexad(cardinality: u8) -> TopologyHexad {
+    let size = edge_cardinality(cardinality);
+    TopologyHexad {
+        graph: format!("K{cardinality}"),
+        cardinality: format!("({cardinality},{size})"),
+        order: cardinality,
+        size,
+        vertex_ordinality: (1..=cardinality).collect(),
+        edge_seriality: (1..=size).collect(),
     }
 }
 

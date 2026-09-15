@@ -25,6 +25,16 @@ cardinality. The category-theory triad for the operations themselves —
 edges** (connectives), not nodes; see [node-edge-inversion](node-edge-inversion.md) for the
 node↔edge duality that places them there.
 
+> **Implemented (v0.5 backend).** The two faces are first-class **peer hexads**, both derived
+> from the one cardinality: a **TopologyHexad** (graph · cardinality · order · size · vertex
+> ordinality · edge seriality) and the **SystematicsHexad** (system · coherence · term
+> designation · connective designation · term/connective cardinality). An **EquivalenceHexad**
+> holds both and **book-matches** them dimension-for-dimension (`core/equivalence.rs`), with a
+> numeric bridge (`order == term_cardinality`, `size == connective_cardinality`) guaranteeing
+> the position serialisations line up. Surfaced over GraphQL as `topologyHexad(cardinality)`,
+> `systematicsHexad(cardinality)`, `equivalenceHexad(cardinality)` (topology + system + pairs +
+> mismatches), and `validateSystemEquivalence(id)` for a stored instance.
+
 ## Topology instance validation (worked: K4)
 ```
 Type            = K4

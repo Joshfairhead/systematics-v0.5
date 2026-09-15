@@ -1,6 +1,7 @@
-//! The **archetype equivalence** surface: `archetypeEquivalence` exposes the topology ↔
-//! vocabulary mapping for a cardinality, and `validateSystemEquivalence` checks a stored
-//! system instance against its archetype. See `docs/v0.6-rebuild/validation.md`.
+//! The **archetype equivalence** surface: `equivalenceHexad` exposes the two book-matched
+//! hexads (topology + vocabulary) and the six paired dimensions relating them, and
+//! `validateSystemEquivalence` checks a stored system instance against its archetype. See
+//! `docs/v0.6-rebuild/validation.md`.
 
 use std::sync::Arc;
 
@@ -12,15 +13,37 @@ fn make_schema() -> systematics_backend::SystematicsSchema {
 }
 
 #[tokio::test]
-async fn archetype_equivalence_lists_the_six_pairs() {
+async fn equivalence_hexad_book_matches_the_two_hexads() {
     let schema = make_schema();
-    let q = r#"{ archetypeEquivalence(cardinality: 3) { topology system topologyValue systemValue } }"#;
+    let q = r#"{
+        equivalenceHexad(cardinality: 3) {
+            topology { graph cardinality order size vertexOrdinality edgeSeriality }
+            system { name coherence termDesignation connectiveDesignation }
+            pairs { topology system topologyValue systemValue }
+            mismatches
+        }
+    }"#;
     let resp = schema.execute(q).await;
     assert!(resp.errors.is_empty(), "query errors: {:?}", resp.errors);
     let d = resp.data.into_json().unwrap();
-    let pairs = d["archetypeEquivalence"].as_array().unwrap();
-    assert_eq!(pairs.len(), 6, "six paired dimensions");
+    let h = &d["equivalenceHexad"];
 
+    // Topology face.
+    assert_eq!(h["topology"]["graph"], "K3");
+    assert_eq!(h["topology"]["cardinality"], "(3,3)");
+    assert_eq!(h["topology"]["order"], 3);
+    assert_eq!(h["topology"]["size"], 3);
+    assert_eq!(h["topology"]["vertexOrdinality"], serde_json::json!([1, 2, 3]));
+    // Vocabulary face.
+    assert_eq!(h["system"]["name"], "Triad");
+    assert_eq!(h["system"]["coherence"], "Dynamism");
+    assert_eq!(h["system"]["termDesignation"], "Impulses");
+    // The faces are consistent.
+    assert!(h["mismatches"].as_array().unwrap().is_empty(), "book-match: {:?}", h["mismatches"]);
+
+    // The six paired dimensions.
+    let pairs = h["pairs"].as_array().unwrap();
+    assert_eq!(pairs.len(), 6, "six paired dimensions");
     let find = |topology: &str| {
         pairs
             .iter()
@@ -40,6 +63,7 @@ async fn archetype_equivalence_lists_the_six_pairs() {
 
     assert_eq!(find("Order")["systemValue"], "Impulses");
     assert_eq!(find("Size")["systemValue"], "Acts");
+    assert_eq!(find("VertexOrdinality")["systemValue"], "term1..term3");
 }
 
 #[tokio::test]

@@ -1,22 +1,25 @@
-//! **Archetype equivalence** — the mapping between a system's **topology** face and its
-//! **vocabulary** (system) face. Both faces are determined by the single cardinality `n`;
-//! the equivalence names the six paired dimensions and lets us validate that a concrete
-//! instance's two faces agree. See `docs/v0.6-rebuild/validation.md`.
+//! **Archetype equivalence** — the book-matching of a system's two hexads: its **topology**
+//! face ([`TopologyHexad`]) and its **vocabulary** face ([`SystematicsHexad`]). Both are
+//! derived from the single cardinality `n`; the equivalence pairs them dimension-for-dimension
+//! and lets us validate that a concrete instance's two faces agree. See
+//! `docs/v0.6-rebuild/validation.md`.
 //!
-//! | topology          | vocabulary (system)     | example (n = 3) |
-//! |-------------------|-------------------------|-----------------|
-//! | Graph             | System                  | K3 = Triad      |
-//! | Cardinality       | Coherence               | (3,3) = Dynamism|
-//! | Order             | Term designation        | 3 = Impulses    |
-//! | Size              | Connective designation  | 3 = Acts        |
-//! | Vertex ordinality | Term position           | 1 = term1       |
-//! | Edge seriality    | Connective position     | 1 = connective1 |
+//! | topology (TopologyHexad) | vocabulary (SystematicsHexad) | example (n = 3) |
+//! |--------------------------|-------------------------------|-----------------|
+//! | Graph                    | System (name)                 | K3 = Triad      |
+//! | Cardinality              | Coherence                     | (3,3) = Dynamism|
+//! | Order                    | Term designation              | 3 = Impulses    |
+//! | Size                     | Connective designation        | 3 = Acts        |
+//! | Vertex ordinality        | Term position                 | 1 = term1       |
+//! | Edge seriality           | Connective position           | 1 = connective1 |
 //!
 //! Topology and vocabulary are two faces of one archetype: validating an instance is
 //! checking they agree (all derived from the one cardinality) and that terms anchor to
 //! vertices and connectives to edges (position = ordinality/seriality).
 
-use super::hexadicsystems::systematics_hexad;
+use super::hexadicsystems::{
+    edge_cardinality, systematics_hexad, topology_hexad, SystematicsHexad, TopologyHexad,
+};
 
 /// One paired dimension of the archetype, with the value each face takes at order `n`.
 #[derive(Debug, Clone, PartialEq)]
@@ -31,62 +34,129 @@ pub struct EquivalencePair {
     pub system_value: String,
 }
 
-/// `|E| = C(n, 2)` — the edge (connective) cardinality.
-pub fn edge_cardinality(order: u8) -> u8 {
-    let n = order as usize;
-    (n * n.saturating_sub(1) / 2) as u8
+fn serial(range: &[u8]) -> String {
+    match (range.first(), range.last()) {
+        (Some(a), Some(b)) => format!("{a}..{b}"),
+        _ => "—".to_string(),
+    }
+}
+fn labelled(base: &str, count: u8) -> String {
+    if count == 0 {
+        "—".to_string()
+    } else {
+        format!("{base}1..{base}{count}")
+    }
 }
 
-fn serial(n: u8) -> String {
-    if n == 0 { "—".to_string() } else { format!("1..{n}") }
-}
-fn labelled(base: &str, n: u8) -> String {
-    if n == 0 { "—".to_string() } else { format!("{base}1..{base}{n}") }
+/// The archetype at order `n` as a **book-matched pair of hexads** — the topology face and
+/// the vocabulary face, held together so their six dimensions can be paired and checked.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EquivalenceHexad {
+    pub topology: TopologyHexad,
+    pub system: SystematicsHexad,
 }
 
-/// The six equivalence pairs at order `n` — the archetype at that cardinality. This *is*
-/// the topology ↔ vocabulary mapping, made first-class.
+impl EquivalenceHexad {
+    /// Both faces of the archetype at cardinality `n`, each from its own source of truth.
+    pub fn for_order(order: u8) -> Self {
+        Self {
+            topology: topology_hexad(order),
+            system: systematics_hexad(order),
+        }
+    }
+
+    /// The six equivalence pairs, book-matching the two hexads dimension-for-dimension.
+    /// (Term/connective *positions* are the serialisation of the vocabulary's cardinalities;
+    /// they line up with the topology's ordinality/seriality because the two hexads share `n`.)
+    pub fn pairs(&self) -> Vec<EquivalencePair> {
+        let t = &self.topology;
+        let s = &self.system;
+        vec![
+            EquivalencePair {
+                topology: "Graph",
+                system: "System",
+                topology_value: t.graph.clone(),
+                system_value: s.name.clone(),
+            },
+            EquivalencePair {
+                topology: "Cardinality",
+                system: "Coherence",
+                topology_value: t.cardinality.clone(),
+                system_value: s.coherence.clone(),
+            },
+            EquivalencePair {
+                topology: "Order",
+                system: "TermDesignation",
+                topology_value: t.order.to_string(),
+                system_value: s.term_designation.clone(),
+            },
+            EquivalencePair {
+                topology: "Size",
+                system: "ConnectiveDesignation",
+                topology_value: t.size.to_string(),
+                system_value: s.connective_designation.clone(),
+            },
+            EquivalencePair {
+                topology: "VertexOrdinality",
+                system: "TermPosition",
+                topology_value: serial(&t.vertex_ordinality),
+                system_value: labelled("term", s.term_cardinality),
+            },
+            EquivalencePair {
+                topology: "EdgeSeriality",
+                system: "ConnectivePosition",
+                topology_value: serial(&t.edge_seriality),
+                system_value: labelled("connective", s.connective_cardinality),
+            },
+        ]
+    }
+
+    /// Validate that the two faces **book-match** — the numeric bridge that guarantees the
+    /// equivalence: `order == term_cardinality`, `size == connective_cardinality`, and the
+    /// ordinality/seriality ranges have those lengths (terms anchor to vertices `1..n`,
+    /// connectives to edges `1..size`). Empty ⇒ the hexads are a consistent archetype.
+    pub fn validate(&self) -> Result<(), Vec<String>> {
+        let t = &self.topology;
+        let s = &self.system;
+        let mut errs = Vec::new();
+        if t.order != s.term_cardinality {
+            errs.push(format!(
+                "Order↔TermCardinality: topology order {} ≠ vocabulary term cardinality {}",
+                t.order, s.term_cardinality
+            ));
+        }
+        if t.size != s.connective_cardinality {
+            errs.push(format!(
+                "Size↔ConnectiveCardinality: topology size {} ≠ vocabulary connective cardinality {}",
+                t.size, s.connective_cardinality
+            ));
+        }
+        if t.vertex_ordinality.len() != s.term_cardinality as usize {
+            errs.push(format!(
+                "VertexOrdinality↔TermPosition: {} vertex ordinalities ≠ {} terms",
+                t.vertex_ordinality.len(),
+                s.term_cardinality
+            ));
+        }
+        if t.edge_seriality.len() != s.connective_cardinality as usize {
+            errs.push(format!(
+                "EdgeSeriality↔ConnectivePosition: {} edge serialities ≠ {} connectives",
+                t.edge_seriality.len(),
+                s.connective_cardinality
+            ));
+        }
+        if errs.is_empty() {
+            Ok(())
+        } else {
+            Err(errs)
+        }
+    }
+}
+
+/// The six equivalence pairs at order `n` — the topology ↔ vocabulary mapping, made
+/// first-class. Thin accessor over [`EquivalenceHexad::pairs`].
 pub fn equivalence(order: u8) -> Vec<EquivalencePair> {
-    let h = systematics_hexad(order);
-    let size = edge_cardinality(order);
-    vec![
-        EquivalencePair {
-            topology: "Graph",
-            system: "System",
-            topology_value: format!("K{order}"),
-            system_value: h.name,
-        },
-        EquivalencePair {
-            topology: "Cardinality",
-            system: "Coherence",
-            topology_value: format!("({order},{size})"),
-            system_value: h.coherence,
-        },
-        EquivalencePair {
-            topology: "Order",
-            system: "TermDesignation",
-            topology_value: order.to_string(),
-            system_value: h.term_designation,
-        },
-        EquivalencePair {
-            topology: "Size",
-            system: "ConnectiveDesignation",
-            topology_value: size.to_string(),
-            system_value: h.connective_designation,
-        },
-        EquivalencePair {
-            topology: "VertexOrdinality",
-            system: "TermPosition",
-            topology_value: serial(order),
-            system_value: labelled("term", order),
-        },
-        EquivalencePair {
-            topology: "EdgeSeriality",
-            system: "ConnectivePosition",
-            topology_value: serial(size),
-            system_value: labelled("connective", size),
-        },
-    ]
+    EquivalenceHexad::for_order(order).pairs()
 }
 
 /// Validate a system **instance** against the archetype for its order — the topology ↔
@@ -167,6 +237,9 @@ mod tests {
         assert_eq!((c.system, c.topology_value.as_str(), c.system_value.as_str()), ("Coherence", "(3,3)", "Dynamism"));
         assert_eq!(pair(&e, "Order").system_value, "Impulses");       // 3 → Impulses
         assert_eq!(pair(&e, "Size").system_value, "Acts");            // 3 → Acts
+        // positions book-match: vertex ordinalities 1..3 ↔ term1..term3.
+        assert_eq!(pair(&e, "VertexOrdinality").topology_value, "1..3");
+        assert_eq!(pair(&e, "VertexOrdinality").system_value, "term1..term3");
     }
 
     #[test]
@@ -176,6 +249,20 @@ mod tests {
         assert_eq!(pair(&e, "Cardinality").system_value, "Activity Field");
         assert_eq!(pair(&e, "Size").topology_value, "6");
         assert_eq!(pair(&e, "Size").system_value, "Interplays");
+        // six edges ↔ connective1..connective6.
+        assert_eq!(pair(&e, "EdgeSeriality").topology_value, "1..6");
+        assert_eq!(pair(&e, "EdgeSeriality").system_value, "connective1..connective6");
+    }
+
+    #[test]
+    fn hexads_book_match_for_every_order() {
+        // The two faces are derived from the one n, so the archetype is always consistent.
+        for n in 1..=8u8 {
+            assert!(
+                EquivalenceHexad::for_order(n).validate().is_ok(),
+                "hexads should book-match at order {n}"
+            );
+        }
     }
 
     #[test]

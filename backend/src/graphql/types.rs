@@ -369,16 +369,20 @@ impl QueryRoot {
         crate::core::hexadicsystems::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
     }
 
-    /// The **archetype equivalence** for a cardinality — the six paired dimensions that
-    /// assert a topology facet equivalent to a vocabulary/system facet (Graph↔System,
+    /// The **topology hexad** for a cardinality — the six structural facets of `K_n`
+    /// (graph · cardinality · order · size · vertex ordinality · edge seriality), the
+    /// geometric peer of `systematicsHexad`.
+    async fn topology_hexad(&self, cardinality: i32) -> GqlTopologyHexad {
+        crate::core::hexadicsystems::topology_hexad(cardinality.clamp(0, 255) as u8).into()
+    }
+
+    /// The **archetype equivalence** for a cardinality — the two book-matched hexads
+    /// (topology + vocabulary) and the six paired dimensions relating them (Graph↔System,
     /// Cardinality↔Coherence, Order↔TermDesignation, Size↔ConnectiveDesignation,
-    /// VertexOrdinality↔TermPosition, EdgeSeriality↔ConnectivePosition). The mapping,
-    /// made first-class. See `docs/v0.6-rebuild/validation.md`.
-    async fn archetype_equivalence(&self, cardinality: i32) -> Vec<GqlEquivalencePair> {
-        crate::core::equivalence::equivalence(cardinality.clamp(0, 255) as u8)
-            .into_iter()
-            .map(GqlEquivalencePair::from)
-            .collect()
+    /// VertexOrdinality↔TermPosition, EdgeSeriality↔ConnectivePosition), plus whether the
+    /// faces are consistent. The mapping, made first-class. See `docs/v0.6-rebuild/validation.md`.
+    async fn equivalence_hexad(&self, cardinality: i32) -> GqlEquivalenceHexad {
+        crate::core::equivalence::EquivalenceHexad::for_order(cardinality.clamp(0, 255) as u8).into()
     }
 
     /// Validate a stored system **instance** against its archetype equivalence: the
@@ -2594,6 +2598,31 @@ impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad
     }
 }
 
+/// The **topology hexad** — a system's six structural facets (the geometric peer of the
+/// systematics hexad): graph · cardinality · order · size · vertex ordinality · edge seriality.
+#[derive(SimpleObject)]
+pub struct GqlTopologyHexad {
+    pub graph: String,
+    pub cardinality: String,
+    pub order: i32,
+    pub size: i32,
+    pub vertex_ordinality: Vec<i32>,
+    pub edge_seriality: Vec<i32>,
+}
+
+impl From<crate::core::hexadicsystems::TopologyHexad> for GqlTopologyHexad {
+    fn from(t: crate::core::hexadicsystems::TopologyHexad) -> Self {
+        Self {
+            graph: t.graph,
+            cardinality: t.cardinality,
+            order: t.order as i32,
+            size: t.size as i32,
+            vertex_ordinality: t.vertex_ordinality.into_iter().map(|x| x as i32).collect(),
+            edge_seriality: t.edge_seriality.into_iter().map(|x| x as i32).collect(),
+        }
+    }
+}
+
 /// One paired dimension of the **archetype equivalence** — a topology facet asserted
 /// equivalent to a vocabulary/system facet at a given cardinality (Graph↔System,
 /// Cardinality↔Coherence, Order↔TermDesignation, Size↔ConnectiveDesignation,
@@ -2613,6 +2642,30 @@ impl From<crate::core::equivalence::EquivalencePair> for GqlEquivalencePair {
             system: p.system.to_string(),
             topology_value: p.topology_value,
             system_value: p.system_value,
+        }
+    }
+}
+
+/// The **archetype equivalence** at a cardinality — the two book-matched hexads (topology +
+/// vocabulary) plus the six paired dimensions relating them, and whether they are consistent.
+#[derive(SimpleObject)]
+pub struct GqlEquivalenceHexad {
+    pub topology: GqlTopologyHexad,
+    pub system: GqlSystematicsHexad,
+    pub pairs: Vec<GqlEquivalencePair>,
+    /// Empty ⇒ the two faces book-match (numeric bridge holds); else the inconsistencies.
+    pub mismatches: Vec<String>,
+}
+
+impl From<crate::core::equivalence::EquivalenceHexad> for GqlEquivalenceHexad {
+    fn from(h: crate::core::equivalence::EquivalenceHexad) -> Self {
+        let pairs = h.pairs().into_iter().map(GqlEquivalencePair::from).collect();
+        let mismatches = h.validate().err().unwrap_or_default();
+        Self {
+            topology: h.topology.into(),
+            system: h.system.into(),
+            pairs,
+            mismatches,
         }
     }
 }
