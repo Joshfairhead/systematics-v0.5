@@ -90,10 +90,11 @@ pub struct TopologyHexad {
     /// The `(order, size)` pair that identifies the complete graph, e.g. "(4,6)". Replaces the
     /// "K_n" label (K4 *is* cardinality `(4,6)`). Book-matches `System` (the name).
     pub cardinality: String,
-    /// The graph's **eigenvalue** — the Laplacian spectrum of `K_n`: `0` (×1, the null space =
-    /// the monad/unity) and `n` (×`n-1`, the algebraic connectivity). The spectral *quality* of
-    /// the graph; **proposed** to book-match `Coherence` (the spectrum is settled, the
-    /// correspondence is not).
+    /// The graph's **eigenvalue** — the Laplacian spectrum of `K_n`: `0` (×1), the all-ones
+    /// "whole" direction (unity — the 1-dimensional null space of a connected graph), and `n`
+    /// (×`n-1`), the differentiated modes (n = algebraic connectivity). The monad K1 is `{0}`
+    /// alone: one node, no connectives. The spectral *quality* of the graph; **proposed** to
+    /// book-match `Coherence` (the spectrum is settled, the correspondence is not).
     pub eigenvalue: String,
     /// Order `n` — the vertex cardinality `|V|`. Book-matches the term designation.
     pub order: u8,
@@ -107,9 +108,10 @@ pub struct TopologyHexad {
     pub edge_ordinality: Vec<u8>,
 }
 
-/// The graph **eigenvalue** facet — the Laplacian spectrum of `K_n`: `0` (×1, the null space =
-/// the monad/unity) and `n` (×`n-1`, the algebraic connectivity). Settled math; its
-/// correspondence to *coherence* is **proposed** (see `core::equivalence`).
+/// The graph **eigenvalue** facet — the Laplacian spectrum of `K_n`: `0` (×1, the all-ones
+/// "whole"/unity direction) and `n` (×`n-1`, the differentiated modes; n = algebraic
+/// connectivity). K1 is `{0}` alone. Settled math; the *coherence* correspondence is
+/// **proposed** (see `core::equivalence`).
 fn laplacian_spectrum(n: u8) -> String {
     match n {
         0 => "—".to_string(),

@@ -20,8 +20,10 @@ These pairs are asserted equivalent (topology facet ↔ system facet):
 
 Reading: a K_n **is** its **cardinality** — "K4" is only notation for `(4,6)` — so cardinality
 book-matches the **system** name. The graph's spectral *quality* (**eigenvalue**, the Laplacian
-spectrum: `0` once = the null space / monad, and `n` with multiplicity `n−1` = the algebraic
-connectivity) book-matches the **coherence** attribute. **Order/size ↔ term/connective
+spectrum: `0` with multiplicity 1 = the all-ones "whole"/unity direction — the 1-dim null space
+of a connected graph, so the monad K1 is `{0}`: one node, no connectives; and `n` with
+multiplicity `n−1` = the differentiated modes, n being the algebraic connectivity) book-matches
+the **coherence** attribute. **Order/size ↔ term/connective
 designations** (the component counts name the components); **vertex/edge ordinality ↔
 term/connective ordinality** (both vertices *and* edges carry a placement). The category-theory
 triad for the operations themselves — **Composition(+) · Associativity(−) · Identity(=)** — is
