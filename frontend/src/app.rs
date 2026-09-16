@@ -185,13 +185,11 @@ pub struct ApiApp {
     canvas_mode: CanvasMode,
     /// Every Sequence / Monad in the graph — shown as rows in the data view.
     sequences: Vec<SequenceView>,
-    /// When navigating inside a monad/sequence: its member addresses. Header
-    /// order_cardinality buttons then load the member of that order_cardinality (not the canonical one).
+    /// **The navigation scope** (`None` = Nullad / whole registry; `Some` = inside a monad,
+    /// its member addresses). The single owner of scope: *both* views read it — the graph
+    /// (Chronos) steps its members by order, the list (Eternity) is scoped to the same members
+    /// (the candidate set / Hyparxis). Survives a view toggle. See docs/v0.6-rebuild/view-model.md.
     active_sequence: Option<Vec<String>>,
-    /// When a **bucket** monad is entered (a group, not an order_cardinality-linear sequence),
-    /// the data view is scoped to just these member addresses — the "group for
-    /// sorting" the Architectural Monad provides. `None` = no scope (whole registry).
-    scope_members: Option<Vec<String>>,
 }
 
 impl ApiApp {
@@ -241,24 +239,13 @@ impl ApiApp {
         orders.dedup();
         orders
     }
-    /// An **ordered core-sequence** has at most one member per order_cardinality, so the header
-    /// can step it order_cardinality-by-order_cardinality (Monad→Dyad→Triad). A **bucket** (e.g. the
-    /// Architectural Monad — several triads) fails this and is treated as a group.
-    fn is_order_navigable(&self, members: &[String]) -> bool {
-        let system_members = members.iter().filter(|m| m.starts_with("system:")).count();
-        system_members > 0 && self.member_orders(members).len() == system_members
-    }
-    /// The header keys reachable in the current context. `None` when not in a
-    /// sequence (canonical: all enabled). In an order_cardinality-navigable sequence, only the
-    /// member orders are enabled. In a bucket, no order_cardinality button is enabled (it is a
-    /// group, not a path — you filter it in the table; Nullad exits).
+    /// The header keys reachable in the current context. `None` when not in a monad
+    /// (canonical: all enabled). Inside a monad, the orders **present** in its members are
+    /// enabled — one *or several* members per order alike (a bucket enables its orders too; the
+    /// graph shows the first candidate at an order, the scoped list shows the rest). Nullad exits.
     fn enabled_order_keys(&self) -> Option<Vec<String>> {
         let members = self.active_sequence.as_ref()?;
-        if self.is_order_navigable(members) {
-            Some(self.member_orders(members).into_iter().map(key_for_order).collect())
-        } else {
-            Some(Vec::new())
-        }
+        Some(self.member_orders(members).into_iter().map(key_for_order).collect())
     }
 }
 
@@ -357,7 +344,6 @@ impl Component for ApiApp {
             canvas_mode: CanvasMode::Viewing,
             sequences: vec![],
             active_sequence: None,
-            scope_members: None,
         }
     }
 
@@ -378,20 +364,18 @@ impl Component for ApiApp {
                     // any monad context and scope, back to the whole registry. No
                     // single system to render (blank canvas in graph mode), no order_cardinality
                     // filter and no member-scope in data mode.
-                    self.active_sequence = None; // leave any monad context
-                    self.scope_members = None; // drop any bucket scope
+                    self.active_sequence = None; // leave any monad context (exit to Nullad)
                     self.selected_system = None;
                     self.system_references = vec![];
                     self.loading = false;
                     return true;
                 }
 
-                // Inside an *order_cardinality-navigable* monad/sequence: the header navigates its
-                // members by order_cardinality (e.g. Monad(CT)→Dyad = Container·Operations, not
-                // canonical). Buckets (several members of the same order_cardinality) aren't
-                // order_cardinality-linear — their order_cardinality buttons are greyed, so this is skipped.
+                // Inside a monad: the header steps its members by order (e.g. Monad(CT)→Dyad =
+                // Container·Operations, not canonical). Where several members share an order (a
+                // bucket), the graph shows the first candidate at that order and the scoped list
+                // shows the rest. On a miss we stay in the monad (don't fall back to canonical).
                 if let Some(members) = self.active_sequence.clone() {
-                    if self.is_order_navigable(&members) {
                     if let Some(order_cardinality) = order_for_key(&name) {
                         if let Some(id) = self.sequence_member_for_order(&members, order_cardinality) {
                             self.loading = true;
@@ -406,9 +390,8 @@ impl Component for ApiApp {
                             return true;
                         }
                     }
-                    // No member at this order_cardinality → leave the monad, fall to canonical.
-                    self.active_sequence = None;
-                    }
+                    // No member at this order in scope → keep the monad, don't navigate away.
+                    return true;
                 }
 
                 self.loading = true;
@@ -569,13 +552,19 @@ impl Component for ApiApp {
             }
             ApiAppMsg::LoadInstance(id) => {
                 // Replace the canvas with the loaded instance system (single canvas).
-                // Load is the ELT triad's edge on the data view, so switch to the
-                // graph mode to reveal what was loaded. Loading a standalone system
-                // leaves any monad/bucket context (its grouping no longer applies).
+                // Load is the ELT triad's edge on the data view, so switch to the graph mode
+                // to reveal what was loaded. If the loaded system is a member of the monad
+                // we're in, STAY in that monad (viewing a candidate as a graph — Hyparxis);
+                // only a standalone system leaves the monad context.
                 self.enter_viewing();
                 self.mode = ViewMode::Graph;
-                self.active_sequence = None;
-                self.scope_members = None;
+                let in_scope = self
+                    .active_sequence
+                    .as_ref()
+                    .is_some_and(|m| m.iter().any(|a| a == &format!("system:{id}")));
+                if !in_scope {
+                    self.active_sequence = None;
+                }
                 self.breadcrumbs.clear();
                 self.loading = true;
                 self.error = None;
@@ -700,38 +689,27 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ViewSequence(members) => {
+                // Enter a monad (its Space): scope BOTH views to its members, land in the graph
+                // on the head (first member), and let the header step the orders present. Toggle
+                // to list for the scoped candidate set (the same members — Hyparxis). Nullad
+                // exits. Order-navigable and bucket monads now open the same way (consistent).
                 self.enter_viewing();
                 self.breadcrumbs.clear();
-                if self.is_order_navigable(&members) {
-                    // Ordered core-sequence (Monad(CT), Data): enter it in the graph;
-                    // the header then steps its members by order_cardinality, greying the rest.
-                    self.mode = ViewMode::Graph;
-                    self.scope_members = None;
-                    let first = members
-                        .iter()
-                        .find_map(|m| m.strip_prefix("system:").map(|s| s.to_string()));
-                    self.active_sequence = Some(members);
-                    if let Some(id) = first {
-                        self.loading = true;
-                        let link = ctx.link().clone();
-                        let client = self.graphql_client.clone();
-                        spawn_local(async move {
-                            match client.fetch_rendered_by_id(&id).await {
-                                Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
-                                Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
-                            }
-                        });
-                    }
-                } else {
-                    // Bucket (Architectural Monad — several triads): not a path but a
-                    // group. Scope the Table to its members for sorting; the order_cardinality
-                    // buttons are greyed (no single order_cardinality to step to). Nullad exits.
-                    self.mode = ViewMode::Table;
-                    self.selected_key = "nullad".to_string(); // drop any order_cardinality filter
-                    self.active_sequence = Some(members.clone());
-                    self.scope_members = Some(members);
-                    self.selected_system = None;
-                    self.loading = false;
+                self.mode = ViewMode::Graph;
+                let first = members
+                    .iter()
+                    .find_map(|m| m.strip_prefix("system:").map(|s| s.to_string()));
+                self.active_sequence = Some(members);
+                if let Some(id) = first {
+                    self.loading = true;
+                    let link = ctx.link().clone();
+                    let client = self.graphql_client.clone();
+                    spawn_local(async move {
+                        match client.fetch_rendered_by_id(&id).await {
+                            Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                            Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                        }
+                    });
                 }
                 true
             }
@@ -755,7 +733,6 @@ impl Component for ApiApp {
             ApiAppMsg::DeleteSequence(id) => {
                 // If the deleted monad is the one we're inside, leave its context.
                 self.active_sequence = None;
-                self.scope_members = None;
                 self.extract_note = Some("Deleting monad…".to_string());
                 let link = ctx.link().clone();
                 let client = self.graphql_client.clone();
@@ -777,7 +754,6 @@ impl Component for ApiApp {
                 // Delete each selected row by its address prefix, then refresh all
                 // three collections so the table reflects the CRUD.
                 self.active_sequence = None;
-                self.scope_members = None;
                 // If the focused system was just deleted, drop it — otherwise its
                 // nodes/edges (derived from `selected_system`) linger as list rows.
                 if let Some(sys) = &self.selected_system {
@@ -1066,8 +1042,14 @@ impl Component for ApiApp {
         // this switch chooses Graph or Table.
         let on_set_mode = ctx.link().callback(ApiAppMsg::SetMode);
         let on_toggle_editing = ctx.link().callback(|_| ApiAppMsg::ToggleEditing);
-        // The selected header key scopes the data view (None = Nullad = all).
-        let filter_order = order_for_key(&self.selected_key);
+        // List filter: inside a monad the list shows the whole scoped candidate set (all
+        // orders — Eternity over the scope); at the Nullad it filters globally by the selected
+        // order type. Either way `scope_ids` restricts the rows to the monad's members.
+        let filter_order = if self.active_sequence.is_some() {
+            None
+        } else {
+            order_for_key(&self.selected_key)
+        };
 
         html! {
             <div class="app">
@@ -1118,11 +1100,12 @@ impl Component for ApiApp {
                                 on_delete_rows={ on_delete_rows }
                                 on_join={ on_join }
                                 on_decompose={ on_decompose }
-                                scope_ids={ self.scope_members.clone() }
+                                scope_ids={ self.active_sequence.clone() }
                             />
-                        } else if self.selected_key == "nullad" {
+                        } else if self.selected_key == "nullad" && self.active_sequence.is_none() {
                             // Nullad in graph mode: a blank canvas standing in for
-                            // the future all-and-everything undirected graph.
+                            // the future all-and-everything undirected graph. (Only when NOT
+                            // in a monad — in a monad the graph shows the current member.)
                             <div class="nullad-blank">
                                 <p class="nullad-blank-title">{ "Nullad — all & everything" }</p>
                                 <p class="nullad-blank-hint">
