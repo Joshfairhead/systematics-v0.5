@@ -2574,15 +2574,15 @@ pub struct GqlLawReading {
 
 /// The systematics hexad for the view — a system's six metadata facets, derived from
 /// its cardinality (name · coherence · term/connective designation · term/connective
-/// cardinality). All mutually determining.
+/// ordinality). All mutually determining.
 #[derive(SimpleObject)]
 pub struct GqlSystematicsHexad {
     pub name: String,
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
-    pub term_cardinality: i32,
-    pub connective_cardinality: i32,
+    pub term_ordinality: Vec<i32>,
+    pub connective_ordinality: Vec<i32>,
 }
 
 impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad {
@@ -2592,8 +2592,8 @@ impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad
             coherence: h.coherence,
             term_designation: h.term_designation,
             connective_designation: h.connective_designation,
-            term_cardinality: h.term_cardinality as i32,
-            connective_cardinality: h.connective_cardinality as i32,
+            term_ordinality: h.term_ordinality.into_iter().map(|x| x as i32).collect(),
+            connective_ordinality: h.connective_ordinality.into_iter().map(|x| x as i32).collect(),
         }
     }
 }

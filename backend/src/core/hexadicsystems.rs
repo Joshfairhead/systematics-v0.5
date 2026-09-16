@@ -53,28 +53,32 @@ pub fn edge_cardinality(order_cardinality: u8) -> u8 {
     (n * n.saturating_sub(1) / 2) as u8
 }
 
-/// The **systematics hexad** — a system's six mutually-determining metadata facets.
-/// Term cardinality = `|V|` = order_cardinality; connective cardinality = `|E|` = `C(order_cardinality, 2)`.
+/// The **systematics hexad** — a system's six mutually-determining metadata facets, the
+/// vocabulary peer of [`TopologyHexad`]. Facets 5/6 are the **term / connective ordinalities**
+/// (placements `1..=n` / `1..=C(n,2)`), book-matching topology's vertex/edge ordinality — *not*
+/// the counts (the counts live on the topology side as `order` / `size`).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SystematicsHexad {
     pub name: String,
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
-    pub term_cardinality: u8,
-    pub connective_cardinality: u8,
+    /// Term ordinalities `1..=n` — placements of the terms. Book-matches vertex ordinality.
+    pub term_ordinality: Vec<u8>,
+    /// Connective ordinalities `1..=C(n,2)` — placements of the connectives. Book-matches edge ordinality.
+    pub connective_ordinality: Vec<u8>,
 }
 
 /// The canonical hexad row for a cardinality (order_cardinality `n`): all six facets derived from
-/// the one number — e.g. `3 → {Triad, Dynamism, Impulses, Acts, 3, 3}`.
+/// the one number — e.g. `3 → {Triad, Dynamism, Impulses, Acts, [1,2,3], [1,2,3]}`.
 pub fn systematics_hexad(cardinality: u8) -> SystematicsHexad {
     SystematicsHexad {
         name: order_name(cardinality).to_string(),
         coherence: coherence(cardinality).to_string(),
         term_designation: term_designation(cardinality).to_string(),
         connective_designation: connective_designation(cardinality).to_string(),
-        term_cardinality: cardinality,
-        connective_cardinality: edge_cardinality(cardinality),
+        term_ordinality: (1..=cardinality).collect(),
+        connective_ordinality: (1..=edge_cardinality(cardinality)).collect(),
     }
 }
 
@@ -82,9 +86,9 @@ pub fn systematics_hexad(cardinality: u8) -> SystematicsHexad {
 /// [`SystematicsHexad`]. Book-matched field-for-field (see `core::equivalence`):
 /// `cardinality ↔ name` (a K_n *is* its cardinality — "K4" is just notation for `(4,6)`),
 /// `eigenvalue ↔ coherence` *(proposed)*, `order ↔ term_designation`,
-/// `size ↔ connective_designation`, `vertex_ordinality ↔ term ordinality`,
-/// `edge_ordinality ↔ connective ordinality`. Both hexads are derived from the one
-/// cardinality, so `order == term_cardinality` and `size == connective_cardinality`.
+/// `size ↔ connective_designation`, `vertex_ordinality ↔ term_ordinality`,
+/// `edge_ordinality ↔ connective_ordinality`. Both hexads are derived from the one
+/// cardinality, so `vertex_ordinality == term_ordinality` and `edge_ordinality == connective_ordinality`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TopologyHexad {
     /// The `(order, size)` pair that identifies the complete graph, e.g. "(4,6)". Replaces the
@@ -146,8 +150,8 @@ pub fn cardinality_from(facet: &str, value: &str) -> Option<u8> {
             "coherence" => h.coherence,
             "term_designation" => h.term_designation,
             "connective_designation" => h.connective_designation,
-            "term_cardinality" => h.term_cardinality.to_string(),
-            "connective_cardinality" => h.connective_cardinality.to_string(),
+            "term_cardinality" => h.term_ordinality.len().to_string(),
+            "connective_cardinality" => h.connective_ordinality.len().to_string(),
             _ => return false,
         };
         got.eq_ignore_ascii_case(value)
@@ -155,10 +159,11 @@ pub fn cardinality_from(facet: &str, value: &str) -> Option<u8> {
 }
 
 /// **Validate** a candidate system's metadata against the canonical hexad for its
-/// cardinality: every facet must match exactly. A triad whose coherence ≠ Dynamism,
-/// or whose connective cardinality ≠ 3, fails. Returns the mismatches.
+/// cardinality (derived from its term ordinality): every facet must match exactly. A triad
+/// whose coherence ≠ Dynamism, or whose connective ordinality ≠ `[1,2,3]`, fails. Returns the
+/// mismatches.
 pub fn validate_metadata(candidate: &SystematicsHexad) -> Result<(), Vec<String>> {
-    let n = candidate.term_cardinality;
+    let n = candidate.term_ordinality.len() as u8;
     let canonical = systematics_hexad(n);
     let mut errs = Vec::new();
     let mut check = |field: &str, got: &str, want: &str| {
@@ -174,10 +179,16 @@ pub fn validate_metadata(candidate: &SystematicsHexad) -> Result<(), Vec<String>
         &candidate.connective_designation,
         &canonical.connective_designation,
     );
-    if candidate.connective_cardinality != canonical.connective_cardinality {
+    if candidate.term_ordinality != canonical.term_ordinality {
         errs.push(format!(
-            "connective_cardinality: {} ≠ canonical {} (cardinality {n})",
-            candidate.connective_cardinality, canonical.connective_cardinality
+            "term_ordinality: {:?} ≠ canonical {:?} (cardinality {n})",
+            candidate.term_ordinality, canonical.term_ordinality
+        ));
+    }
+    if candidate.connective_ordinality != canonical.connective_ordinality {
+        errs.push(format!(
+            "connective_ordinality: {:?} ≠ canonical {:?} (cardinality {n})",
+            candidate.connective_ordinality, canonical.connective_ordinality
         ));
     }
     if errs.is_empty() {
@@ -198,11 +209,14 @@ mod tests {
         assert_eq!(h.coherence, "Dynamism");
         assert_eq!(h.term_designation, "Impulses");
         assert_eq!(h.connective_designation, "Acts");
-        assert_eq!(h.term_cardinality, 3);
-        assert_eq!(h.connective_cardinality, 3); // C(3,2)
+        assert_eq!(h.term_ordinality, vec![1, 2, 3]);
+        assert_eq!(h.connective_ordinality, vec![1, 2, 3]); // C(3,2)
         // tetrad: |V|=4, |E|=6.
         let t = systematics_hexad(4);
-        assert_eq!((t.name.as_str(), t.term_cardinality, t.connective_cardinality), ("Tetrad", 4, 6));
+        assert_eq!(
+            (t.name.as_str(), t.term_ordinality.len(), t.connective_ordinality.len()),
+            ("Tetrad", 4, 6)
+        );
     }
 
     #[test]
@@ -224,7 +238,7 @@ mod tests {
         assert!(validate_metadata(&bad).is_err());
         // a "triad" claiming tetrad edge-cardinality fails.
         let mut bad2 = systematics_hexad(3);
-        bad2.connective_cardinality = 6;
+        bad2.connective_ordinality = (1..=6).collect();
         assert!(validate_metadata(&bad2).is_err());
         // mismatched name vs cardinality fails (name Triad but cardinality 4).
         let mut bad3 = systematics_hexad(4);

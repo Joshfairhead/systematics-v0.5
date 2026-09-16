@@ -69,8 +69,8 @@ impl EquivalenceHexad {
     }
 
     /// The six equivalence pairs, book-matching the two hexads dimension-for-dimension.
-    /// (Term/connective *positions* are the serialisation of the vocabulary's cardinalities;
-    /// they line up with the topology's ordinality/seriality because the two hexads share `n`.)
+    /// (The term/connective ordinalities line up with the topology's vertex/edge ordinalities
+    /// because both faces are derived from the one `n`.)
     pub fn pairs(&self) -> Vec<EquivalencePair> {
         let t = &self.topology;
         let s = &self.system;
@@ -103,49 +103,49 @@ impl EquivalenceHexad {
                 topology: "VertexOrdinality",
                 system: "TermOrdinality",
                 topology_value: serial(&t.vertex_ordinality),
-                system_value: labelled("term", s.term_cardinality),
+                system_value: labelled("term", s.term_ordinality.len() as u8),
             },
             EquivalencePair {
                 topology: "EdgeOrdinality",
                 system: "ConnectiveOrdinality",
                 topology_value: serial(&t.edge_ordinality),
-                system_value: labelled("connective", s.connective_cardinality),
+                system_value: labelled("connective", s.connective_ordinality.len() as u8),
             },
         ]
     }
 
-    /// Validate that the two faces **book-match** — the numeric bridge that guarantees the
-    /// equivalence: `order == term_cardinality`, `size == connective_cardinality`, and the
-    /// ordinality/seriality ranges have those lengths (terms anchor to vertices `1..n`,
-    /// connectives to edges `1..size`). Empty ⇒ the hexads are a consistent archetype.
+    /// Validate that the two faces **book-match** — the bridge that guarantees the equivalence:
+    /// the topology's order/size equal the vocabulary's term/connective counts, and the
+    /// vertex/edge ordinalities equal the term/connective ordinalities (terms anchor to vertices
+    /// `1..n`, connectives to edges `1..size`). Empty ⇒ the hexads are a consistent archetype.
     pub fn validate(&self) -> Result<(), Vec<String>> {
         let t = &self.topology;
         let s = &self.system;
         let mut errs = Vec::new();
-        if t.order != s.term_cardinality {
+        if t.order as usize != s.term_ordinality.len() {
             errs.push(format!(
-                "Order↔TermCardinality: topology order {} ≠ vocabulary term cardinality {}",
-                t.order, s.term_cardinality
+                "Order↔TermOrdinality: topology order {} ≠ {} term ordinalities",
+                t.order,
+                s.term_ordinality.len()
             ));
         }
-        if t.size != s.connective_cardinality {
+        if t.size as usize != s.connective_ordinality.len() {
             errs.push(format!(
-                "Size↔ConnectiveCardinality: topology size {} ≠ vocabulary connective cardinality {}",
-                t.size, s.connective_cardinality
+                "Size↔ConnectiveOrdinality: topology size {} ≠ {} connective ordinalities",
+                t.size,
+                s.connective_ordinality.len()
             ));
         }
-        if t.vertex_ordinality.len() != s.term_cardinality as usize {
+        if t.vertex_ordinality != s.term_ordinality {
             errs.push(format!(
-                "VertexOrdinality↔TermOrdinality: {} vertex ordinalities ≠ {} terms",
-                t.vertex_ordinality.len(),
-                s.term_cardinality
+                "VertexOrdinality↔TermOrdinality: {:?} ≠ {:?}",
+                t.vertex_ordinality, s.term_ordinality
             ));
         }
-        if t.edge_ordinality.len() != s.connective_cardinality as usize {
+        if t.edge_ordinality != s.connective_ordinality {
             errs.push(format!(
-                "EdgeOrdinality↔ConnectiveOrdinality: {} edge ordinalities ≠ {} connectives",
-                t.edge_ordinality.len(),
-                s.connective_cardinality
+                "EdgeOrdinality↔ConnectiveOrdinality: {:?} ≠ {:?}",
+                t.edge_ordinality, s.connective_ordinality
             ));
         }
         if errs.is_empty() {
