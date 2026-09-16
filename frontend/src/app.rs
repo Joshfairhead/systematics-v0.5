@@ -245,7 +245,14 @@ impl ApiApp {
     /// graph shows the first candidate at an order, the scoped list shows the rest). Nullad exits.
     fn enabled_order_keys(&self) -> Option<Vec<String>> {
         let members = self.active_sequence.as_ref()?;
-        Some(self.member_orders(members).into_iter().map(key_for_order).collect())
+        let mut orders = self.member_orders(members);
+        // The **monad (order 1) is the container itself** — always reachable, so you can
+        // always return to the whole-contents list even when no K1 member has been authored
+        // (e.g. the Architectural Monad, whose lowest member is a dyad).
+        if !orders.contains(&1) {
+            orders.insert(0, 1);
+        }
+        Some(orders.into_iter().map(key_for_order).collect())
     }
 }
 
@@ -377,7 +384,17 @@ impl Component for ApiApp {
                 // shows the rest. On a miss we stay in the monad (don't fall back to canonical).
                 if let Some(members) = self.active_sequence.clone() {
                     if let Some(order_cardinality) = order_for_key(&name) {
+                        if order_cardinality == 1 {
+                            // The monad = the container: show all its contents as a list (the
+                            // way back to the scoped "all" view). Not a graph — the container
+                            // is the set, its members are the graphs.
+                            self.mode = ViewMode::Table;
+                            self.loading = false;
+                            return true;
+                        }
                         if let Some(id) = self.sequence_member_for_order(&members, order_cardinality) {
+                            // Selecting a specific order opens that system in the graph.
+                            self.mode = ViewMode::Graph;
                             self.loading = true;
                             let link = ctx.link().clone();
                             let client = self.graphql_client.clone();
@@ -689,28 +706,17 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ViewSequence(members) => {
-                // Enter a monad (its Space): scope BOTH views to its members, land in the graph
-                // on the head (first member), and let the header step the orders present. Toggle
-                // to list for the scoped candidate set (the same members — Hyparxis). Nullad
-                // exits. Order-navigable and bucket monads now open the same way (consistent).
+                // Enter a monad (its Space): scope both views to its members and **land on the
+                // list** of all its contents (the monad = the container). Selecting any order or
+                // row then opens that system in the graph; the monad button returns to this list;
+                // Nullad exits. Consistent for every monad, K1-headed or not.
                 self.enter_viewing();
                 self.breadcrumbs.clear();
-                self.mode = ViewMode::Graph;
-                let first = members
-                    .iter()
-                    .find_map(|m| m.strip_prefix("system:").map(|s| s.to_string()));
+                self.mode = ViewMode::Table;
+                self.selected_key = "monad".to_string(); // the container → list shows all members
                 self.active_sequence = Some(members);
-                if let Some(id) = first {
-                    self.loading = true;
-                    let link = ctx.link().clone();
-                    let client = self.graphql_client.clone();
-                    spawn_local(async move {
-                        match client.fetch_rendered_by_id(&id).await {
-                            Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
-                            Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
-                        }
-                    });
-                }
+                self.selected_system = None; // nothing on the canvas until a system is picked
+                self.loading = false;
                 true
             }
             ApiAppMsg::ToggleEditing => {
