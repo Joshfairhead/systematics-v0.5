@@ -710,6 +710,15 @@ body {
 .ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
 /* In-graph system editor. */
 .graph-with-editor { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+/* Canvas up/down arrows — step the scope's filtered member list. */
+.canvas-nav {
+    width: 2rem; height: 1.5rem; padding: 0; line-height: 1;
+    border: 1px solid #2d3748; border-radius: 0.4rem;
+    background: #1a202c; color: #cbd5e0; font-size: 0.85rem; cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.canvas-nav:hover { background: #2d3748; color: #fff; border-color: #4a5568; }
+.canvas-nav:active { transform: translateY(1px); }
 .system-editor { width: 100%; }
 .edit-toggle {
     align-self: flex-end;

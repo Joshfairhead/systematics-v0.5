@@ -147,6 +147,9 @@ pub enum ApiAppMsg {
     SequencesLoaded(Vec<SequenceView>),
     /// Enter a monad/sequence (member addresses) — navigate its members by order_cardinality.
     ViewSequence(Vec<String>),
+    /// Step the canvas up (-1) / down (+1) through the current scope's filtered member list
+    /// (the members the list shows) — the canvas arrows while inside a monad.
+    StepInScope(i32),
     /// Delete a Sequence/Monad by id (e.g. a stray Extract monad), then refresh.
     DeleteSequence(String),
     /// Delete selected rows (addresses `system:<id>` / `sequence:<id>` /
@@ -253,6 +256,24 @@ impl ApiApp {
             orders.insert(0, 1);
         }
         Some(orders.into_iter().map(key_for_order).collect())
+    }
+    /// The system ids (no `system:` prefix) in the current monad scope that match the active
+    /// list filter (the selected header order; monad/Nullad = all), in member order. This is
+    /// the set the list shows — and the ordered list the canvas up/down arrows step through.
+    fn scoped_filtered_ids(&self) -> Vec<String> {
+        let Some(members) = self.active_sequence.as_ref() else {
+            return Vec::new();
+        };
+        let want = match order_for_key(&self.selected_key) {
+            Some(1) | None => None, // the container → all members
+            some => some,
+        };
+        members
+            .iter()
+            .filter_map(|m| m.strip_prefix("system:"))
+            .filter(|id| want.is_none_or(|o| self.system_order(id) == Some(o)))
+            .map(|s| s.to_string())
+            .collect()
     }
 }
 
@@ -719,6 +740,32 @@ impl Component for ApiApp {
                 self.loading = false;
                 true
             }
+            ApiAppMsg::StepInScope(delta) => {
+                // Move the canvas up/down through the current scope's filtered member list
+                // (wraps around). No-op unless there are at least two candidates.
+                let ids = self.scoped_filtered_ids();
+                if ids.len() < 2 {
+                    return false;
+                }
+                let idx = self
+                    .selected_system
+                    .as_ref()
+                    .and_then(|s| ids.iter().position(|i| i == &s.system_id))
+                    .unwrap_or(0) as i32;
+                let n = ids.len() as i32;
+                let id = ids[((((idx + delta) % n) + n) % n) as usize].clone();
+                self.mode = ViewMode::Graph;
+                self.loading = true;
+                let link = ctx.link().clone();
+                let client = self.graphql_client.clone();
+                spawn_local(async move {
+                    match client.fetch_rendered_by_id(&id).await {
+                        Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                        Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                    }
+                });
+                true
+            }
             ApiAppMsg::ToggleEditing => {
                 // Toggle Viewing ↔ Editing. Entering Editing drops the read-only canonical
                 // view; a canonical seed becomes a blank editable template. The instance is
@@ -1061,6 +1108,11 @@ impl Component for ApiApp {
         } else {
             order_for_key(&self.selected_key)
         };
+        // Canvas up/down arrows: step the current scope's filtered member list. Shown only
+        // inside a monad when the filter has more than one candidate to move between.
+        let on_step_up = ctx.link().callback(|_| ApiAppMsg::StepInScope(-1));
+        let on_step_down = ctx.link().callback(|_| ApiAppMsg::StepInScope(1));
+        let show_canvas_nav = self.active_sequence.is_some() && self.scoped_filtered_ids().len() > 1;
 
         html! {
             <div class="app">
@@ -1159,6 +1211,11 @@ impl Component for ApiApp {
                             } else if let Some(ref system) = self.selected_system {
                                 html! {
                                     <div class="graph-with-editor">
+                                        if show_canvas_nav {
+                                            <button class="canvas-nav canvas-nav-up"
+                                                title="Previous in list"
+                                                onclick={ on_step_up.clone() }>{ "▲" }</button>
+                                        }
                                         <ApiGraphView
                                             system={ system.clone() }
                                             on_navigate={ Some(on_navigate) }
@@ -1172,6 +1229,11 @@ impl Component for ApiApp {
                                             on_edit_value={ Some(on_edit_value) }
                                             name_hint={ self.next_sketch_name() }
                                         />
+                                        if show_canvas_nav {
+                                            <button class="canvas-nav canvas-nav-down"
+                                                title="Next in list"
+                                                onclick={ on_step_down.clone() }>{ "▼" }</button>
+                                        }
                                     </div>
                                 }
                             } else {
