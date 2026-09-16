@@ -29,6 +29,12 @@ links for context.
   (Laplacian=within/coherence, adjacency=between/products; distinguishes orders, blind within an
   order) vs semantic/functorial (same-order, different content); cross-order = containment
   (`K4 ⊃ 4·K3`). A breadcrumb for parked products/functor work.
+- **[view-model.md](view-model.md)** — the two views as the time tetrad: List=Eternity (filter
+  all-of-a-type), Graph=Chronos (one at a time, monad→dodecad), editor=Hyparxis (narrow
+  candidates), Space=the monad container. Diagnoses the v0.5 nav inconsistency and plans the fix.
+- **[refactor-plan.md](refactor-plan.md)** — the v0.6 roadmap: substrate → archetypes (validation
+  split three ways: topology / vocabulary / system) → functional construction → view model →
+  operations → comparing/products; and how the current v0.5 work feeds it.
 - **[node-edge-inversion.md](node-edge-inversion.md)** — the node↔edge duality: express a
   triad as nodes then invert to edges (`node_i ↔ e_(n+1−i)`, "walking the path backwards");
   why Composition · Associativity · Identity live on the edges; special to the triad.

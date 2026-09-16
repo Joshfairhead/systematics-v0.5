@@ -6,6 +6,12 @@ A constructed **topology** must be validated against a **system**. The rebuild m
 correspondence explicit as an **archetype** (the rules/vocabulary) and an **instance** (a
 concrete K_n filled with characters). Both can be saved as hexads.
 
+> **Three archetype validations (v0.6).** What follows is the **system archetype** rule (the two
+> faces book-matched). It splits into three peers: a **topology archetype** validation (a
+> topology instance vs the TopologyHexad alone), a **vocabulary archetype** validation (a
+> vocabulary instance vs the SystematicsHexad alone), and the **system archetype** = the
+> equivalence that book-matches them. See [refactor-plan](refactor-plan.md).
+
 ## Archetype validation — the equivalences
 These pairs are asserted equivalent (topology facet ↔ system facet):
 
