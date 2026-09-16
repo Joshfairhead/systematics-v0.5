@@ -1042,11 +1042,16 @@ impl Component for ApiApp {
         // this switch chooses Graph or Table.
         let on_set_mode = ctx.link().callback(ApiAppMsg::SetMode);
         let on_toggle_editing = ctx.link().callback(|_| ApiAppMsg::ToggleEditing);
-        // List filter: inside a monad the list shows the whole scoped candidate set (all
-        // orders — Eternity over the scope); at the Nullad it filters globally by the selected
-        // order type. Either way `scope_ids` restricts the rows to the monad's members.
+        // List filter (Eternity over the scope): inside a monad the **head/monad** selection
+        // shows the whole container (all members); a higher order (dyad, triad, …) filters the
+        // scoped list to just that order — e.g. Blue Earth + dyad = its three dyads. `scope_ids`
+        // restricts rows to the monad's members either way. At the Nullad the selected order
+        // filters globally by type.
         let filter_order = if self.active_sequence.is_some() {
-            None
+            match order_for_key(&self.selected_key) {
+                Some(1) | None => None, // monad head (or Nullad) → the whole container
+                some => some,           // dyad/triad/… → that order within the scope
+            }
         } else {
             order_for_key(&self.selected_key)
         };
