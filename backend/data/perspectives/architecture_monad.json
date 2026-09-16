@@ -4,6 +4,7 @@
       "id": "sequence_architectural_monad",
       "name": "Architectural Monad",
       "members": [
+        "system:system_architectural_monad_1",
         "system:system_data_2",
         "system:system_order_position_location_3",
         "system:system_citation_3",

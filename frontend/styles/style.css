@@ -709,16 +709,30 @@ body {
 .ed-name { flex: 1; min-width: 12rem; }
 .ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
 /* In-graph system editor. */
-.graph-with-editor { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-/* Canvas up/down arrows — step the scope's filtered member list. */
+.graph-with-editor { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+/* Canvas up/down arrows — round & glassy (matching the nav tabs), overlaid on the canvas
+   and faded until you interact with it (fade in on hover; brighten on the arrow itself). */
 .canvas-nav {
-    width: 2rem; height: 1.5rem; padding: 0; line-height: 1;
-    border: 1px solid #2d3748; border-radius: 0.4rem;
-    background: #1a202c; color: #cbd5e0; font-size: 0.85rem; cursor: pointer;
-    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    position: absolute; left: 50%; transform: translateX(-50%); z-index: 5;
+    width: 2rem; height: 2rem; padding: 0; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #4a5568; font-size: 0.8rem; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(163, 177, 198, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
-.canvas-nav:hover { background: #2d3748; color: #fff; border-color: #4a5568; }
-.canvas-nav:active { transform: translateY(1px); }
+.canvas-nav-up { top: 0.6rem; }
+.canvas-nav-down { bottom: 0.6rem; }
+.graph-with-editor:hover .canvas-nav { opacity: 0.55; }
+.canvas-nav:hover {
+    opacity: 1; background: rgba(255, 255, 255, 0.75); color: #2563eb;
+    transform: translateX(-50%) translateY(-2px);
+}
+.canvas-nav:active { transform: translateX(-50%) translateY(0); }
 .system-editor { width: 100%; }
 .edit-toggle {
     align-self: flex-end;

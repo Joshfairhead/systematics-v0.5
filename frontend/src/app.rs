@@ -257,17 +257,15 @@ impl ApiApp {
         }
         Some(orders.into_iter().map(key_for_order).collect())
     }
-    /// The system ids (no `system:` prefix) in the current monad scope that match the active
-    /// list filter (the selected header order; monad/Nullad = all), in member order. This is
-    /// the set the list shows — and the ordered list the canvas up/down arrows step through.
+    /// The system ids (no `system:` prefix) of the current scope's members of the **selected
+    /// order** (a *strict* order match — the same-order candidates), in member order. This is
+    /// what the canvas up/down arrows step through, so a lone system of an order (e.g. a
+    /// sequence's single monad) shows no arrows, while three dyads do.
     fn scoped_filtered_ids(&self) -> Vec<String> {
         let Some(members) = self.active_sequence.as_ref() else {
             return Vec::new();
         };
-        let want = match order_for_key(&self.selected_key) {
-            Some(1) | None => None, // the container → all members
-            some => some,
-        };
+        let want = order_for_key(&self.selected_key);
         members
             .iter()
             .filter_map(|m| m.strip_prefix("system:"))
@@ -405,17 +403,12 @@ impl Component for ApiApp {
                 // shows the rest. On a miss we stay in the monad (don't fall back to canonical).
                 if let Some(members) = self.active_sequence.clone() {
                     if let Some(order_cardinality) = order_for_key(&name) {
-                        if order_cardinality == 1 {
-                            // The monad = the container: show all its contents as a list (the
-                            // way back to the scoped "all" view). Not a graph — the container
-                            // is the set, its members are the graphs.
-                            self.mode = ViewMode::Table;
-                            self.loading = false;
-                            return true;
-                        }
                         if let Some(id) = self.sequence_member_for_order(&members, order_cardinality) {
-                            // Selecting a specific order opens that system in the graph.
-                            self.mode = ViewMode::Graph;
+                            // Focus this order: load its system onto the canvas (monad→K1,
+                            // dyad→K2, …). Stay in the current view — in the list the header
+                            // filters (monad = all, order k = its members), in the graph the
+                            // canvas shows this order's system. Each tab always resolves the
+                            // correct order.
                             self.loading = true;
                             let link = ctx.link().clone();
                             let client = self.graphql_client.clone();
@@ -428,7 +421,7 @@ impl Component for ApiApp {
                             return true;
                         }
                     }
-                    // No member at this order in scope → keep the monad, don't navigate away.
+                    // No member at this order in scope → keep the sequence, don't navigate away.
                     return true;
                 }
 
@@ -727,17 +720,31 @@ impl Component for ApiApp {
                 true
             }
             ApiAppMsg::ViewSequence(members) => {
-                // Enter a monad (its Space): scope both views to its members and **land on the
-                // list** of all its contents (the monad = the container). Selecting any order or
-                // row then opens that system in the graph; the monad button returns to this list;
-                // Nullad exits. Consistent for every monad, K1-headed or not.
+                // Enter a sequence: scope both views to its members and **land on the list** of
+                // all its contents (the container). Load the sequence's **monad (K1)** onto the
+                // canvas so switching to graph shows the monad vertex (its head, named after the
+                // sequence). Order tabs then focus each order (list: filter — monad = all, order
+                // k = its members; graph: that order's system); Nullad exits.
                 self.enter_viewing();
                 self.breadcrumbs.clear();
                 self.mode = ViewMode::Table;
-                self.selected_key = "monad".to_string(); // the container → list shows all members
+                self.selected_key = "monad".to_string();
+                self.selected_system = None;
+                let monad = self.sequence_member_for_order(&members, 1);
                 self.active_sequence = Some(members);
-                self.selected_system = None; // nothing on the canvas until a system is picked
-                self.loading = false;
+                if let Some(id) = monad {
+                    self.loading = true;
+                    let link = ctx.link().clone();
+                    let client = self.graphql_client.clone();
+                    spawn_local(async move {
+                        match client.fetch_rendered_by_id(&id).await {
+                            Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                            Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                        }
+                    });
+                } else {
+                    self.loading = false;
+                }
                 true
             }
             ApiAppMsg::StepInScope(delta) => {
