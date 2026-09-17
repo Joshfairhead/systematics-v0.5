@@ -994,21 +994,23 @@ impl Component for ApiApp {
                 let terms: Vec<String> = terms.into_iter().map(|(_, v)| v).collect();
                 let connectives: Vec<String> = conns.into_iter().map(|(_, _, v)| v).collect();
 
-                // A rename changes the id (derived from the name), so re-author under the
-                // new name and delete the old system. A value edit keeps the same id, so
-                // authoring overwrites in place (no old id to remove). Renaming a CANONICAL
-                // system forks a custom copy instead — the canonical is never deleted.
+                // Instance systems edit **in place, keeping their id** (id-stable rename/edit),
+                // so any sequence that references them stays valid — a system's id is derived
+                // from its name, so re-authoring under a new name would fork a new id and orphan
+                // the sequence. A CANONICAL seed instead **forks** a custom copy (author under
+                // the new name; the seed is never touched).
                 let old_id = system.system_id.clone();
-                let was_canonical = system.canonical_class.is_none();
-                let rename = matches!(edit, GraphEdit::Name { .. });
+                let is_instance = system.canonical_class.is_some();
                 let link = ctx.link().clone();
                 let client = self.graphql_client.clone();
                 spawn_local(async move {
-                    match client.author_system(&new_name, order, terms, connectives).await {
+                    let result = if is_instance {
+                        client.edit_system(&old_id, &new_name, order, terms, connectives).await
+                    } else {
+                        client.author_system(&new_name, order, terms, connectives).await
+                    };
+                    match result {
                         Ok(sys) => {
-                            if rename && !was_canonical && sys.id != old_id {
-                                let _ = client.delete_system(&old_id).await;
-                            }
                             if let Ok(system) = client.fetch_rendered_by_id(&sys.id).await {
                                 link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)));
                             }

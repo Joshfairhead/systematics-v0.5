@@ -124,10 +124,12 @@ fn module_owned_systems_present() {
     // Model's), and the Assembly/Decomposition dyad. Then 84 → 88 (2026-09-11): the Blue
     // Earth Ventures monad, its World/Businesses dyad, Backing triad, and Venture Ecosystem
     // tetrad.
+    // Then 104 → 105 (2026-09-16): the Architectural Monad's own K1 monad head
+    // (system_architectural_monad_1), so the sequence has a monad = its name.
     assert_eq!(
         graph.systems.len(),
-        104,
-        "expected 12 canonical + 1 citation + 88 fragment + 3 module systems"
+        105,
+        "expected 12 canonical + 1 citation + 88 fragment + 4 module systems"
     );
 }
 
@@ -170,11 +172,12 @@ fn architectural_monad_registry_loads() {
     let monad = graph
         .sequence("sequence_architectural_monad")
         .expect("Architectural Monad registry loaded from its module");
-    // A **bucket**: the architecture systems grouped for sorting (several triads,
-    // so it is not an order_cardinality-linear sequence). OrderCardinality does not matter here.
+    // Its head is the K1 monad (named after the sequence), then the architecture systems
+    // grouped for sorting (several triads). OrderCardinality does not matter here.
     assert_eq!(
         monad.members,
         vec![
+            "system:system_architectural_monad_1",
             "system:system_data_2",
             "system:system_order_position_location_3",
             "system:system_citation_3",

@@ -1132,6 +1132,53 @@ impl MutationRoot {
         Ok(GqlSystem::new(system))
     }
 
+    /// **Edit a system in place from term/connective values, keeping its id** — the id-stable
+    /// editor update. A system's id is derived from its name, so re-authoring under a new name
+    /// (`authorSystem`) forks a new id and orphans any **sequence** that references the old one.
+    /// This rebuilds the system's characters + vocabulary from the given values but **forces the
+    /// existing id**, so a rename (or any value edit) stays in place and sequence memberships
+    /// survive. (Distinct from `updateSystem`, which replaces a System's raw metadata record.)
+    async fn edit_system(
+        &self,
+        ctx: &Context<'_>,
+        id: String,
+        input: AuthorSystemInput,
+    ) -> async_graphql::Result<GqlSystem> {
+        let order_cardinality = input.order_cardinality as u8;
+        if !(1..=12).contains(&order_cardinality) {
+            return Err(Error::new(format!("order_cardinality {order_cardinality} out of range 1..=12")));
+        }
+        let grammar = Template::for_order(order_cardinality);
+        let expected_conn = grammar.expected_connectives();
+        if input.terms.len() != order_cardinality as usize {
+            return Err(Error::new(format!(
+                "expected {order_cardinality} terms, got {}",
+                input.terms.len()
+            )));
+        }
+        if input.connectives.len() != expected_conn {
+            return Err(Error::new(format!(
+                "order_cardinality {order_cardinality} expects {expected_conn} connectives, got {}",
+                input.connectives.len()
+            )));
+        }
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.system(&id).is_none() {
+            return Err(Error::new(format!("System '{id}' not found")));
+        }
+        // Rebuild chars + vocab + system, then force the existing system id (keeping its
+        // sequence memberships) before applying. The old (name-derived) vocab/chars are left
+        // as harmless orphans.
+        let (mut content, mut system) =
+            build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
+        system.id = id.clone();
+        content.systems = vec![system.clone()];
+        graph.apply_content(&content);
+        persist(ctx, &graph);
+        Ok(GqlSystem::new(system))
+    }
+
     /// Join (addition) selected member systems into a K_k on the **union of their distinct
     /// term values** — the complete-graph completion (Kₘ + Kₙ = Kₘ₊ₙ). Connectives start
     /// blank (filled later via on-graph Update). Optionally appends the new system to a

@@ -1,4 +1,34 @@
 {
+  "characters": [
+    {
+      "id": "char_word_architectural_monad_t1",
+      "kind": "word",
+      "value": "Architectural Monad"
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_architectural_monad_1",
+      "name": "Architectural Monad",
+      "order": 1,
+      "terms": [
+        "char_word_architectural_monad_t1"
+      ],
+      "connectives": []
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_architectural_monad_1",
+      "name": "Architectural Monad",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_architectural_monad_1"
+    }
+  ],
   "sequences": [
     {
       "id": "sequence_architectural_monad",

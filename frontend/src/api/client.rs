@@ -207,6 +207,12 @@ struct AuthorSystemResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct EditSystemResponse {
+    #[serde(rename = "editSystem")]
+    edit_system: Option<InstanceSystem>,
+}
+
+#[derive(Deserialize, Debug)]
 struct JoinSystemsResponse {
     #[serde(rename = "joinSystems")]
     join_systems: Option<InstanceSystem>,
@@ -651,6 +657,39 @@ impl GraphQLClient {
             .data
             .and_then(|d| d.author_system)
             .ok_or_else(|| ApiError::ParseError("authorSystem returned no data".to_string()))
+    }
+
+    /// **Id-stable edit**: rebuild the system with id `id` from the given values, keeping the
+    /// id (so sequence references survive a rename or value edit). Used for instance systems;
+    /// canonical seeds fork via `author_system` instead.
+    pub async fn edit_system(
+        &self,
+        id: &str,
+        name: &str,
+        order_cardinality: i32,
+        terms: Vec<String>,
+        connectives: Vec<String>,
+    ) -> Result<InstanceSystem, ApiError> {
+        let query = r#"
+            mutation Edit($id: String!, $input: AuthorSystemInput!) {
+                editSystem(id: $id, input: $input) { id name orderCardinality }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "id": id,
+            "input": { "name": name, "orderCardinality": order_cardinality, "terms": terms, "connectives": connectives }
+        });
+        let response: GraphQLResponse<EditSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.edit_system)
+            .ok_or_else(|| ApiError::ParseError("editSystem returned no data".to_string()))
     }
 
     /// Join (addition) selected member systems into a new K_k on the union of their

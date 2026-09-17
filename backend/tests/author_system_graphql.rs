@@ -152,3 +152,45 @@ async fn author_rejects_wrong_arity() {
     let resp = schema.execute(m).await;
     assert!(!resp.errors.is_empty(), "wrong term count must error");
 }
+
+#[tokio::test]
+async fn edit_system_is_id_stable_and_keeps_sequence_refs() {
+    // The id-stable rename: editing a system (even its name) keeps its id, so a sequence
+    // that references it is not orphaned. authorSystem would fork a new id and strand the ref.
+    let schema = make_schema();
+    // A monad, added to a sequence.
+    let a = schema
+        .execute(r#"mutation { authorSystem(input:{name:"Monad CT", orderCardinality:1, terms:["Monad CT"], connectives:[]}){ id } }"#)
+        .await;
+    assert!(a.errors.is_empty(), "author: {:?}", a.errors);
+    let id = a.data.into_json().unwrap()["authorSystem"]["id"].as_str().unwrap().to_string();
+    let seq = format!(
+        r#"mutation {{ createSequence(input:{{name:"CT", members:["system:{id}"]}}){{ id }} }}"#
+    );
+    let s = schema.execute(&seq).await;
+    assert!(s.errors.is_empty(), "createSequence: {:?}", s.errors);
+    let seq_id = s.data.into_json().unwrap()["createSequence"]["id"].as_str().unwrap().to_string();
+
+    // Rename the monad to "Monoid" via editSystem — id must NOT change.
+    let e = format!(
+        r#"mutation {{ editSystem(id:"{id}", input:{{name:"Monoid", orderCardinality:1, terms:["Monoid"], connectives:[]}}){{ id name }} }}"#
+    );
+    let r = schema.execute(&e).await;
+    assert!(r.errors.is_empty(), "editSystem: {:?}", r.errors);
+    let d = r.data.into_json().unwrap();
+    assert_eq!(d["editSystem"]["id"], id, "id must be stable across a rename");
+    assert_eq!(d["editSystem"]["name"], "Monoid", "name updated in place");
+
+    // The system still resolves under the same id, now named Monoid…
+    let rr = schema.execute(&format!(r#"{{ renderSystem(systemId:"{id}"){{ terms {{ value }} }} }}"#)).await;
+    let dd = rr.data.into_json().unwrap();
+    assert_eq!(dd["renderSystem"]["terms"][0]["value"], "Monoid");
+
+    // …and the sequence still references it (not orphaned).
+    let sq = schema.execute(r#"{ sequences { id members } }"#).await;
+    let sd = sq.data.into_json().unwrap();
+    let members: Vec<String> = sd["sequences"].as_array().unwrap().iter()
+        .find(|s| s["id"] == seq_id).unwrap()["members"].as_array().unwrap()
+        .iter().map(|m| m.as_str().unwrap().to_string()).collect();
+    assert!(members.contains(&format!("system:{id}")), "sequence ref survives the rename: {members:?}");
+}
