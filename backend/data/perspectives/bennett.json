@@ -1,0 +1,97 @@
+{
+  "characters": [
+    {
+      "id": "char_word_bennett_t1",
+      "kind": "word",
+      "value": "Bennett"
+    },
+    {
+      "id": "char_word_mind_t1",
+      "kind": "word",
+      "value": "Automatic"
+    },
+    {
+      "id": "char_word_mind_t2",
+      "kind": "word",
+      "value": "Sensitive"
+    },
+    {
+      "id": "char_word_mind_t3",
+      "kind": "word",
+      "value": "Conscious"
+    },
+    {
+      "id": "char_word_mind_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_mind_c2",
+      "kind": "word",
+      "value": "Awareness"
+    },
+    {
+      "id": "char_word_mind_c3",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_bennett_1",
+      "name": "Bennett",
+      "order": 1,
+      "terms": [
+        "char_word_bennett_t1"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_mind_3",
+      "name": "Mind",
+      "order": 3,
+      "terms": [
+        "char_word_mind_t1",
+        "char_word_mind_t2",
+        "char_word_mind_t3"
+      ],
+      "connectives": [
+        "char_word_mind_c1",
+        "char_word_mind_c2",
+        "char_word_mind_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_bennett_1",
+      "name": "Bennett",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_bennett_1"
+    },
+    {
+      "id": "system_mind_3",
+      "name": "Mind",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_mind_3"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "sequence_bennett",
+      "name": "Bennett",
+      "members": [
+        "system:system_bennett_1",
+        "system:system_mind_3"
+      ]
+    }
+  ]
+}
