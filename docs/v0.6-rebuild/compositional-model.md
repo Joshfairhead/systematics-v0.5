@@ -73,3 +73,27 @@ A fully-articulated triad names its 3 nodes *and* its 3 edges, both following th
 
 (In the v0.5 prototype these were seeded with the node/edge distinction blurred; the rebuild
 should treat nodes and edges as separately-articulated 123 series.)
+
+## Deterministic assembly — the out-degree cascade (Gemma, 2026-09-17)
+A concrete, distributed-safe serialisation for assembling any K_n — the construction method
+we'd been deferring. **Rule:** a source node `u` only links to targets `v` where `u < v`
+(lexicographical ordering of pairs). This yields **`n-1` sequential batches** (batch `k` = node
+`k`'s forward edges) and exactly **`n(n-1)/2`** unique undirected edges — no duplicates, no
+misses, order-independent across agents (Holochain-friendly). Serialised as an instruction
+stream: `InitNodes { count }` then `AddEdge { batch, source, target }` (MessagePack for zomes).
+
+**Why it matters here:**
+- **It *is* our canonical edge order.** For K3 the cascade emits `(1,2), (1,3), (2,3)` — exactly
+  `grammar.rs::edges()`. So we already order edges this way; the cascade names the algorithm.
+- **It settles the serial edge-ordinality** ([validation](validation.md), `ConnectiveOrdinality`).
+  The edge's position in the cascade *is* its serial ordinality: `1-2 → 1, 1-3 → 2, 2-3 → 3`.
+  So the "positional equivalent" of an adjacency pair is its cascade index. (The **six laws** are
+  a *different* serialisation — reading/traversal orders, not the construction order.)
+- **It is the substrate assembly primitive.** The `InitNodes`/`AddEdge` stream is the functional
+  construction (create-vertex + link-to-all) made into a deterministic, replayable protocol —
+  the v0.6 build path.
+
+**Lexicographical, again.** The cascade uses lexicographical *ordering* of edge pairs (linearise
+one K_n); the parked **lexicographical product** `G[H]` combines *two* graphs (a rook-ish
+blow-up). Same word, different operations — but both make "lexicographical order" the primary
+axis, so the cascade's ordering is the natural substrate for defining the products later.
