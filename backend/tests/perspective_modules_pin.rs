@@ -48,10 +48,10 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 19,
-        "expected 19 module files to load (14 sources + the Architecture Pentad \
+        modules, 20,
+        "expected 20 module files to load (14 sources + the Architecture Pentad \
          + the Architectural Monad, Blue Earth, Interface State Model, and Blue Earth \
-         Ventures registries); got {modules}"
+         Ventures registries + the Plato sequence); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
@@ -126,10 +126,12 @@ fn module_owned_systems_present() {
     // tetrad.
     // Then 104 → 105 (2026-09-16): the Architectural Monad's own K1 monad head
     // (system_architectural_monad_1), so the sequence has a monad = its name.
+    // Then 105 → 110 (2026-09-17): the Plato sequence — its monad head + 4 triads
+    // (Tripartite Soul, Social Classes, Three Fates, Cave Allegory).
     assert_eq!(
         graph.systems.len(),
-        105,
-        "expected 12 canonical + 1 citation + 88 fragment + 4 module systems"
+        110,
+        "expected 12 canonical + 1 citation + 88 fragment + 9 module systems"
     );
 }
 
