@@ -708,6 +708,14 @@ body {
 }
 .ed-name { flex: 1; min-width: 12rem; }
 .ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
+/* Raw nodes/edges toggle (all-or-none) — sits under the browser control bar. */
+.raw-toggle {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    margin: 0.2rem 0 0.4rem; padding: 0.15rem 0.1rem;
+    font-size: 0.75rem; color: #718096; cursor: pointer; user-select: none;
+}
+.raw-toggle input { cursor: pointer; }
+
 /* In-graph system editor. */
 .graph-with-editor { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
 /* Canvas up/down arrows — round & glassy (matching the nav tabs), overlaid on the canvas

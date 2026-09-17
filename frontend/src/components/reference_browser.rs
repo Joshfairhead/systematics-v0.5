@@ -77,10 +77,16 @@ pub struct ReferenceBrowserProps {
     /// ("open the canonical system, then customise").
     #[prop_or_default]
     pub templates: Vec<SystemTemplate>,
-    /// The focused system's raw nodes (terms) + edges (connectives), shown as rows
-    /// when the Term/Connective filter is on (off by default).
+    /// Raw nodes (terms) + edges (connectives) as rows — **all systems or none** (the
+    /// `show_raw` toggle). Empty unless `show_raw` is on.
     #[prop_or_default]
     pub raw_elements: Vec<RawElement>,
+    /// Whether the raw nodes/edges rows are shown (drives the toggle's checked state).
+    #[prop_or_default]
+    pub show_raw: bool,
+    /// Toggle the raw nodes/edges rows (all-or-none).
+    #[prop_or_default]
+    pub on_toggle_raw: Callback<()>,
     /// Every Sequence / Monad in the graph — shown as rows (Cites = its members),
     /// so monads (e.g. the Architecture Monad) and their members are visible.
     #[prop_or_default]
@@ -550,6 +556,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 systems,
                 seqs,
                 raw,
+                show_raw: props.show_raw,
+                on_toggle_raw: &props.on_toggle_raw,
                 on_load: &props.on_load,
                 on_view_sequence: &props.on_view_sequence,
                 on_delete_sequence: &props.on_delete_sequence,
@@ -583,8 +591,12 @@ struct TableCtx<'a> {
     systems: &'a [InstanceSystem],
     /// Every Sequence / Monad — shown as rows (Cites = members).
     seqs: &'a [SequenceView],
-    /// The focused system's raw nodes/edges (shown when Term/Connective on).
+    /// Raw nodes/edges rows — all systems or none (the `show_raw` toggle).
     raw: &'a [RawElement],
+    /// Whether the raw nodes/edges rows are on (the toggle's checked state).
+    show_raw: bool,
+    /// Toggle the raw nodes/edges rows (all-or-none).
+    on_toggle_raw: &'a Callback<()>,
     /// Click a system row to view it (loads into the graph).
     on_load: &'a Callback<String>,
     /// Click a monad row to enter it (navigate its members via the header).
@@ -628,6 +640,8 @@ fn table_view(ctx: TableCtx) -> Html {
         systems,
         seqs,
         raw,
+        show_raw,
+        on_toggle_raw,
         on_load,
         on_view_sequence,
         on_delete_sequence,
@@ -1012,6 +1026,14 @@ fn table_view(ctx: TableCtx) -> Html {
                 on_join_selected={ on_join_selected }
                 on_decompose_selected={ on_decompose_selected }
             />
+            <label class="raw-toggle" title="Show every system's raw nodes & edges as rows (all or none)">
+                <input
+                    type="checkbox"
+                    checked={ show_raw }
+                    onclick={ let cb = on_toggle_raw.clone(); Callback::from(move |_: MouseEvent| cb.emit(())) }
+                />
+                { " Nodes & edges" }
+            </label>
 
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }

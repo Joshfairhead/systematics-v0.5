@@ -120,6 +120,8 @@ pub enum ApiAppMsg {
     NavigateToSystem(String),
     NavigateBack,
     ToggleEdgeLabels,
+    /// Toggle showing every system's raw nodes/edges in the list (all-or-none).
+    ToggleRaw,
     ReferencesLoaded(Vec<ReferenceView>),
     SetMode(ViewMode),
     /// Toggle Graph ↔ Table (the `v` hotkey).
@@ -182,6 +184,9 @@ pub struct ApiApp {
     /// When true, node/edge labels show the canonical *class* (from the loaded
     /// system's `canonicalClass`) instead of its instance values.
     show_canonical: bool,
+    /// When true, the list also shows the **raw nodes/edges of *every* system** (all-or-none,
+    /// not just the focused one). Off by default — see `docs`/task "Raw nodes/edges".
+    show_raw: bool,
     /// Feedback from the last Extract (Nullad → Monad), shown in the data view.
     extract_note: Option<String>,
     /// The canvas interface state (Viewing / Editing) — see `CanvasMode`.
@@ -366,6 +371,7 @@ impl Component for ApiApp {
             all_references: vec![],
             instance_systems: vec![],
             show_canonical: false,
+            show_raw: false,
             extract_note: None,
             canvas_mode: CanvasMode::Viewing,
             sequences: vec![],
@@ -545,6 +551,10 @@ impl Component for ApiApp {
             }
             ApiAppMsg::ToggleEdgeLabels => {
                 self.show_edge_labels = !self.show_edge_labels;
+                true
+            }
+            ApiAppMsg::ToggleRaw => {
+                self.show_raw = !self.show_raw;
                 true
             }
             ApiAppMsg::ReferencesLoaded(refs) => {
@@ -1080,25 +1090,26 @@ impl Component for ApiApp {
             })
             .collect();
         all_systems.extend(self.instance_systems.iter().cloned());
-        // The focused system's raw nodes (terms) + edges (connectives) as data rows
-        // (shown in the table when the Term/Connective filter is turned on).
-        let raw_elements: Vec<RawElement> = self
-            .selected_system
-            .as_ref()
-            .map(|s| {
-                let mut v: Vec<RawElement> = s
-                    .terms
-                    .iter()
-                    .map(|t| RawElement { name: t.value.clone(), order_cardinality: s.order_cardinality, is_edge: false })
-                    .collect();
-                v.extend(s.connectives.iter().map(|c| RawElement {
-                    name: c.character_value.clone(),
-                    order_cardinality: s.order_cardinality,
-                    is_edge: true,
-                }));
-                v
-            })
-            .unwrap_or_default();
+        // Raw nodes/edges as data rows — **all systems or none** (the `show_raw` toggle),
+        // rather than only the focused system's (which was confusing). Off by default.
+        let raw_elements: Vec<RawElement> = if self.show_raw {
+            all_systems
+                .iter()
+                .flat_map(|s| {
+                    let o = s.order_cardinality;
+                    s.terms
+                        .iter()
+                        .map(move |t| RawElement { name: t.value.clone(), order_cardinality: o, is_edge: false })
+                        .chain(s.connectives.iter().map(move |c| RawElement {
+                            name: c.value.clone(),
+                            order_cardinality: o,
+                            is_edge: true,
+                        }))
+                })
+                .collect()
+        } else {
+            Vec::new()
+        };
 
         // Data · Graph · Table: the Data (content the header scopes) has two views;
         // this switch chooses Graph or Table.
@@ -1173,6 +1184,8 @@ impl Component for ApiApp {
                                 on_join={ on_join }
                                 on_decompose={ on_decompose }
                                 scope_ids={ self.active_sequence.clone() }
+                                show_raw={ self.show_raw }
+                                on_toggle_raw={ ctx.link().callback(|_| ApiAppMsg::ToggleRaw) }
                             />
                         } else if self.selected_key == "nullad" && self.active_sequence.is_none() {
                             // Nullad in graph mode: a blank canvas standing in for
