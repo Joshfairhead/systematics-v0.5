@@ -1167,14 +1167,40 @@ impl MutationRoot {
         if graph.system(&id).is_none() {
             return Err(Error::new(format!("System '{id}' not found")));
         }
+        // Capture the CURRENT vocabulary + its characters before repointing the system — on a
+        // rename the rebuilt vocab/chars take new (name-derived) ids, orphaning these.
+        let old_vocab = graph.system(&id).and_then(|s| {
+            graph.vocabulary(&s.vocabulary_ref).map(|v| {
+                let chars: Vec<String> =
+                    v.terms.iter().chain(v.connectives.iter()).cloned().collect();
+                (v.id.clone(), chars)
+            })
+        });
         // Rebuild chars + vocab + system, then force the existing system id (keeping its
-        // sequence memberships) before applying. The old (name-derived) vocab/chars are left
-        // as harmless orphans.
+        // sequence memberships) before applying.
         let (mut content, mut system) =
             build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
         system.id = id.clone();
         content.systems = vec![system.clone()];
+        let new_vocab_id = system.vocabulary_ref.clone();
         graph.apply_content(&content);
+        // Cascade-clean the old vocabulary + its now-orphaned characters (a rename changes the
+        // name-derived ids). Characters still referenced by another vocabulary are kept (shared).
+        if let Some((old_vocab_id, old_chars)) = old_vocab {
+            if old_vocab_id != new_vocab_id {
+                graph.delete_vocabulary(&old_vocab_id);
+                let still_used: std::collections::HashSet<String> = graph
+                    .vocabularies
+                    .iter()
+                    .flat_map(|v| v.terms.iter().chain(v.connectives.iter()).cloned())
+                    .collect();
+                for cid in &old_chars {
+                    if !still_used.contains(cid) {
+                        graph.delete_character(cid);
+                    }
+                }
+            }
+        }
         persist(ctx, &graph);
         Ok(GqlSystem::new(system))
     }

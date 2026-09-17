@@ -193,4 +193,13 @@ async fn edit_system_is_id_stable_and_keeps_sequence_refs() {
         .find(|s| s["id"] == seq_id).unwrap()["members"].as_array().unwrap()
         .iter().map(|m| m.as_str().unwrap().to_string()).collect();
     assert!(members.contains(&format!("system:{id}")), "sequence ref survives the rename: {members:?}");
+
+    // No dangling threads: the old (name-derived) vocabulary + character are cleaned up.
+    let old = schema
+        .execute(r#"{ v: vocabulary(id: "vocab_monad_ct_1") { id } c: character(id: "char_word_monad_ct_t1") { id } }"#)
+        .await;
+    assert!(old.errors.is_empty(), "cleanup query: {:?}", old.errors);
+    let od = old.data.into_json().unwrap();
+    assert!(od["v"].is_null(), "old vocabulary should be cleaned up after a rename");
+    assert!(od["c"].is_null(), "old character should be cleaned up after a rename");
 }
