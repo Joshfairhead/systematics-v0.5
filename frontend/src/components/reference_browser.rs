@@ -81,12 +81,18 @@ pub struct ReferenceBrowserProps {
     /// `show_raw` toggle). Empty unless `show_raw` is on.
     #[prop_or_default]
     pub raw_elements: Vec<RawElement>,
-    /// Whether the raw nodes/edges rows are shown (drives the toggle's checked state).
+    /// Row-kind filter pills — which kinds of row are shown.
     #[prop_or_default]
-    pub show_raw: bool,
-    /// Toggle the raw nodes/edges rows (all-or-none).
+    pub pill_sequences: bool,
     #[prop_or_default]
-    pub on_toggle_raw: Callback<()>,
+    pub pill_systems: bool,
+    #[prop_or_default]
+    pub pill_connectives: bool,
+    #[prop_or_default]
+    pub pill_nodes: bool,
+    /// Toggle a pill by key ("sequences"/"systems"/"connectives"/"nodes").
+    #[prop_or_default]
+    pub on_toggle_pill: Callback<String>,
     /// Every Sequence / Monad in the graph — shown as rows (Cites = its members),
     /// so monads (e.g. the Architecture Monad) and their members are visible.
     #[prop_or_default]
@@ -556,8 +562,11 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 systems,
                 seqs,
                 raw,
-                show_raw: props.show_raw,
-                on_toggle_raw: &props.on_toggle_raw,
+                pill_sequences: props.pill_sequences,
+                pill_systems: props.pill_systems,
+                pill_connectives: props.pill_connectives,
+                pill_nodes: props.pill_nodes,
+                on_toggle_pill: &props.on_toggle_pill,
                 on_load: &props.on_load,
                 on_view_sequence: &props.on_view_sequence,
                 on_delete_sequence: &props.on_delete_sequence,
@@ -591,12 +600,14 @@ struct TableCtx<'a> {
     systems: &'a [InstanceSystem],
     /// Every Sequence / Monad — shown as rows (Cites = members).
     seqs: &'a [SequenceView],
-    /// Raw nodes/edges rows — all systems or none (the `show_raw` toggle).
+    /// Raw nodes/edges rows — every system's, per the Nodes/Connectives pills (all-or-none).
     raw: &'a [RawElement],
-    /// Whether the raw nodes/edges rows are on (the toggle's checked state).
-    show_raw: bool,
-    /// Toggle the raw nodes/edges rows (all-or-none).
-    on_toggle_raw: &'a Callback<()>,
+    /// Row-kind filter pills — which kinds of row show, and the toggle.
+    pill_sequences: bool,
+    pill_systems: bool,
+    pill_connectives: bool,
+    pill_nodes: bool,
+    on_toggle_pill: &'a Callback<String>,
     /// Click a system row to view it (loads into the graph).
     on_load: &'a Callback<String>,
     /// Click a monad row to enter it (navigate its members via the header).
@@ -640,8 +651,11 @@ fn table_view(ctx: TableCtx) -> Html {
         systems,
         seqs,
         raw,
-        show_raw,
-        on_toggle_raw,
+        pill_sequences,
+        pill_systems,
+        pill_connectives,
+        pill_nodes,
+        on_toggle_pill,
         on_load,
         on_view_sequence,
         on_delete_sequence,
@@ -695,6 +709,14 @@ fn table_view(ctx: TableCtx) -> Html {
             .as_ref()
             .is_none_or(|ts| !shown_sys.contains(ts.id.as_str())),
         _ => true,
+    });
+    // Row-kind filter pills: keep only the enabled kinds. (Raw node/edge rows are already
+    // built per the Nodes/Connectives pills, so they only appear when enabled; Sequences and
+    // Systems/References are filtered here.)
+    rows.retain(|r| match r {
+        Row::Seq(_) => pill_sequences,
+        Row::Sys(_) | Row::Ref(_) => pill_systems,
+        Row::Raw(_) => true,
     });
     // Default row order_cardinality: by systematic order_cardinality (the header axis).
     rows.sort_by_key(|row| row.order_cardinality());
@@ -1014,14 +1036,25 @@ fn table_view(ctx: TableCtx) -> Html {
                 on_join_selected={ on_join_selected }
                 on_decompose_selected={ on_decompose_selected }
             />
-            <label class="raw-toggle" title="Show every system's raw nodes & edges as rows (all or none)">
-                <input
-                    type="checkbox"
-                    checked={ show_raw }
-                    onclick={ let cb = on_toggle_raw.clone(); Callback::from(move |_: MouseEvent| cb.emit(())) }
-                />
-                { " Nodes & edges" }
-            </label>
+            <div class="row-pills">
+                {
+                    [
+                        ("sequences", "Sequences", pill_sequences),
+                        ("systems", "Systems", pill_systems),
+                        ("connectives", "Connectives", pill_connectives),
+                        ("nodes", "Nodes", pill_nodes),
+                    ]
+                    .into_iter()
+                    .map(|(key, label, on)| {
+                        let cls = if on { "row-pill row-pill-on" } else { "row-pill" };
+                        let cb = on_toggle_pill.clone();
+                        let k = key.to_string();
+                        let onclick = Callback::from(move |_: MouseEvent| cb.emit(k.clone()));
+                        html! { <button class={ cls } onclick={ onclick }>{ label }</button> }
+                    })
+                    .collect::<Html>()
+                }
+            </div>
 
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }

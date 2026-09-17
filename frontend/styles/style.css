@@ -708,13 +708,21 @@ body {
 }
 .ed-name { flex: 1; min-width: 12rem; }
 .ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
-/* Raw nodes/edges toggle (all-or-none) — sits under the browser control bar. */
-.raw-toggle {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    margin: 0.2rem 0 0.4rem; padding: 0.15rem 0.1rem;
-    font-size: 0.75rem; color: #718096; cursor: pointer; user-select: none;
+/* Row-kind filter pills (Sequences/Systems/Connectives/Nodes) — under the control bar. */
+.row-pills { display: flex; gap: 0.4rem; margin: 0.25rem 0 0.5rem; flex-wrap: wrap; }
+.row-pill {
+    padding: 0.25rem 0.7rem; border-radius: 999px; cursor: pointer;
+    font-family: inherit; font-size: 0.75rem; font-weight: 500;
+    background: rgba(255, 255, 255, 0.5); color: #718096;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: all 0.15s ease;
 }
-.raw-toggle input { cursor: pointer; }
+.row-pill:hover { background: rgba(255, 255, 255, 0.7); color: #4a5568; transform: translateY(-1px); }
+.row-pill-on {
+    background: rgba(37, 99, 235, 0.15); color: #2563eb; font-weight: 600;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
 
 /* In-graph system editor. */
 .graph-with-editor { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }

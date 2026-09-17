@@ -120,8 +120,8 @@ pub enum ApiAppMsg {
     NavigateToSystem(String),
     NavigateBack,
     ToggleEdgeLabels,
-    /// Toggle showing every system's raw nodes/edges in the list (all-or-none).
-    ToggleRaw,
+    /// Toggle one of the list's row-kind filter pills ("sequences"/"systems"/"connectives"/"nodes").
+    TogglePill(String),
     ReferencesLoaded(Vec<ReferenceView>),
     SetMode(ViewMode),
     /// Toggle Graph ↔ Table (the `v` hotkey).
@@ -184,9 +184,13 @@ pub struct ApiApp {
     /// When true, node/edge labels show the canonical *class* (from the loaded
     /// system's `canonicalClass`) instead of its instance values.
     show_canonical: bool,
-    /// When true, the list also shows the **raw nodes/edges of *every* system** (all-or-none,
-    /// not just the focused one). Off by default — see `docs`/task "Raw nodes/edges".
-    show_raw: bool,
+    /// **Row-kind filter pills** for the list — which kinds of row are shown. Sequences +
+    /// Systems on by default; Connectives + Nodes (the raw graph elements of every system)
+    /// off. Replaces the old (janky) sort/filter + the single raw toggle.
+    pill_sequences: bool,
+    pill_systems: bool,
+    pill_connectives: bool,
+    pill_nodes: bool,
     /// Feedback from the last Extract (Nullad → Monad), shown in the data view.
     extract_note: Option<String>,
     /// The canvas interface state (Viewing / Editing) — see `CanvasMode`.
@@ -371,7 +375,10 @@ impl Component for ApiApp {
             all_references: vec![],
             instance_systems: vec![],
             show_canonical: false,
-            show_raw: false,
+            pill_sequences: true,
+            pill_systems: true,
+            pill_connectives: false,
+            pill_nodes: false,
             extract_note: None,
             canvas_mode: CanvasMode::Viewing,
             sequences: vec![],
@@ -553,8 +560,14 @@ impl Component for ApiApp {
                 self.show_edge_labels = !self.show_edge_labels;
                 true
             }
-            ApiAppMsg::ToggleRaw => {
-                self.show_raw = !self.show_raw;
+            ApiAppMsg::TogglePill(kind) => {
+                match kind.as_str() {
+                    "sequences" => self.pill_sequences = !self.pill_sequences,
+                    "systems" => self.pill_systems = !self.pill_systems,
+                    "connectives" => self.pill_connectives = !self.pill_connectives,
+                    "nodes" => self.pill_nodes = !self.pill_nodes,
+                    _ => {}
+                }
                 true
             }
             ApiAppMsg::ReferencesLoaded(refs) => {
@@ -1090,21 +1103,29 @@ impl Component for ApiApp {
             })
             .collect();
         all_systems.extend(self.instance_systems.iter().cloned());
-        // Raw nodes/edges as data rows — **all systems or none** (the `show_raw` toggle),
-        // rather than only the focused system's (which was confusing). Off by default.
-        let raw_elements: Vec<RawElement> = if self.show_raw {
+        // Raw graph elements as data rows — every system's Nodes and/or Connectives, per the
+        // pills (all-or-none). Systems/Sequences rows are filtered in the browser by their pills.
+        let raw_elements: Vec<RawElement> = if self.pill_nodes || self.pill_connectives {
             all_systems
                 .iter()
                 .flat_map(|s| {
                     let o = s.order_cardinality;
-                    s.terms
-                        .iter()
-                        .map(move |t| RawElement { name: t.value.clone(), order_cardinality: o, is_edge: false })
-                        .chain(s.connectives.iter().map(move |c| RawElement {
+                    let mut v = Vec::new();
+                    if self.pill_nodes {
+                        v.extend(s.terms.iter().map(|t| RawElement {
+                            name: t.value.clone(),
+                            order_cardinality: o,
+                            is_edge: false,
+                        }));
+                    }
+                    if self.pill_connectives {
+                        v.extend(s.connectives.iter().map(|c| RawElement {
                             name: c.value.clone(),
                             order_cardinality: o,
                             is_edge: true,
-                        }))
+                        }));
+                    }
+                    v
                 })
                 .collect()
         } else {
@@ -1184,8 +1205,11 @@ impl Component for ApiApp {
                                 on_join={ on_join }
                                 on_decompose={ on_decompose }
                                 scope_ids={ self.active_sequence.clone() }
-                                show_raw={ self.show_raw }
-                                on_toggle_raw={ ctx.link().callback(|_| ApiAppMsg::ToggleRaw) }
+                                pill_sequences={ self.pill_sequences }
+                                pill_systems={ self.pill_systems }
+                                pill_connectives={ self.pill_connectives }
+                                pill_nodes={ self.pill_nodes }
+                                on_toggle_pill={ ctx.link().callback(ApiAppMsg::TogglePill) }
                             />
                         } else if self.selected_key == "nullad" && self.active_sequence.is_none() {
                             // Nullad in graph mode: a blank canvas standing in for
