@@ -32,6 +32,9 @@ links for context.
 - **[view-model.md](view-model.md)** — the two views as the time tetrad: List=Eternity (filter
   all-of-a-type), Graph=Chronos (one at a time, monad→dodecad), editor=Hyparxis (narrow
   candidates), Space=the monad container. Diagnoses the v0.5 nav inconsistency and plans the fix.
+- **[construction-plan.md](construction-plan.md)** — plan: correct-by-construction assembly (the
+  out-degree cascade made first-class → deterministic topology + real ConnectiveOrdinality), then
+  the lexicographical (and other) products as operations layered on it. Prototype now, substrate v6.
 - **[refactor-plan.md](refactor-plan.md)** — the v0.6 roadmap: substrate → archetypes (validation
   split three ways: topology / vocabulary / system) → functional construction → view model →
   operations → comparing/products; and how the current v0.5 work feeds it.
