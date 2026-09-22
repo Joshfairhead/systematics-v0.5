@@ -25,7 +25,6 @@ This creates a functional foundation for further bootstrapping a more complete e
 ![12levelsofbeing](images/12LevelsOfBeing.png)
 ![12levelsofenergy](images/12Energies.jpg)
 ![12levelsofvalues](images/12values.jpg)
-![12LevelsOfSociety](images/12LevelsOfSociety.png)
 
 ## Horizon 3
 
