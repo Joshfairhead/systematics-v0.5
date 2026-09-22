@@ -14,6 +14,7 @@
 pub mod citations;
 pub mod content;
 pub mod entries;
+pub mod equivalence;
 pub mod functors;
 pub mod grammar;
 pub mod graph;

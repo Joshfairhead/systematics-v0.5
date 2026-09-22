@@ -986,6 +986,248 @@ pub fn build_fragments_from_tables() -> GraphContent {
         &edge_slugs("hcl", 3),
     );
 
+    // Graph Products (user, 2026-09-01) — the four ways to combine two graphs, by
+    // increasing richness = the realisation direction ground→goal (−− → ++), and the
+    // operational vocabulary for the coalescence / tensor-product arc:
+    //   Cartesian (ground −−, the lattice) · Tensor (instrument −+, the categorical
+    //   product) · Strong (directive +−) · Lexicographic (goal ++, node→subsystem =
+    //   realisation). Relates to the architecture tetrad (Substrate/Model/View/Controller).
+    //   Our K_n topologies are **lexicographically organised**: complete graphs are
+    //   closed under the lexicographic product, K_m[K_n] = K_{mn} (e.g. K2[K4] = K8, 28
+    //   edges) — a node of K2 realised as a whole K4.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Graph Products",
+        4,
+        &slugs(&["cartesian", "tensor", "strong", "lexicographic"]),
+        &edge_slugs("gprod", 4),
+    );
+
+    // Knowledge triad (user, 2026-09-07) — belief(−) · knowledge(=) · truth(+),
+    // ordered +/−/= onto K3 positions 1/2/3: truth(1) · belief(2) · knowledge(3).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Knowledge",
+        3,
+        &slugs(&["truth", "belief", "knowledge"]),
+        &edge_slugs("know", 3),
+    );
+
+    // Discourse triad (user, 2026-09-07) — vocabulary(−) · grammar(+) · language(=);
+    // Language = Grammar + Vocabulary reconciled (the ontology dyad → triad).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Discourse",
+        3,
+        &slugs(&["grammar", "vocabulary", "language"]),
+        &edge_slugs("disc", 3),
+    );
+
+    // Common Noun triad (user, 2026-09-07) — people(+) · places(−) · things(=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Common Noun",
+        3,
+        &slugs(&["people", "places", "things"]),
+        &edge_slugs("noun", 3),
+    );
+
+    // Verbs triad (user, 2026-09-07) — actions(+) · states(−) · occurrences(=).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Verbs",
+        3,
+        &slugs(&["actions", "states", "occurrences"]),
+        &edge_slugs("verb", 3),
+    );
+
+    // Registry — Field of Action tetrad (user, 2026-09-07) — the app IS a registry
+    // with two views + store/read operations. Store (ideal) · Read (ground) ·
+    // Graph (directive) · List (instrumental), onto the K4 tetrad positions 1–4.
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Field of Action",
+        4,
+        &slugs(&["store", "read", "graph", "list"]),
+        &edge_slugs("foa", 4),
+    );
+
+    // Registry — Core tetrad (user, 2026-09-07) — the alternative registry tetrad:
+    // Store · Read · Sort · Filter as the core components (store=ideal, read=ground).
+    push_triadic_system(
+        &mut content,
+        &mut have_char,
+        "Registry Core",
+        4,
+        &slugs(&["store", "read", "sort", "filter"]),
+        &edge_slugs("reg", 4),
+    );
+
+    // --- Store/load & compositional dyads (user, 2026-09-08) ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Import Export", 2,
+        &slugs(&["import", "export"]), &edge_slugs("impexp", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Store Load", 2,
+        &slugs(&["store", "load"]), &edge_slugs("storeload", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Semantics Syntax", 2,
+        &slugs(&["semantics", "syntax"]), &edge_slugs("semsyn", 2),
+    );
+
+    // --- Blue Earth (user, 2026-09-08): monad → dyads → triads → tetrad, grouped by
+    //     the Blue Earth sequence (data/perspectives/blue_earth.json). ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Blue Earth", 1,
+        &slugs(&["blue_earth"]), &edge_slugs("be", 1),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Hosting Facilitation", 2,
+        &slugs(&["hosting", "facilitation"]), &edge_slugs("behf", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Niche National", 2,
+        &slugs(&["niche", "national"]), &edge_slugs("benn", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Deals Deployment", 2,
+        &slugs(&["deal_making", "deployment"]), &edge_slugs("bedd", 2),
+    );
+    // Triad: hosting(+, 1) · coordination(−, 2) · facilitation(=, 3).
+    push_triadic_system(
+        &mut content, &mut have_char, "Delivery", 3,
+        &slugs(&["hosting", "coordination", "facilitation"]), &edge_slugs("bedel", 3),
+    );
+    // Triad: systems change(+, 1) · disruption(−, 2) · funding(=, 3).
+    push_triadic_system(
+        &mut content, &mut have_char, "Impact", 3,
+        &slugs(&["systems_change", "disruption", "funding"]), &edge_slugs("beimp", 3),
+    );
+    // Tetrad from the two dyads: Ideal=national · Ground=niche · Directive=deals ·
+    // Instrumental=deployment (canonical tetrad term order Ideal/Ground/Directive/Instrumental).
+    push_triadic_system(
+        &mut content, &mut have_char, "Blue Earth Strategy", 4,
+        &slugs(&["national", "niche", "deal_making", "deployment"]), &edge_slugs("bestrat", 4),
+    );
+
+    // --- Fitness (user, 2026-09-08) ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Fitness Exercise", 2,
+        &slugs(&["fitness", "exercise"]), &edge_slugs("fitex", 2),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Stretching Mobility", 2,
+        &slugs(&["stretching", "mobility"]), &edge_slugs("strmob", 2),
+    );
+    // Pentad — health-related fitness. Performance fitness (power, agility, balance,
+    // coordination, speed, reaction time) are possible links (edges), TBD.
+    push_triadic_system(
+        &mut content, &mut have_char, "Physical Fitness", 5,
+        &slugs(&[
+            "body_composition",
+            "cardiorespiratory_endurance",
+            "flexibility_mobility",
+            "muscle_strength",
+            "muscle_endurance",
+        ]),
+        &edge_slugs("fitpent", 5),
+    );
+
+    // Interface State Model (user, 2026-09-09) — the canvas state machine dogfooded as a
+    // system: a monad heading the Viewing/Editing dyad. Grouped by its own sequence
+    // (data/perspectives/interface_state_model.json). Viewing=read; Editing unfolds into
+    // create/update/delete (the CRUD tetrad) — that articulation is a later round.
+    push_triadic_system(
+        &mut content, &mut have_char, "Interface State Model", 1,
+        &slugs(&["interface_state_model"]), &edge_slugs("ism", 1),
+    );
+    push_triadic_system(
+        &mut content, &mut have_char, "Viewing Editing", 2,
+        &slugs(&["viewing", "editing"]), &edge_slugs("view_edit", 2),
+    );
+    // The state model's tetrad (user order 1–4): Create · Delete · Update · Read.
+    // Viewing = Read; Editing unfolds into Create/Update/Delete. A member of the Interface
+    // State Model sequence.
+    push_triadic_system(
+        &mut content, &mut have_char, "CRUD", 4,
+        &slugs(&["create", "delete", "update", "read"]), &edge_slugs("crud", 4),
+    );
+
+    // --- Library systems (user, 2026-09-10) ---
+    // Material Science tetrad (the materials tetrahedron): Performance · Processing ·
+    // Properties · Structure. The Engineer edge joins Performance–Processing (edge 1,2);
+    // the Scientist edge joins Properties–Structure (edge 3,4); the rest are placeholders.
+    push_triadic_system(
+        &mut content, &mut have_char, "Material Science", 4,
+        &slugs(&["performance", "processing", "properties", "structure"]),
+        &slugs(&["engineer", "matsci_edge_2", "matsci_edge_3", "matsci_edge_4", "matsci_edge_5", "scientist"]),
+    );
+    // Information Science tetrad: Efficacy · Attributes · Representations · Methods
+    // (workflows), characterised by evaluations.
+    push_triadic_system(
+        &mut content, &mut have_char, "Information Science", 4,
+        &slugs(&["efficacy", "attributes", "representations", "methods"]),
+        &edge_slugs("infsci", 4),
+    );
+    // FAIR data principles tetrad: Findable · Accessible · Interoperable · Reusable.
+    push_triadic_system(
+        &mut content, &mut have_char, "FAIR", 4,
+        &slugs(&["findable", "accessible", "interoperable", "reusable"]),
+        &edge_slugs("fair", 4),
+    );
+    // Convening triad: Hosting · Facilitating · Coordinating.
+    push_triadic_system(
+        &mut content, &mut have_char, "Convening", 3,
+        &slugs(&["hosting", "facilitating", "coordinating"]), &edge_slugs("conv", 3),
+    );
+    // Proof of Stake triad: Delegators(+) · Validators(−) · Stakeholders(=).
+    push_triadic_system(
+        &mut content, &mut have_char, "Proof of Stake", 3,
+        &slugs(&["delegators", "validators", "stakeholders"]), &edge_slugs("pos", 3),
+    );
+    // The Interface State Model's (tentative) triad: Standardisation(+) · Representation(−)
+    // · Interpretation(=). Named "Semiotics"; a member of the Interface State Model sequence.
+    push_triadic_system(
+        &mut content, &mut have_char, "Semiotics", 3,
+        &slugs(&["standardisation", "representation", "interpretation"]), &edge_slugs("sem", 3),
+    );
+    // Decomposition / Assembly dyad — the compose operation's poles (parallels Sort/Filter).
+    // Assembly(+) builds up; Decomposition(−) breaks down.
+    push_triadic_system(
+        &mut content, &mut have_char, "Assembly Decomposition", 2,
+        &slugs(&["assembly", "decomposition"]), &edge_slugs("asmdec", 2),
+    );
+
+    // --- Blue Earth Ventures (user, 2026-09-11): a monad heading a sequence
+    //     (data/perspectives/blue_earth_ventures.json). ---
+    push_triadic_system(
+        &mut content, &mut have_char, "Blue Earth Ventures", 1,
+        &slugs(&["blue_earth_ventures"]), &edge_slugs("bev", 1),
+    );
+    // Dyad: World(+) · Businesses(−).
+    push_triadic_system(
+        &mut content, &mut have_char, "World Businesses", 2,
+        &slugs(&["world", "businesses"]), &edge_slugs("bevwb", 2),
+    );
+    // Triad: Find(+) · Fund(−) · Support(=).
+    push_triadic_system(
+        &mut content, &mut have_char, "Backing", 3,
+        &slugs(&["find", "fund", "support"]), &edge_slugs("bevbk", 3),
+    );
+    // Tetrad: Founders · Investors · Corporate · Opportunities.
+    push_triadic_system(
+        &mut content, &mut have_char, "Venture Ecosystem", 4,
+        &slugs(&["founders", "investors", "corporate", "opportunities"]), &edge_slugs("bevve", 4),
+    );
+
     content
 }
 

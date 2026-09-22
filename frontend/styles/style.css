@@ -460,6 +460,52 @@ body {
     font-weight: 600;
 }
 
+/* In Update mode the title is clickable to rename the system. */
+.graph-title.editable {
+    pointer-events: auto;
+    cursor: text;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    text-decoration-color: #4A90E2;
+}
+
+/* Transient notice in the browser (e.g. "select a system to export"). */
+.browser-notice {
+    margin: 0.4rem 0;
+    padding: 0.4rem 0.7rem;
+    background: #fff4e5;
+    border: 1px solid #f0c78a;
+    border-radius: 8px;
+    color: #8a5a00;
+    font-size: 0.85rem;
+}
+
+/* Transient notice above the list (e.g. "select a system to export"). */
+.browser-notice {
+    margin: 0.4rem 0.75rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+    background: rgba(226, 162, 74, 0.15);
+    border: 1px solid rgba(226, 162, 74, 0.5);
+    color: #8a5a12;
+    font-size: 0.82rem;
+}
+
+/* Export link styled as a toolbar button (it's an <a download>, not a <button>). */
+.export-btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* System type + K-notation (e.g. "Triad · K3"), under the system name. */
+.graph-subtitle {
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.6;
+    letter-spacing: 0.02em;
+}
+
 .designation {
     opacity: 0.8;
 }
@@ -490,7 +536,7 @@ body {
 /* Edge-labels toggle — overlay pinned inside the canvas, top-right */
 .edge-toggle-overlay {
     position: absolute;
-    top: 0.5rem;
+    top: 2.7rem;
     right: 0.75rem;
     z-index: 3;
     display: flex;
@@ -662,8 +708,47 @@ body {
 }
 .ed-name { flex: 1; min-width: 12rem; }
 .ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
+/* Row-kind filter pills (Sequences/Systems/Connectives/Nodes) — under the control bar. */
+.row-pills { display: flex; gap: 0.4rem; margin: 0.25rem 0 0.5rem; flex-wrap: wrap; }
+.row-pill {
+    padding: 0.25rem 0.7rem; border-radius: 999px; cursor: pointer;
+    font-family: inherit; font-size: 0.75rem; font-weight: 500;
+    background: rgba(255, 255, 255, 0.5); color: #718096;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: all 0.15s ease;
+}
+.row-pill:hover { background: rgba(255, 255, 255, 0.7); color: #4a5568; transform: translateY(-1px); }
+.row-pill-on {
+    background: rgba(37, 99, 235, 0.15); color: #2563eb; font-weight: 600;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
 /* In-graph system editor. */
-.graph-with-editor { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.graph-with-editor { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+/* Canvas up/down arrows — round & glassy (matching the nav tabs), overlaid on the canvas
+   and faded until you interact with it (fade in on hover; brighten on the arrow itself). */
+.canvas-nav {
+    position: absolute; left: 50%; transform: translateX(-50%); z-index: 5;
+    width: 2rem; height: 2rem; padding: 0; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #4a5568; font-size: 0.8rem; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(163, 177, 198, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.canvas-nav-up { top: 0.6rem; }
+.canvas-nav-down { bottom: 0.6rem; }
+.graph-with-editor:hover .canvas-nav { opacity: 0.55; }
+.canvas-nav:hover {
+    opacity: 1; background: rgba(255, 255, 255, 0.75); color: #2563eb;
+    transform: translateX(-50%) translateY(-2px);
+}
+.canvas-nav:active { transform: translateX(-50%) translateY(0); }
 .system-editor { width: 100%; }
 .edit-toggle {
     align-self: flex-end;
@@ -1092,6 +1177,21 @@ button.row-open:hover {
     background: rgba(214, 40, 118, 0.2);
 }
 
+/* Join (combine selected systems into a new K_n) — sits beside Delete on selection. */
+.row-join-btn {
+    border: 1px solid rgba(74, 144, 226, 0.5);
+    background: rgba(74, 144, 226, 0.12);
+    color: #2f6fb3;
+    border-radius: 8px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.row-join-btn:hover {
+    background: rgba(74, 144, 226, 0.2);
+}
+
 .compare-matrix .compare-order {
     font-weight: 600;
     white-space: nowrap;
@@ -1136,7 +1236,7 @@ button.row-open:hover {
 }
 .canonical-toggle-overlay {
     position: absolute;
-    top: 2.7rem;
+    top: 0.5rem;
     right: 0.75rem;
     z-index: 3;
     display: flex;
@@ -1149,5 +1249,77 @@ button.row-open:hover {
     -webkit-backdrop-filter: blur(8px);
     border-radius: 10px;
     cursor: pointer;
+}
+
+/* Update (on-graph editing) toggle — stacked under the Canonical switch. */
+.update-toggle-overlay {
+    position: absolute;
+    top: 4.9rem;
+    right: 0.75rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Inline on-graph value editor (Update mode) — floats at the bottom of the canvas. */
+.graph-edit-panel,
+.graph-edit-hint {
+    position: absolute;
+    bottom: 0.9rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
+}
+
+.graph-edit-hint {
+    color: #666;
+    font-style: italic;
+}
+
+.edit-panel-label {
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.edit-panel-input {
+    padding: 0.25rem 0.45rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    min-width: 12rem;
+}
+
+.edit-panel-save,
+.edit-panel-cancel {
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f4f4f4;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.edit-panel-save {
+    background: #4A90E2;
+    color: #fff;
+    border-color: #4A90E2;
 }
 

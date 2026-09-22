@@ -129,6 +129,17 @@ pub struct PositionedChar {
     pub ordinality: String,
 }
 
+/// The **bespoke per-system file format** for store/load (import/export). A single
+/// system as its own small JSON — deliberately simple; the composable format is a
+/// v0.6 target. Store writes it (export); Load reads it (import).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SystemFile {
+    pub name: String,
+    pub order: i32,
+    pub terms: Vec<String>,
+    pub connectives: Vec<String>,
+}
+
 /// A non-canonical System the Load control can browse (id, display name, order_cardinality).
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct InstanceSystem {
@@ -196,6 +207,24 @@ struct AuthorSystemResponse {
 }
 
 #[derive(Deserialize, Debug)]
+struct EditSystemResponse {
+    #[serde(rename = "editSystem")]
+    edit_system: Option<InstanceSystem>,
+}
+
+#[derive(Deserialize, Debug)]
+struct JoinSystemsResponse {
+    #[serde(rename = "joinSystems")]
+    join_systems: Option<InstanceSystem>,
+}
+
+#[derive(Deserialize, Debug)]
+struct DecomposeSystemResponse {
+    #[serde(rename = "decomposeSystem")]
+    decompose_system: Option<Vec<InstanceSystem>>,
+}
+
+#[derive(Deserialize, Debug)]
 struct RenderSystemResponse {
     #[serde(rename = "renderSystem")]
     render_system: Option<RenderedSystem>,
@@ -215,6 +244,7 @@ impl GraphQLClient {
         orderCardinality
         systemId
         name
+        systemName
         coherence
         termDesignation
         connectiveDesignation
@@ -627,6 +657,93 @@ impl GraphQLClient {
             .data
             .and_then(|d| d.author_system)
             .ok_or_else(|| ApiError::ParseError("authorSystem returned no data".to_string()))
+    }
+
+    /// **Id-stable edit**: rebuild the system with id `id` from the given values, keeping the
+    /// id (so sequence references survive a rename or value edit). Used for instance systems;
+    /// canonical seeds fork via `author_system` instead.
+    pub async fn edit_system(
+        &self,
+        id: &str,
+        name: &str,
+        order_cardinality: i32,
+        terms: Vec<String>,
+        connectives: Vec<String>,
+    ) -> Result<InstanceSystem, ApiError> {
+        let query = r#"
+            mutation Edit($id: String!, $input: AuthorSystemInput!) {
+                editSystem(id: $id, input: $input) { id name orderCardinality }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "id": id,
+            "input": { "name": name, "orderCardinality": order_cardinality, "terms": terms, "connectives": connectives }
+        });
+        let response: GraphQLResponse<EditSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.edit_system)
+            .ok_or_else(|| ApiError::ParseError("editSystem returned no data".to_string()))
+    }
+
+    /// Join (addition) selected member systems into a new K_k on the union of their
+    /// distinct terms. `sequence_ref` optionally appends it to a monad's sequence.
+    pub async fn join_systems(
+        &self,
+        name: &str,
+        members: Vec<String>,
+        sequence_ref: Option<String>,
+    ) -> Result<InstanceSystem, ApiError> {
+        let query = r#"
+            mutation Join($input: JoinSystemsInput!) {
+                joinSystems(input: $input) { id name orderCardinality }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "name": name, "members": members, "sequenceRef": sequence_ref }
+        });
+        let response: GraphQLResponse<JoinSystemsResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        response
+            .data
+            .and_then(|d| d.join_systems)
+            .ok_or_else(|| ApiError::ParseError("joinSystems returned no data".to_string()))
+    }
+
+    /// Decompose a system into its faces (Kₖ on each k-subset of its terms). Returns the
+    /// faces produced; `sequence_ref` appends them to a monad's sequence.
+    pub async fn decompose_system(
+        &self,
+        system_ref: &str,
+        sequence_ref: Option<String>,
+    ) -> Result<Vec<InstanceSystem>, ApiError> {
+        let query = r#"
+            mutation Decompose($input: DecomposeSystemInput!) {
+                decomposeSystem(input: $input) { id name orderCardinality }
+            }
+        "#;
+        let variables = serde_json::json!({
+            "input": { "systemRef": system_ref, "sequenceRef": sequence_ref }
+        });
+        let response: GraphQLResponse<DecomposeSystemResponse> =
+            self.execute_query(query, Some(variables)).await?;
+        if let Some(errors) = response.errors {
+            return Err(ApiError::ParseError(
+                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+            ));
+        }
+        Ok(response.data.and_then(|d| d.decompose_system).unwrap_or_default())
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(

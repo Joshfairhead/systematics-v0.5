@@ -369,6 +369,50 @@ impl QueryRoot {
         crate::core::hexadicsystems::systematics_hexad(cardinality.clamp(0, 255) as u8).into()
     }
 
+    /// The **topology hexad** for a cardinality — the six structural facets of `K_n`
+    /// (cardinality · eigenvalue · order · size · vertex ordinality · edge ordinality), the
+    /// geometric peer of `systematicsHexad`.
+    async fn topology_hexad(&self, cardinality: i32) -> GqlTopologyHexad {
+        crate::core::hexadicsystems::topology_hexad(cardinality.clamp(0, 255) as u8).into()
+    }
+
+    /// The **archetype equivalence** for a cardinality — the two book-matched hexads
+    /// (topology + vocabulary) and the six paired dimensions relating them (Cardinality↔System,
+    /// Eigenvalue↔Coherence, Order↔TermDesignation, Size↔ConnectiveDesignation,
+    /// VertexOrdinality↔TermOrdinality, EdgeOrdinality↔ConnectiveOrdinality), plus whether the
+    /// faces are consistent. The mapping, made first-class. See `docs/v0.6-rebuild/validation.md`.
+    async fn equivalence_hexad(&self, cardinality: i32) -> GqlEquivalenceHexad {
+        crate::core::equivalence::EquivalenceHexad::for_order(cardinality.clamp(0, 255) as u8).into()
+    }
+
+    /// Validate a stored system **instance** against its archetype equivalence: the
+    /// vocabulary face (coherence + designations) must match the canonical value for the
+    /// system's order, and the term/connective counts must serialise the vertex ordinalities
+    /// (`1..n`) / edge serialities (`1..C(n,2)`) — terms anchoring to vertices, connectives
+    /// to edges. Empty vec = the instance conforms; otherwise the mismatches.
+    async fn validate_system_equivalence(&self, ctx: &Context<'_>, id: String) -> Vec<String> {
+        let g = graph_snapshot(ctx).await;
+        let Some(sys) = g.system(&id) else {
+            return vec![format!("no system '{id}'")];
+        };
+        let (n_terms, n_conns) = g
+            .vocabulary(&sys.vocabulary_ref)
+            .map(|v| (v.terms.len(), v.connectives.len()))
+            .unwrap_or((0, 0));
+        let term_positions: Vec<i32> = (1..=n_terms as i32).collect();
+        let connective_positions: Vec<i32> = (1..=n_conns as i32).collect();
+        crate::core::equivalence::validate_instance(
+            sys.order_cardinality,
+            &sys.coherence,
+            &sys.term_designation,
+            &sys.connective_designation,
+            &term_positions,
+            &connective_positions,
+        )
+        .err()
+        .unwrap_or_default()
+    }
+
     /// **Compose a system PURELY from the substrate** — the prototype. Ingest the graph's
     /// characters + each system's structure into a content-addressed store, then compose
     /// the requested system from the store *alone* (no graph at compose time): its
@@ -653,7 +697,7 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
 
     // --- The Controller composes the model, then resolves the view from it ---
     // Substrate-composed rather than hand-assembled: the "compose, don't load"
-    // convergence (JSON loading is a legacy device). `compose_system` is law-agnostic
+    // convergence (JSON loading is a legacy device). `join_systems` is law-agnostic
     // — it builds the complete model from the grammar-gated morphisms; the view is one
     // reading of it. Geometry (coordinates/colours/lines) is the render layer and stays
     // a direct read below.
@@ -735,15 +779,64 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         system_id: system.id.clone(),
         name,
         system_name,
-        coherence: system.coherence.clone(),
-        term_designation: system.term_designation.clone(),
-        connective_designation: system.connective_designation.clone(),
+        // Coherence + designations are FIXED per order (canonical, no customisation for
+        // now): sourced from the single hexad model at render time so every system —
+        // including any legacy record that stored a custom coherence — shows the
+        // canonical value.
+        coherence: crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
+        term_designation: crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
+        connective_designation: crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
         terms,
         coordinates,
         colours,
         lines,
         connectives,
     })
+}
+
+/// Build the `GraphContent` (characters + vocabulary + system) for a K_n from term and
+/// connective **values** — the shared build behind `authorSystem` and `joinSystems`.
+/// Char ids derive from the name slug (matching `with_auto_id`), so applying content for
+/// the same (slug, order) upserts onto the same ids (overwrite, not fork). Coherence and
+/// designations are fixed per order (canonical, from the single hexad model).
+fn build_system_content(
+    name: &str,
+    order_cardinality: u8,
+    terms: &[String],
+    connectives: &[String],
+) -> (crate::core::content::GraphContent, System) {
+    let slug = name.to_lowercase().replace(' ', "_");
+    let mut characters = Vec::new();
+    let mut term_ids = Vec::new();
+    for (i, value) in terms.iter().enumerate() {
+        let id = format!("char_word_{slug}_t{}", i + 1);
+        characters.push(Character::new(id.clone(), "word", value.clone()));
+        term_ids.push(id);
+    }
+    let mut conn_ids = Vec::new();
+    for (j, value) in connectives.iter().enumerate() {
+        let id = format!("char_word_{slug}_c{}", j + 1);
+        characters.push(Character::new(id.clone(), "word", value.clone()));
+        conn_ids.push(id);
+    }
+    let vocab = Vocabulary::with_auto_id(name, order_cardinality, term_ids, conn_ids);
+    let vocab_id = vocab.id.clone();
+    let system = System::with_auto_id(
+        name,
+        order_cardinality,
+        crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
+        crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
+        crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
+        format!("grammar_{order_cardinality}"),
+        &vocab_id,
+    );
+    let content = crate::core::content::GraphContent {
+        characters,
+        vocabularies: vec![vocab],
+        systems: vec![system.clone()],
+        ..Default::default()
+    };
+    (content, system)
 }
 
 pub struct GqlRenderedSystem {
@@ -1026,48 +1119,228 @@ impl MutationRoot {
             )));
         }
 
-        // Match the id scheme used by `with_auto_id` so char ids stay unique.
-        let slug = input.name.to_lowercase().replace(' ', "_");
-        let sys_id = format!("system_{slug}_{order_cardinality}");
+        // Build the K_n content (chars + vocab + system) — shared with joinSystems.
+        // Store = write with OVERWRITE semantics: char/vocab/system ids are deterministic
+        // from (name slug, order), so re-authoring the same (slug, order) upserts onto the
+        // same ids via `apply_content` (no fork). Version control deferred.
+        let (content, system) =
+            build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
-        if graph.system(&sys_id).is_some() {
-            return Err(Error::new(format!("System '{sys_id}' already exists")));
-        }
-
-        let mut characters = Vec::new();
-        let mut term_ids = Vec::new();
-        for (i, value) in input.terms.iter().enumerate() {
-            let id = format!("char_word_{slug}_t{}", i + 1);
-            characters.push(Character::new(id.clone(), "word", value.clone()));
-            term_ids.push(id);
-        }
-        let mut conn_ids = Vec::new();
-        for (j, value) in input.connectives.iter().enumerate() {
-            let id = format!("char_word_{slug}_c{}", j + 1);
-            characters.push(Character::new(id.clone(), "word", value.clone()));
-            conn_ids.push(id);
-        }
-        let vocab = Vocabulary::with_auto_id(&input.name, order_cardinality, term_ids, conn_ids);
-        let vocab_id = vocab.id.clone();
-        let system = System::with_auto_id(
-            &input.name,
-            order_cardinality,
-            input.coherence.unwrap_or_else(|| "Custom".to_string()),
-            input.term_designation.unwrap_or_else(|| "Terms".to_string()),
-            input.connective_designation.unwrap_or_else(|| "Connectives".to_string()),
-            format!("grammar_{order_cardinality}"),
-            &vocab_id,
-        );
-        let content = crate::core::content::GraphContent {
-            characters,
-            vocabularies: vec![vocab],
-            systems: vec![system.clone()],
-            ..Default::default()
-        };
         graph.apply_content(&content);
         persist(ctx, &graph);
         Ok(GqlSystem::new(system))
+    }
+
+    /// **Edit a system in place from term/connective values, keeping its id** — the id-stable
+    /// editor update. A system's id is derived from its name, so re-authoring under a new name
+    /// (`authorSystem`) forks a new id and orphans any **sequence** that references the old one.
+    /// This rebuilds the system's characters + vocabulary from the given values but **forces the
+    /// existing id**, so a rename (or any value edit) stays in place and sequence memberships
+    /// survive. (Distinct from `updateSystem`, which replaces a System's raw metadata record.)
+    async fn edit_system(
+        &self,
+        ctx: &Context<'_>,
+        id: String,
+        input: AuthorSystemInput,
+    ) -> async_graphql::Result<GqlSystem> {
+        let order_cardinality = input.order_cardinality as u8;
+        if !(1..=12).contains(&order_cardinality) {
+            return Err(Error::new(format!("order_cardinality {order_cardinality} out of range 1..=12")));
+        }
+        let grammar = Template::for_order(order_cardinality);
+        let expected_conn = grammar.expected_connectives();
+        if input.terms.len() != order_cardinality as usize {
+            return Err(Error::new(format!(
+                "expected {order_cardinality} terms, got {}",
+                input.terms.len()
+            )));
+        }
+        if input.connectives.len() != expected_conn {
+            return Err(Error::new(format!(
+                "order_cardinality {order_cardinality} expects {expected_conn} connectives, got {}",
+                input.connectives.len()
+            )));
+        }
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+        if graph.system(&id).is_none() {
+            return Err(Error::new(format!("System '{id}' not found")));
+        }
+        // Capture the CURRENT vocabulary + its characters before repointing the system — on a
+        // rename the rebuilt vocab/chars take new (name-derived) ids, orphaning these.
+        let old_vocab = graph.system(&id).and_then(|s| {
+            graph.vocabulary(&s.vocabulary_ref).map(|v| {
+                let chars: Vec<String> =
+                    v.terms.iter().chain(v.connectives.iter()).cloned().collect();
+                (v.id.clone(), chars)
+            })
+        });
+        // Rebuild chars + vocab + system, then force the existing system id (keeping its
+        // sequence memberships) before applying.
+        let (mut content, mut system) =
+            build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
+        system.id = id.clone();
+        content.systems = vec![system.clone()];
+        let new_vocab_id = system.vocabulary_ref.clone();
+        graph.apply_content(&content);
+        // Cascade-clean the old vocabulary + its now-orphaned characters (a rename changes the
+        // name-derived ids). Characters still referenced by another vocabulary are kept (shared).
+        if let Some((old_vocab_id, old_chars)) = old_vocab {
+            if old_vocab_id != new_vocab_id {
+                graph.delete_vocabulary(&old_vocab_id);
+                let still_used: std::collections::HashSet<String> = graph
+                    .vocabularies
+                    .iter()
+                    .flat_map(|v| v.terms.iter().chain(v.connectives.iter()).cloned())
+                    .collect();
+                for cid in &old_chars {
+                    if !still_used.contains(cid) {
+                        graph.delete_character(cid);
+                    }
+                }
+            }
+        }
+        persist(ctx, &graph);
+        Ok(GqlSystem::new(system))
+    }
+
+    /// Join (addition) selected member systems into a K_k on the **union of their distinct
+    /// term values** — the complete-graph completion (Kₘ + Kₙ = Kₘ₊ₙ). Connectives start
+    /// blank (filled later via on-graph Update). Optionally appends the new system to a
+    /// monad's sequence, so it shows up as an association of that monad.
+    async fn join_systems(
+        &self,
+        ctx: &Context<'_>,
+        input: JoinSystemsInput,
+    ) -> async_graphql::Result<GqlSystem> {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+
+        // Union of distinct term values across the selected member systems, in order.
+        let mut terms: Vec<String> = Vec::new();
+        let mut seen = std::collections::HashSet::new();
+        for addr in &input.members {
+            let id = addr.strip_prefix("system:").unwrap_or(addr);
+            if let Some(sys) = graph.system(id) {
+                if let Some(vocab) = graph.vocabulary(&sys.vocabulary_ref) {
+                    for cid in &vocab.terms {
+                        if let Some(c) = graph.character(cid) {
+                            if seen.insert(c.value.clone()) {
+                                terms.push(c.value.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let order = terms.len() as u8;
+        if !(1..=12).contains(&order) {
+            return Err(Error::new(format!(
+                "join produced {order} distinct terms (need 1..=12)"
+            )));
+        }
+        let expected_conn = Template::for_order(order).expected_connectives();
+        let connectives = vec![String::new(); expected_conn];
+        let (content, system) = build_system_content(&input.name, order, &terms, &connectives);
+        graph.apply_content(&content);
+
+        // Append the joined system to the monad's sequence (its associations), if given.
+        if let Some(seq_id) = &input.sequence_ref {
+            if let Some(seq) = graph.sequence(seq_id) {
+                let addr = format!("system:{}", system.id);
+                if !seq.members.contains(&addr) {
+                    let mut members = seq.members.clone();
+                    members.push(addr);
+                    let updated = crate::core::sequences::Sequence::new(
+                        seq.id.clone(),
+                        seq.name.clone(),
+                        members,
+                    );
+                    graph.update_sequence(updated);
+                }
+            }
+        }
+        persist(ctx, &graph);
+        Ok(GqlSystem::new(system))
+    }
+
+    /// Decompose (subtraction) a system into its **faces** — every complete subgraph Kₖ on
+    /// a k-subset of its terms, for 2 ≤ k ≤ n−1 (a tetrad → its 6 dyads + 4 triads). The
+    /// inverse of `joinSystems`; connectives start blank (a first cut — inheriting the
+    /// parent's sub-edges is a refinement). Faces are appended to the monad's sequence if
+    /// `sequence_ref` is given. Limited to order ≤ 6 to bound the face count.
+    async fn decompose_system(
+        &self,
+        ctx: &Context<'_>,
+        input: DecomposeSystemInput,
+    ) -> async_graphql::Result<Vec<GqlSystem>> {
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+
+        let id = input.system_ref.strip_prefix("system:").unwrap_or(&input.system_ref);
+        let term_values: Vec<String> = {
+            let sys = graph
+                .system(id)
+                .ok_or_else(|| Error::new(format!("System '{id}' not found")))?;
+            let vocab = graph
+                .vocabulary(&sys.vocabulary_ref)
+                .ok_or_else(|| Error::new("system has no vocabulary"))?;
+            vocab
+                .terms
+                .iter()
+                .filter_map(|c| graph.character(c).map(|c| c.value.clone()))
+                .collect()
+        };
+        let n = term_values.len();
+        if n < 3 {
+            return Err(Error::new("nothing to decompose (need order ≥ 3)"));
+        }
+        if n > 6 {
+            return Err(Error::new(format!("decompose is limited to order ≤ 6 (got {n})")));
+        }
+
+        // Every k-subset (2 ≤ k ≤ n−1) as a complete-subgraph face, via bitmask enumeration.
+        let mut created = Vec::new();
+        let mut contents = Vec::new();
+        for mask in 1u32..(1u32 << n) {
+            let k = mask.count_ones() as usize;
+            if k < 2 || k >= n {
+                continue;
+            }
+            let subset: Vec<String> = (0..n)
+                .filter(|i| mask & (1 << i) != 0)
+                .map(|i| term_values[i].clone())
+                .collect();
+            let name = subset.join(" ");
+            let expected_conn = Template::for_order(k as u8).expected_connectives();
+            let connectives = vec![String::new(); expected_conn];
+            let (content, system) = build_system_content(&name, k as u8, &subset, &connectives);
+            contents.push(content);
+            created.push(system);
+        }
+        for c in &contents {
+            graph.apply_content(c);
+        }
+        if let Some(seq_id) = &input.sequence_ref {
+            if let Some(seq) = graph.sequence(seq_id) {
+                let mut members = seq.members.clone();
+                for s in &created {
+                    let addr = format!("system:{}", s.id);
+                    if !members.contains(&addr) {
+                        members.push(addr);
+                    }
+                }
+                let updated = crate::core::sequences::Sequence::new(
+                    seq.id.clone(),
+                    seq.name.clone(),
+                    members,
+                );
+                graph.update_sequence(updated);
+            }
+        }
+        persist(ctx, &graph);
+        Ok(created.into_iter().map(GqlSystem::new).collect())
     }
 
     async fn update_system(
@@ -1090,8 +1363,29 @@ impl MutationRoot {
     async fn delete_system(&self, ctx: &Context<'_>, id: String) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
+        // Capture the system's vocabulary + its characters before removal, to
+        // cascade-delete orphans (a deleted system shouldn't leave its nodes/edges
+        // behind). Characters still referenced by another vocabulary are kept (shared).
+        let vocab_info = graph.system(&id).and_then(|s| {
+            graph
+                .vocabulary(&s.vocabulary_ref)
+                .map(|v| (v.id.clone(), v.terms.clone(), v.connectives.clone()))
+        });
         let removed = graph.delete_system(&id).is_some();
         if removed {
+            if let Some((vocab_id, terms, conns)) = vocab_info {
+                graph.delete_vocabulary(&vocab_id);
+                let still_used: std::collections::HashSet<String> = graph
+                    .vocabularies
+                    .iter()
+                    .flat_map(|v| v.terms.iter().chain(v.connectives.iter()).cloned())
+                    .collect();
+                for cid in terms.iter().chain(conns.iter()) {
+                    if !still_used.contains(cid) {
+                        graph.delete_character(cid);
+                    }
+                }
+            }
             persist(ctx, &graph);
         }
         removed
@@ -1973,6 +2267,27 @@ pub struct AuthorSystemInput {
     pub connective_designation: Option<String>,
 }
 
+/// Join (addition) selected member systems into a new K_k. `members` are `system:<id>`
+/// addresses; the K_k is built on the **union of their distinct term values**. If
+/// `sequence_ref` is given, the joined system is appended to that monad's sequence.
+#[derive(InputObject)]
+pub struct JoinSystemsInput {
+    pub name: String,
+    pub members: Vec<String>,
+    #[graphql(default)]
+    pub sequence_ref: Option<String>,
+}
+
+/// Decompose a system into its faces (every complete-subgraph Kₖ on a k-subset of its
+/// terms). `system_ref` is a `system:<id>` address; faces are appended to `sequence_ref`
+/// (the monad) if given.
+#[derive(InputObject)]
+pub struct DecomposeSystemInput {
+    pub system_ref: String,
+    #[graphql(default)]
+    pub sequence_ref: Option<String>,
+}
+
 impl SystemInput {
     fn into_system(self) -> System {
         match self.id {
@@ -2332,15 +2647,15 @@ pub struct GqlLawReading {
 
 /// The systematics hexad for the view — a system's six metadata facets, derived from
 /// its cardinality (name · coherence · term/connective designation · term/connective
-/// cardinality). All mutually determining.
+/// ordinality). All mutually determining.
 #[derive(SimpleObject)]
 pub struct GqlSystematicsHexad {
     pub name: String,
     pub coherence: String,
     pub term_designation: String,
     pub connective_designation: String,
-    pub term_cardinality: i32,
-    pub connective_cardinality: i32,
+    pub term_ordinality: Vec<i32>,
+    pub connective_ordinality: Vec<i32>,
 }
 
 impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad {
@@ -2350,8 +2665,82 @@ impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad
             coherence: h.coherence,
             term_designation: h.term_designation,
             connective_designation: h.connective_designation,
-            term_cardinality: h.term_cardinality as i32,
-            connective_cardinality: h.connective_cardinality as i32,
+            term_ordinality: h.term_ordinality.into_iter().map(|x| x as i32).collect(),
+            connective_ordinality: h.connective_ordinality.into_iter().map(|x| x as i32).collect(),
+        }
+    }
+}
+
+/// The **topology hexad** — a system's six structural facets (the geometric peer of the
+/// systematics hexad): cardinality · eigenvalue · order · size · vertex ordinality ·
+/// edge ordinality. (`cardinality` book-matches the system name — a K_n *is* its cardinality;
+/// `eigenvalue`, the Laplacian spectrum, is *proposed* to book-match coherence.)
+#[derive(SimpleObject)]
+pub struct GqlTopologyHexad {
+    pub cardinality: String,
+    pub eigenvalue: String,
+    pub order: i32,
+    pub size: i32,
+    pub vertex_ordinality: Vec<i32>,
+    pub edge_ordinality: Vec<i32>,
+}
+
+impl From<crate::core::hexadicsystems::TopologyHexad> for GqlTopologyHexad {
+    fn from(t: crate::core::hexadicsystems::TopologyHexad) -> Self {
+        Self {
+            cardinality: t.cardinality,
+            eigenvalue: t.eigenvalue,
+            order: t.order as i32,
+            size: t.size as i32,
+            vertex_ordinality: t.vertex_ordinality.into_iter().map(|x| x as i32).collect(),
+            edge_ordinality: t.edge_ordinality.into_iter().map(|x| x as i32).collect(),
+        }
+    }
+}
+
+/// One paired dimension of the **archetype equivalence** — a topology facet asserted
+/// equivalent to a vocabulary/system facet at a given cardinality (Cardinality↔System,
+/// Eigenvalue↔Coherence, Order↔TermDesignation, Size↔ConnectiveDesignation,
+/// VertexOrdinality↔TermOrdinality, EdgeOrdinality↔ConnectiveOrdinality).
+#[derive(SimpleObject)]
+pub struct GqlEquivalencePair {
+    pub topology: String,
+    pub system: String,
+    pub topology_value: String,
+    pub system_value: String,
+}
+
+impl From<crate::core::equivalence::EquivalencePair> for GqlEquivalencePair {
+    fn from(p: crate::core::equivalence::EquivalencePair) -> Self {
+        Self {
+            topology: p.topology.to_string(),
+            system: p.system.to_string(),
+            topology_value: p.topology_value,
+            system_value: p.system_value,
+        }
+    }
+}
+
+/// The **archetype equivalence** at a cardinality — the two book-matched hexads (topology +
+/// vocabulary) plus the six paired dimensions relating them, and whether they are consistent.
+#[derive(SimpleObject)]
+pub struct GqlEquivalenceHexad {
+    pub topology: GqlTopologyHexad,
+    pub system: GqlSystematicsHexad,
+    pub pairs: Vec<GqlEquivalencePair>,
+    /// Empty ⇒ the two faces book-match (numeric bridge holds); else the inconsistencies.
+    pub mismatches: Vec<String>,
+}
+
+impl From<crate::core::equivalence::EquivalenceHexad> for GqlEquivalenceHexad {
+    fn from(h: crate::core::equivalence::EquivalenceHexad) -> Self {
+        let pairs = h.pairs().into_iter().map(GqlEquivalencePair::from).collect();
+        let mismatches = h.validate().err().unwrap_or_default();
+        Self {
+            topology: h.topology.into(),
+            system: h.system.into(),
+            pairs,
+            mismatches,
         }
     }
 }

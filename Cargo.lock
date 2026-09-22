@@ -2668,6 +2668,7 @@ name = "systematics-frontend"
 version = "0.1.0"
 dependencies = [
  "gloo-net 0.5.0",
+ "js-sys",
  "serde",
  "serde_json",
  "systematics-middleware",

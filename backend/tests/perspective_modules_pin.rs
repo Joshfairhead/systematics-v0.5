@@ -48,15 +48,16 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 16,
-        "expected 16 module files to load (14 sources + the Architecture Pentad \
-         + the Architectural Monad registry); got {modules}"
+        modules, 21,
+        "expected 21 module files to load (14 sources + the Architecture Pentad \
+         + the Architectural Monad, Blue Earth, Interface State Model, and Blue Earth \
+         Ventures registries + the Plato and Bennett sequences); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
         15,
-        "15 perspectives from 16 modules — the Architectural Monad module carries \
-         only a Sequence, no perspective"
+        "15 perspectives from 19 modules — the Architectural Monad, Blue Earth, Interface \
+         State Model and Blue Earth Ventures modules carry only a Sequence, no perspective"
     );
 }
 
@@ -103,15 +104,37 @@ fn module_owned_systems_present() {
         "module-owned systems missing after load: {missing:?}"
     );
 
-    // Total systems = 12 canonical + 1 citation + 54 fragments + 3 module-owned = 70.
-    // Fragments grew 39 → 54 (2026-09-01): the Elementary Systematics pentad, Potency,
+    // Total systems = 12 canonical + 1 citation + 88 fragments + 3 module-owned = 104.
+    // Fragments grew 39 → 55 (2026-09-01): the Elementary Systematics pentad, Potency,
     // two Levels-of-Energy dodecads (Hodgson + Bennett), Work, Workspace, the awareness
-    // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, and the four
-    // Holochain-architecture systems (Holochain Zomes, Integrity/Coordinator Zome, Link).
+    // Monad, the Dodecads pentad, Tetrad (Hodgson), Society, Values, the four Holochain-
+    // architecture systems (Holochain Zomes, Integrity/Coordinator Zome, Link), and the
+    // Graph Products tetrad (Cartesian/Tensor/Strong/Lexicographic = ground/instrument/
+    // directive/goal). Then 55 → 61 (2026-09-07): the Knowledge, Discourse, Common Noun
+    // and Verbs triads, and the two registry tetrads (Field of Action = Store/Read/Graph/
+    // List; Registry Core = Store/Read/Sort/Filter). Then 61 → 74 (2026-09-08): the
+    // Import/Export, Store/Load and Semantics/Syntax dyads; the Blue Earth monad, its
+    // Hosting/Facilitation, Niche/National and Deals/Deployment dyads, Delivery and Impact
+    // triads, and Blue Earth Strategy tetrad; and the Fitness/Exercise and Stretching/
+    // Mobility dyads plus the Physical Fitness pentad. Then 74 → 76 (2026-09-09): the
+    // Interface State Model monad and the Viewing/Editing dyad. Then 76 → 77 (2026-09-09):
+    // the CRUD tetrad (Create/Delete/Update/Read, order 1–4), the state model's tetrad.
+    // Then 77 → 84 (2026-09-10): the Material Science, Information Science and FAIR tetrads,
+    // the Convening and Proof of Stake triads, the Semiotics triad (the Interface State
+    // Model's), and the Assembly/Decomposition dyad. Then 84 → 88 (2026-09-11): the Blue
+    // Earth Ventures monad, its World/Businesses dyad, Backing triad, and Venture Ecosystem
+    // tetrad.
+    // Then 104 → 105 (2026-09-16): the Architectural Monad's own K1 monad head
+    // (system_architectural_monad_1), so the sequence has a monad = its name.
+    // Then 105 → 110 (2026-09-17): the Plato sequence — its monad head + 4 triads
+    // (Tripartite Soul, Social Classes, Three Fates, Cave Allegory).
+    // Then 110 → 112 (2026-09-17): the Bennett sequence — its monad head + the Mind triad.
+    // Then 112 → 113 (2026-09-17): the Browser triad (the sort/filter module as a system —
+    // Query·List·View / Sort·Search·Filter) added to the Architectural Monad registry.
     assert_eq!(
         graph.systems.len(),
-        70,
-        "expected 12 canonical + 1 citation + 54 fragment + 3 module systems"
+        113,
+        "expected 12 canonical + 1 citation + 88 fragment + 12 module systems"
     );
 }
 
@@ -154,11 +177,12 @@ fn architectural_monad_registry_loads() {
     let monad = graph
         .sequence("sequence_architectural_monad")
         .expect("Architectural Monad registry loaded from its module");
-    // A **bucket**: the architecture systems grouped for sorting (several triads,
-    // so it is not an order_cardinality-linear sequence). OrderCardinality does not matter here.
+    // Its head is the K1 monad (named after the sequence), then the architecture systems
+    // grouped for sorting (several triads). OrderCardinality does not matter here.
     assert_eq!(
         monad.members,
         vec![
+            "system:system_architectural_monad_1",
             "system:system_data_2",
             "system:system_order_position_location_3",
             "system:system_citation_3",
@@ -173,6 +197,7 @@ fn architectural_monad_registry_loads() {
             "system:system_graph_theory_7",
             "system:system_topology_geometry_4",
             "system:system_provenance_5",
+            "system:system_browser_3",
         ]
     );
     // Seeded members resolve; the architecture **octad** is documented but not yet

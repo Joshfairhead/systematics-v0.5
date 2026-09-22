@@ -1,9 +1,95 @@
 {
+  "characters": [
+    {
+      "id": "char_word_architectural_monad_t1",
+      "kind": "word",
+      "value": "Architectural Monad"
+    },
+    {
+      "id": "char_word_browser_t1",
+      "kind": "word",
+      "value": "Query"
+    },
+    {
+      "id": "char_word_browser_t2",
+      "kind": "word",
+      "value": "List"
+    },
+    {
+      "id": "char_word_browser_t3",
+      "kind": "word",
+      "value": "View"
+    },
+    {
+      "id": "char_word_browser_c1",
+      "kind": "word",
+      "value": "Sort"
+    },
+    {
+      "id": "char_word_browser_c2",
+      "kind": "word",
+      "value": "Search"
+    },
+    {
+      "id": "char_word_browser_c3",
+      "kind": "word",
+      "value": "Filter"
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_architectural_monad_1",
+      "name": "Architectural Monad",
+      "order": 1,
+      "terms": [
+        "char_word_architectural_monad_t1"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_browser_3",
+      "name": "Browser",
+      "order": 3,
+      "terms": [
+        "char_word_browser_t1",
+        "char_word_browser_t2",
+        "char_word_browser_t3"
+      ],
+      "connectives": [
+        "char_word_browser_c1",
+        "char_word_browser_c2",
+        "char_word_browser_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_architectural_monad_1",
+      "name": "Architectural Monad",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_architectural_monad_1"
+    },
+    {
+      "id": "system_browser_3",
+      "name": "Browser",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_browser_3"
+    }
+  ],
   "sequences": [
     {
       "id": "sequence_architectural_monad",
       "name": "Architectural Monad",
       "members": [
+        "system:system_architectural_monad_1",
         "system:system_data_2",
         "system:system_order_position_location_3",
         "system:system_citation_3",
@@ -17,7 +103,8 @@
         "system:system_path_distance_2",
         "system:system_graph_theory_7",
         "system:system_topology_geometry_4",
-        "system:system_provenance_5"
+        "system:system_provenance_5",
+        "system:system_browser_3"
       ]
     }
   ]
