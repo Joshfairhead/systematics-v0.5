@@ -24,8 +24,9 @@ fn embedded_modules_are_complete_without_a_filesystem() {
     }
 
     assert_eq!(
-        modules, 19,
-        "the deployed binary must serve all 19 modules from the embedded copy"
+        modules, 21,
+        "the deployed binary must serve all 21 modules from the embedded copy \
+         (incl. the Plato and Bennett sequences)"
     );
     assert_eq!(
         graph.references.len(),
