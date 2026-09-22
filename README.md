@@ -4,11 +4,11 @@
 
 ## Why
 
-The field of arteficial intelligence is complex and solving any singular aspect is unlikely to be of much much value due to the non-linear and highly systemic nature of these systems. If we want safe performant systems then we need to work cross functionally across domains like interpretability, representation, and steerability.
+The field of arteficial intelligence is complex and solving any singular aspect is unlikely to be of much much value due to the non-linear and highly systemic nature of these systems. If we want safe performant systems then we need to work cross functionally across domains like interpretability, representation, and standardisation.
 
 ## How
 
-The inter-related nature of complex problems requires a relational approach, which in this case would be a functional linguistic ontology. Without going too deep into his work, Bennett offers a set of ontological lenses through a set of complete graphs which link the stable or invarient elements of a vocabulary together as a sort of ‘natural language metaphysics’ enabling such elements to be qualatively transformed according to the mathmatical principals of applied category theory. In other words, to over come issues with representation and interpretability, we are creating structured systems of transformation (morphisms and functors) which are applicable to both qualative and quantative domains, represented visually as complete graphs.
+The inter-related nature of complex problems requires a relational approach, which in this case would be a functional linguistic ontology. Without going too deep into his work, Bennett offers a set of ontological lenses through a set of complete graphs which link the stable or invarient elements of a vocabulary together as a sort of ‘natural language metaphysics’ enabling such elements to be qualatively transformed according to the mathmatical principals of applied category theory. In other words, to over come issues with representation and interpretability, we are creating structured systems of transformation which are applicable to both qualative and quantative domains, represented visually as complete graphs.
 
 ## What
 
