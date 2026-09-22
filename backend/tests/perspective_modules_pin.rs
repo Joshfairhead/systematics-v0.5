@@ -129,10 +129,12 @@ fn module_owned_systems_present() {
     // Then 105 → 110 (2026-09-17): the Plato sequence — its monad head + 4 triads
     // (Tripartite Soul, Social Classes, Three Fates, Cave Allegory).
     // Then 110 → 112 (2026-09-17): the Bennett sequence — its monad head + the Mind triad.
+    // Then 112 → 113 (2026-09-17): the Browser triad (the sort/filter module as a system —
+    // Query·List·View / Sort·Search·Filter) added to the Architectural Monad registry.
     assert_eq!(
         graph.systems.len(),
-        112,
-        "expected 12 canonical + 1 citation + 88 fragment + 11 module systems"
+        113,
+        "expected 12 canonical + 1 citation + 88 fragment + 12 module systems"
     );
 }
 
@@ -195,6 +197,7 @@ fn architectural_monad_registry_loads() {
             "system:system_graph_theory_7",
             "system:system_topology_geometry_4",
             "system:system_provenance_5",
+            "system:system_browser_3",
         ]
     );
     // Seeded members resolve; the architecture **octad** is documented but not yet
