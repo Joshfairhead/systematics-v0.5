@@ -719,7 +719,13 @@ fn table_view(ctx: TableCtx) -> Html {
         Row::Raw(_) => true,
     });
     // Default row order_cardinality: by systematic order_cardinality (the header axis).
-    rows.sort_by_key(|row| row.order_cardinality());
+    // Sort by systematic order (the Type axis), then **alphabetically by name** within each
+    // order (the Name column was previously in insertion order).
+    rows.sort_by(|a, b| {
+        a.order_cardinality()
+            .cmp(&b.order_cardinality())
+            .then_with(|| a.hay().cmp(&b.hay()))
+    });
 
     // ---- Control-bar display data + callbacks (for the decoupled BrowserControls
     // view). The controller computes chips/predicates via spo::; the view only renders
@@ -1036,28 +1042,33 @@ fn table_view(ctx: TableCtx) -> Html {
                 on_join_selected={ on_join_selected }
                 on_decompose_selected={ on_decompose_selected }
             />
-            <div class="row-pills">
-                {
-                    [
-                        ("sequences", "Sequences", pill_sequences),
-                        ("systems", "Systems", pill_systems),
-                        ("connectives", "Connectives", pill_connectives),
-                        ("nodes", "Nodes", pill_nodes),
-                    ]
-                    .into_iter()
-                    .map(|(key, label, on)| {
-                        let cls = if on { "row-pill row-pill-on" } else { "row-pill" };
-                        let cb = on_toggle_pill.clone();
-                        let k = key.to_string();
-                        let onclick = Callback::from(move |_: MouseEvent| cb.emit(k.clone()));
-                        html! { <button class={ cls } onclick={ onclick }>{ label }</button> }
-                    })
-                    .collect::<Html>()
-                }
-            </div>
 
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }
+
+            // Filter module — the four row-kind pills, in a bounded box under Create.
+            <div class="filter-module">
+                <span class="filter-module-label">{ "Filter" }</span>
+                <div class="row-pills">
+                    {
+                        [
+                            ("sequences", "Sequences", pill_sequences),
+                            ("systems", "Systems", pill_systems),
+                            ("connectives", "Connectives", pill_connectives),
+                            ("nodes", "Nodes", pill_nodes),
+                        ]
+                        .into_iter()
+                        .map(|(key, label, on)| {
+                            let cls = if on { "row-pill row-pill-on" } else { "row-pill" };
+                            let cb = on_toggle_pill.clone();
+                            let k = key.to_string();
+                            let onclick = Callback::from(move |_: MouseEvent| cb.emit(k.clone()));
+                            html! { <button class={ cls } onclick={ onclick }>{ label }</button> }
+                        })
+                        .collect::<Html>()
+                    }
+                </div>
+            </div>
 
             // Reciprocal traversal — the pinned subject's quads (S → P·O·source).
             { inspect_panel }

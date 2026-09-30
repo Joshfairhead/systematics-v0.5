@@ -708,8 +708,19 @@ body {
 }
 .ed-name { flex: 1; min-width: 12rem; }
 .ed-hint { font-size: 0.72rem; color: #a0aec0; margin: 0.2rem 0 0; }
-/* Row-kind filter pills (Sequences/Systems/Connectives/Nodes) — under the control bar. */
-.row-pills { display: flex; gap: 0.4rem; margin: 0.25rem 0 0.5rem; flex-wrap: wrap; }
+/* Filter module — a bounded grey box under the Create pop-down, holding the row-kind pills. */
+.filter-module {
+    margin: 0.5rem 0; padding: 0.6rem 0.75rem;
+    background: rgba(163, 177, 198, 0.12);
+    border: 1px solid rgba(163, 177, 198, 0.25); border-radius: 12px;
+}
+.filter-module-label {
+    display: block; margin-bottom: 0.45rem;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; color: #718096;
+}
+/* Row-kind filter pills (Sequences/Systems/Connectives/Nodes). */
+.row-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .row-pill {
     padding: 0.25rem 0.7rem; border-radius: 999px; cursor: pointer;
     font-family: inherit; font-size: 0.75rem; font-weight: 500;
