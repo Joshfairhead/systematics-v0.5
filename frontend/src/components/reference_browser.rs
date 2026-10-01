@@ -21,10 +21,11 @@
 
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
+use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
-use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
+use crate::api::client::{InstanceSystem, ReferenceView, SequenceView, SystemFile};
 use crate::components::browser_controls::{BrowserControls, ChipItem, PredItem};
 use crate::components::inspector::{Inspector, ObjCite, PosGroup, PredGroup};
 // The SPO triple store + query API live in their own module (swappable spike).
@@ -62,6 +63,12 @@ pub struct ReferenceBrowserProps {
     /// Delete selected rows by address (`system:` / `sequence:` / `reference:`).
     #[prop_or_default]
     pub on_delete_rows: Callback<Vec<String>>,
+    /// Join (addition) the selected systems into a new K_k (the assembly operation).
+    #[prop_or_default]
+    pub on_join: Callback<JoinRequest>,
+    /// Decompose a single selected system into its faces (the inverse of Join).
+    #[prop_or_default]
+    pub on_decompose: Callback<DecomposeRequest>,
     /// When a **bucket** monad is entered, scope the table to just these member
     /// addresses (`system:<id>`). `None` = no scope (the whole registry).
     #[prop_or_default]
@@ -70,10 +77,22 @@ pub struct ReferenceBrowserProps {
     /// ("open the canonical system, then customise").
     #[prop_or_default]
     pub templates: Vec<SystemTemplate>,
-    /// The focused system's raw nodes (terms) + edges (connectives), shown as rows
-    /// when the Term/Connective filter is on (off by default).
+    /// Raw nodes (terms) + edges (connectives) as rows — **all systems or none** (the
+    /// `show_raw` toggle). Empty unless `show_raw` is on.
     #[prop_or_default]
     pub raw_elements: Vec<RawElement>,
+    /// Row-kind filter pills — which kinds of row are shown.
+    #[prop_or_default]
+    pub pill_sequences: bool,
+    #[prop_or_default]
+    pub pill_systems: bool,
+    #[prop_or_default]
+    pub pill_connectives: bool,
+    #[prop_or_default]
+    pub pill_nodes: bool,
+    /// Toggle a pill by key ("sequences"/"systems"/"connectives"/"nodes").
+    #[prop_or_default]
+    pub on_toggle_pill: Callback<String>,
     /// Every Sequence / Monad in the graph — shown as rows (Cites = its members),
     /// so monads (e.g. the Architecture Monad) and their members are visible.
     #[prop_or_default]
@@ -114,6 +133,20 @@ pub struct ExtractRequest {
     pub members: Vec<String>,
 }
 
+/// A request to Join (addition) the selected systems into a new K_k on the union of
+/// their distinct terms. `name` is provisional (rename later); `members` are the
+/// selected `system:<id>` addresses.
+#[derive(Clone, PartialEq)]
+pub struct JoinRequest {
+    pub name: String,
+    pub members: Vec<String>,
+}
+
+/// A request to Decompose a single selected system into its faces (the inverse of Join).
+#[derive(Clone, PartialEq)]
+pub struct DecomposeRequest {
+    pub system_ref: String,
+}
 
 /// A selectable column — one **tag key**. The view is composed by choosing which
 /// keys to show (the Tag reconciler's own by-key action). Everything is a tag, so
@@ -141,7 +174,7 @@ const ALL_COLS: [ColKey; 6] = [
 impl ColKey {
     fn label(self) -> &'static str {
         match self {
-            ColKey::OrderCardinality => "OrderCardinality",
+            ColKey::OrderCardinality => "Type",
             ColKey::Name => "Name",
             ColKey::Perspective => "Perspective",
             ColKey::Citation => "Citation",
@@ -185,7 +218,11 @@ impl Row<'_> {
             Row::Seq(s) => format!("{} {}", s.name, s.members.join(" ")).to_lowercase(),
             Row::Ref(r) => format!(
                 "{} {} {} {} {} {}",
-                persp(r), src(r), art(r), loc(r), r.target,
+                persp(r),
+                src(r),
+                art(r),
+                loc(r),
+                r.target,
                 r.note.clone().unwrap_or_default()
             )
             .to_lowercase(),
@@ -213,7 +250,7 @@ fn passes_row(row: Row, filter_order: Option<i32>, needle: &str) -> bool {
 fn in_scope(row: &Row, scope: Option<&[String]>) -> bool {
     match scope {
         None => true,
-        Some(members) => row.system_addr().is_some_and(|a| members.iter().any(|m| *m == a)),
+        Some(members) => row.system_addr().is_some_and(|a| members.contains(&a)),
     }
 }
 /// A row's **deletable address** (`system:` / `sequence:` / `reference:`), used by
@@ -281,7 +318,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let search = use_state(String::new);
     // Sort (=) selects the header tags (which tag keys are columns).
     let sort_open = use_state(|| false);
-    let visible_cols = use_state(|| vec![ColKey::OrderCardinality, ColKey::Name, ColKey::Citation]);
+    // Static list (prototype): Type · Name only. The Sort/Filter query controls are
+    // hidden (see BrowserControls `show_query`), so these columns don't change.
+    let visible_cols = use_state(|| vec![ColKey::OrderCardinality, ColKey::Name]);
     // Filter (−) scopes the data returned, by cite-degree. Default: Systems only —
     // coherence/designations/terms/connectives are opt-in.
     let filter_open = use_state(|| false);
@@ -296,6 +335,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     let inspect = use_state(|| Option::<String>::None);
     // Row-select CRUD: the set of selected row addresses (system:/sequence:/reference:).
     let selected = use_state(HashSet::<String>::new);
+    // Transient notice (e.g. "select a system to export").
+    let notice = use_state(|| Option::<String>::None);
     // Editor: author a new System from custom values (the app-authored path).
     let editor_open = use_state(|| false);
     let ed_name = use_state(String::new);
@@ -333,12 +374,25 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     };
 
     // ---- Editor form: author a System from custom values ----
-    let toggle_editor = { let o = editor_open.clone(); Callback::from(move |_: MouseEvent| o.set(!*o)) };
-    let on_ed_name = { let s = ed_name.clone(); Callback::from(move |e: InputEvent| s.set(e.target_unchecked_into::<HtmlInputElement>().value())) };
+    let toggle_editor = {
+        let o = editor_open.clone();
+        Callback::from(move |_: MouseEvent| o.set(!*o))
+    };
+    let on_ed_name = {
+        let s = ed_name.clone();
+        Callback::from(move |e: InputEvent| {
+            s.set(e.target_unchecked_into::<HtmlInputElement>().value())
+        })
+    };
     let on_ed_order = {
         let (ed_order, ed_terms, ed_conns) = (ed_order.clone(), ed_terms.clone(), ed_conns.clone());
         Callback::from(move |e: InputEvent| {
-            let n = e.target_unchecked_into::<HtmlInputElement>().value().parse::<i32>().unwrap_or(3).clamp(1, 12);
+            let n = e
+                .target_unchecked_into::<HtmlInputElement>()
+                .value()
+                .parse::<i32>()
+                .unwrap_or(3)
+                .clamp(1, 12);
             ed_order.set(n);
             ed_terms.set(vec![String::new(); n as usize]);
             ed_conns.set(vec![String::new(); (n * (n - 1) / 2) as usize]);
@@ -351,14 +405,21 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         let oninput = Callback::from(move |e: InputEvent| {
             let v = e.target_unchecked_into::<HtmlInputElement>().value();
             let mut next = (*state).clone();
-            if i < next.len() { next[i] = v; }
+            if i < next.len() {
+                next[i] = v;
+            }
             state.set(next);
         });
         html! { <input class="ed-input" placeholder={ph} value={ val } oninput={ oninput } /> }
     };
     let ed_order_val = *ed_order;
     let on_create = {
-        let (on_author, ed_name, ed_terms, ed_conns) = (props.on_author.clone(), ed_name.clone(), ed_terms.clone(), ed_conns.clone());
+        let (on_author, ed_name, ed_terms, ed_conns) = (
+            props.on_author.clone(),
+            ed_name.clone(),
+            ed_terms.clone(),
+            ed_conns.clone(),
+        );
         Callback::from(move |_: MouseEvent| {
             on_author.emit(AuthorRequest {
                 name: (*ed_name).clone(),
@@ -370,8 +431,12 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     };
     // Prefill from the canonical system of the current order_cardinality ("open the canonical").
     let on_prefill = {
-        let (templates, ed_order, ed_terms, ed_conns) =
-            (props.templates.clone(), ed_order.clone(), ed_terms.clone(), ed_conns.clone());
+        let (templates, ed_order, ed_terms, ed_conns) = (
+            props.templates.clone(),
+            ed_order.clone(),
+            ed_terms.clone(),
+            ed_conns.clone(),
+        );
         Callback::from(move |_: MouseEvent| {
             if let Some(t) = templates.iter().find(|t| t.order_cardinality == *ed_order) {
                 ed_terms.set(t.terms.clone());
@@ -383,22 +448,49 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         && ed_terms.iter().all(|t| !t.trim().is_empty())
         && ed_conns.iter().all(|c| !c.trim().is_empty());
 
-    // Load opens the OS file browser to pick a JSON system file (import format TBD).
-    let on_file = Callback::from(move |e: Event| {
-        let input = e.target_unchecked_into::<HtmlInputElement>();
-        if let Some(f) = input.files().and_then(|fs| fs.get(0)) {
-            web_sys::console::log_1(
-                &format!("Load: {} ({} bytes) — JSON import TBD", f.name(), f.size()).into(),
-            );
-        }
-    });
+    // Load (import): read a bespoke per-system JSON file and **Store** it via on_author
+    // (create/overwrite). Store = write, Load = read — this is Load-from-file → Store.
+    let on_file = {
+        let on_author = props.on_author.clone();
+        Callback::from(move |e: Event| {
+            let input = e.target_unchecked_into::<HtmlInputElement>();
+            let Some(file) = input.files().and_then(|fs| fs.get(0)) else {
+                return;
+            };
+            let on_author = on_author.clone();
+            let text = wasm_bindgen_futures::JsFuture::from(file.text());
+            wasm_bindgen_futures::spawn_local(async move {
+                match text.await {
+                    Ok(js) => match serde_json::from_str::<SystemFile>(
+                        &js.as_string().unwrap_or_default(),
+                    ) {
+                        Ok(sf) => on_author.emit(AuthorRequest {
+                            name: sf.name,
+                            order_cardinality: sf.order,
+                            terms: sf.terms,
+                            connectives: sf.connectives,
+                        }),
+                        Err(err) => web_sys::console::log_1(
+                            &format!("Import: invalid system JSON — {err}").into(),
+                        ),
+                    },
+                    Err(_) => web_sys::console::log_1(&"Import: could not read file".into()),
+                }
+            });
+            // Reset so the same file can be re-imported.
+            input.set_value("");
+        })
+    };
     let can_extract = !extract_members.is_empty();
     let on_extract_click = {
         let on_extract = props.on_extract.clone();
         let name = extract_name.clone();
         let members = extract_members.clone();
         Callback::from(move |_: MouseEvent| {
-            on_extract.emit(ExtractRequest { name: name.clone(), members: members.clone() })
+            on_extract.emit(ExtractRequest {
+                name: name.clone(),
+                members: members.clone(),
+            })
         })
     };
     let extract_title = format!(
@@ -411,19 +503,54 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         <button
             class={ classes!("elt-btn", (*editor_open).then_some("active")) }
             onclick={ toggle_editor.clone() }
-            title="New — author a system from custom terms/connectives"
-        >{ if *editor_open { "New ▴" } else { "New ▾" } }</button>
+            title="Create — author a system from custom terms/connectives"
+        >{ if *editor_open { "Create ▴" } else { "Create ▾" } }</button>
     };
-    // Extract · Load · Transform (right of the search bar) — the operation edge.
+    // Export (Store to file): download each checkbox-selected system as a bespoke JSON.
+    // If nothing is selected, show a notice (tick a system's box, same as delete).
+    let on_export = {
+        let selected = selected.clone();
+        let systems = props.instance_systems.clone();
+        let notice = notice.clone();
+        Callback::from(move |_: MouseEvent| {
+            let ids: Vec<String> = selected
+                .iter()
+                .filter_map(|a| a.strip_prefix("system:").map(|s| s.to_string()))
+                .collect();
+            if ids.is_empty() {
+                notice.set(Some(
+                    "Select a system (tick its box) to export.".to_string(),
+                ));
+                return;
+            }
+            notice.set(None);
+            for id in &ids {
+                if let Some(sys) = systems.iter().find(|s| &s.id == id) {
+                    download_system_json(sys);
+                }
+            }
+        })
+    };
+    // Store/Load controls beside Create (the ELT bar is hidden in the prototype):
+    //  · Load ↥ — import a system from a bespoke JSON file.
+    //  · Export ↧ — store the checkbox-selected system(s) to JSON files.
+    let import_btn = html! {
+        <>
+            <label class="elt-btn" title="Import — load a system from a bespoke JSON file (store/load)">
+                { "Import ↥" }
+                <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
+            </label>
+            <button class="elt-btn" onclick={ on_export } title="Export — store the selected system(s) to bespoke JSON files (tick a box first)">
+                { "Export ↧" }
+            </button>
+        </>
+    };
+    // Extract · Transform (the old ELT operation edge) — kept but hidden (show_elt=false).
     let elt_btns = html! {
         <>
             <button class="elt-btn" disabled={ !can_extract } onclick={ on_extract_click } title={ extract_title }>
                 { format!("Extract ({})", extract_members.len()) }
             </button>
-            <label class="elt-btn" title="Load — open a JSON system file (import format TBD)">
-                { "Load ↥" }
-                <input type="file" accept="application/json,.json" style="display:none;" onchange={ on_file } />
-            </label>
             <button class="elt-btn" disabled=true title="Transform — apply a Functor to a loaded system. Not yet wired.">
                 { "Transform" }
             </button>
@@ -461,15 +588,25 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
 
     html! {
         <div class="reference-browser">
+            if let Some(msg) = (*notice).clone() {
+                <div class="browser-notice">{ msg }</div>
+            }
             { table_view(TableCtx {
                 refs,
                 systems,
                 seqs,
                 raw,
+                pill_sequences: props.pill_sequences,
+                pill_systems: props.pill_systems,
+                pill_connectives: props.pill_connectives,
+                pill_nodes: props.pill_nodes,
+                on_toggle_pill: &props.on_toggle_pill,
                 on_load: &props.on_load,
                 on_view_sequence: &props.on_view_sequence,
                 on_delete_sequence: &props.on_delete_sequence,
                 on_delete_rows: &props.on_delete_rows,
+                on_join: &props.on_join,
+                on_decompose: &props.on_decompose,
                 filter_order,
                 scope,
                 search: &search,
@@ -482,6 +619,7 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 inspect: &inspect,
                 selected: &selected,
                 new_btn,
+                import_btn,
                 elt_btns,
                 editor_form,
             }) }
@@ -496,8 +634,14 @@ struct TableCtx<'a> {
     systems: &'a [InstanceSystem],
     /// Every Sequence / Monad — shown as rows (Cites = members).
     seqs: &'a [SequenceView],
-    /// The focused system's raw nodes/edges (shown when Term/Connective on).
+    /// Raw nodes/edges rows — every system's, per the Nodes/Connectives pills (all-or-none).
     raw: &'a [RawElement],
+    /// Row-kind filter pills — which kinds of row show, and the toggle.
+    pill_sequences: bool,
+    pill_systems: bool,
+    pill_connectives: bool,
+    pill_nodes: bool,
+    on_toggle_pill: &'a Callback<String>,
     /// Click a system row to view it (loads into the graph).
     on_load: &'a Callback<String>,
     /// Click a monad row to enter it (navigate its members via the header).
@@ -506,6 +650,9 @@ struct TableCtx<'a> {
     on_delete_sequence: &'a Callback<String>,
     /// Delete selected rows by address (row-select CRUD).
     on_delete_rows: &'a Callback<Vec<String>>,
+    /// Join (addition) the selected systems into a new K_k.
+    on_join: &'a Callback<JoinRequest>,
+    on_decompose: &'a Callback<DecomposeRequest>,
     /// OrderCardinality filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     /// Bucket scope — when a bucket monad is entered, show only its members.
@@ -524,9 +671,10 @@ struct TableCtx<'a> {
     inspect: &'a UseStateHandle<Option<String>>,
     /// Selected row addresses (row-select CRUD).
     selected: &'a UseStateHandle<HashSet<String>>,
-    /// New toggle (placed left of Sort); ELT buttons (right of search); and the
+    /// Create toggle; Import file-picker (store/load); ELT buttons (hidden); and the
     /// editor plane that folds under the control bar. Pre-rendered in the body.
     new_btn: Html,
+    import_btn: Html,
     elt_btns: Html,
     editor_form: Html,
 }
@@ -537,10 +685,17 @@ fn table_view(ctx: TableCtx) -> Html {
         systems,
         seqs,
         raw,
+        pill_sequences,
+        pill_systems,
+        pill_connectives,
+        pill_nodes,
+        on_toggle_pill,
         on_load,
         on_view_sequence,
         on_delete_sequence,
         on_delete_rows,
+        on_join,
+        on_decompose,
         filter_order,
         scope,
         search,
@@ -553,6 +708,7 @@ fn table_view(ctx: TableCtx) -> Html {
         inspect,
         selected,
         new_btn,
+        import_btn,
         elt_btns,
         editor_form,
     } = ctx;
@@ -566,6 +722,10 @@ fn table_view(ctx: TableCtx) -> Html {
         .filter(|row| in_scope(row, scope))
         .filter(|row| passes_constraints(row, spo_constraints, triples))
         .collect();
+    // The Nullad shows **all data** — every system (and every sequence) is a top-level row,
+    // even systems that are also members of a sequence. (The earlier "Pragmatic Nullad" hid
+    // sequence-member systems so they only appeared inside their monad; disabled per design —
+    // all systems are viewable in the Nullad, discriminated later by the sort/filter module.)
     // A reference is **metadata on its subject system**, not a peer row. If the
     // system it cites is already shown, fold the reference away (this is what made
     // a whole-system citation appear as a second, duplicate "system"). References
@@ -584,8 +744,22 @@ fn table_view(ctx: TableCtx) -> Html {
             .is_none_or(|ts| !shown_sys.contains(ts.id.as_str())),
         _ => true,
     });
+    // Row-kind filter pills: keep only the enabled kinds. (Raw node/edge rows are already
+    // built per the Nodes/Connectives pills, so they only appear when enabled; Sequences and
+    // Systems/References are filtered here.)
+    rows.retain(|r| match r {
+        Row::Seq(_) => pill_sequences,
+        Row::Sys(_) | Row::Ref(_) => pill_systems,
+        Row::Raw(_) => true,
+    });
     // Default row order_cardinality: by systematic order_cardinality (the header axis).
-    rows.sort_by_key(|row| row.order_cardinality());
+    // Sort by systematic order (the Type axis), then **alphabetically by name** within each
+    // order (the Name column was previously in insertion order).
+    rows.sort_by(|a, b| {
+        a.order_cardinality()
+            .cmp(&b.order_cardinality())
+            .then_with(|| a.hay().cmp(&b.hay()))
+    });
 
     // ---- Control-bar display data + callbacks (for the decoupled BrowserControls
     // view). The controller computes chips/predicates via spo::; the view only renders
@@ -629,7 +803,9 @@ fn table_view(ctx: TableCtx) -> Html {
     let objects: Vec<ChipItem> = pred_objects_scoped(triples, &active_pred_key, spo_constraints)
         .into_iter()
         .map(|v| ChipItem {
-            on: spo_constraints.get(&active_pred_key).is_some_and(|s| s.contains(&v)),
+            on: spo_constraints
+                .get(&active_pred_key)
+                .is_some_and(|s| s.contains(&v)),
             key: v.clone(),
             label: v,
         })
@@ -649,11 +825,16 @@ fn table_view(ctx: TableCtx) -> Html {
     };
     let active_pred_label = pred_label(&active_pred_key);
     // Visible columns in canonical order_cardinality (independent of toggle order_cardinality).
-    let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
+    let cols: Vec<ColKey> = ALL_COLS
+        .into_iter()
+        .filter(|c| visible_cols.contains(c))
+        .collect();
 
     let cell = |k: ColKey, row: &Row| -> Html {
         let order_cell = |o: Option<i32>| html! { { o.map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } };
         match (k, row) {
+            // The blue tags are **sequences** (they head a monad; they are not themselves a monad).
+            (ColKey::OrderCardinality, Row::Seq(_)) => html! { { "sequence" } },
             (ColKey::OrderCardinality, _) => order_cell(row.order_cardinality()),
             (ColKey::Name, Row::Sys(s)) => {
                 let load = {
@@ -690,7 +871,11 @@ fn table_view(ctx: TableCtx) -> Html {
                 }
             }
             (ColKey::Name, Row::Raw(e)) => {
-                let cls = if e.is_edge { "tag tag-locator" } else { "tag tag-perspective" };
+                let cls = if e.is_edge {
+                    "tag tag-locator"
+                } else {
+                    "tag tag-perspective"
+                };
                 html! { <span class={ cls }>{ &e.name }</span> }
             }
             (ColKey::Cites, Row::Raw(e)) => html! { { if e.is_edge { "edge" } else { "node" } } },
@@ -706,13 +891,14 @@ fn table_view(ctx: TableCtx) -> Html {
                         e.stop_propagation();
                         on_delete_sequence.emit(id.clone());
                     });
-                    html! { <button class="row-delete" onclick={ onclick } title="Delete this monad">{ "✕" }</button> }
+                    html! { <button class="row-delete" onclick={ onclick } title="Delete this sequence">{ "✕" }</button> }
                 };
                 let name_tag = if s.members.iter().any(|m| m.starts_with("system:")) {
                     let on_view_sequence = on_view_sequence.clone();
                     let members = s.members.clone();
-                    let onclick = Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
-                    html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this monad — header buttons navigate its members">{ label }</button> }
+                    let onclick =
+                        Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
+                    html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this sequence — header buttons navigate its members">{ label }</button> }
                 } else {
                     html! { <span class="tag tag-monad">{ label }</span> }
                 };
@@ -728,8 +914,16 @@ fn table_view(ctx: TableCtx) -> Html {
             (ColKey::Citation, Row::Ref(r)) => citation_tags(r),
             (ColKey::Cites, Row::Ref(r)) => {
                 let f = frag(r);
-                let cites = if f.is_empty() { "whole system".to_string() } else { f };
-                let target_label = r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_else(|| r.target.clone());
+                let cites = if f.is_empty() {
+                    "whole system".to_string()
+                } else {
+                    f
+                };
+                let target_label = r
+                    .target_system
+                    .as_ref()
+                    .map(|s| s.name.clone())
+                    .unwrap_or_else(|| r.target.clone());
                 html! { <span title={ target_label }>{ cites }</span> }
             }
             (ColKey::Note, Row::Ref(r)) => html! { { r.note.clone().unwrap_or_default() } },
@@ -744,8 +938,14 @@ fn table_view(ctx: TableCtx) -> Html {
         let search = search.clone();
         Callback::from(move |v: String| search.set(v))
     };
-    let on_toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: ()| s.set(!*s)) };
-    let on_toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: ()| s.set(!*s)) };
+    let on_toggle_sort = {
+        let s = sort_open.clone();
+        Callback::from(move |_: ()| s.set(!*s))
+    };
+    let on_toggle_filter = {
+        let s = filter_open.clone();
+        Callback::from(move |_: ()| s.set(!*s))
+    };
     let scoped = !spo_constraints.is_empty();
 
     // Reciprocal traversal — a pinned SUBJECT advertising its values (S → P·O·source).
@@ -774,8 +974,14 @@ fn table_view(ctx: TableCtx) -> Html {
         }
         // Systematics predicate order_cardinality; any others appended after.
         const ORDER: [&str; 8] = [
-            "name", "order_cardinality", "coherence", "term-designation", "connective-designation",
-            "term", "connective", "source",
+            "name",
+            "order_cardinality",
+            "coherence",
+            "term-designation",
+            "connective-designation",
+            "term",
+            "connective",
+            "source",
         ];
         let mut preds: Vec<String> = ORDER
             .iter()
@@ -831,6 +1037,45 @@ fn table_view(ctx: TableCtx) -> Html {
             selected.set(HashSet::new());
         })
     };
+    // Join (addition): assemble the selected systems into a new K_k. The provisional
+    // name joins the selected systems' names (rename later on the canvas).
+    let on_join_selected = {
+        let selected = selected.clone();
+        let on_join = on_join.clone();
+        let systems = systems.to_vec();
+        Callback::from(move |_: ()| {
+            let members: Vec<String> = selected
+                .iter()
+                .filter(|a| a.starts_with("system:"))
+                .cloned()
+                .collect();
+            if members.len() < 2 {
+                return;
+            }
+            let name = members
+                .iter()
+                .filter_map(|a| a.strip_prefix("system:"))
+                .filter_map(|id| systems.iter().find(|s| s.id == id).map(|s| s.name.clone()))
+                .collect::<Vec<_>>()
+                .join(" ");
+            on_join.emit(JoinRequest { name, members });
+            selected.set(HashSet::new());
+        })
+    };
+    // Decompose (subtraction): break the single selected system into its faces.
+    let on_decompose_selected = {
+        let selected = selected.clone();
+        let on_decompose = on_decompose.clone();
+        Callback::from(move |_: ()| {
+            let mut sys = selected.iter().filter(|a| a.starts_with("system:"));
+            if let (Some(system_ref), None) = (sys.next().cloned(), sys.next()) {
+                on_decompose.emit(DecomposeRequest { system_ref });
+                selected.set(HashSet::new());
+            }
+        })
+    };
+    // Count only the joinable (system) selections — Join shows when ≥2.
+    let join_count = selected.iter().filter(|a| a.starts_with("system:")).count();
     let sel_count = selected.len();
 
     html! {
@@ -841,6 +1086,7 @@ fn table_view(ctx: TableCtx) -> Html {
             <BrowserControls
                 elt_btns={ elt_btns }
                 new_btn={ new_btn }
+                import_btn={ import_btn }
                 search={ (**search).clone() }
                 on_search={ on_search }
                 sort_open={ **sort_open }
@@ -858,10 +1104,37 @@ fn table_view(ctx: TableCtx) -> Html {
                 shown={ rows.len() }
                 sel_count={ sel_count }
                 on_delete_selected={ on_delete_selected }
+                join_count={ join_count }
+                on_join_selected={ on_join_selected }
+                on_decompose_selected={ on_decompose_selected }
             />
 
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }
+
+            // Filter module — the four row-kind pills, in a bounded box under Create.
+            <div class="filter-module">
+                <span class="filter-module-label">{ "Filter" }</span>
+                <div class="row-pills">
+                    {
+                        [
+                            ("sequences", "Sequences", pill_sequences),
+                            ("systems", "Systems", pill_systems),
+                            ("connectives", "Connectives", pill_connectives),
+                            ("nodes", "Nodes", pill_nodes),
+                        ]
+                        .into_iter()
+                        .map(|(key, label, on)| {
+                            let cls = if on { "row-pill row-pill-on" } else { "row-pill" };
+                            let cb = on_toggle_pill.clone();
+                            let k = key.to_string();
+                            let onclick = Callback::from(move |_: MouseEvent| cb.emit(k.clone()));
+                            html! { <button class={ cls } onclick={ onclick }>{ label }</button> }
+                        })
+                        .collect::<Html>()
+                    }
+                </div>
+            </div>
 
             // Reciprocal traversal — the pinned subject's quads (S → P·O·source).
             { inspect_panel }
@@ -929,9 +1202,14 @@ fn citation_tags(r: &ReferenceView) -> Html {
 
     let source_tag = (!source.is_empty())
         .then(|| html! { <span class="tag tag-source" title="Source">{ source }</span> });
-    let artefact_url = r.artefact.as_ref().and_then(|a| a.url.clone()).unwrap_or_default();
-    let artefact_tag = (!artefact.is_empty())
-        .then(|| html! { <span class="tag tag-artefact" title={ artefact_url }>{ artefact }</span> });
+    let artefact_url = r
+        .artefact
+        .as_ref()
+        .and_then(|a| a.url.clone())
+        .unwrap_or_default();
+    let artefact_tag = (!artefact.is_empty()).then(
+        || html! { <span class="tag tag-artefact" title={ artefact_url }>{ artefact }</span> },
+    );
     let locator_tag = (!locator.is_empty())
         .then(|| html! { <span class="tag tag-locator" title="Lookup">{ locator }</span> });
 
@@ -941,5 +1219,47 @@ fn citation_tags(r: &ReferenceView) -> Html {
             { artefact_tag.unwrap_or_default() }
             { locator_tag.unwrap_or_default() }
         </span>
+    }
+}
+
+/// Export (Store to file): serialize an instance system into a bespoke per-system JSON
+/// and trigger a browser download via a transient data-URL anchor. Terms/connectives
+/// come from the list system already in vocabulary order (the order authoring expects).
+fn download_system_json(sys: &InstanceSystem) {
+    let file = SystemFile {
+        name: sys.name.clone(),
+        order: sys.order_cardinality,
+        terms: sys.terms.iter().map(|t| t.value.clone()).collect(),
+        connectives: sys.connectives.iter().map(|c| c.value.clone()).collect(),
+    };
+    let json = serde_json::to_string_pretty(&file).unwrap_or_default();
+    let href = format!(
+        "data:application/json;charset=utf-8,{}",
+        String::from(js_sys::encode_uri_component(&json))
+    );
+    let slug: String = sys
+        .name
+        .trim()
+        .to_lowercase()
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c } else { '-' })
+        .collect();
+    let filename = format!(
+        "{}.json",
+        if slug.is_empty() {
+            "system".into()
+        } else {
+            slug
+        }
+    );
+
+    if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
+        if let Ok(el) = doc.create_element("a") {
+            let _ = el.set_attribute("href", &href);
+            let _ = el.set_attribute("download", &filename);
+            if let Some(anchor) = el.dyn_ref::<web_sys::HtmlElement>() {
+                anchor.click();
+            }
+        }
     }
 }

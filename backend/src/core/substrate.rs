@@ -85,13 +85,15 @@ impl TopologyGraph {
                 template.size()
             ));
         }
-        let legal: std::collections::HashSet<(u8, u8)> =
-            template.edges().into_iter().collect();
+        let legal: std::collections::HashSet<(u8, u8)> = template.edges().into_iter().collect();
         for l in &self.links {
             if l.endpoints.0 >= l.endpoints.1 {
                 errs.push(format!("orbit {} is not undirected (a < b)", l.id));
             } else if !legal.contains(&l.endpoints) {
-                errs.push(format!("orbit {:?} is not a legal template edge", l.endpoints));
+                errs.push(format!(
+                    "orbit {:?} is not a legal template edge",
+                    l.endpoints
+                ));
             }
         }
         if errs.is_empty() {
@@ -209,7 +211,11 @@ impl Morphism for EdgeToOrbit {
         MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        let (a, b) = if self.a < self.b {
+            (self.a, self.b)
+        } else {
+            (self.b, self.a)
+        };
         hg.topology.links.push(Link {
             id: format!("lk_{}_{}_{}", self.cardinality, a, b),
             endpoints: (a, b),
@@ -265,7 +271,11 @@ impl Morphism for ConnectiveToOrbit {
         MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        let (a, b) = if self.a < self.b {
+            (self.a, self.b)
+        } else {
+            (self.b, self.a)
+        };
         let conn_id = format!("conn_{}_{}_{}", self.cardinality, a, b);
         hg.data.push(DataElement {
             id: conn_id.clone(),
@@ -309,7 +319,10 @@ impl Morphism for CoordinateToVertex {
         hg.data.push(DataElement {
             id: coord_id.clone(),
             kind: "coordinate".to_string(),
-            character: format!("{},{},{}", self.coordinate[0], self.coordinate[1], self.coordinate[2]),
+            character: format!(
+                "{},{},{}",
+                self.coordinate[0], self.coordinate[1], self.coordinate[2]
+            ),
         });
         hg.links.push(HyperLink {
             id: format!("anchor_g_{}_{}", self.cardinality, self.index),
@@ -365,7 +378,11 @@ impl Morphism for CoordinateLine {
         MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        let (a, b) = if self.a < self.b {
+            (self.a, self.b)
+        } else {
+            (self.b, self.a)
+        };
         let line_id = format!("line_{}_{}_{}", self.cardinality, a, b);
         // lateral: coordinate → coordinate.
         hg.links.push(HyperLink {
@@ -399,7 +416,11 @@ impl Morphism for ColourLine {
         MorphismSite::Edge(self.a, self.b)
     }
     fn apply(&self, hg: &mut Hypergraph) {
-        let (a, b) = if self.a < self.b { (self.a, self.b) } else { (self.b, self.a) };
+        let (a, b) = if self.a < self.b {
+            (self.a, self.b)
+        } else {
+            (self.b, self.a)
+        };
         let colline_id = format!("colline_{}_{}_{}", self.cardinality, a, b);
         // lateral: colour → colour.
         hg.links.push(HyperLink {
@@ -740,7 +761,12 @@ pub fn compose_from_store_by_system(
         .into_iter()
         .filter_map(|(a, b)| target_for(&format!("connective@{a}-{b}")))
         .collect();
-    Some(compose_from_store(store, cardinality, &term_ids, &connective_ids))
+    Some(compose_from_store(
+        store,
+        cardinality,
+        &term_ids,
+        &connective_ids,
+    ))
 }
 
 /// **Compose a seeded system from the store** — the substrate-as-data-source path for a
@@ -847,12 +873,26 @@ mod tests {
         assert_eq!(hg.data.iter().filter(|d| d.kind == "term").count(), 3);
         assert_eq!(hg.data.iter().filter(|d| d.kind == "connective").count(), 3);
         // canonical index: term_3_1 = Will, anchored orthogonally to vertex el_3_1.
-        assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "term_3_1")
+                .unwrap()
+                .character,
+            "Will"
+        );
         let anchor = hg.links.iter().find(|l| l.id == "anchor_v_3_1").unwrap();
         assert_eq!(anchor.base, "el_3_1");
         assert_eq!(anchor.target, "term_3_1");
         // connective on the (1,2) orbit = Generation.
-        assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_1_2").unwrap().character, "Generation");
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "conn_3_1_2")
+                .unwrap()
+                .character,
+            "Generation"
+        );
         // lateral term–connective–term: term_3_1 ──conn_3_1_2── term_3_2.
         let lat = hg.links.iter().find(|l| l.id == "lat_3_1_2").unwrap();
         assert_eq!(lat.base, "term_3_1");
@@ -869,7 +909,11 @@ mod tests {
             &["a".into(), "b".into(), "c".into()],
             &["x".into(), "y".into(), "z".into()],
         );
-        let lateral: Vec<_> = hg.links.iter().filter(|l| l.id.starts_with("lat_")).collect();
+        let lateral: Vec<_> = hg
+            .links
+            .iter()
+            .filter(|l| l.id.starts_with("lat_"))
+            .collect();
         assert_eq!(lateral.len(), 3); // the triad's internal term–connective–term structure
         for l in lateral {
             assert!(l.base.starts_with("term_") && l.target.starts_with("term_"));
@@ -889,18 +933,45 @@ mod tests {
         assert_eq!(hg.data.iter().filter(|d| d.kind == "coordinate").count(), 3);
         assert_eq!(hg.data.iter().filter(|d| d.kind == "colour").count(), 3);
         // orthogonal anchors: vertex el_3_1 ▶ coord_3_1 and ▶ colour_3_1.
-        assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == "coord_3_1"));
-        assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == "colour_3_1"));
-        assert_eq!(hg.data.iter().find(|d| d.id == "colour_3_3").unwrap().character, "blue");
-        assert_eq!(hg.data.iter().find(|d| d.id == "coord_3_1").unwrap().character, "0,1,0");
+        assert!(hg
+            .links
+            .iter()
+            .any(|l| l.base == "el_3_1" && l.target == "coord_3_1"));
+        assert!(hg
+            .links
+            .iter()
+            .any(|l| l.base == "el_3_1" && l.target == "colour_3_1"));
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "colour_3_3")
+                .unwrap()
+                .character,
+            "blue"
+        );
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "coord_3_1")
+                .unwrap()
+                .character,
+            "0,1,0"
+        );
         // laterals: 3 coordinate→coordinate lines + 3 colour→colour lines per edge.
         assert_eq!(hg.links.iter().filter(|l| l.link_type == "line").count(), 3);
-        assert_eq!(hg.links.iter().filter(|l| l.link_type == "colour").count(), 3);
+        assert_eq!(
+            hg.links.iter().filter(|l| l.link_type == "colour").count(),
+            3
+        );
         let line = hg.links.iter().find(|l| l.id == "line_3_1_2").unwrap();
         assert_eq!(line.base, "coord_3_1");
         assert_eq!(line.target, "coord_3_2");
         // and each line / colour-line ANCHORS to its topological orbit (edge ↔ line).
-        let anchor_line = hg.links.iter().find(|l| l.id == "anchor_line_3_1_2").unwrap();
+        let anchor_line = hg
+            .links
+            .iter()
+            .find(|l| l.id == "anchor_line_3_1_2")
+            .unwrap();
         assert_eq!(anchor_line.base, "lk_3_1_2"); // the orbit
         assert_eq!(anchor_line.target, "line_3_1_2");
         assert!(hg
@@ -912,14 +983,40 @@ mod tests {
     #[test]
     fn every_canonical_morphism_declares_its_topological_site() {
         // vertex morphisms → Vertex(index); edge morphisms → Edge(a,b).
-        assert_eq!(IndexToVertex { cardinality: 3, index: 2 }.site(), MorphismSite::Vertex(2));
-        assert_eq!(EdgeToOrbit { cardinality: 3, a: 1, b: 2 }.site(), MorphismSite::Edge(1, 2));
         assert_eq!(
-            TermToVertex { cardinality: 3, index: 3, character: "x".into() }.site(),
+            IndexToVertex {
+                cardinality: 3,
+                index: 2
+            }
+            .site(),
+            MorphismSite::Vertex(2)
+        );
+        assert_eq!(
+            EdgeToOrbit {
+                cardinality: 3,
+                a: 1,
+                b: 2
+            }
+            .site(),
+            MorphismSite::Edge(1, 2)
+        );
+        assert_eq!(
+            TermToVertex {
+                cardinality: 3,
+                index: 3,
+                character: "x".into()
+            }
+            .site(),
             MorphismSite::Vertex(3)
         );
         assert_eq!(
-            ConnectiveToOrbit { cardinality: 3, a: 2, b: 3, character: "y".into() }.site(),
+            ConnectiveToOrbit {
+                cardinality: 3,
+                a: 2,
+                b: 3,
+                character: "y".into()
+            }
+            .site(),
             MorphismSite::Edge(2, 3)
         );
     }
@@ -937,22 +1034,37 @@ mod tests {
         // A self-loop (1,1) is not an edge of K_3 → the adjacency matrix has no such
         // entry → the grammar rejects the bundle (composition is gated, not blind).
         let mut bundle = topology_morphisms(3);
-        bundle.push(Box::new(EdgeToOrbit { cardinality: 3, a: 1, b: 1 }));
+        bundle.push(Box::new(EdgeToOrbit {
+            cardinality: 3,
+            a: 1,
+            b: 1,
+        }));
         let result = compose_checked(3, bundle);
         assert!(result.is_err(), "self-loop must be rejected");
         assert!(result.unwrap_err()[0].contains("Edge(1, 1)"));
 
         // An out-of-range edge (2,5) on a triad is likewise ungrammatical.
         let mut bundle = topology_morphisms(3);
-        bundle.push(Box::new(ConnectiveToOrbit { cardinality: 3, a: 2, b: 5, character: "z".into() }));
-        assert!(compose_checked(3, bundle).is_err(), "out-of-range edge must be rejected");
+        bundle.push(Box::new(ConnectiveToOrbit {
+            cardinality: 3,
+            a: 2,
+            b: 5,
+            character: "z".into(),
+        }));
+        assert!(
+            compose_checked(3, bundle).is_err(),
+            "out-of-range edge must be rejected"
+        );
     }
 
     #[test]
     fn grammar_rejects_an_out_of_range_vertex_morphism() {
         // Vertex 4 does not exist in K_3 → rejected.
         let mut bundle = topology_morphisms(3);
-        bundle.push(Box::new(IndexToVertex { cardinality: 3, index: 4 }));
+        bundle.push(Box::new(IndexToVertex {
+            cardinality: 3,
+            index: 4,
+        }));
         let err = compose_checked(3, bundle).unwrap_err();
         assert!(err[0].contains("Vertex(4)"));
     }
@@ -969,16 +1081,51 @@ mod tests {
         );
         assert_eq!(hg.topology.elements.len(), 3);
         assert_eq!(hg.topology.links.len(), 3);
-        for (kind, n) in [("term", 3), ("connective", 3), ("coordinate", 3), ("colour", 3)] {
-            assert_eq!(hg.data.iter().filter(|d| d.kind == kind).count(), n, "{kind} count");
+        for (kind, n) in [
+            ("term", 3),
+            ("connective", 3),
+            ("coordinate", 3),
+            ("colour", 3),
+        ] {
+            assert_eq!(
+                hg.data.iter().filter(|d| d.kind == kind).count(),
+                n,
+                "{kind} count"
+            );
         }
         // the same anchors the two partial builders produce, now in ONE hypergraph.
-        assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
-        assert_eq!(hg.data.iter().find(|d| d.id == "colour_3_3").unwrap().character, "#FFFF00");
-        assert_eq!(hg.data.iter().find(|d| d.id == "coord_3_1").unwrap().character, "0,1,0");
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "term_3_1")
+                .unwrap()
+                .character,
+            "Will"
+        );
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "colour_3_3")
+                .unwrap()
+                .character,
+            "#FFFF00"
+        );
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "coord_3_1")
+                .unwrap()
+                .character,
+            "0,1,0"
+        );
         // vertex el_3_1 anchors term, coordinate AND colour — the tetrad meeting at one vertex.
         for target in ["term_3_1", "coord_3_1", "colour_3_1"] {
-            assert!(hg.links.iter().any(|l| l.base == "el_3_1" && l.target == target), "anchor {target}");
+            assert!(
+                hg.links
+                    .iter()
+                    .any(|l| l.base == "el_3_1" && l.target == target),
+                "anchor {target}"
+            );
         }
     }
 
@@ -1006,7 +1153,21 @@ mod tests {
         // compose the system FROM the store (no raw strings passed in).
         let hg = compose_from_store(&store, 3, &terms, &conns);
         assert_eq!(hg.topology.elements.len(), 3);
-        assert_eq!(hg.data.iter().find(|d| d.id == "term_3_1").unwrap().character, "Will");
-        assert_eq!(hg.data.iter().find(|d| d.id == "conn_3_1_2").unwrap().character, "Generation");
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "term_3_1")
+                .unwrap()
+                .character,
+            "Will"
+        );
+        assert_eq!(
+            hg.data
+                .iter()
+                .find(|d| d.id == "conn_3_1_2")
+                .unwrap()
+                .character,
+            "Generation"
+        );
     }
 }

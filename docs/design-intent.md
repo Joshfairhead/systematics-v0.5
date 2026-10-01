@@ -1533,6 +1533,64 @@ docs: `docs/architecture-pentad.md` (the pentad in depth) and
 
 ---
 
+## v0.5 as a prototype registry — CRUD, store/load, and the compositionality inventory [user, 2026-09-07]
+
+**Scope decision.** v0.6 is the foundational, fully-composable rewrite (see the Holochain
+section below). So **v0.5 is deliberately scoped as a prototype library**: tidy it, hide the
+half-built cruft, and *don't* harden the architecture. The first feature is a **simple library
+to store and load articulations** — not the composable homoiconic target, which is deferred.
+
+**The app is a Registry.** The whole system is a **registry** of systems with two **views**
+(graph / list) and the **store / read** operations over them. This gives an architectural
+**sequence** (a core sequence, each order refining the last):
+
+| order | system | terms |
+|---|---|---|
+| **Monad** | **Registry** | the store-of-systems itself |
+| **Dyad** | **Store / Load** | write / read |
+| **Triad** | **SPO** | subject · predicate · object |
+| **Tetrad** | **CRUD** | create · read · update · delete |
+
+Each refines the previous: the registry's two coarse operations (**Store = write**, i.e.
+create / update / — eventually — delete; **Load = read**) are expressed through an **SPO**
+command (subject · predicate · object), and CRUD is that same store/read at a **finer
+granularity**. So the scope of any operation is an SPO triple — a single term/connective, or a
+whole system. **Coarse store/load (whole-system file I/O) comes before fine CRUD.** An **Update**
+reads as a generic command (a Holochain host-call shape): subject = *update*, predicate = *the
+node/edge to change*, object = *the new value*.
+
+**Two registry tetrads (seeded as systems).** The registry has a **field of action**:
+- **Field of Action** — **Store** (ideal) · **Read** (ground) · **Graph** (directive) ·
+  **List** (instrumental). Store/read are the operations; graph/list are the two views. We
+  update through *both* views: on-canvas in graph view, and via the modal in list view.
+- **Registry Core** (alternative) — **Store · Read · Sort · Filter** as the core components.
+
+Both are now real K₄ systems in the fragments bundle (alongside **Knowledge**, **Discourse**,
+**Common Noun**, **Verbs**, and the **Graph Products** tetrad). See `data/mod.rs`
+`build_fragments_from_tables`.
+
+**Compositionality inventory (foundations status — *indeterminate*, hence limitations).**
+Naming what is composable today vs. not, so the gap is explicit rather than assumed:
+- **Composable today:** the **substrate store** (`SubstrateStore`: content-addressed elements +
+  `base–type–target` links) already composes a system purely from the store
+  (`compose_from_store_by_system`) — this is the v0.6-shaped layer, and it works.
+- **Not composable today:** the **authoring / persistence path** is still coarse. Systems are
+  code-defined (Rust tables → JSON seed → graph), and app-authored systems go through
+  `authorSystem` as **whole systems**. There is **no per-element (SPO-granular) create/update**
+  addressing an individual node or edge by identity — that needs the composable data model
+  (v0.6). So in-app **Update is a whole-system overwrite**, not a fine-grained element edit.
+- **Import/export** is therefore **bespoke per-system JSON** (`{ name, order, terms,
+  connectives }`) — deliberately simple; the truly composable file format is a v0.6 target.
+- **Version control** on updates (history of a system's edits) is wanted but deferred.
+
+**Assembly space (direction, not built).** The target beyond the store/load dyad is an
+**assembly space** where dyads can be *paired*: e.g. **store/load** put alongside
+**sort/filter**, or **semantics/syntax** from the Pentad shown together in the dyad list — a
+place to compose systems from parts. In that framing the **Nullad is like eternity**: the
+storehouse of *all possibilities* from which pairings are assembled. The distance between
+today's bespoke per-system JSON and that composable assembly space *is* the indeterminate
+foundations status named above.
+
 ## Holochain refactor — TO DO (deferred to **systematics-v0.6**) [user, 2026-09-01]
 
 **This is the foundational refactor; it happens in a fresh project (systematics-v0.6),

@@ -14,22 +14,23 @@
 pub mod citations;
 pub mod content;
 pub mod entries;
+pub mod equivalence;
 pub mod functors;
 pub mod grammar;
 pub mod graph;
+pub mod hexadicsystems;
 pub mod laws;
 pub mod perspectives;
 pub mod sequences;
 pub mod substrate;
-pub mod hexadicsystems;
 pub mod systems;
 pub mod vocabularies;
 
 pub use entries::{
-    Character, Coordinate, Entry, Line, OrderCardinality, Point, Point3d, Ordinality, Segment,
+    Character, Coordinate, Entry, Line, OrderCardinality, Ordinality, Point, Point3d, Segment,
 };
 
-pub use vocabularies::{Geometry, Vocabulary, Topology};
+pub use vocabularies::{Geometry, Topology, Vocabulary};
 
 pub use grammar::Template;
 

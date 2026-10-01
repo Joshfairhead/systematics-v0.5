@@ -34,7 +34,12 @@ impl Link {
         let predicate = predicate.into();
         let target = target.into();
         let id = Self::compute_id(&source, &predicate, &target);
-        Self { id, source, predicate, target }
+        Self {
+            id,
+            source,
+            predicate,
+            target,
+        }
     }
 
     /// Deterministic id from the triple, so the same link is idempotent and
@@ -161,7 +166,10 @@ mod tests {
 
     #[test]
     fn test_addresses() {
-        assert_eq!(address::term("system_canonical_triad_3", 1), "system:system_canonical_triad_3#term:1");
+        assert_eq!(
+            address::term("system_canonical_triad_3", 1),
+            "system:system_canonical_triad_3#term:1"
+        );
         assert_eq!(address::connective("s", 1, 3), "system:s#conn:1-3");
     }
 }

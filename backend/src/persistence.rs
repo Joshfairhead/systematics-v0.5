@@ -24,14 +24,21 @@ pub fn resolve_store_path() -> PathBuf {
 /// is fine (fresh start). Returns the number of items applied.
 pub fn load_into(graph: &mut Graph, path: &Path) -> std::io::Result<usize> {
     if !path.exists() {
-        tracing::info!("No user store at {}; starting from canonical only", path.display());
+        tracing::info!(
+            "No user store at {}; starting from canonical only",
+            path.display()
+        );
         return Ok(0);
     }
     let raw = std::fs::read_to_string(path)?;
     let content: GraphContent = serde_json::from_str(&raw).map_err(|e| {
         std::io::Error::new(
             std::io::ErrorKind::InvalidData,
-            format!("store at {} is not valid GraphContent: {}", path.display(), e),
+            format!(
+                "store at {} is not valid GraphContent: {}",
+                path.display(),
+                e
+            ),
         )
     })?;
     let count = content.ids().len();
@@ -47,16 +54,15 @@ pub fn save(graph: &Graph, path: &Path) -> std::io::Result<()> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let json = serde_json::to_string_pretty(&content).map_err(|e| {
-        std::io::Error::new(std::io::ErrorKind::InvalidData, e.to_string())
-    })?;
+    let json = serde_json::to_string_pretty(&content)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e.to_string()))?;
     std::fs::write(path, json)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{Character, Vocabulary, System};
+    use crate::core::{Character, System, Vocabulary};
     use crate::data;
 
     fn temp_path(name: &str) -> PathBuf {
@@ -106,7 +112,10 @@ mod tests {
 
         // The user slice excludes canonical (Will/Function/Being stay canonical).
         let user = graph.user_content();
-        assert!(user.systems.iter().any(|s| s.id == "system_theology_triad_3"));
+        assert!(user
+            .systems
+            .iter()
+            .any(|s| s.id == "system_theology_triad_3"));
         assert!(user.characters.iter().any(|c| c.id == "char_word_immanent"));
         assert!(
             !user.characters.iter().any(|c| c.id == "char_word_will"),

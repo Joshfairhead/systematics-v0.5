@@ -9,13 +9,15 @@ use serde::{Deserialize, Serialize};
 
 use super::citations::{Artefact, Lookup, Reference, Source};
 use super::content::GraphContent;
-use super::entries::{Character, Coordinate, Entry, Line, OrderCardinality, Point, Ordinality, Segment};
+use super::entries::{
+    Character, Coordinate, Entry, Line, OrderCardinality, Ordinality, Point, Segment,
+};
 use super::functors::Functor;
 use super::grammar::Template;
-use super::sequences::Sequence;
 use super::perspectives::Perspective;
+use super::sequences::Sequence;
 use super::systems::System;
-use super::vocabularies::{Geometry, Vocabulary, Topology};
+use super::vocabularies::{Geometry, Topology, Vocabulary};
 
 /// The primary container. Holds substrate entries and the four higher-level tables.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -132,7 +134,11 @@ impl Graph {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Point(p) if order_cardinality.map(|o| p.order_value() == Some(o)).unwrap_or(true) => {
+                Entry::Point(p)
+                    if order_cardinality
+                        .map(|o| p.order_value() == Some(o))
+                        .unwrap_or(true) =>
+                {
                     Some(p)
                 }
                 _ => None,
@@ -153,7 +159,11 @@ impl Graph {
         self.entries
             .iter()
             .filter_map(|e| match e {
-                Entry::Line(l) if order_cardinality.map(|o| l.order_value() == Some(o)).unwrap_or(true) => {
+                Entry::Line(l)
+                    if order_cardinality
+                        .map(|o| l.order_value() == Some(o))
+                        .unwrap_or(true) =>
+                {
                     Some(l)
                 }
                 _ => None,
@@ -174,7 +184,9 @@ impl Graph {
             .iter()
             .filter_map(|e| match e {
                 Entry::Coordinate(c)
-                    if order_cardinality.map(|o| c.order_value() == Some(o)).unwrap_or(true) =>
+                    if order_cardinality
+                        .map(|o| c.order_value() == Some(o))
+                        .unwrap_or(true) =>
                 {
                     Some(c)
                 }
@@ -218,7 +230,9 @@ impl Graph {
     }
 
     pub fn topology_for_order(&self, order_cardinality: u8) -> Option<&Topology> {
-        self.topological_vocabs.iter().find(|v| v.order_cardinality == order_cardinality)
+        self.topological_vocabs
+            .iter()
+            .find(|v| v.order_cardinality == order_cardinality)
     }
 
     pub fn geometry(&self, id: &str) -> Option<&Geometry> {
@@ -226,7 +240,9 @@ impl Graph {
     }
 
     pub fn geometry_for_order(&self, order_cardinality: u8) -> Option<&Geometry> {
-        self.geometric_vocabs.iter().find(|v| v.order_cardinality == order_cardinality)
+        self.geometric_vocabs
+            .iter()
+            .find(|v| v.order_cardinality == order_cardinality)
     }
 
     pub fn vocabulary(&self, id: &str) -> Option<&Vocabulary> {
@@ -252,10 +268,7 @@ impl Graph {
         self.vocabularies.push(vocab);
     }
 
-    pub fn update_vocabulary(
-        &mut self,
-        vocab: Vocabulary,
-    ) -> Option<Vocabulary> {
+    pub fn update_vocabulary(&mut self, vocab: Vocabulary) -> Option<Vocabulary> {
         let idx = self.vocabularies.iter().position(|v| v.id == vocab.id)?;
         Some(std::mem::replace(&mut self.vocabularies[idx], vocab))
     }
@@ -272,7 +285,9 @@ impl Graph {
     }
 
     pub fn template_for_order(&self, order_cardinality: u8) -> Option<&Template> {
-        self.templates.iter().find(|g| g.order_cardinality == order_cardinality)
+        self.templates
+            .iter()
+            .find(|g| g.order_cardinality == order_cardinality)
     }
 
     pub fn add_template(&mut self, grammar: Template) {
@@ -286,7 +301,10 @@ impl Graph {
     }
 
     pub fn systems_for_order(&self, order_cardinality: u8) -> Vec<&System> {
-        self.systems.iter().filter(|s| s.order_cardinality == order_cardinality).collect()
+        self.systems
+            .iter()
+            .filter(|s| s.order_cardinality == order_cardinality)
+            .collect()
     }
 
     pub fn add_system(&mut self, system: System) {
@@ -472,7 +490,10 @@ impl Graph {
     }
 
     pub fn update_perspective(&mut self, perspective: Perspective) -> Option<Perspective> {
-        let idx = self.perspectives.iter().position(|p| p.id == perspective.id)?;
+        let idx = self
+            .perspectives
+            .iter()
+            .position(|p| p.id == perspective.id)?;
         Some(std::mem::replace(&mut self.perspectives[idx], perspective))
     }
 
@@ -528,7 +549,10 @@ impl Graph {
 
     /// All References whose cited target matches the given Expression address.
     pub fn references_for(&self, address: &str) -> Vec<&Reference> {
-        self.references.iter().filter(|r| r.target == address).collect()
+        self.references
+            .iter()
+            .filter(|r| r.target == address)
+            .collect()
     }
 
     /// All References citing anything within a System (the whole system, or any
@@ -582,13 +606,25 @@ impl Graph {
         let mut manifest: HashSet<String> = HashSet::new();
 
         // 1) References this perspective owns, and the entities they reach.
-        let (mut src, mut art, mut lk, mut sys) =
-            (HashSet::new(), HashSet::new(), HashSet::new(), HashSet::new());
-        for r in self.references.iter().filter(|r| r.perspective_ref == perspective_id) {
+        let (mut src, mut art, mut lk, mut sys) = (
+            HashSet::new(),
+            HashSet::new(),
+            HashSet::new(),
+            HashSet::new(),
+        );
+        for r in self
+            .references
+            .iter()
+            .filter(|r| r.perspective_ref == perspective_id)
+        {
             out.references.push(r.clone());
             src.insert(r.source_ref.clone());
-            if let Some(a) = &r.artefact_ref { art.insert(a.clone()); }
-            if let Some(l) = &r.lookup_ref { lk.insert(l.clone()); }
+            if let Some(a) = &r.artefact_ref {
+                art.insert(a.clone());
+            }
+            if let Some(l) = &r.lookup_ref {
+                lk.insert(l.clone());
+            }
             if let Some(rest) = r.target.strip_prefix("system:") {
                 sys.insert(rest.split('#').next().unwrap_or(rest).to_string());
             }
@@ -624,7 +660,11 @@ impl Graph {
 
         // 4) Vocabularies + characters owned via the owned systems.
         let mut chars = HashSet::new();
-        for v in self.vocabularies.iter().filter(|v| vocab.contains(&v.id) && is_own(&v.id)) {
+        for v in self
+            .vocabularies
+            .iter()
+            .filter(|v| vocab.contains(&v.id) && is_own(&v.id))
+        {
             out.vocabularies.push(v.clone());
             chars.extend(v.terms.iter().chain(v.connectives.iter()).cloned());
         }
@@ -637,18 +677,47 @@ impl Graph {
 
         // 5) Citation entities: own the non-canonical ones; record canonical /
         //    shared ones as external dependencies.
-        out.sources = self.sources.iter().filter(|s| src.contains(&s.id) && is_own(&s.id)).cloned().collect();
-        out.artefacts = self.artefacts.iter().filter(|a| art.contains(&a.id) && is_own(&a.id)).cloned().collect();
-        out.lookups = self.lookups.iter().filter(|l| lk.contains(&l.id) && is_own(&l.id)).cloned().collect();
-        for s in &src { if self.source(s).is_none_or(|e| !is_own(&e.id)) { manifest.insert(format!("source:{s}")); } }
-        for a in &art { if self.artefact(a).is_none_or(|e| !is_own(&e.id)) { manifest.insert(format!("artefact:{a}")); } }
-        for l in &lk  { if self.lookup(l).is_none_or(|e| !is_own(&e.id)) { manifest.insert(format!("lookup:{l}")); } }
+        out.sources = self
+            .sources
+            .iter()
+            .filter(|s| src.contains(&s.id) && is_own(&s.id))
+            .cloned()
+            .collect();
+        out.artefacts = self
+            .artefacts
+            .iter()
+            .filter(|a| art.contains(&a.id) && is_own(&a.id))
+            .cloned()
+            .collect();
+        out.lookups = self
+            .lookups
+            .iter()
+            .filter(|l| lk.contains(&l.id) && is_own(&l.id))
+            .cloned()
+            .collect();
+        for s in &src {
+            if self.source(s).is_none_or(|e| !is_own(&e.id)) {
+                manifest.insert(format!("source:{s}"));
+            }
+        }
+        for a in &art {
+            if self.artefact(a).is_none_or(|e| !is_own(&e.id)) {
+                manifest.insert(format!("artefact:{a}"));
+            }
+        }
+        for l in &lk {
+            if self.lookup(l).is_none_or(|e| !is_own(&e.id)) {
+                manifest.insert(format!("lookup:{l}"));
+            }
+        }
 
         // 6) Link endpoints that point outside this module (sibling perspectives,
         //    shared citation entities) are external dependencies.
         for l in &persp.links {
             for endpoint in [&l.source, &l.target] {
-                let Some((kind, rest)) = endpoint.split_once(':') else { continue };
+                let Some((kind, rest)) = endpoint.split_once(':') else {
+                    continue;
+                };
                 let id = rest.split('#').next().unwrap_or(rest);
                 let owned = match kind {
                     "system" => out.systems.iter().any(|s| s.id == id),
@@ -692,11 +761,7 @@ impl Graph {
 
     /// Look up which Character inhabits a given Point through a
     /// Vocabulary's paired Topology.
-    pub fn character_at_point(
-        &self,
-        vocabulary_id: &str,
-        point_id: &str,
-    ) -> Option<&Character> {
+    pub fn character_at_point(&self, vocabulary_id: &str, point_id: &str) -> Option<&Character> {
         let sv = self.vocabulary(vocabulary_id)?;
         let topology = self.topology_for_order(sv.order_cardinality)?;
         let idx = topology.points.iter().position(|p| p == point_id)?;
@@ -706,11 +771,7 @@ impl Graph {
 
     /// Look up which Character inhabits a given Line through a
     /// Vocabulary's paired Topology.
-    pub fn character_at_line(
-        &self,
-        vocabulary_id: &str,
-        line_id: &str,
-    ) -> Option<&Character> {
+    pub fn character_at_line(&self, vocabulary_id: &str, line_id: &str) -> Option<&Character> {
         let sv = self.vocabulary(vocabulary_id)?;
         let topology = self.topology_for_order(sv.order_cardinality)?;
         let idx = topology.lines.iter().position(|l| l == line_id)?;
@@ -735,28 +796,24 @@ impl Graph {
                     grammar.topological_vocab_ref
                 )]
             })?;
-        let geo = self
-            .geometry(&grammar.geometric_vocab_ref)
-            .ok_or_else(|| {
-                vec![format!(
-                    "Geometry '{}' not found",
-                    grammar.geometric_vocab_ref
-                )]
-            })?;
+        let geo = self.geometry(&grammar.geometric_vocab_ref).ok_or_else(|| {
+            vec![format!(
+                "Geometry '{}' not found",
+                grammar.geometric_vocab_ref
+            )]
+        })?;
         let s = self
             .vocabulary(&sys.vocabulary_ref)
-            .ok_or_else(|| {
-                vec![format!("Vocabulary '{}' not found", sys.vocabulary_ref)]
-            })?;
+            .ok_or_else(|| vec![format!("Vocabulary '{}' not found", sys.vocabulary_ref)])?;
         grammar.validate_with(t, geo, s)
     }
 
     /// Look up the Canonical Vocabulary containing hex colours for
     /// the given order_cardinality (created by seed as "Canonical Colours {name}").
     pub fn canonical_colour_vocab_for_order(&self, order_cardinality: u8) -> Option<&Vocabulary> {
-        self.vocabularies
-            .iter()
-            .find(|v| v.order_cardinality == order_cardinality && v.name.starts_with("Canonical Colours"))
+        self.vocabularies.iter().find(|v| {
+            v.order_cardinality == order_cardinality && v.name.starts_with("Canonical Colours")
+        })
     }
 
     // ==========================================================================
@@ -769,6 +826,14 @@ impl Graph {
         self.entries
             .retain(|e| !matches!(e, Entry::Character(c) if c.id == id));
         self.entries.push(Entry::Character(character));
+    }
+
+    /// Delete a Character entry by id. Returns whether one was removed.
+    pub fn delete_character(&mut self, id: &str) -> bool {
+        let before = self.entries.len();
+        self.entries
+            .retain(|e| !matches!(e, Entry::Character(c) if c.id == id));
+        self.entries.len() != before
     }
 
     /// Upsert a Coordinate by id.
@@ -942,9 +1007,7 @@ impl Graph {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::vocabularies::{
-        Geometry, Vocabulary, Topology,
-    };
+    use crate::core::vocabularies::{Geometry, Topology, Vocabulary};
 
     fn triad_test_graph() -> Graph {
         let mut g = Graph::new();
@@ -960,7 +1023,14 @@ mod tests {
                 g.add_entry(Entry::Segment(Segment::new(3, p1, p2)));
             }
         }
-        for value in ["Will", "Function", "Being", "Generation", "Decision", "Consent"] {
+        for value in [
+            "Will",
+            "Function",
+            "Being",
+            "Generation",
+            "Decision",
+            "Consent",
+        ] {
             g.add_entry(Entry::Character(Character::with_auto_id("word", value)));
         }
         g.add_topological_vocab(Topology::canonical_for(3));

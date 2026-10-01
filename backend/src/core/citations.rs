@@ -37,10 +37,19 @@ impl Source {
         kind: Option<String>,
         description: Option<String>,
     ) -> Self {
-        Self { id: id.into(), name: name.into(), kind, description }
+        Self {
+            id: id.into(),
+            name: name.into(),
+            kind,
+            description,
+        }
     }
 
-    pub fn with_auto_id(name: impl Into<String>, kind: Option<String>, description: Option<String>) -> Self {
+    pub fn with_auto_id(
+        name: impl Into<String>,
+        kind: Option<String>,
+        description: Option<String>,
+    ) -> Self {
         let name = name.into();
         Self::new(format!("source_{}", slug(&name)), name, kind, description)
     }
@@ -66,7 +75,13 @@ impl Artefact {
         kind: Option<String>,
         url: Option<String>,
     ) -> Self {
-        Self { id: id.into(), source_ref: source_ref.into(), title: title.into(), kind, url }
+        Self {
+            id: id.into(),
+            source_ref: source_ref.into(),
+            title: title.into(),
+            kind,
+            url,
+        }
     }
 
     pub fn with_auto_id(
@@ -76,7 +91,13 @@ impl Artefact {
         url: Option<String>,
     ) -> Self {
         let title = title.into();
-        Self::new(format!("artefact_{}", slug(&title)), source_ref, title, kind, url)
+        Self::new(
+            format!("artefact_{}", slug(&title)),
+            source_ref,
+            title,
+            kind,
+            url,
+        )
     }
 }
 
@@ -94,7 +115,11 @@ impl Lookup {
         artefact_ref: impl Into<String>,
         locator: impl Into<String>,
     ) -> Self {
-        Self { id: id.into(), artefact_ref: artefact_ref.into(), locator: locator.into() }
+        Self {
+            id: id.into(),
+            artefact_ref: artefact_ref.into(),
+            locator: locator.into(),
+        }
     }
 
     pub fn with_auto_id(artefact_ref: impl Into<String>, locator: impl Into<String>) -> Self {
@@ -173,7 +198,20 @@ impl Reference {
         let perspective_ref = perspective_ref.into();
         let target = target.into();
         let source_ref = source_ref.into();
-        let id = format!("reference_{}_{}_{}", slug(&perspective_ref), slug(&target), slug(&source_ref));
-        Self::new(id, perspective_ref, target, source_ref, artefact_ref, lookup_ref, note)
+        let id = format!(
+            "reference_{}_{}_{}",
+            slug(&perspective_ref),
+            slug(&target),
+            slug(&source_ref)
+        );
+        Self::new(
+            id,
+            perspective_ref,
+            target,
+            source_ref,
+            artefact_ref,
+            lookup_ref,
+            note,
+        )
     }
 }

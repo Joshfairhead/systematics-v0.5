@@ -58,7 +58,14 @@ pub struct RenderedSystem {
     pub order_cardinality: i32,
     #[serde(rename = "systemId")]
     pub system_id: String,
+    /// The **order label** for this K_n (e.g. "Triad") — canonical for the class,
+    /// used as the system-type subtitle on the canvas.
     pub name: String,
+    /// The system's **own name** (the author-given / canonical name), shown as the
+    /// canvas title. `default` so responses that don't select `systemName` still
+    /// deserialize (falls back to the order label at the view).
+    #[serde(default, rename = "systemName")]
+    pub system_name: String,
     pub coherence: String,
     #[serde(rename = "termDesignation")]
     pub term_designation: String,

@@ -20,12 +20,12 @@ pub struct Sequence {
 }
 
 impl Sequence {
-    pub fn new(
-        id: impl Into<String>,
-        name: impl Into<String>,
-        members: Vec<String>,
-    ) -> Self {
-        Self { id: id.into(), name: name.into(), members }
+    pub fn new(id: impl Into<String>, name: impl Into<String>, members: Vec<String>) -> Self {
+        Self {
+            id: id.into(),
+            name: name.into(),
+            members,
+        }
     }
 
     /// Build with an id derived from the name: `sequence_<slug>`.

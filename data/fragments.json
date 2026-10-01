@@ -4559,6 +4559,946 @@
       "id": "char_word_hcl_edge_3",
       "kind": "word",
       "value": "Hcl Edge 3"
+    },
+    {
+      "id": "char_word_cartesian",
+      "kind": "word",
+      "value": "Cartesian"
+    },
+    {
+      "id": "char_word_tensor",
+      "kind": "word",
+      "value": "Tensor"
+    },
+    {
+      "id": "char_word_strong",
+      "kind": "word",
+      "value": "Strong"
+    },
+    {
+      "id": "char_word_lexicographic",
+      "kind": "word",
+      "value": "Lexicographic"
+    },
+    {
+      "id": "char_word_gprod_edge_1",
+      "kind": "word",
+      "value": "Gprod Edge 1"
+    },
+    {
+      "id": "char_word_gprod_edge_2",
+      "kind": "word",
+      "value": "Gprod Edge 2"
+    },
+    {
+      "id": "char_word_gprod_edge_3",
+      "kind": "word",
+      "value": "Gprod Edge 3"
+    },
+    {
+      "id": "char_word_gprod_edge_4",
+      "kind": "word",
+      "value": "Gprod Edge 4"
+    },
+    {
+      "id": "char_word_gprod_edge_5",
+      "kind": "word",
+      "value": "Gprod Edge 5"
+    },
+    {
+      "id": "char_word_gprod_edge_6",
+      "kind": "word",
+      "value": "Gprod Edge 6"
+    },
+    {
+      "id": "char_word_truth",
+      "kind": "word",
+      "value": "Truth"
+    },
+    {
+      "id": "char_word_belief",
+      "kind": "word",
+      "value": "Belief"
+    },
+    {
+      "id": "char_word_knowledge",
+      "kind": "word",
+      "value": "Knowledge"
+    },
+    {
+      "id": "char_word_know_edge_1",
+      "kind": "word",
+      "value": "Know Edge 1"
+    },
+    {
+      "id": "char_word_know_edge_2",
+      "kind": "word",
+      "value": "Know Edge 2"
+    },
+    {
+      "id": "char_word_know_edge_3",
+      "kind": "word",
+      "value": "Know Edge 3"
+    },
+    {
+      "id": "char_word_grammar",
+      "kind": "word",
+      "value": "Grammar"
+    },
+    {
+      "id": "char_word_vocabulary",
+      "kind": "word",
+      "value": "Vocabulary"
+    },
+    {
+      "id": "char_word_language",
+      "kind": "word",
+      "value": "Language"
+    },
+    {
+      "id": "char_word_disc_edge_1",
+      "kind": "word",
+      "value": "Disc Edge 1"
+    },
+    {
+      "id": "char_word_disc_edge_2",
+      "kind": "word",
+      "value": "Disc Edge 2"
+    },
+    {
+      "id": "char_word_disc_edge_3",
+      "kind": "word",
+      "value": "Disc Edge 3"
+    },
+    {
+      "id": "char_word_people",
+      "kind": "word",
+      "value": "People"
+    },
+    {
+      "id": "char_word_places",
+      "kind": "word",
+      "value": "Places"
+    },
+    {
+      "id": "char_word_things",
+      "kind": "word",
+      "value": "Things"
+    },
+    {
+      "id": "char_word_noun_edge_1",
+      "kind": "word",
+      "value": "Noun Edge 1"
+    },
+    {
+      "id": "char_word_noun_edge_2",
+      "kind": "word",
+      "value": "Noun Edge 2"
+    },
+    {
+      "id": "char_word_noun_edge_3",
+      "kind": "word",
+      "value": "Noun Edge 3"
+    },
+    {
+      "id": "char_word_actions",
+      "kind": "word",
+      "value": "Actions"
+    },
+    {
+      "id": "char_word_occurrences",
+      "kind": "word",
+      "value": "Occurrences"
+    },
+    {
+      "id": "char_word_verb_edge_1",
+      "kind": "word",
+      "value": "Verb Edge 1"
+    },
+    {
+      "id": "char_word_verb_edge_2",
+      "kind": "word",
+      "value": "Verb Edge 2"
+    },
+    {
+      "id": "char_word_verb_edge_3",
+      "kind": "word",
+      "value": "Verb Edge 3"
+    },
+    {
+      "id": "char_word_store",
+      "kind": "word",
+      "value": "Store"
+    },
+    {
+      "id": "char_word_read",
+      "kind": "word",
+      "value": "Read"
+    },
+    {
+      "id": "char_word_graph",
+      "kind": "word",
+      "value": "Graph"
+    },
+    {
+      "id": "char_word_list",
+      "kind": "word",
+      "value": "List"
+    },
+    {
+      "id": "char_word_foa_edge_1",
+      "kind": "word",
+      "value": "Foa Edge 1"
+    },
+    {
+      "id": "char_word_foa_edge_2",
+      "kind": "word",
+      "value": "Foa Edge 2"
+    },
+    {
+      "id": "char_word_foa_edge_3",
+      "kind": "word",
+      "value": "Foa Edge 3"
+    },
+    {
+      "id": "char_word_foa_edge_4",
+      "kind": "word",
+      "value": "Foa Edge 4"
+    },
+    {
+      "id": "char_word_foa_edge_5",
+      "kind": "word",
+      "value": "Foa Edge 5"
+    },
+    {
+      "id": "char_word_foa_edge_6",
+      "kind": "word",
+      "value": "Foa Edge 6"
+    },
+    {
+      "id": "char_word_sort",
+      "kind": "word",
+      "value": "Sort"
+    },
+    {
+      "id": "char_word_filter",
+      "kind": "word",
+      "value": "Filter"
+    },
+    {
+      "id": "char_word_reg_edge_1",
+      "kind": "word",
+      "value": "Reg Edge 1"
+    },
+    {
+      "id": "char_word_reg_edge_2",
+      "kind": "word",
+      "value": "Reg Edge 2"
+    },
+    {
+      "id": "char_word_reg_edge_3",
+      "kind": "word",
+      "value": "Reg Edge 3"
+    },
+    {
+      "id": "char_word_reg_edge_4",
+      "kind": "word",
+      "value": "Reg Edge 4"
+    },
+    {
+      "id": "char_word_reg_edge_5",
+      "kind": "word",
+      "value": "Reg Edge 5"
+    },
+    {
+      "id": "char_word_reg_edge_6",
+      "kind": "word",
+      "value": "Reg Edge 6"
+    },
+    {
+      "id": "char_word_import",
+      "kind": "word",
+      "value": "Import"
+    },
+    {
+      "id": "char_word_export",
+      "kind": "word",
+      "value": "Export"
+    },
+    {
+      "id": "char_word_impexp_edge_1",
+      "kind": "word",
+      "value": "Impexp Edge 1"
+    },
+    {
+      "id": "char_word_storeload_edge_1",
+      "kind": "word",
+      "value": "Storeload Edge 1"
+    },
+    {
+      "id": "char_word_semantics",
+      "kind": "word",
+      "value": "Semantics"
+    },
+    {
+      "id": "char_word_syntax",
+      "kind": "word",
+      "value": "Syntax"
+    },
+    {
+      "id": "char_word_semsyn_edge_1",
+      "kind": "word",
+      "value": "Semsyn Edge 1"
+    },
+    {
+      "id": "char_word_blue_earth",
+      "kind": "word",
+      "value": "Blue Earth"
+    },
+    {
+      "id": "char_word_hosting",
+      "kind": "word",
+      "value": "Hosting"
+    },
+    {
+      "id": "char_word_facilitation",
+      "kind": "word",
+      "value": "Facilitation"
+    },
+    {
+      "id": "char_word_behf_edge_1",
+      "kind": "word",
+      "value": "Behf Edge 1"
+    },
+    {
+      "id": "char_word_niche",
+      "kind": "word",
+      "value": "Niche"
+    },
+    {
+      "id": "char_word_national",
+      "kind": "word",
+      "value": "National"
+    },
+    {
+      "id": "char_word_benn_edge_1",
+      "kind": "word",
+      "value": "Benn Edge 1"
+    },
+    {
+      "id": "char_word_deal_making",
+      "kind": "word",
+      "value": "Deal Making"
+    },
+    {
+      "id": "char_word_deployment",
+      "kind": "word",
+      "value": "Deployment"
+    },
+    {
+      "id": "char_word_bedd_edge_1",
+      "kind": "word",
+      "value": "Bedd Edge 1"
+    },
+    {
+      "id": "char_word_coordination",
+      "kind": "word",
+      "value": "Coordination"
+    },
+    {
+      "id": "char_word_bedel_edge_1",
+      "kind": "word",
+      "value": "Bedel Edge 1"
+    },
+    {
+      "id": "char_word_bedel_edge_2",
+      "kind": "word",
+      "value": "Bedel Edge 2"
+    },
+    {
+      "id": "char_word_bedel_edge_3",
+      "kind": "word",
+      "value": "Bedel Edge 3"
+    },
+    {
+      "id": "char_word_systems_change",
+      "kind": "word",
+      "value": "Systems Change"
+    },
+    {
+      "id": "char_word_disruption",
+      "kind": "word",
+      "value": "Disruption"
+    },
+    {
+      "id": "char_word_funding",
+      "kind": "word",
+      "value": "Funding"
+    },
+    {
+      "id": "char_word_beimp_edge_1",
+      "kind": "word",
+      "value": "Beimp Edge 1"
+    },
+    {
+      "id": "char_word_beimp_edge_2",
+      "kind": "word",
+      "value": "Beimp Edge 2"
+    },
+    {
+      "id": "char_word_beimp_edge_3",
+      "kind": "word",
+      "value": "Beimp Edge 3"
+    },
+    {
+      "id": "char_word_bestrat_edge_1",
+      "kind": "word",
+      "value": "Bestrat Edge 1"
+    },
+    {
+      "id": "char_word_bestrat_edge_2",
+      "kind": "word",
+      "value": "Bestrat Edge 2"
+    },
+    {
+      "id": "char_word_bestrat_edge_3",
+      "kind": "word",
+      "value": "Bestrat Edge 3"
+    },
+    {
+      "id": "char_word_bestrat_edge_4",
+      "kind": "word",
+      "value": "Bestrat Edge 4"
+    },
+    {
+      "id": "char_word_bestrat_edge_5",
+      "kind": "word",
+      "value": "Bestrat Edge 5"
+    },
+    {
+      "id": "char_word_bestrat_edge_6",
+      "kind": "word",
+      "value": "Bestrat Edge 6"
+    },
+    {
+      "id": "char_word_fitness",
+      "kind": "word",
+      "value": "Fitness"
+    },
+    {
+      "id": "char_word_exercise",
+      "kind": "word",
+      "value": "Exercise"
+    },
+    {
+      "id": "char_word_fitex_edge_1",
+      "kind": "word",
+      "value": "Fitex Edge 1"
+    },
+    {
+      "id": "char_word_stretching",
+      "kind": "word",
+      "value": "Stretching"
+    },
+    {
+      "id": "char_word_mobility",
+      "kind": "word",
+      "value": "Mobility"
+    },
+    {
+      "id": "char_word_strmob_edge_1",
+      "kind": "word",
+      "value": "Strmob Edge 1"
+    },
+    {
+      "id": "char_word_body_composition",
+      "kind": "word",
+      "value": "Body Composition"
+    },
+    {
+      "id": "char_word_cardiorespiratory_endurance",
+      "kind": "word",
+      "value": "Cardiorespiratory Endurance"
+    },
+    {
+      "id": "char_word_flexibility_mobility",
+      "kind": "word",
+      "value": "Flexibility Mobility"
+    },
+    {
+      "id": "char_word_muscle_strength",
+      "kind": "word",
+      "value": "Muscle Strength"
+    },
+    {
+      "id": "char_word_muscle_endurance",
+      "kind": "word",
+      "value": "Muscle Endurance"
+    },
+    {
+      "id": "char_word_fitpent_edge_1",
+      "kind": "word",
+      "value": "Fitpent Edge 1"
+    },
+    {
+      "id": "char_word_fitpent_edge_2",
+      "kind": "word",
+      "value": "Fitpent Edge 2"
+    },
+    {
+      "id": "char_word_fitpent_edge_3",
+      "kind": "word",
+      "value": "Fitpent Edge 3"
+    },
+    {
+      "id": "char_word_fitpent_edge_4",
+      "kind": "word",
+      "value": "Fitpent Edge 4"
+    },
+    {
+      "id": "char_word_fitpent_edge_5",
+      "kind": "word",
+      "value": "Fitpent Edge 5"
+    },
+    {
+      "id": "char_word_fitpent_edge_6",
+      "kind": "word",
+      "value": "Fitpent Edge 6"
+    },
+    {
+      "id": "char_word_fitpent_edge_7",
+      "kind": "word",
+      "value": "Fitpent Edge 7"
+    },
+    {
+      "id": "char_word_fitpent_edge_8",
+      "kind": "word",
+      "value": "Fitpent Edge 8"
+    },
+    {
+      "id": "char_word_fitpent_edge_9",
+      "kind": "word",
+      "value": "Fitpent Edge 9"
+    },
+    {
+      "id": "char_word_fitpent_edge_10",
+      "kind": "word",
+      "value": "Fitpent Edge 10"
+    },
+    {
+      "id": "char_word_interface_state_model",
+      "kind": "word",
+      "value": "Interface State Model"
+    },
+    {
+      "id": "char_word_viewing",
+      "kind": "word",
+      "value": "Viewing"
+    },
+    {
+      "id": "char_word_editing",
+      "kind": "word",
+      "value": "Editing"
+    },
+    {
+      "id": "char_word_view_edit_edge_1",
+      "kind": "word",
+      "value": "View Edit Edge 1"
+    },
+    {
+      "id": "char_word_create",
+      "kind": "word",
+      "value": "Create"
+    },
+    {
+      "id": "char_word_delete",
+      "kind": "word",
+      "value": "Delete"
+    },
+    {
+      "id": "char_word_update",
+      "kind": "word",
+      "value": "Update"
+    },
+    {
+      "id": "char_word_crud_edge_1",
+      "kind": "word",
+      "value": "Crud Edge 1"
+    },
+    {
+      "id": "char_word_crud_edge_2",
+      "kind": "word",
+      "value": "Crud Edge 2"
+    },
+    {
+      "id": "char_word_crud_edge_3",
+      "kind": "word",
+      "value": "Crud Edge 3"
+    },
+    {
+      "id": "char_word_crud_edge_4",
+      "kind": "word",
+      "value": "Crud Edge 4"
+    },
+    {
+      "id": "char_word_crud_edge_5",
+      "kind": "word",
+      "value": "Crud Edge 5"
+    },
+    {
+      "id": "char_word_crud_edge_6",
+      "kind": "word",
+      "value": "Crud Edge 6"
+    },
+    {
+      "id": "char_word_performance",
+      "kind": "word",
+      "value": "Performance"
+    },
+    {
+      "id": "char_word_processing",
+      "kind": "word",
+      "value": "Processing"
+    },
+    {
+      "id": "char_word_properties",
+      "kind": "word",
+      "value": "Properties"
+    },
+    {
+      "id": "char_word_structure",
+      "kind": "word",
+      "value": "Structure"
+    },
+    {
+      "id": "char_word_engineer",
+      "kind": "word",
+      "value": "Engineer"
+    },
+    {
+      "id": "char_word_matsci_edge_2",
+      "kind": "word",
+      "value": "Matsci Edge 2"
+    },
+    {
+      "id": "char_word_matsci_edge_3",
+      "kind": "word",
+      "value": "Matsci Edge 3"
+    },
+    {
+      "id": "char_word_matsci_edge_4",
+      "kind": "word",
+      "value": "Matsci Edge 4"
+    },
+    {
+      "id": "char_word_matsci_edge_5",
+      "kind": "word",
+      "value": "Matsci Edge 5"
+    },
+    {
+      "id": "char_word_scientist",
+      "kind": "word",
+      "value": "Scientist"
+    },
+    {
+      "id": "char_word_efficacy",
+      "kind": "word",
+      "value": "Efficacy"
+    },
+    {
+      "id": "char_word_attributes",
+      "kind": "word",
+      "value": "Attributes"
+    },
+    {
+      "id": "char_word_representations",
+      "kind": "word",
+      "value": "Representations"
+    },
+    {
+      "id": "char_word_methods",
+      "kind": "word",
+      "value": "Methods"
+    },
+    {
+      "id": "char_word_infsci_edge_1",
+      "kind": "word",
+      "value": "Infsci Edge 1"
+    },
+    {
+      "id": "char_word_infsci_edge_2",
+      "kind": "word",
+      "value": "Infsci Edge 2"
+    },
+    {
+      "id": "char_word_infsci_edge_3",
+      "kind": "word",
+      "value": "Infsci Edge 3"
+    },
+    {
+      "id": "char_word_infsci_edge_4",
+      "kind": "word",
+      "value": "Infsci Edge 4"
+    },
+    {
+      "id": "char_word_infsci_edge_5",
+      "kind": "word",
+      "value": "Infsci Edge 5"
+    },
+    {
+      "id": "char_word_infsci_edge_6",
+      "kind": "word",
+      "value": "Infsci Edge 6"
+    },
+    {
+      "id": "char_word_findable",
+      "kind": "word",
+      "value": "Findable"
+    },
+    {
+      "id": "char_word_accessible",
+      "kind": "word",
+      "value": "Accessible"
+    },
+    {
+      "id": "char_word_interoperable",
+      "kind": "word",
+      "value": "Interoperable"
+    },
+    {
+      "id": "char_word_reusable",
+      "kind": "word",
+      "value": "Reusable"
+    },
+    {
+      "id": "char_word_fair_edge_1",
+      "kind": "word",
+      "value": "Fair Edge 1"
+    },
+    {
+      "id": "char_word_fair_edge_2",
+      "kind": "word",
+      "value": "Fair Edge 2"
+    },
+    {
+      "id": "char_word_fair_edge_3",
+      "kind": "word",
+      "value": "Fair Edge 3"
+    },
+    {
+      "id": "char_word_fair_edge_4",
+      "kind": "word",
+      "value": "Fair Edge 4"
+    },
+    {
+      "id": "char_word_fair_edge_5",
+      "kind": "word",
+      "value": "Fair Edge 5"
+    },
+    {
+      "id": "char_word_fair_edge_6",
+      "kind": "word",
+      "value": "Fair Edge 6"
+    },
+    {
+      "id": "char_word_facilitating",
+      "kind": "word",
+      "value": "Facilitating"
+    },
+    {
+      "id": "char_word_coordinating",
+      "kind": "word",
+      "value": "Coordinating"
+    },
+    {
+      "id": "char_word_conv_edge_1",
+      "kind": "word",
+      "value": "Conv Edge 1"
+    },
+    {
+      "id": "char_word_conv_edge_2",
+      "kind": "word",
+      "value": "Conv Edge 2"
+    },
+    {
+      "id": "char_word_conv_edge_3",
+      "kind": "word",
+      "value": "Conv Edge 3"
+    },
+    {
+      "id": "char_word_delegators",
+      "kind": "word",
+      "value": "Delegators"
+    },
+    {
+      "id": "char_word_validators",
+      "kind": "word",
+      "value": "Validators"
+    },
+    {
+      "id": "char_word_stakeholders",
+      "kind": "word",
+      "value": "Stakeholders"
+    },
+    {
+      "id": "char_word_pos_edge_1",
+      "kind": "word",
+      "value": "Pos Edge 1"
+    },
+    {
+      "id": "char_word_pos_edge_2",
+      "kind": "word",
+      "value": "Pos Edge 2"
+    },
+    {
+      "id": "char_word_pos_edge_3",
+      "kind": "word",
+      "value": "Pos Edge 3"
+    },
+    {
+      "id": "char_word_standardisation",
+      "kind": "word",
+      "value": "Standardisation"
+    },
+    {
+      "id": "char_word_representation",
+      "kind": "word",
+      "value": "Representation"
+    },
+    {
+      "id": "char_word_interpretation",
+      "kind": "word",
+      "value": "Interpretation"
+    },
+    {
+      "id": "char_word_sem_edge_1",
+      "kind": "word",
+      "value": "Sem Edge 1"
+    },
+    {
+      "id": "char_word_sem_edge_2",
+      "kind": "word",
+      "value": "Sem Edge 2"
+    },
+    {
+      "id": "char_word_sem_edge_3",
+      "kind": "word",
+      "value": "Sem Edge 3"
+    },
+    {
+      "id": "char_word_assembly",
+      "kind": "word",
+      "value": "Assembly"
+    },
+    {
+      "id": "char_word_decomposition",
+      "kind": "word",
+      "value": "Decomposition"
+    },
+    {
+      "id": "char_word_asmdec_edge_1",
+      "kind": "word",
+      "value": "Asmdec Edge 1"
+    },
+    {
+      "id": "char_word_blue_earth_ventures",
+      "kind": "word",
+      "value": "Blue Earth Ventures"
+    },
+    {
+      "id": "char_word_world",
+      "kind": "word",
+      "value": "World"
+    },
+    {
+      "id": "char_word_businesses",
+      "kind": "word",
+      "value": "Businesses"
+    },
+    {
+      "id": "char_word_bevwb_edge_1",
+      "kind": "word",
+      "value": "Bevwb Edge 1"
+    },
+    {
+      "id": "char_word_find",
+      "kind": "word",
+      "value": "Find"
+    },
+    {
+      "id": "char_word_fund",
+      "kind": "word",
+      "value": "Fund"
+    },
+    {
+      "id": "char_word_support",
+      "kind": "word",
+      "value": "Support"
+    },
+    {
+      "id": "char_word_bevbk_edge_1",
+      "kind": "word",
+      "value": "Bevbk Edge 1"
+    },
+    {
+      "id": "char_word_bevbk_edge_2",
+      "kind": "word",
+      "value": "Bevbk Edge 2"
+    },
+    {
+      "id": "char_word_bevbk_edge_3",
+      "kind": "word",
+      "value": "Bevbk Edge 3"
+    },
+    {
+      "id": "char_word_founders",
+      "kind": "word",
+      "value": "Founders"
+    },
+    {
+      "id": "char_word_investors",
+      "kind": "word",
+      "value": "Investors"
+    },
+    {
+      "id": "char_word_corporate",
+      "kind": "word",
+      "value": "Corporate"
+    },
+    {
+      "id": "char_word_opportunities",
+      "kind": "word",
+      "value": "Opportunities"
+    },
+    {
+      "id": "char_word_bevve_edge_1",
+      "kind": "word",
+      "value": "Bevve Edge 1"
+    },
+    {
+      "id": "char_word_bevve_edge_2",
+      "kind": "word",
+      "value": "Bevve Edge 2"
+    },
+    {
+      "id": "char_word_bevve_edge_3",
+      "kind": "word",
+      "value": "Bevve Edge 3"
+    },
+    {
+      "id": "char_word_bevve_edge_4",
+      "kind": "word",
+      "value": "Bevve Edge 4"
+    },
+    {
+      "id": "char_word_bevve_edge_5",
+      "kind": "word",
+      "value": "Bevve Edge 5"
+    },
+    {
+      "id": "char_word_bevve_edge_6",
+      "kind": "word",
+      "value": "Bevve Edge 6"
     }
   ],
   "coordinates": [],
@@ -5990,6 +6930,510 @@
         "char_word_hcl_edge_2",
         "char_word_hcl_edge_3"
       ]
+    },
+    {
+      "id": "vocab_graph_products_4",
+      "name": "Graph Products",
+      "order": 4,
+      "terms": [
+        "char_word_cartesian",
+        "char_word_tensor",
+        "char_word_strong",
+        "char_word_lexicographic"
+      ],
+      "connectives": [
+        "char_word_gprod_edge_1",
+        "char_word_gprod_edge_2",
+        "char_word_gprod_edge_3",
+        "char_word_gprod_edge_4",
+        "char_word_gprod_edge_5",
+        "char_word_gprod_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_knowledge_3",
+      "name": "Knowledge",
+      "order": 3,
+      "terms": [
+        "char_word_truth",
+        "char_word_belief",
+        "char_word_knowledge"
+      ],
+      "connectives": [
+        "char_word_know_edge_1",
+        "char_word_know_edge_2",
+        "char_word_know_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_discourse_3",
+      "name": "Discourse",
+      "order": 3,
+      "terms": [
+        "char_word_grammar",
+        "char_word_vocabulary",
+        "char_word_language"
+      ],
+      "connectives": [
+        "char_word_disc_edge_1",
+        "char_word_disc_edge_2",
+        "char_word_disc_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_common_noun_3",
+      "name": "Common Noun",
+      "order": 3,
+      "terms": [
+        "char_word_people",
+        "char_word_places",
+        "char_word_things"
+      ],
+      "connectives": [
+        "char_word_noun_edge_1",
+        "char_word_noun_edge_2",
+        "char_word_noun_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_verbs_3",
+      "name": "Verbs",
+      "order": 3,
+      "terms": [
+        "char_word_actions",
+        "char_word_states",
+        "char_word_occurrences"
+      ],
+      "connectives": [
+        "char_word_verb_edge_1",
+        "char_word_verb_edge_2",
+        "char_word_verb_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_field_of_action_4",
+      "name": "Field of Action",
+      "order": 4,
+      "terms": [
+        "char_word_store",
+        "char_word_read",
+        "char_word_graph",
+        "char_word_list"
+      ],
+      "connectives": [
+        "char_word_foa_edge_1",
+        "char_word_foa_edge_2",
+        "char_word_foa_edge_3",
+        "char_word_foa_edge_4",
+        "char_word_foa_edge_5",
+        "char_word_foa_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_registry_core_4",
+      "name": "Registry Core",
+      "order": 4,
+      "terms": [
+        "char_word_store",
+        "char_word_read",
+        "char_word_sort",
+        "char_word_filter"
+      ],
+      "connectives": [
+        "char_word_reg_edge_1",
+        "char_word_reg_edge_2",
+        "char_word_reg_edge_3",
+        "char_word_reg_edge_4",
+        "char_word_reg_edge_5",
+        "char_word_reg_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_import_export_2",
+      "name": "Import Export",
+      "order": 2,
+      "terms": [
+        "char_word_import",
+        "char_word_export"
+      ],
+      "connectives": [
+        "char_word_impexp_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_store_load_2",
+      "name": "Store Load",
+      "order": 2,
+      "terms": [
+        "char_word_store",
+        "char_word_load"
+      ],
+      "connectives": [
+        "char_word_storeload_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_semantics_syntax_2",
+      "name": "Semantics Syntax",
+      "order": 2,
+      "terms": [
+        "char_word_semantics",
+        "char_word_syntax"
+      ],
+      "connectives": [
+        "char_word_semsyn_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_blue_earth_1",
+      "name": "Blue Earth",
+      "order": 1,
+      "terms": [
+        "char_word_blue_earth"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_hosting_facilitation_2",
+      "name": "Hosting Facilitation",
+      "order": 2,
+      "terms": [
+        "char_word_hosting",
+        "char_word_facilitation"
+      ],
+      "connectives": [
+        "char_word_behf_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_niche_national_2",
+      "name": "Niche National",
+      "order": 2,
+      "terms": [
+        "char_word_niche",
+        "char_word_national"
+      ],
+      "connectives": [
+        "char_word_benn_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_deals_deployment_2",
+      "name": "Deals Deployment",
+      "order": 2,
+      "terms": [
+        "char_word_deal_making",
+        "char_word_deployment"
+      ],
+      "connectives": [
+        "char_word_bedd_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_delivery_3",
+      "name": "Delivery",
+      "order": 3,
+      "terms": [
+        "char_word_hosting",
+        "char_word_coordination",
+        "char_word_facilitation"
+      ],
+      "connectives": [
+        "char_word_bedel_edge_1",
+        "char_word_bedel_edge_2",
+        "char_word_bedel_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_impact_3",
+      "name": "Impact",
+      "order": 3,
+      "terms": [
+        "char_word_systems_change",
+        "char_word_disruption",
+        "char_word_funding"
+      ],
+      "connectives": [
+        "char_word_beimp_edge_1",
+        "char_word_beimp_edge_2",
+        "char_word_beimp_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_blue_earth_strategy_4",
+      "name": "Blue Earth Strategy",
+      "order": 4,
+      "terms": [
+        "char_word_national",
+        "char_word_niche",
+        "char_word_deal_making",
+        "char_word_deployment"
+      ],
+      "connectives": [
+        "char_word_bestrat_edge_1",
+        "char_word_bestrat_edge_2",
+        "char_word_bestrat_edge_3",
+        "char_word_bestrat_edge_4",
+        "char_word_bestrat_edge_5",
+        "char_word_bestrat_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_fitness_exercise_2",
+      "name": "Fitness Exercise",
+      "order": 2,
+      "terms": [
+        "char_word_fitness",
+        "char_word_exercise"
+      ],
+      "connectives": [
+        "char_word_fitex_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_stretching_mobility_2",
+      "name": "Stretching Mobility",
+      "order": 2,
+      "terms": [
+        "char_word_stretching",
+        "char_word_mobility"
+      ],
+      "connectives": [
+        "char_word_strmob_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_physical_fitness_5",
+      "name": "Physical Fitness",
+      "order": 5,
+      "terms": [
+        "char_word_body_composition",
+        "char_word_cardiorespiratory_endurance",
+        "char_word_flexibility_mobility",
+        "char_word_muscle_strength",
+        "char_word_muscle_endurance"
+      ],
+      "connectives": [
+        "char_word_fitpent_edge_1",
+        "char_word_fitpent_edge_2",
+        "char_word_fitpent_edge_3",
+        "char_word_fitpent_edge_4",
+        "char_word_fitpent_edge_5",
+        "char_word_fitpent_edge_6",
+        "char_word_fitpent_edge_7",
+        "char_word_fitpent_edge_8",
+        "char_word_fitpent_edge_9",
+        "char_word_fitpent_edge_10"
+      ]
+    },
+    {
+      "id": "vocab_interface_state_model_1",
+      "name": "Interface State Model",
+      "order": 1,
+      "terms": [
+        "char_word_interface_state_model"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_viewing_editing_2",
+      "name": "Viewing Editing",
+      "order": 2,
+      "terms": [
+        "char_word_viewing",
+        "char_word_editing"
+      ],
+      "connectives": [
+        "char_word_view_edit_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_crud_4",
+      "name": "CRUD",
+      "order": 4,
+      "terms": [
+        "char_word_create",
+        "char_word_delete",
+        "char_word_update",
+        "char_word_read"
+      ],
+      "connectives": [
+        "char_word_crud_edge_1",
+        "char_word_crud_edge_2",
+        "char_word_crud_edge_3",
+        "char_word_crud_edge_4",
+        "char_word_crud_edge_5",
+        "char_word_crud_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_material_science_4",
+      "name": "Material Science",
+      "order": 4,
+      "terms": [
+        "char_word_performance",
+        "char_word_processing",
+        "char_word_properties",
+        "char_word_structure"
+      ],
+      "connectives": [
+        "char_word_engineer",
+        "char_word_matsci_edge_2",
+        "char_word_matsci_edge_3",
+        "char_word_matsci_edge_4",
+        "char_word_matsci_edge_5",
+        "char_word_scientist"
+      ]
+    },
+    {
+      "id": "vocab_information_science_4",
+      "name": "Information Science",
+      "order": 4,
+      "terms": [
+        "char_word_efficacy",
+        "char_word_attributes",
+        "char_word_representations",
+        "char_word_methods"
+      ],
+      "connectives": [
+        "char_word_infsci_edge_1",
+        "char_word_infsci_edge_2",
+        "char_word_infsci_edge_3",
+        "char_word_infsci_edge_4",
+        "char_word_infsci_edge_5",
+        "char_word_infsci_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_fair_4",
+      "name": "FAIR",
+      "order": 4,
+      "terms": [
+        "char_word_findable",
+        "char_word_accessible",
+        "char_word_interoperable",
+        "char_word_reusable"
+      ],
+      "connectives": [
+        "char_word_fair_edge_1",
+        "char_word_fair_edge_2",
+        "char_word_fair_edge_3",
+        "char_word_fair_edge_4",
+        "char_word_fair_edge_5",
+        "char_word_fair_edge_6"
+      ]
+    },
+    {
+      "id": "vocab_convening_3",
+      "name": "Convening",
+      "order": 3,
+      "terms": [
+        "char_word_hosting",
+        "char_word_facilitating",
+        "char_word_coordinating"
+      ],
+      "connectives": [
+        "char_word_conv_edge_1",
+        "char_word_conv_edge_2",
+        "char_word_conv_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_proof_of_stake_3",
+      "name": "Proof of Stake",
+      "order": 3,
+      "terms": [
+        "char_word_delegators",
+        "char_word_validators",
+        "char_word_stakeholders"
+      ],
+      "connectives": [
+        "char_word_pos_edge_1",
+        "char_word_pos_edge_2",
+        "char_word_pos_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_semiotics_3",
+      "name": "Semiotics",
+      "order": 3,
+      "terms": [
+        "char_word_standardisation",
+        "char_word_representation",
+        "char_word_interpretation"
+      ],
+      "connectives": [
+        "char_word_sem_edge_1",
+        "char_word_sem_edge_2",
+        "char_word_sem_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_assembly_decomposition_2",
+      "name": "Assembly Decomposition",
+      "order": 2,
+      "terms": [
+        "char_word_assembly",
+        "char_word_decomposition"
+      ],
+      "connectives": [
+        "char_word_asmdec_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_blue_earth_ventures_1",
+      "name": "Blue Earth Ventures",
+      "order": 1,
+      "terms": [
+        "char_word_blue_earth_ventures"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_world_businesses_2",
+      "name": "World Businesses",
+      "order": 2,
+      "terms": [
+        "char_word_world",
+        "char_word_businesses"
+      ],
+      "connectives": [
+        "char_word_bevwb_edge_1"
+      ]
+    },
+    {
+      "id": "vocab_backing_3",
+      "name": "Backing",
+      "order": 3,
+      "terms": [
+        "char_word_find",
+        "char_word_fund",
+        "char_word_support"
+      ],
+      "connectives": [
+        "char_word_bevbk_edge_1",
+        "char_word_bevbk_edge_2",
+        "char_word_bevbk_edge_3"
+      ]
+    },
+    {
+      "id": "vocab_venture_ecosystem_4",
+      "name": "Venture Ecosystem",
+      "order": 4,
+      "terms": [
+        "char_word_founders",
+        "char_word_investors",
+        "char_word_corporate",
+        "char_word_opportunities"
+      ],
+      "connectives": [
+        "char_word_bevve_edge_1",
+        "char_word_bevve_edge_2",
+        "char_word_bevve_edge_3",
+        "char_word_bevve_edge_4",
+        "char_word_bevve_edge_5",
+        "char_word_bevve_edge_6"
+      ]
     }
   ],
   "systems": [
@@ -6532,6 +7976,346 @@
       "connective_designation": "Acts",
       "grammar_ref": "grammar_3",
       "vocabulary_ref": "vocab_holochain_link_3"
+    },
+    {
+      "id": "system_graph_products_4",
+      "name": "Graph Products",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_graph_products_4"
+    },
+    {
+      "id": "system_knowledge_3",
+      "name": "Knowledge",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_knowledge_3"
+    },
+    {
+      "id": "system_discourse_3",
+      "name": "Discourse",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_discourse_3"
+    },
+    {
+      "id": "system_common_noun_3",
+      "name": "Common Noun",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_common_noun_3"
+    },
+    {
+      "id": "system_verbs_3",
+      "name": "Verbs",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_verbs_3"
+    },
+    {
+      "id": "system_field_of_action_4",
+      "name": "Field of Action",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_field_of_action_4"
+    },
+    {
+      "id": "system_registry_core_4",
+      "name": "Registry Core",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_registry_core_4"
+    },
+    {
+      "id": "system_import_export_2",
+      "name": "Import Export",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_import_export_2"
+    },
+    {
+      "id": "system_store_load_2",
+      "name": "Store Load",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_store_load_2"
+    },
+    {
+      "id": "system_semantics_syntax_2",
+      "name": "Semantics Syntax",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_semantics_syntax_2"
+    },
+    {
+      "id": "system_blue_earth_1",
+      "name": "Blue Earth",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_blue_earth_1"
+    },
+    {
+      "id": "system_hosting_facilitation_2",
+      "name": "Hosting Facilitation",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_hosting_facilitation_2"
+    },
+    {
+      "id": "system_niche_national_2",
+      "name": "Niche National",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_niche_national_2"
+    },
+    {
+      "id": "system_deals_deployment_2",
+      "name": "Deals Deployment",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_deals_deployment_2"
+    },
+    {
+      "id": "system_delivery_3",
+      "name": "Delivery",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_delivery_3"
+    },
+    {
+      "id": "system_impact_3",
+      "name": "Impact",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_impact_3"
+    },
+    {
+      "id": "system_blue_earth_strategy_4",
+      "name": "Blue Earth Strategy",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_blue_earth_strategy_4"
+    },
+    {
+      "id": "system_fitness_exercise_2",
+      "name": "Fitness Exercise",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_fitness_exercise_2"
+    },
+    {
+      "id": "system_stretching_mobility_2",
+      "name": "Stretching Mobility",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_stretching_mobility_2"
+    },
+    {
+      "id": "system_physical_fitness_5",
+      "name": "Physical Fitness",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_physical_fitness_5"
+    },
+    {
+      "id": "system_interface_state_model_1",
+      "name": "Interface State Model",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_interface_state_model_1"
+    },
+    {
+      "id": "system_viewing_editing_2",
+      "name": "Viewing Editing",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_viewing_editing_2"
+    },
+    {
+      "id": "system_crud_4",
+      "name": "CRUD",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_crud_4"
+    },
+    {
+      "id": "system_material_science_4",
+      "name": "Material Science",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_material_science_4"
+    },
+    {
+      "id": "system_information_science_4",
+      "name": "Information Science",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_information_science_4"
+    },
+    {
+      "id": "system_fair_4",
+      "name": "FAIR",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_fair_4"
+    },
+    {
+      "id": "system_convening_3",
+      "name": "Convening",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_convening_3"
+    },
+    {
+      "id": "system_proof_of_stake_3",
+      "name": "Proof of Stake",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_proof_of_stake_3"
+    },
+    {
+      "id": "system_semiotics_3",
+      "name": "Semiotics",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_semiotics_3"
+    },
+    {
+      "id": "system_assembly_decomposition_2",
+      "name": "Assembly Decomposition",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_assembly_decomposition_2"
+    },
+    {
+      "id": "system_blue_earth_ventures_1",
+      "name": "Blue Earth Ventures",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_blue_earth_ventures_1"
+    },
+    {
+      "id": "system_world_businesses_2",
+      "name": "World Businesses",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_world_businesses_2"
+    },
+    {
+      "id": "system_backing_3",
+      "name": "Backing",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_backing_3"
+    },
+    {
+      "id": "system_venture_ecosystem_4",
+      "name": "Venture Ecosystem",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_venture_ecosystem_4"
     }
   ],
   "perspectives": [],

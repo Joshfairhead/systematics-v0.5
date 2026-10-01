@@ -16,11 +16,11 @@ use serde::{Deserialize, Serialize};
 /// A vocabulary of topological anchors for one OrderCardinality (K_n).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Topology {
-    pub id: String,          // "topvocab_{order_cardinality}"
+    pub id: String, // "topvocab_{order_cardinality}"
     #[serde(rename = "order")]
-    pub order_cardinality: u8,           // K_n size
+    pub order_cardinality: u8, // K_n size
     pub points: Vec<String>, // ordered PointRef IDs, len == order_cardinality
-    pub lines: Vec<String>,  // ordered LineRef IDs, len == C(order_cardinality, 2)
+    pub lines: Vec<String>, // ordered LineRef IDs, len == C(order_cardinality, 2)
 }
 
 impl Topology {
@@ -80,11 +80,11 @@ impl Topology {
 /// A vocabulary of geometric anchors for one OrderCardinality.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Geometry {
-    pub id: String,               // "geovocab_{order_cardinality}"
+    pub id: String, // "geovocab_{order_cardinality}"
     #[serde(rename = "order")]
-    pub order_cardinality: u8,                // K_n size
+    pub order_cardinality: u8, // K_n size
     pub coordinates: Vec<String>, // ordered CoordinateRef IDs, len == order_cardinality
-    pub segments: Vec<String>,    // ordered SegmentRef IDs, len == C(order_cardinality, 2)
+    pub segments: Vec<String>, // ordered SegmentRef IDs, len == C(order_cardinality, 2)
 }
 
 impl Geometry {
@@ -145,11 +145,11 @@ impl Geometry {
 /// Triad, Theology Triad, …).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vocabulary {
-    pub id: String,              // "vocab_{slug}_{order_cardinality}"
-    pub name: String,            // e.g. "Canonical Triad", "Theology Triad"
+    pub id: String,   // "vocab_{slug}_{order_cardinality}"
+    pub name: String, // e.g. "Canonical Triad", "Theology Triad"
     #[serde(rename = "order")]
-    pub order_cardinality: u8,               // K_n size
-    pub terms: Vec<String>,      // ordered CharacterRef IDs, [i] inhabits topology.points[i]
+    pub order_cardinality: u8, // K_n size
+    pub terms: Vec<String>, // ordered CharacterRef IDs, [i] inhabits topology.points[i]
     pub connectives: Vec<String>, // ordered CharacterRef IDs, [i] inhabits topology.lines[i]
 }
 
@@ -259,10 +259,7 @@ mod tests {
         let t = Topology::canonical_for(3);
         assert_eq!(t.id, "topvocab_3");
         assert_eq!(t.points, vec!["point_3_1", "point_3_2", "point_3_3"]);
-        assert_eq!(
-            t.lines,
-            vec!["line_3_1_2", "line_3_1_3", "line_3_2_3"]
-        );
+        assert_eq!(t.lines, vec!["line_3_1_2", "line_3_1_3", "line_3_2_3"]);
         assert!(t.validate().is_ok());
     }
 
@@ -304,11 +301,7 @@ mod tests {
             "Bad Triad",
             3,
             vec!["char_a".into(), "char_b".into()], // only 2 terms — should be 3
-            vec![
-                "char_c".into(),
-                "char_d".into(),
-                "char_e".into(),
-            ],
+            vec!["char_c".into(), "char_d".into(), "char_e".into()],
         );
         let errs = s.validate_against(&t).unwrap_err();
         assert!(errs.iter().any(|e| e.contains("expected 3 terms")));

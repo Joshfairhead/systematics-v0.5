@@ -1,0 +1,265 @@
+{
+  "characters": [
+    {
+      "id": "char_word_plato_t1",
+      "kind": "word",
+      "value": "Plato"
+    },
+    {
+      "id": "char_word_tripartite_soul_t1",
+      "kind": "word",
+      "value": "Reason"
+    },
+    {
+      "id": "char_word_tripartite_soul_t2",
+      "kind": "word",
+      "value": "Spirit / Thumos"
+    },
+    {
+      "id": "char_word_tripartite_soul_t3",
+      "kind": "word",
+      "value": "Appetites"
+    },
+    {
+      "id": "char_word_tripartite_soul_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_tripartite_soul_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_tripartite_soul_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_social_classes_t1",
+      "kind": "word",
+      "value": "Guardians"
+    },
+    {
+      "id": "char_word_social_classes_t2",
+      "kind": "word",
+      "value": "Auxiliaries"
+    },
+    {
+      "id": "char_word_social_classes_t3",
+      "kind": "word",
+      "value": "Artisans"
+    },
+    {
+      "id": "char_word_social_classes_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_social_classes_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_social_classes_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_three_fates_t1",
+      "kind": "word",
+      "value": "Atropos"
+    },
+    {
+      "id": "char_word_three_fates_t2",
+      "kind": "word",
+      "value": "Clotho"
+    },
+    {
+      "id": "char_word_three_fates_t3",
+      "kind": "word",
+      "value": "Lachesis"
+    },
+    {
+      "id": "char_word_three_fates_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_three_fates_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_three_fates_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cave_allegory_t1",
+      "kind": "word",
+      "value": "Sun"
+    },
+    {
+      "id": "char_word_cave_allegory_t2",
+      "kind": "word",
+      "value": "Assent"
+    },
+    {
+      "id": "char_word_cave_allegory_t3",
+      "kind": "word",
+      "value": "Chains and Shadows"
+    },
+    {
+      "id": "char_word_cave_allegory_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cave_allegory_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cave_allegory_c3",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_plato_1",
+      "name": "Plato",
+      "order": 1,
+      "terms": [
+        "char_word_plato_t1"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_tripartite_soul_3",
+      "name": "Tripartite Soul",
+      "order": 3,
+      "terms": [
+        "char_word_tripartite_soul_t1",
+        "char_word_tripartite_soul_t2",
+        "char_word_tripartite_soul_t3"
+      ],
+      "connectives": [
+        "char_word_tripartite_soul_c1",
+        "char_word_tripartite_soul_c2",
+        "char_word_tripartite_soul_c3"
+      ]
+    },
+    {
+      "id": "vocab_social_classes_3",
+      "name": "Social Classes",
+      "order": 3,
+      "terms": [
+        "char_word_social_classes_t1",
+        "char_word_social_classes_t2",
+        "char_word_social_classes_t3"
+      ],
+      "connectives": [
+        "char_word_social_classes_c1",
+        "char_word_social_classes_c2",
+        "char_word_social_classes_c3"
+      ]
+    },
+    {
+      "id": "vocab_three_fates_3",
+      "name": "Three Fates",
+      "order": 3,
+      "terms": [
+        "char_word_three_fates_t1",
+        "char_word_three_fates_t2",
+        "char_word_three_fates_t3"
+      ],
+      "connectives": [
+        "char_word_three_fates_c1",
+        "char_word_three_fates_c2",
+        "char_word_three_fates_c3"
+      ]
+    },
+    {
+      "id": "vocab_cave_allegory_3",
+      "name": "Cave Allegory",
+      "order": 3,
+      "terms": [
+        "char_word_cave_allegory_t1",
+        "char_word_cave_allegory_t2",
+        "char_word_cave_allegory_t3"
+      ],
+      "connectives": [
+        "char_word_cave_allegory_c1",
+        "char_word_cave_allegory_c2",
+        "char_word_cave_allegory_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_plato_1",
+      "name": "Plato",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_plato_1"
+    },
+    {
+      "id": "system_tripartite_soul_3",
+      "name": "Tripartite Soul",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_tripartite_soul_3"
+    },
+    {
+      "id": "system_social_classes_3",
+      "name": "Social Classes",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_social_classes_3"
+    },
+    {
+      "id": "system_three_fates_3",
+      "name": "Three Fates",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_three_fates_3"
+    },
+    {
+      "id": "system_cave_allegory_3",
+      "name": "Cave Allegory",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_cave_allegory_3"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "sequence_plato",
+      "name": "Plato",
+      "members": [
+        "system:system_plato_1",
+        "system:system_tripartite_soul_3",
+        "system:system_social_classes_3",
+        "system:system_three_fates_3",
+        "system:system_cave_allegory_3"
+      ]
+    }
+  ]
+}

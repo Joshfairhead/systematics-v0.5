@@ -36,7 +36,11 @@ async fn functor_create_validate_apply() {
         }
     "#;
     let resp = schema.execute(create).await;
-    assert!(resp.errors.is_empty(), "createFunctor errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "createFunctor errors: {:?}",
+        resp.errors
+    );
     let data = resp.data.into_json().unwrap();
     assert_eq!(data["createFunctor"]["id"], "functor_rot3");
     assert_eq!(data["createFunctor"]["permutation"], json!([2, 3, 1]));
@@ -59,7 +63,10 @@ async fn functor_create_validate_apply() {
     "#;
     let resp = schema.execute(persp).await;
     let data = resp.data.into_json().unwrap();
-    let pid = data["createPerspective"]["id"].as_str().unwrap().to_string();
+    let pid = data["createPerspective"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     let add_links = format!(
         r#"
@@ -87,19 +94,29 @@ async fn functor_create_validate_apply() {
     "#
     );
     let resp = schema.execute(apply.as_str()).await;
-    assert!(resp.errors.is_empty(), "applyFunctor errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "applyFunctor errors: {:?}",
+        resp.errors
+    );
     let data = resp.data.into_json().unwrap();
     let links = data["applyFunctor"]["links"].as_array().unwrap();
     assert_eq!(links.len(), 2);
 
     // term:1 → term:f(1)=2 ; term:2 → term:f(2)=3, all onto the target system.
-    let term_link = links.iter().find(|l| l["predicate"] == "notes" && l["source"].as_str().unwrap().contains("term:")).unwrap();
+    let term_link = links
+        .iter()
+        .find(|l| l["predicate"] == "notes" && l["source"].as_str().unwrap().contains("term:"))
+        .unwrap();
     assert_eq!(term_link["source"], "system:system_citation_3#term:2");
     assert_eq!(term_link["target"], "system:system_citation_3#term:3");
 
     // conn:2-3 → conn between f(2)=3, f(3)=1 → canonicalized 1-3 ; bare system
     // retargeted.
-    let conn_link = links.iter().find(|l| l["source"].as_str().unwrap().contains("conn:")).unwrap();
+    let conn_link = links
+        .iter()
+        .find(|l| l["source"].as_str().unwrap().contains("conn:"))
+        .unwrap();
     assert_eq!(conn_link["source"], "system:system_citation_3#conn:1-3");
     assert_eq!(conn_link["target"], "system:system_citation_3");
 }
@@ -123,7 +140,11 @@ async fn non_bijection_fails_validation() {
         }
     "#;
     let resp = schema.execute(create).await;
-    assert!(resp.errors.is_empty(), "createFunctor errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "createFunctor errors: {:?}",
+        resp.errors
+    );
 
     let validate = r#"query { validateFunctor(id: "functor_bad") }"#;
     let resp = schema.execute(validate).await;
