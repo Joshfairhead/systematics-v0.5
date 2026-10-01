@@ -1,0 +1,363 @@
+{
+  "characters": [
+    {
+      "id": "char_word_aesthetics_t1",
+      "kind": "word",
+      "value": "Aesthetics"
+    },
+    {
+      "id": "char_word_sensory_somatic_t1",
+      "kind": "word",
+      "value": "Sensory"
+    },
+    {
+      "id": "char_word_sensory_somatic_t2",
+      "kind": "word",
+      "value": "Somatic"
+    },
+    {
+      "id": "char_word_sensory_somatic_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognitive_conceptual_t1",
+      "kind": "word",
+      "value": "Cognitive"
+    },
+    {
+      "id": "char_word_cognitive_conceptual_t2",
+      "kind": "word",
+      "value": "Conceptual"
+    },
+    {
+      "id": "char_word_cognitive_conceptual_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_somatics_t1",
+      "kind": "word",
+      "value": "Proprioception"
+    },
+    {
+      "id": "char_word_somatics_t2",
+      "kind": "word",
+      "value": "Kinesthetic"
+    },
+    {
+      "id": "char_word_somatics_t3",
+      "kind": "word",
+      "value": "Vestibular"
+    },
+    {
+      "id": "char_word_somatics_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_somatics_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_somatics_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognition_t1",
+      "kind": "word",
+      "value": "Noetic"
+    },
+    {
+      "id": "char_word_cognition_t2",
+      "kind": "word",
+      "value": "Narrative"
+    },
+    {
+      "id": "char_word_cognition_t3",
+      "kind": "word",
+      "value": "Visceral"
+    },
+    {
+      "id": "char_word_cognition_t4",
+      "kind": "word",
+      "value": "Morality"
+    },
+    {
+      "id": "char_word_cognition_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognition_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognition_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognition_c4",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognition_c5",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_cognition_c6",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_t1",
+      "kind": "word",
+      "value": "Visual"
+    },
+    {
+      "id": "char_word_senses_t2",
+      "kind": "word",
+      "value": "Auditory"
+    },
+    {
+      "id": "char_word_senses_t3",
+      "kind": "word",
+      "value": "Smells"
+    },
+    {
+      "id": "char_word_senses_t4",
+      "kind": "word",
+      "value": "Tastes"
+    },
+    {
+      "id": "char_word_senses_t5",
+      "kind": "word",
+      "value": "Tactile"
+    },
+    {
+      "id": "char_word_senses_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c4",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c5",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c6",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c7",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c8",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c9",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_senses_c10",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_aesthetics_1",
+      "name": "Aesthetics",
+      "order": 1,
+      "terms": [
+        "char_word_aesthetics_t1"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_sensory_somatic_2",
+      "name": "Sensory & Somatic",
+      "order": 2,
+      "terms": [
+        "char_word_sensory_somatic_t1",
+        "char_word_sensory_somatic_t2"
+      ],
+      "connectives": [
+        "char_word_sensory_somatic_c1"
+      ]
+    },
+    {
+      "id": "vocab_cognitive_conceptual_2",
+      "name": "Cognitive & Conceptual",
+      "order": 2,
+      "terms": [
+        "char_word_cognitive_conceptual_t1",
+        "char_word_cognitive_conceptual_t2"
+      ],
+      "connectives": [
+        "char_word_cognitive_conceptual_c1"
+      ]
+    },
+    {
+      "id": "vocab_somatics_3",
+      "name": "Somatics",
+      "order": 3,
+      "terms": [
+        "char_word_somatics_t1",
+        "char_word_somatics_t2",
+        "char_word_somatics_t3"
+      ],
+      "connectives": [
+        "char_word_somatics_c1",
+        "char_word_somatics_c2",
+        "char_word_somatics_c3"
+      ]
+    },
+    {
+      "id": "vocab_cognition_4",
+      "name": "Cognition",
+      "order": 4,
+      "terms": [
+        "char_word_cognition_t1",
+        "char_word_cognition_t2",
+        "char_word_cognition_t3",
+        "char_word_cognition_t4"
+      ],
+      "connectives": [
+        "char_word_cognition_c1",
+        "char_word_cognition_c2",
+        "char_word_cognition_c3",
+        "char_word_cognition_c4",
+        "char_word_cognition_c5",
+        "char_word_cognition_c6"
+      ]
+    },
+    {
+      "id": "vocab_senses_5",
+      "name": "Senses",
+      "order": 5,
+      "terms": [
+        "char_word_senses_t1",
+        "char_word_senses_t2",
+        "char_word_senses_t3",
+        "char_word_senses_t4",
+        "char_word_senses_t5"
+      ],
+      "connectives": [
+        "char_word_senses_c1",
+        "char_word_senses_c2",
+        "char_word_senses_c3",
+        "char_word_senses_c4",
+        "char_word_senses_c5",
+        "char_word_senses_c6",
+        "char_word_senses_c7",
+        "char_word_senses_c8",
+        "char_word_senses_c9",
+        "char_word_senses_c10"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_aesthetics_1",
+      "name": "Aesthetics",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_aesthetics_1"
+    },
+    {
+      "id": "system_sensory_somatic_2",
+      "name": "Sensory & Somatic",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_sensory_somatic_2"
+    },
+    {
+      "id": "system_cognitive_conceptual_2",
+      "name": "Cognitive & Conceptual",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_cognitive_conceptual_2"
+    },
+    {
+      "id": "system_somatics_3",
+      "name": "Somatics",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_somatics_3"
+    },
+    {
+      "id": "system_cognition_4",
+      "name": "Cognition",
+      "order": 4,
+      "coherence": "Activity Field",
+      "term_designation": "Sources",
+      "connective_designation": "Interplays",
+      "grammar_ref": "grammar_4",
+      "vocabulary_ref": "vocab_cognition_4"
+    },
+    {
+      "id": "system_senses_5",
+      "name": "Senses",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_senses_5"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "sequence_aesthetics",
+      "name": "Aesthetics",
+      "members": [
+        "system:system_aesthetics_1",
+        "system:system_sensory_somatic_2",
+        "system:system_cognitive_conceptual_2",
+        "system:system_somatics_3",
+        "system:system_cognition_4",
+        "system:system_senses_5"
+      ]
+    }
+  ]
+}

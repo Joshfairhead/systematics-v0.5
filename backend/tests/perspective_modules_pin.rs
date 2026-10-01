@@ -48,11 +48,11 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 24,
-        "expected 24 module files to load (14 sources + the Architecture Pentad \
+        modules, 25,
+        "expected 25 module files to load (14 sources + the Architecture Pentad \
          + the Architectural Monad, Blue Earth, Interface State Model, and Blue Earth \
-         Ventures registries + the Plato, Bennett, Rheomode and DU1 sequences + the \
-         standalone concepts module); got {modules}"
+         Ventures registries + the Plato, Bennett, Rheomode, DU1 and Aesthetics \
+         sequences + the standalone concepts module); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
@@ -134,10 +134,13 @@ fn module_owned_systems_present() {
     // Query·List·View / Sort·Search·Filter) added to the Architectural Monad registry.
     // Then 113 → 125 (2026-09-30): durabilised the Rheomode monad (+5), DU1 monad (+2),
     // the Consent pentad + Argument triad (concepts), and Blue Earth's Impact Thesis triad.
+    // Then 125 → 131 (2026-10-01): the Aesthetics monad — its K1 head, the Sensory & Somatic
+    // and Cognitive & Conceptual dyads, the Somatics triad, the Cognition tetrad, and the
+    // Senses pentad (6 systems).
     assert_eq!(
         graph.systems.len(),
-        125,
-        "expected 12 canonical + 1 citation + 88 fragment + 24 module systems"
+        131,
+        "expected 12 canonical + 1 citation + 88 fragment + 30 module systems"
     );
 }
 
