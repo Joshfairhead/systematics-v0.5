@@ -7,9 +7,9 @@ use async_graphql::*;
 use tokio::sync::RwLock;
 
 use crate::core::{
-    Artefact, Character, Coordinate, Entry, Functor, Geometry, Template, Graph, Law, Line,
-    Lookup, OrderCardinality, Perspective, PerspectiveLink, Point, Ordinality, Reference, Sequence, Vocabulary,
-    Segment, Source, System, Topology,
+    Artefact, Character, Coordinate, Entry, Functor, Geometry, Graph, Law, Line, Lookup,
+    OrderCardinality, Ordinality, Perspective, PerspectiveLink, Point, Reference, Segment,
+    Sequence, Source, System, Template, Topology, Vocabulary,
 };
 
 /// Shared, mutable graph passed to the GraphQL schema as context data.
@@ -55,12 +55,16 @@ impl QueryRoot {
             return None;
         }
         let g = graph_snapshot(ctx).await;
-        g.order_cardinality(value as u8).map(|o| GqlOrder::new(o.clone()))
+        g.order_cardinality(value as u8)
+            .map(|o| GqlOrder::new(o.clone()))
     }
 
     async fn orders(&self, ctx: &Context<'_>) -> Vec<GqlOrder> {
         let g = graph_snapshot(ctx).await;
-        g.orders().into_iter().map(|o| GqlOrder::new(o.clone())).collect()
+        g.orders()
+            .into_iter()
+            .map(|o| GqlOrder::new(o.clone()))
+            .collect()
     }
 
     async fn ordinality(&self, ctx: &Context<'_>, value: i32) -> Option<GqlPosition> {
@@ -68,7 +72,8 @@ impl QueryRoot {
             return None;
         }
         let g = graph_snapshot(ctx).await;
-        g.ordinality(value as u8).map(|p| GqlPosition::new(p.clone()))
+        g.ordinality(value as u8)
+            .map(|p| GqlPosition::new(p.clone()))
     }
 
     async fn positions(&self, ctx: &Context<'_>) -> Vec<GqlPosition> {
@@ -79,7 +84,12 @@ impl QueryRoot {
             .collect()
     }
 
-    async fn point(&self, ctx: &Context<'_>, order_cardinality: i32, ordinality: i32) -> Option<GqlPoint> {
+    async fn point(
+        &self,
+        ctx: &Context<'_>,
+        order_cardinality: i32,
+        ordinality: i32,
+    ) -> Option<GqlPoint> {
         let g = graph_snapshot(ctx).await;
         g.point(order_cardinality as u8, ordinality as u8)
             .map(|p| GqlPoint::new(p.clone()))
@@ -124,7 +134,11 @@ impl QueryRoot {
             .map(|c| GqlCoordinate::new(c.clone()))
     }
 
-    async fn coordinates(&self, ctx: &Context<'_>, order_cardinality: Option<i32>) -> Vec<GqlCoordinate> {
+    async fn coordinates(
+        &self,
+        ctx: &Context<'_>,
+        order_cardinality: Option<i32>,
+    ) -> Vec<GqlCoordinate> {
         let g = graph_snapshot(ctx).await;
         g.coordinates(order_cardinality.map(|o| o as u8))
             .into_iter()
@@ -159,14 +173,9 @@ impl QueryRoot {
 
     // -------- vocabularies and perspective --------
 
-    async fn topology(
-        &self,
-        ctx: &Context<'_>,
-        id: String,
-    ) -> Option<GqlTopology> {
+    async fn topology(&self, ctx: &Context<'_>, id: String) -> Option<GqlTopology> {
         let g = graph_snapshot(ctx).await;
-        g.topology(&id)
-            .map(|v| GqlTopology::new(v.clone()))
+        g.topology(&id).map(|v| GqlTopology::new(v.clone()))
     }
 
     async fn topology_for_order(
@@ -179,14 +188,9 @@ impl QueryRoot {
             .map(|v| GqlTopology::new(v.clone()))
     }
 
-    async fn geometry(
-        &self,
-        ctx: &Context<'_>,
-        id: String,
-    ) -> Option<GqlGeometry> {
+    async fn geometry(&self, ctx: &Context<'_>, id: String) -> Option<GqlGeometry> {
         let g = graph_snapshot(ctx).await;
-        g.geometry(&id)
-            .map(|v| GqlGeometry::new(v.clone()))
+        g.geometry(&id).map(|v| GqlGeometry::new(v.clone()))
     }
 
     async fn geometry_for_order(
@@ -199,14 +203,9 @@ impl QueryRoot {
             .map(|v| GqlGeometry::new(v.clone()))
     }
 
-    async fn vocabulary(
-        &self,
-        ctx: &Context<'_>,
-        id: String,
-    ) -> Option<GqlVocabulary> {
+    async fn vocabulary(&self, ctx: &Context<'_>, id: String) -> Option<GqlVocabulary> {
         let g = graph_snapshot(ctx).await;
-        g.vocabulary(&id)
-            .map(|v| GqlVocabulary::new(v.clone()))
+        g.vocabulary(&id).map(|v| GqlVocabulary::new(v.clone()))
     }
 
     async fn vocabularies_for_order(
@@ -223,9 +222,14 @@ impl QueryRoot {
 
     // -------- templates (structure) and systems (reconcilers) --------
 
-    async fn template_for_order(&self, ctx: &Context<'_>, order_cardinality: i32) -> Option<GqlTemplate> {
+    async fn template_for_order(
+        &self,
+        ctx: &Context<'_>,
+        order_cardinality: i32,
+    ) -> Option<GqlTemplate> {
         let g = graph_snapshot(ctx).await;
-        g.template_for_order(order_cardinality as u8).map(|gr| GqlTemplate::new(gr.clone()))
+        g.template_for_order(order_cardinality as u8)
+            .map(|gr| GqlTemplate::new(gr.clone()))
     }
 
     async fn system_by_id(&self, ctx: &Context<'_>, id: String) -> Option<GqlSystem> {
@@ -252,7 +256,10 @@ impl QueryRoot {
             .filter(|s| s.id != canonical_system_id(s.order_cardinality))
             // Hide empty/unlabelled systems (e.g. un-scraped DU1) so they don't
             // give misleading blank representations.
-            .filter(|s| g.vocabulary(&s.vocabulary_ref).is_some_and(|v| !v.terms.is_empty()))
+            .filter(|s| {
+                g.vocabulary(&s.vocabulary_ref)
+                    .is_some_and(|v| !v.terms.is_empty())
+            })
             .map(|s| GqlSystem::new(s.clone()))
             .collect()
     }
@@ -382,7 +389,8 @@ impl QueryRoot {
     /// VertexOrdinality↔TermOrdinality, EdgeOrdinality↔ConnectiveOrdinality), plus whether the
     /// faces are consistent. The mapping, made first-class. See `docs/v0.6-rebuild/validation.md`.
     async fn equivalence_hexad(&self, cardinality: i32) -> GqlEquivalenceHexad {
-        crate::core::equivalence::EquivalenceHexad::for_order(cardinality.clamp(0, 255) as u8).into()
+        crate::core::equivalence::EquivalenceHexad::for_order(cardinality.clamp(0, 255) as u8)
+            .into()
     }
 
     /// Validate a stored system **instance** against its archetype equivalence: the
@@ -466,13 +474,21 @@ impl QueryRoot {
 
     async fn sequences(&self, ctx: &Context<'_>) -> Vec<GqlSequence> {
         let g = graph_snapshot(ctx).await;
-        g.sequences().iter().cloned().map(GqlSequence::new).collect()
+        g.sequences()
+            .iter()
+            .cloned()
+            .map(GqlSequence::new)
+            .collect()
     }
 
     // -------- resolved RenderedSystem (a System resolved into a bound K-graph) --------
 
     /// Resolve any System (canonical or user) into its complete RenderedSystem.
-    async fn render_system(&self, ctx: &Context<'_>, system_id: String) -> Option<GqlRenderedSystem> {
+    async fn render_system(
+        &self,
+        ctx: &Context<'_>,
+        system_id: String,
+    ) -> Option<GqlRenderedSystem> {
         let g = graph_snapshot(ctx).await;
         resolve_system(&g, &system_id).map(GqlRenderedSystem::new)
     }
@@ -491,7 +507,8 @@ impl QueryRoot {
             return None;
         }
         let g = graph_snapshot(ctx).await;
-        resolve_system(&g, &canonical_system_id(order_cardinality as u8)).map(GqlRenderedSystem::new)
+        resolve_system(&g, &canonical_system_id(order_cardinality as u8))
+            .map(GqlRenderedSystem::new)
     }
 
     async fn system_by_name(&self, ctx: &Context<'_>, name: String) -> Option<GqlRenderedSystem> {
@@ -530,7 +547,10 @@ impl QueryRoot {
 
     async fn perspectives(&self, ctx: &Context<'_>) -> Vec<GqlPerspective> {
         let g = graph_snapshot(ctx).await;
-        g.perspectives().iter().map(|p| GqlPerspective::new(p.clone())).collect()
+        g.perspectives()
+            .iter()
+            .map(|p| GqlPerspective::new(p.clone()))
+            .collect()
     }
 
     async fn source(&self, ctx: &Context<'_>, id: String) -> Option<GqlSource> {
@@ -557,7 +577,10 @@ impl QueryRoot {
     /// source · artefact · system · lookup client-side).
     async fn all_references(&self, ctx: &Context<'_>) -> Vec<GqlReference> {
         let g = graph_snapshot(ctx).await;
-        g.references.iter().map(|r| GqlReference::new(r.clone())).collect()
+        g.references
+            .iter()
+            .map(|r| GqlReference::new(r.clone()))
+            .collect()
     }
 
     /// A Perspective exported as a self-contained, loadable JSON module
@@ -582,7 +605,9 @@ impl QueryRoot {
         } else {
             g.references_for(&address)
         };
-        refs.into_iter().map(|r| GqlReference::new(r.clone())).collect()
+        refs.into_iter()
+            .map(|r| GqlReference::new(r.clone()))
+            .collect()
     }
 
     /// All References citing anything within a System — prefetch for tooltips.
@@ -711,7 +736,8 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         .iter()
         .filter_map(|cid| graph.character(cid).map(|c| c.value.clone()))
         .collect();
-    let model = crate::core::substrate::compose_system(order_cardinality, &term_values, &connective_values);
+    let model =
+        crate::core::substrate::compose_system(order_cardinality, &term_values, &connective_values);
 
     // Terms — resolved from the composed model, in ordinality order_cardinality.
     let mut terms = Vec::new();
@@ -784,8 +810,12 @@ fn resolve_system(graph: &Graph, system_id: &str) -> Option<RenderedSystemData> 
         // including any legacy record that stored a custom coherence — shows the
         // canonical value.
         coherence: crate::core::hexadicsystems::coherence(order_cardinality).to_string(),
-        term_designation: crate::core::hexadicsystems::term_designation(order_cardinality).to_string(),
-        connective_designation: crate::core::hexadicsystems::connective_designation(order_cardinality).to_string(),
+        term_designation: crate::core::hexadicsystems::term_designation(order_cardinality)
+            .to_string(),
+        connective_designation: crate::core::hexadicsystems::connective_designation(
+            order_cardinality,
+        )
+        .to_string(),
         terms,
         coordinates,
         colours,
@@ -1039,10 +1069,7 @@ impl MutationRoot {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         if graph.vocabulary(&sv.id).is_some() {
-            return Err(Error::new(format!(
-                "Vocabulary '{}' already exists",
-                sv.id
-            )));
+            return Err(Error::new(format!("Vocabulary '{}' already exists", sv.id)));
         }
         graph.add_vocabulary(sv.clone());
         persist(ctx, &graph);
@@ -1102,7 +1129,9 @@ impl MutationRoot {
     ) -> async_graphql::Result<GqlSystem> {
         let order_cardinality = input.order_cardinality as u8;
         if !(1..=12).contains(&order_cardinality) {
-            return Err(Error::new(format!("order_cardinality {order_cardinality} out of range 1..=12")));
+            return Err(Error::new(format!(
+                "order_cardinality {order_cardinality} out of range 1..=12"
+            )));
         }
         let grammar = Template::for_order(order_cardinality);
         let expected_conn = grammar.expected_connectives();
@@ -1123,8 +1152,12 @@ impl MutationRoot {
         // Store = write with OVERWRITE semantics: char/vocab/system ids are deterministic
         // from (name slug, order), so re-authoring the same (slug, order) upserts onto the
         // same ids via `apply_content` (no fork). Version control deferred.
-        let (content, system) =
-            build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
+        let (content, system) = build_system_content(
+            &input.name,
+            order_cardinality,
+            &input.terms,
+            &input.connectives,
+        );
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         graph.apply_content(&content);
@@ -1146,7 +1179,9 @@ impl MutationRoot {
     ) -> async_graphql::Result<GqlSystem> {
         let order_cardinality = input.order_cardinality as u8;
         if !(1..=12).contains(&order_cardinality) {
-            return Err(Error::new(format!("order_cardinality {order_cardinality} out of range 1..=12")));
+            return Err(Error::new(format!(
+                "order_cardinality {order_cardinality} out of range 1..=12"
+            )));
         }
         let grammar = Template::for_order(order_cardinality);
         let expected_conn = grammar.expected_connectives();
@@ -1171,15 +1206,23 @@ impl MutationRoot {
         // rename the rebuilt vocab/chars take new (name-derived) ids, orphaning these.
         let old_vocab = graph.system(&id).and_then(|s| {
             graph.vocabulary(&s.vocabulary_ref).map(|v| {
-                let chars: Vec<String> =
-                    v.terms.iter().chain(v.connectives.iter()).cloned().collect();
+                let chars: Vec<String> = v
+                    .terms
+                    .iter()
+                    .chain(v.connectives.iter())
+                    .cloned()
+                    .collect();
                 (v.id.clone(), chars)
             })
         });
         // Rebuild chars + vocab + system, then force the existing system id (keeping its
         // sequence memberships) before applying.
-        let (mut content, mut system) =
-            build_system_content(&input.name, order_cardinality, &input.terms, &input.connectives);
+        let (mut content, mut system) = build_system_content(
+            &input.name,
+            order_cardinality,
+            &input.terms,
+            &input.connectives,
+        );
         system.id = id.clone();
         content.systems = vec![system.clone()];
         let new_vocab_id = system.vocabulary_ref.clone();
@@ -1278,7 +1321,10 @@ impl MutationRoot {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
 
-        let id = input.system_ref.strip_prefix("system:").unwrap_or(&input.system_ref);
+        let id = input
+            .system_ref
+            .strip_prefix("system:")
+            .unwrap_or(&input.system_ref);
         let term_values: Vec<String> = {
             let sys = graph
                 .system(id)
@@ -1297,7 +1343,9 @@ impl MutationRoot {
             return Err(Error::new("nothing to decompose (need order ≥ 3)"));
         }
         if n > 6 {
-            return Err(Error::new(format!("decompose is limited to order ≤ 6 (got {n})")));
+            return Err(Error::new(format!(
+                "decompose is limited to order ≤ 6 (got {n})"
+            )));
         }
 
         // Every k-subset (2 ≤ k ≤ n−1) as a complete-subgraph face, via bitmask enumeration.
@@ -1402,7 +1450,10 @@ impl MutationRoot {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         if graph.functor(&functor.id).is_some() {
-            return Err(Error::new(format!("Functor '{}' already exists", functor.id)));
+            return Err(Error::new(format!(
+                "Functor '{}' already exists",
+                functor.id
+            )));
         }
         graph.add_functor(functor.clone());
         persist(ctx, &graph);
@@ -1451,7 +1502,10 @@ impl MutationRoot {
         let mut graph = graph_arc.write().await;
         if graph.sequence(&sequence.id).is_some() {
             if explicit_id {
-                return Err(Error::new(format!("Sequence '{}' already exists", sequence.id)));
+                return Err(Error::new(format!(
+                    "Sequence '{}' already exists",
+                    sequence.id
+                )));
             }
             sequence.id = graph.unique_sequence_id(&sequence.id);
         }
@@ -1603,7 +1657,12 @@ impl MutationRoot {
         Ok(GqlLink::new(link))
     }
 
-    async fn remove_link(&self, ctx: &Context<'_>, perspective_id: String, link_id: String) -> bool {
+    async fn remove_link(
+        &self,
+        ctx: &Context<'_>,
+        perspective_id: String,
+        link_id: String,
+    ) -> bool {
         let graph_arc = shared_graph(ctx);
         let mut graph = graph_arc.write().await;
         let removed = graph
@@ -1668,7 +1727,8 @@ impl MutationRoot {
 
         // Artefact (optional).
         let artefact_id = input.artefact_title.as_ref().map(|title| {
-            let a = Artefact::with_auto_id(&source_id, title.clone(), None, input.artefact_url.clone());
+            let a =
+                Artefact::with_auto_id(&source_id, title.clone(), None, input.artefact_url.clone());
             let id = a.id.clone();
             graph.upsert_artefact(a);
             id
@@ -2527,7 +2587,8 @@ impl GqlReference {
     /// Resolve the cited Source (provenance origin).
     async fn source(&self, ctx: &Context<'_>) -> Option<GqlSource> {
         let g = graph_snapshot(ctx).await;
-        g.source(&self.inner.source_ref).map(|s| GqlSource::new(s.clone()))
+        g.source(&self.inner.source_ref)
+            .map(|s| GqlSource::new(s.clone()))
     }
     /// Resolve the Artefact, if any.
     async fn artefact(&self, ctx: &Context<'_>) -> Option<GqlArtefact> {
@@ -2666,7 +2727,11 @@ impl From<crate::core::hexadicsystems::SystematicsHexad> for GqlSystematicsHexad
             term_designation: h.term_designation,
             connective_designation: h.connective_designation,
             term_ordinality: h.term_ordinality.into_iter().map(|x| x as i32).collect(),
-            connective_ordinality: h.connective_ordinality.into_iter().map(|x| x as i32).collect(),
+            connective_ordinality: h
+                .connective_ordinality
+                .into_iter()
+                .map(|x| x as i32)
+                .collect(),
         }
     }
 }
@@ -2734,7 +2799,11 @@ pub struct GqlEquivalenceHexad {
 
 impl From<crate::core::equivalence::EquivalenceHexad> for GqlEquivalenceHexad {
     fn from(h: crate::core::equivalence::EquivalenceHexad) -> Self {
-        let pairs = h.pairs().into_iter().map(GqlEquivalencePair::from).collect();
+        let pairs = h
+            .pairs()
+            .into_iter()
+            .map(GqlEquivalencePair::from)
+            .collect();
         let mismatches = h.validate().err().unwrap_or_default();
         Self {
             topology: h.topology.into(),

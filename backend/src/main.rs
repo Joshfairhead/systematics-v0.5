@@ -94,7 +94,11 @@ fn build_api_router() -> Router {
     }
     let store_path = persistence::resolve_store_path();
     if let Err(e) = persistence::load_into(&mut graph, &store_path) {
-        tracing::error!("failed to load user store from {}: {}", store_path.display(), e);
+        tracing::error!(
+            "failed to load user store from {}: {}",
+            store_path.display(),
+            e
+        );
     }
     tracing::info!("User store: {}", store_path.display());
 

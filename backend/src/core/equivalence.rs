@@ -227,7 +227,10 @@ mod tests {
     use super::*;
 
     fn pair<'a>(pairs: &'a [EquivalencePair], topology: &str) -> &'a EquivalencePair {
-        pairs.iter().find(|p| p.topology == topology).expect("dimension present")
+        pairs
+            .iter()
+            .find(|p| p.topology == topology)
+            .expect("dimension present")
     }
 
     #[test]
@@ -236,14 +239,20 @@ mod tests {
         assert_eq!(e.len(), 6, "six paired dimensions");
         // Cardinality (3,3) ↔ System (Triad).
         let c = pair(&e, "Cardinality");
-        assert_eq!((c.system, c.topology_value.as_str(), c.system_value.as_str()), ("System", "(3,3)", "Triad"));
+        assert_eq!(
+            (c.system, c.topology_value.as_str(), c.system_value.as_str()),
+            ("System", "(3,3)", "Triad")
+        );
         // Eigenvalue (Laplacian spectrum) ↔ Coherence (Dynamism).
         let ev = pair(&e, "Eigenvalue");
-        assert_eq!((ev.system, ev.system_value.as_str()), ("Coherence", "Dynamism"));
+        assert_eq!(
+            (ev.system, ev.system_value.as_str()),
+            ("Coherence", "Dynamism")
+        );
         assert_eq!(ev.topology_value, "0 (×1), 3 (×2)");
-        assert_eq!(pair(&e, "Order").system_value, "Impulses");       // 3 → Impulses
-        assert_eq!(pair(&e, "Size").system_value, "Acts");            // 3 → Acts
-        // ordinalities book-match: vertex ordinalities 1..3 ↔ term1..term3.
+        assert_eq!(pair(&e, "Order").system_value, "Impulses"); // 3 → Impulses
+        assert_eq!(pair(&e, "Size").system_value, "Acts"); // 3 → Acts
+                                                           // ordinalities book-match: vertex ordinalities 1..3 ↔ term1..term3.
         assert_eq!(pair(&e, "VertexOrdinality").system, "TermOrdinality");
         assert_eq!(pair(&e, "VertexOrdinality").topology_value, "1..3");
         assert_eq!(pair(&e, "VertexOrdinality").system_value, "term1..term3");
@@ -263,7 +272,10 @@ mod tests {
         // six edges ↔ connective1..connective6.
         assert_eq!(pair(&e, "EdgeOrdinality").system, "ConnectiveOrdinality");
         assert_eq!(pair(&e, "EdgeOrdinality").topology_value, "1..6");
-        assert_eq!(pair(&e, "EdgeOrdinality").system_value, "connective1..connective6");
+        assert_eq!(
+            pair(&e, "EdgeOrdinality").system_value,
+            "connective1..connective6"
+        );
     }
 
     #[test]
@@ -279,21 +291,32 @@ mod tests {
 
     #[test]
     fn valid_triad_instance_passes() {
-        assert!(validate_instance(3, "Dynamism", "Impulses", "Acts", &[1, 2, 3], &[1, 2, 3]).is_ok());
+        assert!(
+            validate_instance(3, "Dynamism", "Impulses", "Acts", &[1, 2, 3], &[1, 2, 3]).is_ok()
+        );
     }
 
     #[test]
     fn wrong_coherence_fails() {
-        let errs = validate_instance(3, "Complementarity", "Impulses", "Acts", &[1, 2, 3], &[1, 2, 3])
-            .unwrap_err();
+        let errs = validate_instance(
+            3,
+            "Complementarity",
+            "Impulses",
+            "Acts",
+            &[1, 2, 3],
+            &[1, 2, 3],
+        )
+        .unwrap_err();
         assert!(errs.iter().any(|e| e.contains("Eigenvalue↔Coherence")));
     }
 
     #[test]
     fn misanchored_ordinalities_fail() {
         // Only two term ordinalities for a triad ⇒ terms don't anchor to the three vertices.
-        let errs = validate_instance(3, "Dynamism", "Impulses", "Acts", &[1, 2], &[1, 2, 3])
-            .unwrap_err();
-        assert!(errs.iter().any(|e| e.contains("VertexOrdinality↔TermOrdinality")));
+        let errs =
+            validate_instance(3, "Dynamism", "Impulses", "Acts", &[1, 2], &[1, 2, 3]).unwrap_err();
+        assert!(errs
+            .iter()
+            .any(|e| e.contains("VertexOrdinality↔TermOrdinality")));
     }
 }

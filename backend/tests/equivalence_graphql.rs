@@ -33,13 +33,20 @@ async fn equivalence_hexad_book_matches_the_two_hexads() {
     assert_eq!(h["topology"]["eigenvalue"], "0 (×1), 3 (×2)");
     assert_eq!(h["topology"]["order"], 3);
     assert_eq!(h["topology"]["size"], 3);
-    assert_eq!(h["topology"]["vertexOrdinality"], serde_json::json!([1, 2, 3]));
+    assert_eq!(
+        h["topology"]["vertexOrdinality"],
+        serde_json::json!([1, 2, 3])
+    );
     // Vocabulary face.
     assert_eq!(h["system"]["name"], "Triad");
     assert_eq!(h["system"]["coherence"], "Dynamism");
     assert_eq!(h["system"]["termDesignation"], "Impulses");
     // The faces are consistent.
-    assert!(h["mismatches"].as_array().unwrap().is_empty(), "book-match: {:?}", h["mismatches"]);
+    assert!(
+        h["mismatches"].as_array().unwrap().is_empty(),
+        "book-match: {:?}",
+        h["mismatches"]
+    );
 
     // The six paired dimensions.
     let pairs = h["pairs"].as_array().unwrap();
@@ -75,14 +82,20 @@ async fn validate_system_equivalence_passes_for_a_canonical_triad() {
     let m = r#"mutation { authorSystem(input:{ name:"Eq Triad", orderCardinality:3, terms:["A","B","C"], connectives:["x","y","z"] }){ id } }"#;
     let r = schema.execute(m).await;
     assert!(r.errors.is_empty(), "author errors: {:?}", r.errors);
-    let id = r.data.into_json().unwrap()["authorSystem"]["id"].as_str().unwrap().to_string();
+    let id = r.data.into_json().unwrap()["authorSystem"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     let q = format!(r#"{{ validateSystemEquivalence(id: "{id}") }}"#);
     let resp = schema.execute(&q).await;
     assert!(resp.errors.is_empty(), "query errors: {:?}", resp.errors);
     let d = resp.data.into_json().unwrap();
     let mismatches = d["validateSystemEquivalence"].as_array().unwrap();
-    assert!(mismatches.is_empty(), "expected a conforming triad, got: {mismatches:?}");
+    assert!(
+        mismatches.is_empty(),
+        "expected a conforming triad, got: {mismatches:?}"
+    );
 }
 
 #[tokio::test]

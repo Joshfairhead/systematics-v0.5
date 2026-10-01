@@ -10,21 +10,50 @@
 use serde::{Deserialize, Serialize};
 
 const ORDER_NAMES: [&str; 12] = [
-    "Monad", "Dyad", "Triad", "Tetrad", "Pentad", "Hexad", "Heptad", "Octad", "Ennead",
-    "Decad", "Undecad", "Dodecad",
+    "Monad", "Dyad", "Triad", "Tetrad", "Pentad", "Hexad", "Heptad", "Octad", "Ennead", "Decad",
+    "Undecad", "Dodecad",
 ];
 const COHERENCE: [&str; 12] = [
-    "Universality", "Complementarity", "Dynamism", "Activity Field",
-    "Significance and Potential", "Coalescence", "Generation", "Self-Sufficiency",
-    "Transformation", "Intrinsic Harmony", "Articulate Symmetry", "Perfection",
+    "Universality",
+    "Complementarity",
+    "Dynamism",
+    "Activity Field",
+    "Significance and Potential",
+    "Coalescence",
+    "Generation",
+    "Self-Sufficiency",
+    "Transformation",
+    "Intrinsic Harmony",
+    "Articulate Symmetry",
+    "Perfection",
 ];
 const TERM_DESIGNATION: [&str; 12] = [
-    "Totality", "Poles", "Impulses", "Sources", "Limits", "Laws", "States", "Elements",
-    "Needs Research", "Needs Research", "Needs Research", "Needs Research",
+    "Totality",
+    "Poles",
+    "Impulses",
+    "Sources",
+    "Limits",
+    "Laws",
+    "States",
+    "Elements",
+    "Needs Research",
+    "Needs Research",
+    "Needs Research",
+    "Needs Research",
 ];
 const CONNECTIVE_DESIGNATION: [&str; 12] = [
-    "Unity", "Force", "Acts", "Interplays", "Mutualities", "Steps", "Intervals",
-    "Components", "Needs Research", "Needs Research", "Needs Research", "Needs Research",
+    "Unity",
+    "Force",
+    "Acts",
+    "Interplays",
+    "Mutualities",
+    "Steps",
+    "Intervals",
+    "Components",
+    "Needs Research",
+    "Needs Research",
+    "Needs Research",
+    "Needs Research",
 ];
 
 fn lookup(table: &[&'static str; 12], order_cardinality: u8) -> &'static str {
@@ -168,12 +197,18 @@ pub fn validate_metadata(candidate: &SystematicsHexad) -> Result<(), Vec<String>
     let mut errs = Vec::new();
     let mut check = |field: &str, got: &str, want: &str| {
         if !got.eq_ignore_ascii_case(want) {
-            errs.push(format!("{field}: '{got}' ≠ canonical '{want}' (cardinality {n})"));
+            errs.push(format!(
+                "{field}: '{got}' ≠ canonical '{want}' (cardinality {n})"
+            ));
         }
     };
     check("name", &candidate.name, &canonical.name);
     check("coherence", &candidate.coherence, &canonical.coherence);
-    check("term_designation", &candidate.term_designation, &canonical.term_designation);
+    check(
+        "term_designation",
+        &candidate.term_designation,
+        &canonical.term_designation,
+    );
     check(
         "connective_designation",
         &candidate.connective_designation,
@@ -211,10 +246,14 @@ mod tests {
         assert_eq!(h.connective_designation, "Acts");
         assert_eq!(h.term_ordinality, vec![1, 2, 3]);
         assert_eq!(h.connective_ordinality, vec![1, 2, 3]); // C(3,2)
-        // tetrad: |V|=4, |E|=6.
+                                                            // tetrad: |V|=4, |E|=6.
         let t = systematics_hexad(4);
         assert_eq!(
-            (t.name.as_str(), t.term_ordinality.len(), t.connective_ordinality.len()),
+            (
+                t.name.as_str(),
+                t.term_ordinality.len(),
+                t.connective_ordinality.len()
+            ),
             ("Tetrad", 4, 6)
         );
     }

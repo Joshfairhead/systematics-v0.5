@@ -63,7 +63,14 @@ impl Functor {
         system_ref: impl Into<String>,
     ) -> Self {
         let system_ref = system_ref.into();
-        Self::new(id, name, order_cardinality, system_ref.clone(), system_ref, (1..=order_cardinality).collect())
+        Self::new(
+            id,
+            name,
+            order_cardinality,
+            system_ref.clone(),
+            system_ref,
+            (1..=order_cardinality).collect(),
+        )
     }
 
     /// Map a source ordinality (1-based) to its target ordinality, if in range.
@@ -86,7 +93,10 @@ impl Functor {
         let n = self.order_cardinality as usize;
 
         if self.order_cardinality == 0 {
-            errs.push(format!("Functor {}: order_cardinality must be >= 1", self.id));
+            errs.push(format!(
+                "Functor {}: order_cardinality must be >= 1",
+                self.id
+            ));
         }
         if self.permutation.len() != n {
             errs.push(format!(
@@ -209,7 +219,14 @@ mod tests {
 
     fn rotate_triad() -> Functor {
         // 1→2, 2→3, 3→1 over a triad, system A → system B.
-        Functor::new("functor_rot", "rotate", 3, "system_a_3", "system_b_3", vec![2, 3, 1])
+        Functor::new(
+            "functor_rot",
+            "rotate",
+            3,
+            "system_a_3",
+            "system_b_3",
+            vec![2, 3, 1],
+        )
     }
 
     #[test]
@@ -217,7 +234,10 @@ mod tests {
         let id = Functor::identity("functor_id", "identity", 4, "system_x_4");
         assert!(id.validate().is_ok());
         assert_eq!(id.map_position(3), Some(3));
-        assert_eq!(id.map_address("system:system_x_4#term:2"), "system:system_x_4#term:2");
+        assert_eq!(
+            id.map_address("system:system_x_4#term:2"),
+            "system:system_x_4#term:2"
+        );
     }
 
     #[test]
@@ -246,30 +266,48 @@ mod tests {
     #[test]
     fn maps_term_addresses() {
         let f = rotate_triad();
-        assert_eq!(f.map_address("system:system_a_3#term:1"), "system:system_b_3#term:2");
-        assert_eq!(f.map_address("system:system_a_3#term:3"), "system:system_b_3#term:1");
+        assert_eq!(
+            f.map_address("system:system_a_3#term:1"),
+            "system:system_b_3#term:2"
+        );
+        assert_eq!(
+            f.map_address("system:system_a_3#term:3"),
+            "system:system_b_3#term:1"
+        );
     }
 
     #[test]
     fn derived_connective_map_is_canonicalized() {
         // conn between positions 2,3 -> f(2)=3, f(3)=1 -> canonical min-max = 1-3.
         let f = rotate_triad();
-        assert_eq!(f.map_address("system:system_a_3#conn:2-3"), "system:system_b_3#conn:1-3");
+        assert_eq!(
+            f.map_address("system:system_a_3#conn:2-3"),
+            "system:system_b_3#conn:1-3"
+        );
         // and it agrees regardless of input endpoint order_cardinality (structure preservation).
-        assert_eq!(f.map_address("system:system_a_3#conn:3-2"), "system:system_b_3#conn:1-3");
+        assert_eq!(
+            f.map_address("system:system_a_3#conn:3-2"),
+            "system:system_b_3#conn:1-3"
+        );
     }
 
     #[test]
     fn system_level_fragments_and_bare_system_retarget() {
         let f = rotate_triad();
         assert_eq!(f.map_address("system:system_a_3"), "system:system_b_3");
-        assert_eq!(f.map_address("system:system_a_3#coherence"), "system:system_b_3#coherence");
+        assert_eq!(
+            f.map_address("system:system_a_3#coherence"),
+            "system:system_b_3#coherence"
+        );
     }
 
     #[test]
     fn foreign_and_nonsystem_addresses_pass_through() {
         let f = rotate_triad();
-        assert_eq!(f.map_address("system:system_other_3#term:1"), "system:system_other_3#term:1");
+        assert_eq!(
+            f.map_address("system:system_other_3#term:1"),
+            "system:system_other_3#term:1"
+        );
         assert_eq!(f.map_address("perspective:p"), "perspective:p");
     }
 

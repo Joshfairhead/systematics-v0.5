@@ -279,7 +279,10 @@ impl GraphQLClient {
     "#;
 
     #[allow(dead_code)]
-    pub async fn fetch_system_by_order(&self, order_cardinality: i32) -> Result<RenderedSystem, ApiError> {
+    pub async fn fetch_system_by_order(
+        &self,
+        order_cardinality: i32,
+    ) -> Result<RenderedSystem, ApiError> {
         let query = format!(
             r#"
             query GetSystem($orderCardinality: Int!) {{
@@ -306,10 +309,12 @@ impl GraphQLClient {
             ));
         }
 
-        let system = response
-            .data
-            .and_then(|d| d.system)
-            .ok_or_else(|| ApiError::NotFound(format!("System with order_cardinality {} not found", order_cardinality)))?;
+        let system = response.data.and_then(|d| d.system).ok_or_else(|| {
+            ApiError::NotFound(format!(
+                "System with order_cardinality {} not found",
+                order_cardinality
+            ))
+        })?;
 
         Ok(self.transform_coordinates(system))
     }
@@ -402,10 +407,17 @@ impl GraphQLClient {
             self.execute_query(query, None).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
-        Ok(response.data.map(|d| d.instance_systems).unwrap_or_default())
+        Ok(response
+            .data
+            .map(|d| d.instance_systems)
+            .unwrap_or_default())
     }
 
     /// Render any System by id (used to load instance systems into the canvas).
@@ -428,7 +440,11 @@ impl GraphQLClient {
             self.execute_query(&query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         let system = response
@@ -498,11 +514,18 @@ impl GraphQLClient {
 
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
 
-        Ok(response.data.map(|d| d.references_for_system).unwrap_or_default())
+        Ok(response
+            .data
+            .map(|d| d.references_for_system)
+            .unwrap_or_default())
     }
 
     /// Every citation in the graph, enriched with owning perspective + resolved
@@ -532,7 +555,11 @@ impl GraphQLClient {
 
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
 
@@ -542,11 +569,14 @@ impl GraphQLClient {
     /// Every Sequence (Monad / registry) in the graph — id, name, members.
     pub async fn fetch_sequences(&self) -> Result<Vec<SequenceView>, ApiError> {
         let query = r#"{ sequences { id name members } }"#;
-        let response: GraphQLResponse<SequencesResponse> =
-            self.execute_query(query, None).await?;
+        let response: GraphQLResponse<SequencesResponse> = self.execute_query(query, None).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         Ok(response.data.map(|d| d.sequences).unwrap_or_default())
@@ -573,7 +603,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         response
@@ -595,7 +629,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         Ok(response.data.map(|d| d.delete_sequence).unwrap_or(false))
@@ -609,7 +647,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         Ok(response.data.map(|d| d.delete_system).unwrap_or(false))
@@ -623,7 +665,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         Ok(response.data.map(|d| d.delete_reference).unwrap_or(false))
@@ -650,7 +696,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         response
@@ -683,7 +733,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         response
@@ -712,7 +766,11 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         response
@@ -740,10 +798,17 @@ impl GraphQLClient {
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
-                errors.iter().map(|e| e.message.clone()).collect::<Vec<_>>().join(", "),
+                errors
+                    .iter()
+                    .map(|e| e.message.clone())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
-        Ok(response.data.and_then(|d| d.decompose_system).unwrap_or_default())
+        Ok(response
+            .data
+            .and_then(|d| d.decompose_system)
+            .unwrap_or_default())
     }
 
     async fn execute_query<T: for<'de> Deserialize<'de>>(

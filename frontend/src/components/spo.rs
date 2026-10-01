@@ -11,8 +11,8 @@ use crate::api::client::{InstanceSystem, ReferenceView, SequenceView};
 
 /// Standard order_cardinality labels (the invariant systematics names).
 const ORDER_NAMES: [&str; 12] = [
-    "Monad", "Dyad", "Triad", "Tetrad", "Pentad", "Hexad", "Heptad", "Octad",
-    "Ennead", "Decad", "Undecad", "Dodecad",
+    "Monad", "Dyad", "Triad", "Tetrad", "Pentad", "Hexad", "Heptad", "Octad", "Ennead", "Decad",
+    "Undecad", "Dodecad",
 ];
 
 pub fn order_name(order_cardinality: i32) -> String {
@@ -27,13 +27,22 @@ pub fn persp(r: &ReferenceView) -> String {
     r.perspective_name.clone().unwrap_or_default()
 }
 pub fn src(r: &ReferenceView) -> String {
-    r.source.as_ref().map(|s| s.name.clone()).unwrap_or_default()
+    r.source
+        .as_ref()
+        .map(|s| s.name.clone())
+        .unwrap_or_default()
 }
 pub fn art(r: &ReferenceView) -> String {
-    r.artefact.as_ref().map(|a| a.title.clone()).unwrap_or_default()
+    r.artefact
+        .as_ref()
+        .map(|a| a.title.clone())
+        .unwrap_or_default()
 }
 pub fn loc(r: &ReferenceView) -> String {
-    r.lookup.as_ref().map(|l| l.locator.clone()).unwrap_or_default()
+    r.lookup
+        .as_ref()
+        .map(|l| l.locator.clone())
+        .unwrap_or_default()
 }
 pub fn order_of(r: &ReferenceView) -> Option<i32> {
     r.target_system.as_ref().map(|s| s.order_cardinality)
@@ -113,7 +122,12 @@ pub fn build_triples(
     };
     for s in systems {
         base(&s.id, "name", s.name.clone(), String::new()); // scope to a *specific* system
-        base(&s.id, "order_cardinality", order_name(s.order_cardinality), String::new());
+        base(
+            &s.id,
+            "order_cardinality",
+            order_name(s.order_cardinality),
+            String::new(),
+        );
         // Terms/connectives carry their GRAPH ordinality (node index / base–target edge),
         // supplied by the backend — terms anchor to nodes, connectives to edges.
         for term in &s.terms {
@@ -144,7 +158,11 @@ pub fn build_triples(
         // falling back to the perspective when there is no named author.
         let origin = {
             let a = src(r);
-            if a.is_empty() { persp(r) } else { a }
+            if a.is_empty() {
+                persp(r)
+            } else {
+                a
+            }
         };
         if !origin.is_empty() {
             t.push(Triple {

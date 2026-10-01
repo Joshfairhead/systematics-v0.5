@@ -41,8 +41,16 @@ pub fn system_selector(props: &SystemSelectorProps) -> Html {
     };
 
     // Data · Graph · Table condensed to a single "View" toggle (swaps the view).
-    let other_mode = if props.mode == ViewMode::Graph { ViewMode::Table } else { ViewMode::Graph };
-    let current_label = if props.mode == ViewMode::Graph { "Graph" } else { "Table" };
+    let other_mode = if props.mode == ViewMode::Graph {
+        ViewMode::Table
+    } else {
+        ViewMode::Graph
+    };
+    let current_label = if props.mode == ViewMode::Graph {
+        "Graph"
+    } else {
+        "Table"
+    };
     let toggle_view = {
         let on_set_mode = props.on_set_mode.clone();
         Callback::from(move |_| on_set_mode.emit(other_mode))

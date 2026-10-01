@@ -36,12 +36,12 @@ impl Law {
     /// 5 purple interaction · 6 orange concentration. *(Layout per the user,
     /// 2026-08-18; the hexad itself may still flip — separate inquiry.)*
     pub const HEXAD: [Law; 6] = [
-        Law::Identity,      // 1 red
-        Law::Expansion,     // 2 blue
-        Law::OrderCardinality,         // 3 yellow
-        Law::Freedom,       // 4 green
-        Law::Interaction,   // 5 purple  (alias SPO)
-        Law::Concentration, // 6 orange
+        Law::Identity,         // 1 red
+        Law::Expansion,        // 2 blue
+        Law::OrderCardinality, // 3 yellow
+        Law::Freedom,          // 4 green
+        Law::Interaction,      // 5 purple  (alias SPO)
+        Law::Concentration,    // 6 orange
     ];
 
     /// The law's permutation in one-line notation over positions `1..=3`:
@@ -49,12 +49,12 @@ impl Law {
     /// the S₃ table in `docs/design-intent.md`.)
     pub fn permutation(&self) -> [u8; 3] {
         match self {
-            Law::Expansion => [1, 2, 3],     // e (identity permutation)
-            Law::Identity => [2, 3, 1],      // 3-cycle
-            Law::OrderCardinality => [3, 1, 2],         // 3-cycle
-            Law::Interaction => [1, 3, 2],   // transposition — SPO
-            Law::Concentration => [2, 1, 3], // transposition
-            Law::Freedom => [3, 2, 1],       // transposition
+            Law::Expansion => [1, 2, 3],        // e (identity permutation)
+            Law::Identity => [2, 3, 1],         // 3-cycle
+            Law::OrderCardinality => [3, 1, 2], // 3-cycle
+            Law::Interaction => [1, 3, 2],      // transposition — SPO
+            Law::Concentration => [2, 1, 3],    // transposition
+            Law::Freedom => [3, 2, 1],          // transposition
         }
     }
 
@@ -165,7 +165,14 @@ impl Law {
         source_ref: impl Into<String>,
         target_ref: impl Into<String>,
     ) -> Functor {
-        Functor::new(id, self.name(), 3, source_ref, target_ref, self.permutation_vec())
+        Functor::new(
+            id,
+            self.name(),
+            3,
+            source_ref,
+            target_ref,
+            self.permutation_vec(),
+        )
     }
 }
 
@@ -207,8 +214,12 @@ mod tests {
     #[test]
     fn test_even_odd_split() {
         // rotations {expansion, identity, order_cardinality} even; reflections odd.
-        assert!(Law::Expansion.is_even() && Law::Identity.is_even() && Law::OrderCardinality.is_even());
-        assert!(!Law::Interaction.is_even() && !Law::Concentration.is_even() && !Law::Freedom.is_even());
+        assert!(
+            Law::Expansion.is_even() && Law::Identity.is_even() && Law::OrderCardinality.is_even()
+        );
+        assert!(
+            !Law::Interaction.is_even() && !Law::Concentration.is_even() && !Law::Freedom.is_even()
+        );
     }
 
     #[test]
@@ -227,8 +238,11 @@ mod tests {
         // Verified entries from the design-doc multiplication table (row ∘ col):
         assert_eq!(Law::Interaction.compose(&Law::Identity), Law::Freedom); // int∘idn = fre
         assert_eq!(Law::Interaction.compose(&Law::Interaction), Law::Expansion); // int∘int = e
-        assert_eq!(Law::Identity.compose(&Law::OrderCardinality), Law::Expansion); // idn∘ord = exp
-        // expansion is the identity element: e ∘ x = x for all x.
+        assert_eq!(
+            Law::Identity.compose(&Law::OrderCardinality),
+            Law::Expansion
+        ); // idn∘ord = exp
+           // expansion is the identity element: e ∘ x = x for all x.
         for law in Law::HEXAD {
             assert_eq!(Law::Expansion.compose(&law), law);
             assert_eq!(law.compose(&Law::Expansion), law);
@@ -252,12 +266,26 @@ mod tests {
         // expansion (1-2-3): the natural loop 1→2→3→1.
         assert_eq!(
             Law::Expansion.read_walk(&nodes, &edges),
-            ["Will", "generation", "Function", "consent", "Being", "decision"]
+            [
+                "Will",
+                "generation",
+                "Function",
+                "consent",
+                "Being",
+                "decision"
+            ]
         );
         // interaction (1-3-2 = SPO): Will→Being→Function→Will.
         assert_eq!(
             Law::Interaction.read_walk(&nodes, &edges),
-            ["Will", "decision", "Being", "consent", "Function", "generation"]
+            [
+                "Will",
+                "decision",
+                "Being",
+                "consent",
+                "Function",
+                "generation"
+            ]
         );
         // the walk is a closed loop: last edge joins the 3rd node back to the 1st.
         for law in Law::HEXAD {
@@ -278,7 +306,7 @@ mod tests {
         assert_eq!(Law::Expansion.read(&mvc), ["View", "Model", "Controller"]); // 123
         assert_eq!(Law::Interaction.read(&mvc), ["View", "Controller", "Model"]); // 132 (SPO)
         assert_eq!(Law::Freedom.read(&mvc), ["Controller", "Model", "View"]); // 321
-        // all six give distinct orderings (S₃ acts freely on the 3 positions).
+                                                                              // all six give distinct orderings (S₃ acts freely on the 3 positions).
         let readings: Vec<[&str; 3]> = Law::HEXAD.iter().map(|l| l.read(&mvc)).collect();
         for i in 0..6 {
             for j in (i + 1)..6 {
@@ -309,16 +337,38 @@ mod tests {
         let nodes = ["View", "Model", "Controller"];
         let edges = ["compose", "render", "resolve"]; // (1,2), (1,3), (2,3)
         let expect = [
-            (Law::Expansion, ["View", "compose", "Model", "resolve", "Controller"]), // 123
-            (Law::Identity, ["Model", "resolve", "Controller", "render", "View"]), // 231
-            (Law::OrderCardinality, ["Controller", "render", "View", "compose", "Model"]), // 312
-            (Law::Interaction, ["View", "render", "Controller", "resolve", "Model"]), // 132
-            (Law::Concentration, ["Model", "compose", "View", "render", "Controller"]), // 213
-            (Law::Freedom, ["Controller", "resolve", "Model", "compose", "View"]), // 321
+            (
+                Law::Expansion,
+                ["View", "compose", "Model", "resolve", "Controller"],
+            ), // 123
+            (
+                Law::Identity,
+                ["Model", "resolve", "Controller", "render", "View"],
+            ), // 231
+            (
+                Law::OrderCardinality,
+                ["Controller", "render", "View", "compose", "Model"],
+            ), // 312
+            (
+                Law::Interaction,
+                ["View", "render", "Controller", "resolve", "Model"],
+            ), // 132
+            (
+                Law::Concentration,
+                ["Model", "compose", "View", "render", "Controller"],
+            ), // 213
+            (
+                Law::Freedom,
+                ["Controller", "resolve", "Model", "compose", "View"],
+            ), // 321
         ];
         for (law, sentence) in expect {
             let walk = law.read_walk(&nodes, &edges);
-            assert_eq!(&walk[0..5], &sentence[..], "law {law:?} categorical reading");
+            assert_eq!(
+                &walk[0..5],
+                &sentence[..],
+                "law {law:?} categorical reading"
+            );
         }
     }
 
@@ -338,16 +388,62 @@ mod tests {
         let nodes = ["Line", "Adjacency", "Incidence"];
         let edges = ["identity", "associativity", "composition"]; // (1,2), (1,3), (2,3)
         let expect = [
-            (Law::Expansion, ["Line", "identity", "Adjacency", "composition", "Incidence"]), // 123
-            (Law::Identity, ["Adjacency", "composition", "Incidence", "associativity", "Line"]), // 231
-            (Law::OrderCardinality, ["Incidence", "associativity", "Line", "identity", "Adjacency"]), // 312
-            (Law::Interaction, ["Line", "associativity", "Incidence", "composition", "Adjacency"]), // 132
-            (Law::Concentration, ["Adjacency", "identity", "Line", "associativity", "Incidence"]), // 213
-            (Law::Freedom, ["Incidence", "composition", "Adjacency", "identity", "Line"]), // 321
+            (
+                Law::Expansion,
+                ["Line", "identity", "Adjacency", "composition", "Incidence"],
+            ), // 123
+            (
+                Law::Identity,
+                [
+                    "Adjacency",
+                    "composition",
+                    "Incidence",
+                    "associativity",
+                    "Line",
+                ],
+            ), // 231
+            (
+                Law::OrderCardinality,
+                [
+                    "Incidence",
+                    "associativity",
+                    "Line",
+                    "identity",
+                    "Adjacency",
+                ],
+            ), // 312
+            (
+                Law::Interaction,
+                [
+                    "Line",
+                    "associativity",
+                    "Incidence",
+                    "composition",
+                    "Adjacency",
+                ],
+            ), // 132
+            (
+                Law::Concentration,
+                [
+                    "Adjacency",
+                    "identity",
+                    "Line",
+                    "associativity",
+                    "Incidence",
+                ],
+            ), // 213
+            (
+                Law::Freedom,
+                ["Incidence", "composition", "Adjacency", "identity", "Line"],
+            ), // 321
         ];
         for (law, sentence) in expect {
             let walk = law.read_walk(&nodes, &edges);
-            assert_eq!(&walk[0..5], &sentence[..], "law {law:?} graph-triad reading");
+            assert_eq!(
+                &walk[0..5],
+                &sentence[..],
+                "law {law:?} graph-triad reading"
+            );
         }
     }
 }

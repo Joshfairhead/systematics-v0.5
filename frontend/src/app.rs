@@ -48,8 +48,8 @@ pub enum CanvasMode {
 /// (key `"nullad"`), prepended in the selector — the unbounded "all", which has
 /// no single system to render or filter to.
 const ORDER_KEYS: [&str; 12] = [
-    "monad", "dyad", "triad", "tetrad", "pentad", "hexad", "heptad", "octad",
-    "ennead", "decad", "undecad", "dodecad",
+    "monad", "dyad", "triad", "tetrad", "pentad", "hexad", "heptad", "octad", "ennead", "decad",
+    "undecad", "dodecad",
 ];
 
 /// The index of edge `(base,target)` in canonical K_n edge order (1,2),(1,3),(2,3),…
@@ -230,10 +230,19 @@ impl ApiApp {
             .iter()
             .find(|s| s.system_id == id)
             .map(|s| s.order_cardinality)
-            .or_else(|| self.instance_systems.iter().find(|s| s.id == id).map(|s| s.order_cardinality))
+            .or_else(|| {
+                self.instance_systems
+                    .iter()
+                    .find(|s| s.id == id)
+                    .map(|s| s.order_cardinality)
+            })
     }
     /// The sequence member (system id) whose resolved order_cardinality matches, if any.
-    fn sequence_member_for_order(&self, members: &[String], order_cardinality: i32) -> Option<String> {
+    fn sequence_member_for_order(
+        &self,
+        members: &[String],
+        order_cardinality: i32,
+    ) -> Option<String> {
         members
             .iter()
             .filter_map(|m| m.strip_prefix("system:"))
@@ -323,7 +332,10 @@ impl Component for ApiApp {
             let link_kb = ctx.link().clone();
             let closure = wasm_bindgen::closure::Closure::<dyn FnMut(web_sys::KeyboardEvent)>::new(
                 move |e: web_sys::KeyboardEvent| {
-                    if let Some(t) = e.target().and_then(|t| t.dyn_into::<web_sys::HtmlElement>().ok()) {
+                    if let Some(t) = e
+                        .target()
+                        .and_then(|t| t.dyn_into::<web_sys::HtmlElement>().ok())
+                    {
                         let tag = t.tag_name().to_lowercase();
                         if tag == "input" || tag == "textarea" || t.is_content_editable() {
                             return;
@@ -335,10 +347,8 @@ impl Component for ApiApp {
                 },
             );
             if let Some(win) = web_sys::window() {
-                let _ = win.add_event_listener_with_callback(
-                    "keydown",
-                    closure.as_ref().unchecked_ref(),
-                );
+                let _ = win
+                    .add_event_listener_with_callback("keydown", closure.as_ref().unchecked_ref());
             }
             closure.forget();
         }
@@ -416,7 +426,9 @@ impl Component for ApiApp {
                 // shows the rest. On a miss we stay in the monad (don't fall back to canonical).
                 if let Some(members) = self.active_sequence.clone() {
                     if let Some(order_cardinality) = order_for_key(&name) {
-                        if let Some(id) = self.sequence_member_for_order(&members, order_cardinality) {
+                        if let Some(id) =
+                            self.sequence_member_for_order(&members, order_cardinality)
+                        {
                             // Focus this order: load its system onto the canvas (monad→K1,
                             // dyad→K2, …). Stay in the current view — in the list the header
                             // filters (monad = all, order k = its members), in the graph the
@@ -427,8 +439,12 @@ impl Component for ApiApp {
                             let client = self.graphql_client.clone();
                             spawn_local(async move {
                                 match client.fetch_rendered_by_id(&id).await {
-                                    Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
-                                    Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
+                                    Ok(system) => {
+                                        link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)))
+                                    }
+                                    Err(e) => {
+                                        link.send_message(ApiAppMsg::LoadError(e.to_string()))
+                                    }
                                 }
                             });
                             return true;
@@ -519,7 +535,12 @@ impl Component for ApiApp {
                 );
                 for sys in &systems {
                     web_sys::console::log_1(
-                        &format!("  - order_cardinality {} ({})", sys.order_cardinality, sys.display_name()).into(),
+                        &format!(
+                            "  - order_cardinality {} ({})",
+                            sys.order_cardinality,
+                            sys.display_name()
+                        )
+                        .into(),
                     );
                 }
 
@@ -683,7 +704,10 @@ impl Component for ApiApp {
                 let link = ctx.link().clone();
                 let client = self.graphql_client.clone();
                 spawn_local(async move {
-                    match client.join_systems(&req.name, req.members, sequence_ref).await {
+                    match client
+                        .join_systems(&req.name, req.members, sequence_ref)
+                        .await
+                    {
                         Ok(sys) => {
                             link.send_message(ApiAppMsg::MonadExtracted(format!(
                                 "Joined “{}” → {} (order_cardinality {})",
@@ -732,8 +756,9 @@ impl Component for ApiApp {
                                 link.send_message(ApiAppMsg::SequencesLoaded(seqs));
                             }
                         }
-                        Err(e) => link
-                            .send_message(ApiAppMsg::MonadExtracted(format!("Decompose failed: {e}"))),
+                        Err(e) => link.send_message(ApiAppMsg::MonadExtracted(format!(
+                            "Decompose failed: {e}"
+                        ))),
                     }
                 });
                 true
@@ -761,7 +786,9 @@ impl Component for ApiApp {
                     let client = self.graphql_client.clone();
                     spawn_local(async move {
                         match client.fetch_rendered_by_id(&id).await {
-                            Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                            Ok(system) => {
+                                link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)))
+                            }
                             Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
                         }
                     });
@@ -803,7 +830,11 @@ impl Component for ApiApp {
                 // — see the `is_blank` branch of `EditValue`. So toggling Update and backing
                 // out leaves no stray system.
                 let entering = self.canvas_mode == CanvasMode::Viewing;
-                self.canvas_mode = if entering { CanvasMode::Editing } else { CanvasMode::Viewing };
+                self.canvas_mode = if entering {
+                    CanvasMode::Editing
+                } else {
+                    CanvasMode::Viewing
+                };
                 if entering {
                     self.show_canonical = false;
                 }
@@ -840,7 +871,10 @@ impl Component for ApiApp {
                 // If the focused system was just deleted, drop it — otherwise its
                 // nodes/edges (derived from `selected_system`) linger as list rows.
                 if let Some(sys) = &self.selected_system {
-                    if addrs.iter().any(|a| a == &format!("system:{}", sys.system_id)) {
+                    if addrs
+                        .iter()
+                        .any(|a| a == &format!("system:{}", sys.system_id))
+                    {
                         self.selected_system = None;
                         self.breadcrumbs.clear();
                     }
@@ -901,7 +935,9 @@ impl Component for ApiApp {
                             )));
                             // Load the authored system so the graph updates to it.
                             match client.fetch_rendered_by_id(&sys.id).await {
-                                Ok(system) => link.send_message(ApiAppMsg::SystemLoaded(Box::new(system))),
+                                Ok(system) => {
+                                    link.send_message(ApiAppMsg::SystemLoaded(Box::new(system)))
+                                }
                                 Err(e) => link.send_message(ApiAppMsg::LoadError(e.to_string())),
                             }
                             // Refetch so the new system appears in the Nullad table.
@@ -943,7 +979,11 @@ impl Component for ApiApp {
                             }
                             self.next_sketch_name()
                         }
-                        GraphEdit::Connective { base, target, value } => {
+                        GraphEdit::Connective {
+                            base,
+                            target,
+                            value,
+                        } => {
                             if let Some(i) = edge_index(order, *base, *target) {
                                 if i < connectives.len() {
                                     connectives[i] = value.clone();
@@ -964,8 +1004,9 @@ impl Component for ApiApp {
                                     link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
                                 }
                             }
-                            Err(e) => link
-                                .send_message(ApiAppMsg::MonadExtracted(format!("Create failed: {e}"))),
+                            Err(e) => link.send_message(ApiAppMsg::MonadExtracted(format!(
+                                "Create failed: {e}"
+                            ))),
                         }
                     });
                     return false;
@@ -980,7 +1021,13 @@ impl Component for ApiApp {
                 let mut conns: Vec<(i32, i32, String)> = system
                     .connectives
                     .iter()
-                    .map(|c| (c.base_ordinality, c.target_ordinality, c.character_value.clone()))
+                    .map(|c| {
+                        (
+                            c.base_ordinality,
+                            c.target_ordinality,
+                            c.character_value.clone(),
+                        )
+                    })
                     .collect();
                 conns.sort_by_key(|(b, t, _)| (*b, *t));
 
@@ -999,7 +1046,11 @@ impl Component for ApiApp {
                             }
                         }
                     }
-                    GraphEdit::Connective { base, target, value } => {
+                    GraphEdit::Connective {
+                        base,
+                        target,
+                        value,
+                    } => {
                         let (lo, hi) = ((*base).min(*target), (*base).max(*target));
                         for slot in conns.iter_mut() {
                             if slot.0.min(slot.1) == lo && slot.0.max(slot.1) == hi {
@@ -1028,9 +1079,13 @@ impl Component for ApiApp {
                 let client = self.graphql_client.clone();
                 spawn_local(async move {
                     let result = if is_instance {
-                        client.edit_system(&old_id, &new_name, order, terms, connectives).await
+                        client
+                            .edit_system(&old_id, &new_name, order, terms, connectives)
+                            .await
                     } else {
-                        client.author_system(&new_name, order, terms, connectives).await
+                        client
+                            .author_system(&new_name, order, terms, connectives)
+                            .await
                     };
                     match result {
                         Ok(sys) => {
@@ -1041,9 +1096,8 @@ impl Component for ApiApp {
                                 link.send_message(ApiAppMsg::InstanceSystemsLoaded(instances));
                             }
                         }
-                        Err(e) => {
-                            link.send_message(ApiAppMsg::MonadExtracted(format!("Update failed: {e}")))
-                        }
+                        Err(e) => link
+                            .send_message(ApiAppMsg::MonadExtracted(format!("Update failed: {e}"))),
                     }
                 });
                 false
@@ -1073,7 +1127,11 @@ impl Component for ApiApp {
             .map(|s| SystemTemplate {
                 order_cardinality: s.order_cardinality,
                 terms: s.terms.iter().map(|t| t.value.clone()).collect(),
-                connectives: s.connectives.iter().map(|c| c.character_value.clone()).collect(),
+                connectives: s
+                    .connectives
+                    .iter()
+                    .map(|c| c.character_value.clone())
+                    .collect(),
             })
             .collect();
         // ALL systems as table rows: canonical (from the loaded set) + instance
@@ -1090,7 +1148,10 @@ impl Component for ApiApp {
                 terms: s
                     .terms
                     .iter()
-                    .map(|t| PositionedChar { value: t.value.clone(), ordinality: t.ordinality.to_string() })
+                    .map(|t| PositionedChar {
+                        value: t.value.clone(),
+                        ordinality: t.ordinality.to_string(),
+                    })
                     .collect(),
                 connectives: s
                     .connectives
@@ -1153,7 +1214,8 @@ impl Component for ApiApp {
         // inside a monad when the filter has more than one candidate to move between.
         let on_step_up = ctx.link().callback(|_| ApiAppMsg::StepInScope(-1));
         let on_step_down = ctx.link().callback(|_| ApiAppMsg::StepInScope(1));
-        let show_canvas_nav = self.active_sequence.is_some() && self.scoped_filtered_ids().len() > 1;
+        let show_canvas_nav =
+            self.active_sequence.is_some() && self.scoped_filtered_ids().len() > 1;
 
         html! {
             <div class="app">
@@ -1293,4 +1355,3 @@ impl Component for ApiApp {
         }
     }
 }
-

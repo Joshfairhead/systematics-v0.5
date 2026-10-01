@@ -9,7 +9,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::vocabularies::{Geometry, Vocabulary, Topology};
+use super::vocabularies::{Geometry, Topology, Vocabulary};
 
 /// The complete graph `K_n` for one OrderCardinality.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -336,7 +336,7 @@ mod tests {
         assert_eq!(t.order_cardinality(), 4); // vertices
         assert_eq!(t.degree(), 3); // each vertex joins the other 3
         assert_eq!(t.size(), 6); // C(4,2) edges
-        // the monad edge-cases: no edges, degree 0
+                                 // the monad edge-cases: no edges, degree 0
         let m = Template::for_order(1);
         assert_eq!(m.degree(), 0);
         assert_eq!(m.size(), 0);
@@ -356,10 +356,7 @@ mod tests {
     fn test_adjacency_matrix_is_complete() {
         // K_3: all-1s off the diagonal, 0 on it.
         let a = Template::for_order(3).adjacency_matrix();
-        assert_eq!(
-            a,
-            vec![vec![0, 1, 1], vec![1, 0, 1], vec![1, 1, 0]]
-        );
+        assert_eq!(a, vec![vec![0, 1, 1], vec![1, 0, 1], vec![1, 1, 0]]);
     }
 
     #[test]
@@ -404,7 +401,7 @@ mod tests {
         // legal edges of K_3 (all off-diagonal pairs).
         assert!(k3.admits_edge(1, 2) && k3.admits_edge(1, 3) && k3.admits_edge(2, 3));
         assert!(k3.admits_edge(2, 1)); // order_cardinality-independent (undirected)
-        // ungrammatical: self-loop (on the diagonal → A = 0) and out-of-range.
+                                       // ungrammatical: self-loop (on the diagonal → A = 0) and out-of-range.
         assert!(!k3.admits_edge(1, 1));
         assert!(!k3.admits_edge(1, 4));
         assert!(!k3.admits_edge(0, 2));

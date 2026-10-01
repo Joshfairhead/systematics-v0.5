@@ -30,9 +30,27 @@ async fn substrate_composed_triad_view_is_byte_identical() {
     // Terms — composed by the substrate, in ordinality orderCardinality.
     let terms = sys["terms"].as_array().unwrap();
     assert_eq!(terms.len(), 3);
-    assert_eq!((terms[0]["ordinality"].as_i64().unwrap(), terms[0]["value"].as_str().unwrap()), (1, "Will"));
-    assert_eq!((terms[1]["ordinality"].as_i64().unwrap(), terms[1]["value"].as_str().unwrap()), (2, "Function"));
-    assert_eq!((terms[2]["ordinality"].as_i64().unwrap(), terms[2]["value"].as_str().unwrap()), (3, "Being"));
+    assert_eq!(
+        (
+            terms[0]["ordinality"].as_i64().unwrap(),
+            terms[0]["value"].as_str().unwrap()
+        ),
+        (1, "Will")
+    );
+    assert_eq!(
+        (
+            terms[1]["ordinality"].as_i64().unwrap(),
+            terms[1]["value"].as_str().unwrap()
+        ),
+        (2, "Function")
+    );
+    assert_eq!(
+        (
+            terms[2]["ordinality"].as_i64().unwrap(),
+            terms[2]["value"].as_str().unwrap()
+        ),
+        (3, "Being")
+    );
 
     // Connectives — canonical edge orderCardinality, with the legacy `line_{n}_{a}_{b}` ids the
     // frontend depends on, and the character values on the right edges.

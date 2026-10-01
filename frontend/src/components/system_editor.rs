@@ -23,7 +23,12 @@ pub struct SystemEditorProps {
 pub fn system_editor(props: &SystemEditorProps) -> Html {
     let sys = &props.system;
     let name = use_state(|| sys.name.clone());
-    let terms = use_state(|| sys.terms.iter().map(|t| t.value.clone()).collect::<Vec<String>>());
+    let terms = use_state(|| {
+        sys.terms
+            .iter()
+            .map(|t| t.value.clone())
+            .collect::<Vec<String>>()
+    });
     let conns = use_state(|| {
         sys.connectives
             .iter()
@@ -33,7 +38,9 @@ pub fn system_editor(props: &SystemEditorProps) -> Html {
 
     let on_name = {
         let name = name.clone();
-        Callback::from(move |e: InputEvent| name.set(e.target_unchecked_into::<HtmlInputElement>().value()))
+        Callback::from(move |e: InputEvent| {
+            name.set(e.target_unchecked_into::<HtmlInputElement>().value())
+        })
     };
     // An input bound to index `i` of a Vec<String> state.
     let vec_input = |state: &UseStateHandle<Vec<String>>, i: usize| -> Html {
@@ -52,7 +59,12 @@ pub fn system_editor(props: &SystemEditorProps) -> Html {
 
     let order_cardinality = sys.order_cardinality;
     let on_save = {
-        let (on_author, name, terms, conns) = (props.on_author.clone(), name.clone(), terms.clone(), conns.clone());
+        let (on_author, name, terms, conns) = (
+            props.on_author.clone(),
+            name.clone(),
+            terms.clone(),
+            conns.clone(),
+        );
         Callback::from(move |_: MouseEvent| {
             on_author.emit(AuthorRequest {
                 name: (*name).clone(),

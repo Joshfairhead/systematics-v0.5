@@ -9,10 +9,19 @@ use crate::api::client::ReferenceView;
 /// value applied (Store = write, overwrite), which also updates the list view.
 #[derive(Clone, PartialEq, Debug)]
 pub enum GraphEdit {
-    Term { ordinality: i32, value: String },
-    Connective { base: i32, target: i32, value: String },
+    Term {
+        ordinality: i32,
+        value: String,
+    },
+    Connective {
+        base: i32,
+        target: i32,
+        value: String,
+    },
     /// Rename the system (re-author under the new name; the parent deletes the old).
-    Name { value: String },
+    Name {
+        value: String,
+    },
 }
 
 /// Default colors for rendering
@@ -135,8 +144,10 @@ impl Component for ApiGraphView {
                                 .connectives
                                 .iter()
                                 .find(|c| {
-                                    (c.base_ordinality.min(c.target_ordinality),
-                                     c.base_ordinality.max(c.target_ordinality)) == (b, t)
+                                    (
+                                        c.base_ordinality.min(c.target_ordinality),
+                                        c.base_ordinality.max(c.target_ordinality),
+                                    ) == (b, t)
                                 })
                                 .map(|c| c.character_value.clone())
                                 .unwrap_or_default()
@@ -169,7 +180,9 @@ impl Component for ApiGraphView {
                 if let Some(cb) = ctx.props().on_edit_value.clone() {
                     if self.renaming {
                         if !self.draft.trim().is_empty() {
-                            cb.emit(GraphEdit::Name { value: self.draft.trim().to_string() });
+                            cb.emit(GraphEdit::Name {
+                                value: self.draft.trim().to_string(),
+                            });
                         }
                     } else if let Some(idx) = self.selected_node {
                         cb.emit(GraphEdit::Term {
@@ -272,11 +285,12 @@ impl Component for ApiGraphView {
         // The edge-labels switch reads the system's connective designation
         // (Acts / Interplays / Mutualities …). Beyond the octad (orders 9–12) the
         // designation is still being researched, so fall back to a generic "Connectives".
-        let edge_label = if system.order_cardinality >= 9 || system.connective_designation.is_empty() {
-            "Connectives".to_string()
-        } else {
-            system.connective_designation.clone()
-        };
+        let edge_label =
+            if system.order_cardinality >= 9 || system.connective_designation.is_empty() {
+                "Connectives".to_string()
+            } else {
+                system.connective_designation.clone()
+            };
 
         // The shared inline input panel (draft + Save/Cancel) for a labelled edit.
         let input_panel = |label: String, draft: String| -> Html {
@@ -305,7 +319,10 @@ impl Component for ApiGraphView {
             } else {
                 self.selected_node
                     .map(|idx| format!("{} {}", system.term_designation, idx + 1))
-                    .or_else(|| self.selected_edge.map(|(a, b)| format!("edge {}–{}", a + 1, b + 1)))
+                    .or_else(|| {
+                        self.selected_edge
+                            .map(|(a, b)| format!("edge {}–{}", a + 1, b + 1))
+                    })
             };
             match target {
                 Some(label) => input_panel(format!("Update {label}"), self.draft.clone()),

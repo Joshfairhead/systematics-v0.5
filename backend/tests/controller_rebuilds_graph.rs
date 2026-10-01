@@ -20,7 +20,9 @@ fn controller_rebuilds_the_topology_of_every_seeded_order() {
     for order_cardinality in 1..=12u8 {
         let topo = graph
             .topology_for_order(order_cardinality)
-            .unwrap_or_else(|| panic!("order_cardinality {order_cardinality} has a seeded topology"));
+            .unwrap_or_else(|| {
+                panic!("order_cardinality {order_cardinality} has a seeded topology")
+            });
 
         // Ground truth from the seeded topological vocabulary: points → vertex
         // positions, lines (`line_{order_cardinality}_{lo}_{hi}`) → undirected edges.
@@ -45,8 +47,14 @@ fn controller_rebuilds_the_topology_of_every_seeded_order() {
         let mut rb_edges: Vec<(u8, u8)> = rebuilt.links.iter().map(|l| l.endpoints).collect();
         rb_edges.sort_unstable();
 
-        assert_eq!(rb_positions, gt_positions, "order_cardinality {order_cardinality}: vertices must match");
-        assert_eq!(rb_edges, gt_edges, "order_cardinality {order_cardinality}: edges must match");
+        assert_eq!(
+            rb_positions, gt_positions,
+            "order_cardinality {order_cardinality}: vertices must match"
+        );
+        assert_eq!(
+            rb_edges, gt_edges,
+            "order_cardinality {order_cardinality}: edges must match"
+        );
     }
 }
 
@@ -68,7 +76,12 @@ fn controller_rebuilds_term_assignments_beyond_the_triad() {
         if vocab.terms.len() != order_cardinality as usize {
             continue;
         }
-        let value = |cid: &String| graph.character(cid).map(|c| c.value.clone()).unwrap_or_default();
+        let value = |cid: &String| {
+            graph
+                .character(cid)
+                .map(|c| c.value.clone())
+                .unwrap_or_default()
+        };
         let terms: Vec<String> = vocab.terms.iter().map(value).collect();
         let connectives: Vec<String> = vocab.connectives.iter().map(value).collect();
 
@@ -80,7 +93,12 @@ fn controller_rebuilds_term_assignments_beyond_the_triad() {
                 .data
                 .iter()
                 .find(|d| d.id == format!("term_{order_cardinality}_{pos}"))
-                .unwrap_or_else(|| panic!("{} order_cardinality {order_cardinality}: term at {pos}", sys.id));
+                .unwrap_or_else(|| {
+                    panic!(
+                        "{} order_cardinality {order_cardinality}: term at {pos}",
+                        sys.id
+                    )
+                });
             assert_eq!(&anchored.character, term, "{} term at vertex {pos}", sys.id);
             assert!(
                 hg.links.iter().any(|l| {

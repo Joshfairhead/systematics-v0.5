@@ -5,8 +5,8 @@
 //! Vocabularies and one Canonical Perspective per OrderCardinality.
 
 use crate::core::{
-    Entry, Geometry, Template, GraphContent, Graph, Line, OrderCardinality, Point, Ordinality,
-    Segment, Topology,
+    Entry, Geometry, Graph, GraphContent, Line, OrderCardinality, Ordinality, Point, Segment,
+    Template, Topology,
 };
 
 /// The canonical seed content (coordinates, characters, semantic vocabularies,
@@ -109,7 +109,10 @@ fn load_embedded_modules(graph: &mut Graph) -> usize {
                 graph.apply_content(&content);
                 loaded += 1;
             }
-            None => eprintln!("skipped invalid embedded perspective module {}", f.path().display()),
+            None => eprintln!(
+                "skipped invalid embedded perspective module {}",
+                f.path().display()
+            ),
         }
     }
     loaded
@@ -183,7 +186,6 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
     }
 }
 
-
 // =============================================================================
 // Canonical content generator + data tables (test-only).
 //
@@ -193,1383 +195,1647 @@ fn add_substrate_combinatorics(graph: &mut Graph) {
 
 #[cfg(test)]
 mod regen {
-    use crate::core::{Character, Coordinate, GraphContent, Point3d, Vocabulary, System};
+    use crate::core::{Character, Coordinate, GraphContent, Point3d, System, Vocabulary};
 
-/// Build the canonical data layer from the Rust tables. This is the generator
-/// behind `data/canonical.json`; at runtime the JSON is loaded instead.
-pub fn build_canonical_from_tables() -> GraphContent {
-    let mut content = GraphContent::default();
-    let mut have_char = std::collections::HashSet::new();
+    /// Build the canonical data layer from the Rust tables. This is the generator
+    /// behind `data/canonical.json`; at runtime the JSON is loaded instead.
+    pub fn build_canonical_from_tables() -> GraphContent {
+        let mut content = GraphContent::default();
+        let mut have_char = std::collections::HashSet::new();
 
-    for order_cardinality in 1..=12u8 {
-        // Coordinates (the geometric values).
-        for (idx, coord) in get_coordinates(order_cardinality).iter().enumerate() {
-            content
-                .coordinates
-                .push(Coordinate::from_point3d(order_cardinality, (idx + 1) as u8, *coord));
+        for order_cardinality in 1..=12u8 {
+            // Coordinates (the geometric values).
+            for (idx, coord) in get_coordinates(order_cardinality).iter().enumerate() {
+                content.coordinates.push(Coordinate::from_point3d(
+                    order_cardinality,
+                    (idx + 1) as u8,
+                    *coord,
+                ));
+            }
+
+            // Word triad: term/connective Characters + Vocabulary + System.
+            push_triadic_system(
+                &mut content,
+                &mut have_char,
+                &format!("Canonical {}", canonical_system_name(order_cardinality)),
+                order_cardinality,
+                &get_term_character_slugs(order_cardinality),
+                &get_canonical_connective_slugs(order_cardinality),
+            );
+
+            // Hex colour characters + the canonical colour Vocabulary.
+            let hex_codes = get_colours(order_cardinality);
+            let mut colour_ids = Vec::new();
+            for hex in &hex_codes {
+                let id = format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase());
+                if have_char.insert(id.clone()) {
+                    content
+                        .characters
+                        .push(Character::new(id.clone(), "hex", hex.to_string()));
+                }
+                colour_ids.push(id);
+            }
+            content.vocabularies.push(Vocabulary::with_auto_id(
+                format!(
+                    "Canonical Colours {}",
+                    canonical_system_name(order_cardinality)
+                ),
+                order_cardinality,
+                colour_ids,
+                vec![],
+            ));
         }
 
-        // Word triad: term/connective Characters + Vocabulary + System.
-        push_triadic_system(
-            &mut content,
-            &mut have_char,
-            &format!("Canonical {}", canonical_system_name(order_cardinality)),
-            order_cardinality,
-            &get_term_character_slugs(order_cardinality),
-            &get_canonical_connective_slugs(order_cardinality),
-        );
+        content
+    }
 
-        // Hex colour characters + the canonical colour Vocabulary.
-        let hex_codes = get_colours(order_cardinality);
-        let mut colour_ids = Vec::new();
-        for hex in &hex_codes {
-            let id = format!("char_hex_{}", hex.trim_start_matches('#').to_lowercase());
+    /// Shared construction primitive: push term/connective word Characters, then a
+    /// `Vocabulary` and a `System` over `grammar_{order_cardinality}`, with metadata inherited
+    /// from the order_cardinality. Reused for every canonical order_cardinality AND the Citation triad — the
+    /// homoiconic bootstrap: the same builder that makes any system makes the system
+    /// that *describes* citation.
+    fn push_triadic_system(
+        content: &mut GraphContent,
+        have_char: &mut std::collections::HashSet<String>,
+        name: &str,
+        order_cardinality: u8,
+        term_slugs: &[String],
+        connective_slugs: &[String],
+    ) {
+        for slug in term_slugs.iter().chain(connective_slugs.iter()) {
+            let id = format!("char_word_{}", slug);
             if have_char.insert(id.clone()) {
                 content
                     .characters
-                    .push(Character::new(id.clone(), "hex", hex.to_string()));
+                    .push(Character::new(id, "word", word_from_slug(slug)));
             }
-            colour_ids.push(id);
         }
-        content.vocabularies.push(Vocabulary::with_auto_id(
-            format!("Canonical Colours {}", canonical_system_name(order_cardinality)),
+        let term_char_ids: Vec<String> = term_slugs
+            .iter()
+            .map(|s| format!("char_word_{}", s))
+            .collect();
+        let connective_char_ids: Vec<String> = connective_slugs
+            .iter()
+            .map(|s| format!("char_word_{}", s))
+            .collect();
+        let vocab =
+            Vocabulary::with_auto_id(name, order_cardinality, term_char_ids, connective_char_ids);
+        let vocab_id = vocab.id.clone();
+        content.vocabularies.push(vocab);
+        content.systems.push(System::with_auto_id(
+            name,
             order_cardinality,
-            colour_ids,
-            vec![],
+            canonical_coherence(order_cardinality),
+            canonical_term_designation(order_cardinality),
+            canonical_connective_designation(order_cardinality),
+            format!("grammar_{}", order_cardinality),
+            &vocab_id,
         ));
     }
 
-    content
-}
-
-/// Shared construction primitive: push term/connective word Characters, then a
-/// `Vocabulary` and a `System` over `grammar_{order_cardinality}`, with metadata inherited
-/// from the order_cardinality. Reused for every canonical order_cardinality AND the Citation triad — the
-/// homoiconic bootstrap: the same builder that makes any system makes the system
-/// that *describes* citation.
-fn push_triadic_system(
-    content: &mut GraphContent,
-    have_char: &mut std::collections::HashSet<String>,
-    name: &str,
-    order_cardinality: u8,
-    term_slugs: &[String],
-    connective_slugs: &[String],
-) {
-    for slug in term_slugs.iter().chain(connective_slugs.iter()) {
-        let id = format!("char_word_{}", slug);
-        if have_char.insert(id.clone()) {
-            content
-                .characters
-                .push(Character::new(id, "word", word_from_slug(slug)));
-        }
+    /// Build the Citation triad as its own content bundle (`data/citation.json`):
+    /// **Source / Artefact / Lookup** as the three impulses of a K3, with the
+    /// **citation-query** edges (user, 2026-08-18): the three connectives are
+    /// **Search · Sort · Filter**, in canonical edge order_cardinality over nodes
+    /// 1=source · 2=artefact · 3=lookup — (1,2) source–artefact = **Sort**,
+    /// (1,3) source–lookup = **Search**, (2,3) artefact–lookup = **Filter**.
+    /// Metadata inherits order_cardinality 3 (Dynamism / Impulses / Acts).
+    pub fn build_citation_from_tables() -> GraphContent {
+        let mut content = GraphContent::default();
+        let mut have_char = std::collections::HashSet::new();
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Citation",
+            3,
+            &[
+                "source".to_string(),
+                "artefact".to_string(),
+                "lookup".to_string(),
+            ],
+            &[
+                "sort".to_string(),
+                "search".to_string(),
+                "filter".to_string(),
+            ],
+        );
+        content
     }
-    let term_char_ids: Vec<String> = term_slugs.iter().map(|s| format!("char_word_{}", s)).collect();
-    let connective_char_ids: Vec<String> = connective_slugs
-        .iter()
-        .map(|s| format!("char_word_{}", s))
-        .collect();
-    let vocab = Vocabulary::with_auto_id(name, order_cardinality, term_char_ids, connective_char_ids);
-    let vocab_id = vocab.id.clone();
-    content.vocabularies.push(vocab);
-    content.systems.push(System::with_auto_id(
-        name,
-        order_cardinality,
-        canonical_coherence(order_cardinality),
-        canonical_term_designation(order_cardinality),
-        canonical_connective_designation(order_cardinality),
-        format!("grammar_{}", order_cardinality),
-        &vocab_id,
-    ));
-}
 
-/// Build the Citation triad as its own content bundle (`data/citation.json`):
-/// **Source / Artefact / Lookup** as the three impulses of a K3, with the
-/// **citation-query** edges (user, 2026-08-18): the three connectives are
-/// **Search · Sort · Filter**, in canonical edge order_cardinality over nodes
-/// 1=source · 2=artefact · 3=lookup — (1,2) source–artefact = **Sort**,
-/// (1,3) source–lookup = **Search**, (2,3) artefact–lookup = **Filter**.
-/// Metadata inherits order_cardinality 3 (Dynamism / Impulses / Acts).
-pub fn build_citation_from_tables() -> GraphContent {
-    let mut content = GraphContent::default();
-    let mut have_char = std::collections::HashSet::new();
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Citation",
-        3,
-        &["source".to_string(), "artefact".to_string(), "lookup".to_string()],
-        &["sort".to_string(), "search".to_string(), "filter".to_string()],
-    );
-    content
-}
-
-/// Small helper: `Vec<String>` from string literals, for readability below.
-fn slugs(xs: &[&str]) -> Vec<String> {
-    xs.iter().map(|s| s.to_string()).collect()
-}
-
-/// `C(order_cardinality, 2)` placeholder edge slugs for a `K_order` whose connectives aren't
-/// yet named (used by the architecture/graph-theory scaffold systems).
-fn edge_slugs(prefix: &str, order_cardinality: usize) -> Vec<String> {
-    let count = order_cardinality * order_cardinality.saturating_sub(1) / 2;
-    (1..=count).map(|i| format!("{prefix}_edge_{i}")).collect()
-}
-
-/// Seed a metadata **dodecad** by **composing it from the single source**
-/// (`core::hexadicsystems`): each of the 12 terms takes the *exact* facet value for
-/// its ordinality, so the dodecad can never drift from the hexad. The hexad module is
-/// primordial (the seed) and *composes* the dodecads — not the reverse (reading the
-/// in-graph dodecads at seed time would be circular, since seeding each dodecad calls
-/// `canonical_*`). Char-id slugs are disambiguated where a value repeats ("Needs
-/// Research" at 9–12); the character *value* stays the exact hexadic string.
-/// Connectives are placeholder edges.
-fn push_metadata_dodecad(
-    content: &mut GraphContent,
-    have_char: &mut std::collections::HashSet<String>,
-    name: &str,
-    edge_prefix: &str,
-    facet: impl Fn(u8) -> &'static str,
-) {
-    let mut seen: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
-    let mut term_char_ids = Vec::with_capacity(12);
-    for n in 1..=12u8 {
-        let value = facet(n);
-        let base = value.to_lowercase().replace(' ', "_").replace('-', "_");
-        let count = seen.entry(base.clone()).or_insert(0);
-        *count += 1;
-        let slug = if *count == 1 { base } else { format!("{base}_{n}") };
-        let id = format!("char_word_{slug}");
-        if have_char.insert(id.clone()) {
-            content.characters.push(Character::new(id.clone(), "word", value));
-        }
-        term_char_ids.push(id);
+    /// Small helper: `Vec<String>` from string literals, for readability below.
+    fn slugs(xs: &[&str]) -> Vec<String> {
+        xs.iter().map(|s| s.to_string()).collect()
     }
-    let mut connective_char_ids = Vec::new();
-    for slug in edge_slugs(edge_prefix, 12) {
-        let id = format!("char_word_{slug}");
-        if have_char.insert(id.clone()) {
-            content
-                .characters
-                .push(Character::new(id.clone(), "word", word_from_slug(&slug)));
-        }
-        connective_char_ids.push(id);
+
+    /// `C(order_cardinality, 2)` placeholder edge slugs for a `K_order` whose connectives aren't
+    /// yet named (used by the architecture/graph-theory scaffold systems).
+    fn edge_slugs(prefix: &str, order_cardinality: usize) -> Vec<String> {
+        let count = order_cardinality * order_cardinality.saturating_sub(1) / 2;
+        (1..=count).map(|i| format!("{prefix}_edge_{i}")).collect()
     }
-    let vocab = Vocabulary::with_auto_id(name, 12, term_char_ids, connective_char_ids);
-    let vocab_id = vocab.id.clone();
-    content.vocabularies.push(vocab);
-    content.systems.push(System::with_auto_id(
-        name,
-        12,
-        canonical_coherence(12),
-        canonical_term_designation(12),
-        canonical_connective_designation(12),
-        "grammar_12".to_string(),
-        &vocab_id,
-    ));
-}
 
-/// Build the author-contributed and systematics-core **fragments** as their own
-/// bundle (`data/fragments.json`). Source of the author triads: **Josh Fairhead**
-/// (see `docs/fragments.md`). Each is a real K_n system (terms + named/placeholder
-/// connectives) so it resolves in the graph; metadata inherits the canonical order_cardinality.
-///
-/// Maths triad term positions (theorems=1, lemmas=2, proofs=3) fix the named edges
-/// onto the K3 lines (1,2)(1,3)(2,3): bili · φ · Fibonacci. The Determining-
-/// Conditions tetrad is K4 (4 dimensions, 6 laws as its 6 edges — assignment TBD).
-pub fn build_fragments_from_tables() -> GraphContent {
-    let mut content = GraphContent::default();
-    let mut have_char = std::collections::HashSet::new();
-
-    // Impulse → ordinality convention: **pos1 = + (affirming), pos2 = − (denying),
-    // pos3 = = (reconciling)** — fixed by the confirmed-correct Maths sub-triad.
-
-    // Root triad: Aesthetics (+) · Maths (−) · Harmony (=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Aesthetics Maths Harmony",
-        3,
-        &slugs(&["aesthetics", "maths", "harmony"]),
-        &slugs(&["ahm_edge_1", "ahm_edge_2", "ahm_edge_3"]),
-    );
-    // Aesthetics → Unity (+) · Variety (−) · Form (=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Aesthetics",
-        3,
-        &slugs(&["unity", "variety", "form"]),
-        &slugs(&["aesthetics_edge_1", "aesthetics_edge_2", "aesthetics_edge_3"]),
-    );
-    // Harmony → Inevitability (+) · Economy (−) · Proportion (=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Harmony",
-        3,
-        &slugs(&["inevitability", "economy", "proportion"]),
-        &slugs(&["harmony_edge_1", "harmony_edge_2", "harmony_edge_3"]),
-    );
-    // Maths → Theorems (+) · Lemmas (−) · Proofs (=); named edges on lines
-    // (1,2)=bili, (1,3)=φ, (2,3)=Fibonacci.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Maths",
-        3,
-        &slugs(&["theorems", "lemmas", "proofs"]),
-        &slugs(&["bili", "phi", "fibonacci"]),
-    );
-    // Life triad (not architectural; perspective/tag = "life") — Health (+) ·
-    // Wealth (−) · Wisdom (=). Source: Josh Fairhead.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Life",
-        3,
-        &slugs(&["health", "wealth", "wisdom"]),
-        &slugs(&["life_edge_1", "life_edge_2", "life_edge_3"]),
-    );
-    // Determining Conditions of science — a K4 tetrad: Time (Chronos) · Hyparxis ·
-    // Eternity (Aionios) · Space; the 6 laws as its 6 edges. (Positioning WIP.)
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Determining Conditions",
-        4,
-        &slugs(&["time", "hyparxis", "eternity", "space"]),
-        &slugs(&[
-            "statistical",
-            "correspondence",
-            "classification",
-            "conservation",
-            "irreversibility",
-            "coexistence",
-        ]),
-    );
-
-    // ---- Architecture-project WIP fragments (documented in-graph) ----
-
-    // AD4M Perspective tetrad [WIP]: Perspective · Subject · Predicate · Object.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "AD4M Perspective",
-        4,
-        &slugs(&["perspective", "subject", "predicate", "object"]),
-        &slugs(&["ad4m_edge_1", "ad4m_edge_2", "ad4m_edge_3", "ad4m_edge_4", "ad4m_edge_5", "ad4m_edge_6"]),
-    );
-    // Perspective triad [WIP] — subject · predicate · object are the three EDGES
-    // (a triple's roles); the three nodes are TBD (perspective parts).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Perspective",
-        3,
-        &slugs(&["perspective_node_1", "perspective_node_2", "perspective_node_3"]),
-        &slugs(&["subject", "predicate", "object"]),
-    );
-    // OrderCardinality · Ordinality · Location triad [WIP] — the topological anchor. `order_cardinality ×
-    // ordinality = location`; most triples attach to a location (e.g. Location ·
-    // Term-character · Source; Lines = Location · Connection · Location). May fold
-    // into a pentad.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "OrderCardinality Ordinality Location",
-        3,
-        &slugs(&["order_cardinality", "ordinality", "location"]),
-        &slugs(&["opl_edge_1", "opl_edge_2", "opl_edge_3"]),
-    );
-    // Data Object triad [WIP] — the reference triple: key (+) · value (−) ·
-    // reference (=). A key holds many values, each independently referenced (the
-    // basis of #25/#28). Likely a Perspective once sequenced +=− / 132 interaction.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Data Object",
-        3,
-        &slugs(&["key", "value", "reference"]),
-        &slugs(&["do_edge_1", "do_edge_2", "do_edge_3"]),
-    );
-    // Class · Instantiation · Instance triad [WIP] — e.g. K₄ (class) · Tetrad
-    // (instantiation) · Canonical Tetrad (instance).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Class Instantiation Instance",
-        3,
-        &slugs(&["class", "instantiation", "instance"]),
-        &slugs(&["cii_edge_1", "cii_edge_2", "cii_edge_3"]),
-    );
-    // Operations triad [WIP] — ELT: Extract · Load · Transform as the three NODES;
-    // edges TBD. ELT ≅ RAG (data-warehouse ↔ generative-AI): the same isomorphic
-    // triangle; both are *composition*. The 3!=6 permutations = the six laws of three.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Operations",
-        3,
-        &slugs(&["extract", "load", "transform"]),
-        &slugs(&["op_edge_1", "op_edge_2", "op_edge_3"]),
-    );
-    // Composition triad [WIP] — RAG: Retrieve · Augment · Generate as the nodes;
-    // the generative-AI isomorph of ELT (Operations). Both are composition.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Composition",
-        3,
-        &slugs(&["retrieve", "augment", "generate"]),
-        &slugs(&["comp_edge_1", "comp_edge_2", "comp_edge_3"]),
-    );
-    // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order_cardinality 1);
-    // the dyad (key · value) is ALSO called "Data" (data = a key:value tag) and
-    // links to the Data monad. (Two "Data" systems, orders 1 and 2.)
-    push_triadic_system(&mut content, &mut have_char, "Data", 1, &slugs(&["data"]), &slugs(&[]));
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Data",
-        2,
-        &slugs(&["key", "value"]),
-        &slugs(&["key_value_edge"]),
-    );
-
-    // The Data progression as a Sequence: monad → dyad → triad (Data → Data →
-    // ELT). Links the Data monad and dyad (in-graph navigation is design-TBD).
-    content.sequences.push(crate::core::Sequence::new(
-        "sequence_data_progression",
-        "Data",
-        vec![
-            "system:system_data_1".to_string(),
-            "system:system_data_2".to_string(),
-            "system:system_operations_3".to_string(),
-        ],
-    ));
-
-    // The CT monad as a sequence: Monad (1) → {Container · Operations} dyad (2) →
-    // {Identity · Associativity · Composition} triad (3). A monad needs structure
-    // (container) AND process (operations), governed by the three CT axioms.
-    push_triadic_system(&mut content, &mut have_char, "Monad", 1, &slugs(&["monad"]), &slugs(&[]));
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Container Operations",
-        2,
-        &slugs(&["container", "operations"]),
-        &slugs(&["container_operations_edge"]),
-    );
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Identity Associativity Composition",
-        3,
-        &slugs(&["identity", "associativity", "composition"]),
-        &slugs(&["iac_edge_1", "iac_edge_2", "iac_edge_3"]),
-    );
-    content.sequences.push(crate::core::Sequence::new(
-        "sequence_ct_monad",
-        "Monad (CT)",
-        vec![
-            "system:system_monad_1".to_string(),
-            "system:system_container_operations_2".to_string(),
-            "system:system_identity_associativity_composition_3".to_string(),
-        ],
-    ));
-
-    // ---- Author-contributed triads (perspective/tag, not architectural) ----
-
-    // Requests triad [Josh Fairhead] — Ask (+) · Context (−) · Urgency (=): the
-    // shape of a request (what is asked, in what context, at what urgency).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Requests",
-        3,
-        &slugs(&["ask", "context", "urgency"]),
-        &slugs(&["requests_edge_1", "requests_edge_2", "requests_edge_3"]),
-    );
-    // Identification triad [Ouspensky, The Fourth Way] — Like (+) · Dislike (−) ·
-    // Identification (=): like and dislike are both identification. Edges (user,
-    // 2026-08-27), canonical order_cardinality (1,2),(1,3),(2,3): (1,3) Like–Identification =
-    // Attraction, (2,3) Dislike–Identification = Repulsion; (1,2) Like–Dislike TBD.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Identification",
-        3,
-        &slugs(&["like", "dislike", "identification"]),
-        &slugs(&["identification_edge_1", "attraction", "repulsion"]),
-    );
-    // Self-Remembering triad [Ouspensky, The Fourth Way] — Imagination (+) ·
-    // Negative emotion (−) · Identification (=) (user, 2026-08-27; corrected from the
-    // mislabelled "Negative Emotion" layout). Shares the `identification` character
-    // with the Identification triad (same term, reused across systems).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Self Remembering",
-        3,
-        &slugs(&["imagination", "negative_emotion", "identification"]),
-        &slugs(&["sr_edge_1", "sr_edge_2", "sr_edge_3"]),
-    );
-    // Ouspensky tetrad on emotion [The Fourth Way] (user, 2026-08-27): Positive (++) ·
-    // Negative (−−) · Pleasant (+−) · Unpleasant (−+). (`negative_emotion` char reused.)
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Emotion",
-        4,
-        &slugs(&["positive_emotion", "negative_emotion", "pleasant_emotion", "unpleasant_emotion"]),
-        &edge_slugs("emo", 4),
-    );
-
-    // ---- AI-agent harness cluster (user, 2026-08-27) [levelup.gitconnected
-    // "Your AI Agent Isn't Broken, Your Harness Is"]. Assignments TENTATIVE — user
-    // unsure; likely a dodecad to complete from the article's harness components. ----
-    // Harness-engineering triad: Prompt (+, what the model reads) · Context (−, what
-    // enters the window & when) · Harness (=, the full app infrastructure).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Harness Engineering",
-        3,
-        &slugs(&["prompt", "context", "harness"]),
-        &edge_slugs("he", 3),
-    );
-    // Harness loop — the agent's cycle: Act (+) · Think (−) · Observe (=). "All is here."
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Harness Loop",
-        3,
-        &slugs(&["act", "think", "observe"]),
-        &edge_slugs("hl", 3),
-    );
-    // Agent triad — "Agents = Model + Harness": Agent (+) · Harness (−) · Model (=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Agent",
-        3,
-        &slugs(&["agent", "harness", "model"]),
-        &edge_slugs("ag", 3),
-    );
-
-    // ---- Graph-theory / topology scaffold (user, 2026-08-13) [architecture] ----
-    // The construction triad — how we build a system for examining property graphs:
-    // Semantic Projection (+) · Structural Topology (−) · Graph Template (=). Matrix
-    // names (validated 2026-08-26): Line graph (+) · Adjacency graph (−) · Incidence
-    // graph (=). Its edges are the **category-theory axioms**, grounded in incidence
-    // `B` (edge order_cardinality (1,2),(1,3),(2,3) over the nodes above):
-    //   (1,2) Line–Adjacency      = identity      (duals, same up to iso — an orbital)
-    //   (1,3) Line–Incidence      = associativity (A·B = B·L, assoc. of B·Bᵀ·B)
-    //   (2,3) Adjacency–Incidence = composition   (A = B·Bᵀ)
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Graph Construction",
-        3,
-        &slugs(&["semantic_projection", "structural_topology", "graph_template"]),
-        &slugs(&["identity", "associativity", "composition"]),
-    );
-    // The dyad on each construction node: what that impulse defines.
-    // Graph Template (=) → order_cardinality · size.
-    push_triadic_system(&mut content, &mut have_char, "OrderCardinality Size", 2, &slugs(&["order_cardinality", "size"]), &edge_slugs("os", 2));
-    // Structural Topology (−) → vertex · edge (the adjacency pair).
-    push_triadic_system(&mut content, &mut have_char, "Vertex Edge", 2, &slugs(&["vertex", "edge"]), &edge_slugs("ve", 2));
-    // Semantic Projection (+) → term · connective (the characters).
-    push_triadic_system(&mut content, &mut have_char, "Term Connective", 2, &slugs(&["term", "connective"]), &edge_slugs("tc", 2));
-    // Navigation dyad [architecture / graph-theory monad]: path · distance.
-    push_triadic_system(&mut content, &mut have_char, "Path Distance", 2, &slugs(&["path", "distance"]), &edge_slugs("pd", 2));
-    // Graph-theory holding heptad — terms to sort later (order_cardinality=#nodes, size=#edges).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Graph Theory",
-        7,
-        &slugs(&["order_cardinality", "degree", "index", "adjacency", "neighbourhood", "location", "ordinality"]),
-        &edge_slugs("gt", 7),
-    );
-    // Topology · Geometry · Ordinality · Location tetrad — the topology/geometry split
-    // (ordinality = combinatorial/topological adjacency; location = geometric).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Topology Geometry",
-        4,
-        &slugs(&["topology", "geometry", "ordinality", "location"]),
-        &edge_slugs("tg", 4),
-    );
-    // Provenance pentad (generalises the citation triad): Source · Distributer ·
-    // Expression · Artefact · Lookup (user swapped artefact/expression order_cardinality).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Provenance",
-        5,
-        &slugs(&["source", "distributer", "expression", "artefact", "lookup"]),
-        &edge_slugs("prov", 5),
-    );
-
-    // The six laws of three as a Hexad — the Controller laid out as DATA (the laws
-    // named as nodes). Terms in Hexad-ordinality order_cardinality (1 identity · 2 expansion ·
-    // 3 order_cardinality · 4 freedom · 5 interaction[SPO] · 6 concentration), matching
-    // `core::laws::Law::HEXAD`. Edges = the S₃ group relations between laws, TBD →
-    // placeholder for now. The morphism logic (permutation/read/compose) lives in
-    // `core/laws.rs`; this seed is the in-graph, addressable form of the same six.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Six Laws of Three",
-        6,
-        &slugs(&[
-            "identity",
-            "expansion",
-            "order_cardinality",
-            "freedom",
-            "interaction",
-            "concentration",
-        ]),
-        &edge_slugs("law", 6),
-    );
-
-    // Harness triad — what a harness *is* (the Controller-as-harness). Impulse →
-    // ordinality: pos1 = + (tools), pos2 = − (constraints), pos3 = = (environment).
-    // Edges TBD → placeholder.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Harness",
-        3,
-        &slugs(&["tools", "constraints", "environment"]),
-        &edge_slugs("harness", 3),
-    );
-
-    // Interface triad — how the Controller's morphisms are expressed in Rust:
-    // struct (+, instance) · enum (−, kinds) · trait (=, interface/behaviour).
-    // Edges TBD → placeholder. (Impulse assignment tentative.)
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Interface",
-        3,
-        &slugs(&["struct", "enum", "trait"]),
-        &edge_slugs("interface", 3),
-    );
-
-    // Metadata dodecads (user, 2026-08-20; composed-from-source 2026-08-27) — the 12
-    // values per metadata dimension as order_cardinality-12 systems, to fill the view's metadata
-    // sections. **Composed from the single source** (`core::hexadicsystems`) so they
-    // can't drift from the hexad; designations 9–12 are still "Needs Research". Edges
-    // TBD → placeholder.
-    push_metadata_dodecad(
-        &mut content,
-        &mut have_char,
-        "Coherence Attributes",
-        "coh",
-        crate::core::hexadicsystems::coherence,
-    );
-    push_metadata_dodecad(
-        &mut content,
-        &mut have_char,
-        "Term Designations",
-        "tdes",
-        crate::core::hexadicsystems::term_designation,
-    );
-    push_metadata_dodecad(
-        &mut content,
-        &mut have_char,
-        "Connective Designations",
-        "cdes",
-        crate::core::hexadicsystems::connective_designation,
-    );
-
-    // ---- Systematics library additions (user, 2026-09-01) ----
-
-    // Elementary Systematics **pentad** (JGB) — 1 Quintessence · 2 Source · 3 Value
-    // Nature · 4 Factual Nature · 5 End. Edges in canonical K5 order; (1,2) TBD.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Elementary Systematics Pentad",
-        5,
-        &slugs(&["quintessence", "source", "value_nature", "factual_nature", "end"]),
-        &slugs(&[
-            "es5_edge_1",                        // (1,2) quintessence–source (TBD)
-            "what_i_might_become",               // (1,3)
-            "what_i_inescapably_am",             // (1,4)
-            "reality_of_fulfilment",             // (1,5)
-            "substantiality_of_meaning",         // (2,3)
-            "realisation_of_material_potential", // (2,4)
-            "range_of_potential_in_the_world",   // (2,5)
-            "inner_levels_of_existence",         // (3,4)
-            "condition_of_fulfilment",           // (3,5)
-            "actuality_of_fulfilment",           // (4,5)
-        ]),
-    );
-
-    // Potency dodecad (Bennett) — the 12 grades of potency.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Potency",
-        12,
-        &slugs(&[
-            "universal_field", "elemental_complexes", "elemental_structures",
-            "soil_and_ocean", "phytovegetation", "germ_cells", "animals", "humans",
-            "planets", "stars_and_solar_systems", "galaxies", "unfathomable_totality",
-        ]),
-        &edge_slugs("pot", 12),
-    );
-
-    // Levels of Energy — Hodgson articulation (e6/e7 corrected per the slides: e6
-    // organismic = animal body, e7 regenerative = germinal).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Levels of Energy",
-        12,
-        &slugs(&[
-            "zero_point_energy", "patterning_energy", "cohesive_energy",
-            "adaptive_energy", "constructive_energy", "organismic_energy",
-            "regenerative_energy", "sensitive_energy", "conscious_energy",
-            "creative_energy", "unitive_energy", "transcendent_energy",
-        ]),
-        &edge_slugs("energy_h", 12),
-    );
-
-    // Levels of Energy — Bennett originals (where they differ from Hodgson).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Levels of Energy (Bennett)",
-        12,
-        &slugs(&[
-            "dispersive_energy", "directed_energy", "cohesive_energy",
-            "plastic_energy", "constructive_energy", "vital_energy",
-            "automatic_energy", "sensitive_energy", "conscious_energy",
-            "creative_energy", "unitive_energy", "transcendent_energy",
-        ]),
-        &edge_slugs("energy_b", 12),
-    );
-
-    // Work — a dyad of anabolic / catabolic.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Work",
-        2,
-        &slugs(&["anabolic", "catabolic"]),
-        &edge_slugs("work", 2),
-    );
-
-    // Workspace — a triad of tabs · panes · agents (the app's own workspace).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Workspace",
-        3,
-        &slugs(&["tabs", "panes", "agents"]),
-        &edge_slugs("wksp", 3),
-    );
-
-    // Monad — the total content of a moment of awareness.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Total Content of a Moment of Awareness",
-        1,
-        &slugs(&["total_content_of_a_moment_of_awareness"]),
-        &edge_slugs("moment", 1),
-    );
-
-    // A **pentad of dodecads** — names the five 12-fold systems (nodes not yet linked to
-    // their dodecads; naming only for now).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Dodecads Pentad",
-        5,
-        &slugs(&[
-            "the_12_energies",
-            "the_12_sources_of_the_world_mandala",
-            "the_12_values",
-            "the_12_potencies",
-            "the_12_levels_of_society",
-        ]),
-        &edge_slugs("dodp", 5),
-    );
-
-    // Tetrad (Hodgson) — preserves the previous canonical tetrad edges (from Hodgson's
-    // book) now that the canonical Tetrad carries the JGB / Elementary-Systematics edges.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Tetrad (Hodgson)",
-        4,
-        &slugs(&["ideal", "ground", "directive", "instrumental"]),
-        &slugs(&[
-            "motivational_imperative", "receptive_regard", "effectual_compatibility",
-            "material_mastery", "technical_power", "demonstrable_activity",
-        ]),
-    );
-
-    // Society dodecad (Bennett) — the 12 grades of society, ordinality 1→12.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Society",
-        12,
-        &slugs(&[
-            "dependents", "producers", "craftsmen", "psychostatic_leaders", "candidates",
-            "specialists", "counsellors", "psychokinetic_initiates", "guides", "saints",
-            "prophets", "psychoteleios_messengers",
-        ]),
-        &edge_slugs("soc", 12),
-    );
-
-    // Values dodecad (Bennett) — the 12 values, ordinality 1→12.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Values",
-        12,
-        &slugs(&[
-            "contingency", "conflict", "concern", "joy", "hope", "need", "discernment",
-            "serenity", "transcendence", "holiness", "love", "fulfillment",
-        ]),
-        &edge_slugs("val", 12),
-    );
-
-    // ---- Holochain architecture, recorded as systems (refactor deferred to v0.6) ----
-
-    // Holochain Zomes — a dyad of integrity (static) / coordinator (dynamic).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Holochain Zomes",
-        2,
-        &slugs(&["integrity", "coordinator"]),
-        &edge_slugs("hcz", 2),
-    );
-
-    // Integrity zome — a triad: validation rules · entries · links (the static schema).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Integrity Zome",
-        3,
-        &slugs(&["validation_rules", "entries", "links"]),
-        &edge_slugs("intz", 3),
-    );
-
-    // Coordinator zome — a triad: function calls (+) · signal handlers (−) · host calls (=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Coordinator Zome",
-        3,
-        &slugs(&["function_calls", "signal_handlers", "host_calls"]),
-        &edge_slugs("coordz", 3),
-    );
-
-    // Holochain Link — a triad: base (content address / identity) · type (namespace /
-    // composition) · target (topological anchor: cardinality + ordinality).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Holochain Link",
-        3,
-        &slugs(&["base", "type", "target"]),
-        &edge_slugs("hcl", 3),
-    );
-
-    // Graph Products (user, 2026-09-01) — the four ways to combine two graphs, by
-    // increasing richness = the realisation direction ground→goal (−− → ++), and the
-    // operational vocabulary for the coalescence / tensor-product arc:
-    //   Cartesian (ground −−, the lattice) · Tensor (instrument −+, the categorical
-    //   product) · Strong (directive +−) · Lexicographic (goal ++, node→subsystem =
-    //   realisation). Relates to the architecture tetrad (Substrate/Model/View/Controller).
-    //   Our K_n topologies are **lexicographically organised**: complete graphs are
-    //   closed under the lexicographic product, K_m[K_n] = K_{mn} (e.g. K2[K4] = K8, 28
-    //   edges) — a node of K2 realised as a whole K4.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Graph Products",
-        4,
-        &slugs(&["cartesian", "tensor", "strong", "lexicographic"]),
-        &edge_slugs("gprod", 4),
-    );
-
-    // Knowledge triad (user, 2026-09-07) — belief(−) · knowledge(=) · truth(+),
-    // ordered +/−/= onto K3 positions 1/2/3: truth(1) · belief(2) · knowledge(3).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Knowledge",
-        3,
-        &slugs(&["truth", "belief", "knowledge"]),
-        &edge_slugs("know", 3),
-    );
-
-    // Discourse triad (user, 2026-09-07) — vocabulary(−) · grammar(+) · language(=);
-    // Language = Grammar + Vocabulary reconciled (the ontology dyad → triad).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Discourse",
-        3,
-        &slugs(&["grammar", "vocabulary", "language"]),
-        &edge_slugs("disc", 3),
-    );
-
-    // Common Noun triad (user, 2026-09-07) — people(+) · places(−) · things(=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Common Noun",
-        3,
-        &slugs(&["people", "places", "things"]),
-        &edge_slugs("noun", 3),
-    );
-
-    // Verbs triad (user, 2026-09-07) — actions(+) · states(−) · occurrences(=).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Verbs",
-        3,
-        &slugs(&["actions", "states", "occurrences"]),
-        &edge_slugs("verb", 3),
-    );
-
-    // Registry — Field of Action tetrad (user, 2026-09-07) — the app IS a registry
-    // with two views + store/read operations. Store (ideal) · Read (ground) ·
-    // Graph (directive) · List (instrumental), onto the K4 tetrad positions 1–4.
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Field of Action",
-        4,
-        &slugs(&["store", "read", "graph", "list"]),
-        &edge_slugs("foa", 4),
-    );
-
-    // Registry — Core tetrad (user, 2026-09-07) — the alternative registry tetrad:
-    // Store · Read · Sort · Filter as the core components (store=ideal, read=ground).
-    push_triadic_system(
-        &mut content,
-        &mut have_char,
-        "Registry Core",
-        4,
-        &slugs(&["store", "read", "sort", "filter"]),
-        &edge_slugs("reg", 4),
-    );
-
-    // --- Store/load & compositional dyads (user, 2026-09-08) ---
-    push_triadic_system(
-        &mut content, &mut have_char, "Import Export", 2,
-        &slugs(&["import", "export"]), &edge_slugs("impexp", 2),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Store Load", 2,
-        &slugs(&["store", "load"]), &edge_slugs("storeload", 2),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Semantics Syntax", 2,
-        &slugs(&["semantics", "syntax"]), &edge_slugs("semsyn", 2),
-    );
-
-    // --- Blue Earth (user, 2026-09-08): monad → dyads → triads → tetrad, grouped by
-    //     the Blue Earth sequence (data/perspectives/blue_earth.json). ---
-    push_triadic_system(
-        &mut content, &mut have_char, "Blue Earth", 1,
-        &slugs(&["blue_earth"]), &edge_slugs("be", 1),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Hosting Facilitation", 2,
-        &slugs(&["hosting", "facilitation"]), &edge_slugs("behf", 2),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Niche National", 2,
-        &slugs(&["niche", "national"]), &edge_slugs("benn", 2),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Deals Deployment", 2,
-        &slugs(&["deal_making", "deployment"]), &edge_slugs("bedd", 2),
-    );
-    // Triad: hosting(+, 1) · coordination(−, 2) · facilitation(=, 3).
-    push_triadic_system(
-        &mut content, &mut have_char, "Delivery", 3,
-        &slugs(&["hosting", "coordination", "facilitation"]), &edge_slugs("bedel", 3),
-    );
-    // Triad: systems change(+, 1) · disruption(−, 2) · funding(=, 3).
-    push_triadic_system(
-        &mut content, &mut have_char, "Impact", 3,
-        &slugs(&["systems_change", "disruption", "funding"]), &edge_slugs("beimp", 3),
-    );
-    // Tetrad from the two dyads: Ideal=national · Ground=niche · Directive=deals ·
-    // Instrumental=deployment (canonical tetrad term order Ideal/Ground/Directive/Instrumental).
-    push_triadic_system(
-        &mut content, &mut have_char, "Blue Earth Strategy", 4,
-        &slugs(&["national", "niche", "deal_making", "deployment"]), &edge_slugs("bestrat", 4),
-    );
-
-    // --- Fitness (user, 2026-09-08) ---
-    push_triadic_system(
-        &mut content, &mut have_char, "Fitness Exercise", 2,
-        &slugs(&["fitness", "exercise"]), &edge_slugs("fitex", 2),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Stretching Mobility", 2,
-        &slugs(&["stretching", "mobility"]), &edge_slugs("strmob", 2),
-    );
-    // Pentad — health-related fitness. Performance fitness (power, agility, balance,
-    // coordination, speed, reaction time) are possible links (edges), TBD.
-    push_triadic_system(
-        &mut content, &mut have_char, "Physical Fitness", 5,
-        &slugs(&[
-            "body_composition",
-            "cardiorespiratory_endurance",
-            "flexibility_mobility",
-            "muscle_strength",
-            "muscle_endurance",
-        ]),
-        &edge_slugs("fitpent", 5),
-    );
-
-    // Interface State Model (user, 2026-09-09) — the canvas state machine dogfooded as a
-    // system: a monad heading the Viewing/Editing dyad. Grouped by its own sequence
-    // (data/perspectives/interface_state_model.json). Viewing=read; Editing unfolds into
-    // create/update/delete (the CRUD tetrad) — that articulation is a later round.
-    push_triadic_system(
-        &mut content, &mut have_char, "Interface State Model", 1,
-        &slugs(&["interface_state_model"]), &edge_slugs("ism", 1),
-    );
-    push_triadic_system(
-        &mut content, &mut have_char, "Viewing Editing", 2,
-        &slugs(&["viewing", "editing"]), &edge_slugs("view_edit", 2),
-    );
-    // The state model's tetrad (user order 1–4): Create · Delete · Update · Read.
-    // Viewing = Read; Editing unfolds into Create/Update/Delete. A member of the Interface
-    // State Model sequence.
-    push_triadic_system(
-        &mut content, &mut have_char, "CRUD", 4,
-        &slugs(&["create", "delete", "update", "read"]), &edge_slugs("crud", 4),
-    );
-
-    // --- Library systems (user, 2026-09-10) ---
-    // Material Science tetrad (the materials tetrahedron): Performance · Processing ·
-    // Properties · Structure. The Engineer edge joins Performance–Processing (edge 1,2);
-    // the Scientist edge joins Properties–Structure (edge 3,4); the rest are placeholders.
-    push_triadic_system(
-        &mut content, &mut have_char, "Material Science", 4,
-        &slugs(&["performance", "processing", "properties", "structure"]),
-        &slugs(&["engineer", "matsci_edge_2", "matsci_edge_3", "matsci_edge_4", "matsci_edge_5", "scientist"]),
-    );
-    // Information Science tetrad: Efficacy · Attributes · Representations · Methods
-    // (workflows), characterised by evaluations.
-    push_triadic_system(
-        &mut content, &mut have_char, "Information Science", 4,
-        &slugs(&["efficacy", "attributes", "representations", "methods"]),
-        &edge_slugs("infsci", 4),
-    );
-    // FAIR data principles tetrad: Findable · Accessible · Interoperable · Reusable.
-    push_triadic_system(
-        &mut content, &mut have_char, "FAIR", 4,
-        &slugs(&["findable", "accessible", "interoperable", "reusable"]),
-        &edge_slugs("fair", 4),
-    );
-    // Convening triad: Hosting · Facilitating · Coordinating.
-    push_triadic_system(
-        &mut content, &mut have_char, "Convening", 3,
-        &slugs(&["hosting", "facilitating", "coordinating"]), &edge_slugs("conv", 3),
-    );
-    // Proof of Stake triad: Delegators(+) · Validators(−) · Stakeholders(=).
-    push_triadic_system(
-        &mut content, &mut have_char, "Proof of Stake", 3,
-        &slugs(&["delegators", "validators", "stakeholders"]), &edge_slugs("pos", 3),
-    );
-    // The Interface State Model's (tentative) triad: Standardisation(+) · Representation(−)
-    // · Interpretation(=). Named "Semiotics"; a member of the Interface State Model sequence.
-    push_triadic_system(
-        &mut content, &mut have_char, "Semiotics", 3,
-        &slugs(&["standardisation", "representation", "interpretation"]), &edge_slugs("sem", 3),
-    );
-    // Decomposition / Assembly dyad — the compose operation's poles (parallels Sort/Filter).
-    // Assembly(+) builds up; Decomposition(−) breaks down.
-    push_triadic_system(
-        &mut content, &mut have_char, "Assembly Decomposition", 2,
-        &slugs(&["assembly", "decomposition"]), &edge_slugs("asmdec", 2),
-    );
-
-    // --- Blue Earth Ventures (user, 2026-09-11): a monad heading a sequence
-    //     (data/perspectives/blue_earth_ventures.json). ---
-    push_triadic_system(
-        &mut content, &mut have_char, "Blue Earth Ventures", 1,
-        &slugs(&["blue_earth_ventures"]), &edge_slugs("bev", 1),
-    );
-    // Dyad: World(+) · Businesses(−).
-    push_triadic_system(
-        &mut content, &mut have_char, "World Businesses", 2,
-        &slugs(&["world", "businesses"]), &edge_slugs("bevwb", 2),
-    );
-    // Triad: Find(+) · Fund(−) · Support(=).
-    push_triadic_system(
-        &mut content, &mut have_char, "Backing", 3,
-        &slugs(&["find", "fund", "support"]), &edge_slugs("bevbk", 3),
-    );
-    // Tetrad: Founders · Investors · Corporate · Opportunities.
-    push_triadic_system(
-        &mut content, &mut have_char, "Venture Ecosystem", 4,
-        &slugs(&["founders", "investors", "corporate", "opportunities"]), &edge_slugs("bevve", 4),
-    );
-
-    content
-}
-
-// =============================================================================
-// Canonical vocabulary data
-// =============================================================================
-
-/// Term-character values in ordinality order_cardinality for each canonical system.
-fn get_term_characters(order_cardinality: u8) -> Vec<&'static str> {
-    match order_cardinality {
-        1 => vec!["Unity"],
-        2 => vec!["Essence", "Existence"],
-        3 => vec!["Will", "Function", "Being"],
-        4 => vec!["Ideal", "Ground", "Directive", "Instrumental"],
-        5 => vec![
-            "Quintessence",
-            "Source",
-            "Higher Potential",
-            "Lower Potential",
-            "Purpose",
-        ],
-        6 => vec![
-            "Priorities",
-            "Criteria",
-            "Values",
-            "Resources",
-            "Options",
-            "Facts",
-        ],
-        7 => vec![
-            "Insight",
-            "Application",
-            "Design",
-            "Research",
-            "Synthesis",
-            "Delivery",
-            "Value",
-        ],
-        8 => vec![
-            "Inherent Values",
-            "Critical Functions",
-            "Organisational Modes",
-            "Necessary Resourcing",
-            "Intrinsic Nature",
-            "Smallest Significant Holon",
-            "Integrative Totality",
-            "Supportive Platform",
-        ],
-        9 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9",
-        ],
-        10 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9", "Term 10",
-        ],
-        11 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9", "Term 10", "Term 11",
-        ],
-        12 => vec![
-            "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
-            "Term 9", "Term 10", "Term 11", "Term 12",
-        ],
-        _ => vec![],
-    }
-}
-
-fn get_term_character_slugs(order_cardinality: u8) -> Vec<String> {
-    get_term_characters(order_cardinality).into_iter().map(slugify).collect()
-}
-
-/// Canonical connective slugs in canonical topological order_cardinality (p1 < p2).
-fn get_canonical_connective_slugs(order_cardinality: u8) -> Vec<String> {
-    match order_cardinality {
-        1 => vec![],
-        2 => vec!["force_1_needs_research".into()],
-        3 => vec![
-            "generation".into(),
-            "decision".into(),
-            "consent".into(),
-        ],
-        // Canonical tetrad edges from **Elementary Systematics** (JGB), in canonical
-        // edge order over 1=Ideal · 2=Ground · 3=Directive · 4=Instrumental:
-        //   (1,2) realisation · (1,3) participation · (1,4) transformation
-        //   (2,3) perception · (2,4) conservation · (3,4) understanding
-        4 => vec![
-            "realisation".into(),
-            "participation".into(),
-            "transformation".into(),
-            "perception".into(),
-            "conservation".into(),
-            "understanding".into(),
-        ],
-        5 => vec![
-            "quantitative_match".into(),
-            "aspiration".into(),
-            "operation".into(),
-            "qualitative_match".into(),
-            "function".into(),
-            "input".into(),
-            "range_of_significance".into(),
-            "range_of_potential".into(),
-            "output".into(),
-            "form".into(),
-        ],
-        _ => {
-            let prefix = match order_cardinality {
-                6 => "step",
-                7 => "interval",
-                8 => "component",
-                9 => "transmutation",
-                10 => "progression",
-                11 => "correlation",
-                12 => "harmony",
-                _ => return vec![],
+    /// Seed a metadata **dodecad** by **composing it from the single source**
+    /// (`core::hexadicsystems`): each of the 12 terms takes the *exact* facet value for
+    /// its ordinality, so the dodecad can never drift from the hexad. The hexad module is
+    /// primordial (the seed) and *composes* the dodecads — not the reverse (reading the
+    /// in-graph dodecads at seed time would be circular, since seeding each dodecad calls
+    /// `canonical_*`). Char-id slugs are disambiguated where a value repeats ("Needs
+    /// Research" at 9–12); the character *value* stays the exact hexadic string.
+    /// Connectives are placeholder edges.
+    fn push_metadata_dodecad(
+        content: &mut GraphContent,
+        have_char: &mut std::collections::HashSet<String>,
+        name: &str,
+        edge_prefix: &str,
+        facet: impl Fn(u8) -> &'static str,
+    ) {
+        let mut seen: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
+        let mut term_char_ids = Vec::with_capacity(12);
+        for n in 1..=12u8 {
+            let value = facet(n);
+            let base = value.to_lowercase().replace([' ', '-'], "_");
+            let count = seen.entry(base.clone()).or_insert(0);
+            *count += 1;
+            let slug = if *count == 1 {
+                base
+            } else {
+                format!("{base}_{n}")
             };
-            let n = order_cardinality as usize;
-            let count = n * (n - 1) / 2;
-            (1..=count)
-                .map(|i| format!("{}_{}_needs_research", prefix, i))
-                .collect()
+            let id = format!("char_word_{slug}");
+            if have_char.insert(id.clone()) {
+                content
+                    .characters
+                    .push(Character::new(id.clone(), "word", value));
+            }
+            term_char_ids.push(id);
+        }
+        let mut connective_char_ids = Vec::new();
+        for slug in edge_slugs(edge_prefix, 12) {
+            let id = format!("char_word_{slug}");
+            if have_char.insert(id.clone()) {
+                content
+                    .characters
+                    .push(Character::new(id.clone(), "word", word_from_slug(&slug)));
+            }
+            connective_char_ids.push(id);
+        }
+        let vocab = Vocabulary::with_auto_id(name, 12, term_char_ids, connective_char_ids);
+        let vocab_id = vocab.id.clone();
+        content.vocabularies.push(vocab);
+        content.systems.push(System::with_auto_id(
+            name,
+            12,
+            canonical_coherence(12),
+            canonical_term_designation(12),
+            canonical_connective_designation(12),
+            "grammar_12".to_string(),
+            &vocab_id,
+        ));
+    }
+
+    /// Build the author-contributed and systematics-core **fragments** as their own
+    /// bundle (`data/fragments.json`). Source of the author triads: **Josh Fairhead**
+    /// (see `docs/fragments.md`). Each is a real K_n system (terms + named/placeholder
+    /// connectives) so it resolves in the graph; metadata inherits the canonical order_cardinality.
+    ///
+    /// Maths triad term positions (theorems=1, lemmas=2, proofs=3) fix the named edges
+    /// onto the K3 lines (1,2)(1,3)(2,3): bili · φ · Fibonacci. The Determining-
+    /// Conditions tetrad is K4 (4 dimensions, 6 laws as its 6 edges — assignment TBD).
+    pub fn build_fragments_from_tables() -> GraphContent {
+        let mut content = GraphContent::default();
+        let mut have_char = std::collections::HashSet::new();
+
+        // Impulse → ordinality convention: **pos1 = + (affirming), pos2 = − (denying),
+        // pos3 = = (reconciling)** — fixed by the confirmed-correct Maths sub-triad.
+
+        // Root triad: Aesthetics (+) · Maths (−) · Harmony (=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Aesthetics Maths Harmony",
+            3,
+            &slugs(&["aesthetics", "maths", "harmony"]),
+            &slugs(&["ahm_edge_1", "ahm_edge_2", "ahm_edge_3"]),
+        );
+        // Aesthetics → Unity (+) · Variety (−) · Form (=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Aesthetics",
+            3,
+            &slugs(&["unity", "variety", "form"]),
+            &slugs(&[
+                "aesthetics_edge_1",
+                "aesthetics_edge_2",
+                "aesthetics_edge_3",
+            ]),
+        );
+        // Harmony → Inevitability (+) · Economy (−) · Proportion (=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Harmony",
+            3,
+            &slugs(&["inevitability", "economy", "proportion"]),
+            &slugs(&["harmony_edge_1", "harmony_edge_2", "harmony_edge_3"]),
+        );
+        // Maths → Theorems (+) · Lemmas (−) · Proofs (=); named edges on lines
+        // (1,2)=bili, (1,3)=φ, (2,3)=Fibonacci.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Maths",
+            3,
+            &slugs(&["theorems", "lemmas", "proofs"]),
+            &slugs(&["bili", "phi", "fibonacci"]),
+        );
+        // Life triad (not architectural; perspective/tag = "life") — Health (+) ·
+        // Wealth (−) · Wisdom (=). Source: Josh Fairhead.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Life",
+            3,
+            &slugs(&["health", "wealth", "wisdom"]),
+            &slugs(&["life_edge_1", "life_edge_2", "life_edge_3"]),
+        );
+        // Determining Conditions of science — a K4 tetrad: Time (Chronos) · Hyparxis ·
+        // Eternity (Aionios) · Space; the 6 laws as its 6 edges. (Positioning WIP.)
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Determining Conditions",
+            4,
+            &slugs(&["time", "hyparxis", "eternity", "space"]),
+            &slugs(&[
+                "statistical",
+                "correspondence",
+                "classification",
+                "conservation",
+                "irreversibility",
+                "coexistence",
+            ]),
+        );
+
+        // ---- Architecture-project WIP fragments (documented in-graph) ----
+
+        // AD4M Perspective tetrad [WIP]: Perspective · Subject · Predicate · Object.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "AD4M Perspective",
+            4,
+            &slugs(&["perspective", "subject", "predicate", "object"]),
+            &slugs(&[
+                "ad4m_edge_1",
+                "ad4m_edge_2",
+                "ad4m_edge_3",
+                "ad4m_edge_4",
+                "ad4m_edge_5",
+                "ad4m_edge_6",
+            ]),
+        );
+        // Perspective triad [WIP] — subject · predicate · object are the three EDGES
+        // (a triple's roles); the three nodes are TBD (perspective parts).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Perspective",
+            3,
+            &slugs(&[
+                "perspective_node_1",
+                "perspective_node_2",
+                "perspective_node_3",
+            ]),
+            &slugs(&["subject", "predicate", "object"]),
+        );
+        // OrderCardinality · Ordinality · Location triad [WIP] — the topological anchor. `order_cardinality ×
+        // ordinality = location`; most triples attach to a location (e.g. Location ·
+        // Term-character · Source; Lines = Location · Connection · Location). May fold
+        // into a pentad.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "OrderCardinality Ordinality Location",
+            3,
+            &slugs(&["order_cardinality", "ordinality", "location"]),
+            &slugs(&["opl_edge_1", "opl_edge_2", "opl_edge_3"]),
+        );
+        // Data Object triad [WIP] — the reference triple: key (+) · value (−) ·
+        // reference (=). A key holds many values, each independently referenced (the
+        // basis of #25/#28). Likely a Perspective once sequenced +=− / 132 interaction.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Data Object",
+            3,
+            &slugs(&["key", "value", "reference"]),
+            &slugs(&["do_edge_1", "do_edge_2", "do_edge_3"]),
+        );
+        // Class · Instantiation · Instance triad [WIP] — e.g. K₄ (class) · Tetrad
+        // (instantiation) · Canonical Tetrad (instance).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Class Instantiation Instance",
+            3,
+            &slugs(&["class", "instantiation", "instance"]),
+            &slugs(&["cii_edge_1", "cii_edge_2", "cii_edge_3"]),
+        );
+        // Operations triad [WIP] — ELT: Extract · Load · Transform as the three NODES;
+        // edges TBD. ELT ≅ RAG (data-warehouse ↔ generative-AI): the same isomorphic
+        // triangle; both are *composition*. The 3!=6 permutations = the six laws of three.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Operations",
+            3,
+            &slugs(&["extract", "load", "transform"]),
+            &slugs(&["op_edge_1", "op_edge_2", "op_edge_3"]),
+        );
+        // Composition triad [WIP] — RAG: Retrieve · Augment · Generate as the nodes;
+        // the generative-AI isomorph of ELT (Operations). Both are composition.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Composition",
+            3,
+            &slugs(&["retrieve", "augment", "generate"]),
+            &slugs(&["comp_edge_1", "comp_edge_2", "comp_edge_3"]),
+        );
+        // The Data progression (monad → dyad → triad) [WIP]. The monad "Data" (order_cardinality 1);
+        // the dyad (key · value) is ALSO called "Data" (data = a key:value tag) and
+        // links to the Data monad. (Two "Data" systems, orders 1 and 2.)
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Data",
+            1,
+            &slugs(&["data"]),
+            &slugs(&[]),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Data",
+            2,
+            &slugs(&["key", "value"]),
+            &slugs(&["key_value_edge"]),
+        );
+
+        // The Data progression as a Sequence: monad → dyad → triad (Data → Data →
+        // ELT). Links the Data monad and dyad (in-graph navigation is design-TBD).
+        content.sequences.push(crate::core::Sequence::new(
+            "sequence_data_progression",
+            "Data",
+            vec![
+                "system:system_data_1".to_string(),
+                "system:system_data_2".to_string(),
+                "system:system_operations_3".to_string(),
+            ],
+        ));
+
+        // The CT monad as a sequence: Monad (1) → {Container · Operations} dyad (2) →
+        // {Identity · Associativity · Composition} triad (3). A monad needs structure
+        // (container) AND process (operations), governed by the three CT axioms.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Monad",
+            1,
+            &slugs(&["monad"]),
+            &slugs(&[]),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Container Operations",
+            2,
+            &slugs(&["container", "operations"]),
+            &slugs(&["container_operations_edge"]),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Identity Associativity Composition",
+            3,
+            &slugs(&["identity", "associativity", "composition"]),
+            &slugs(&["iac_edge_1", "iac_edge_2", "iac_edge_3"]),
+        );
+        content.sequences.push(crate::core::Sequence::new(
+            "sequence_ct_monad",
+            "Monad (CT)",
+            vec![
+                "system:system_monad_1".to_string(),
+                "system:system_container_operations_2".to_string(),
+                "system:system_identity_associativity_composition_3".to_string(),
+            ],
+        ));
+
+        // ---- Author-contributed triads (perspective/tag, not architectural) ----
+
+        // Requests triad [Josh Fairhead] — Ask (+) · Context (−) · Urgency (=): the
+        // shape of a request (what is asked, in what context, at what urgency).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Requests",
+            3,
+            &slugs(&["ask", "context", "urgency"]),
+            &slugs(&["requests_edge_1", "requests_edge_2", "requests_edge_3"]),
+        );
+        // Identification triad [Ouspensky, The Fourth Way] — Like (+) · Dislike (−) ·
+        // Identification (=): like and dislike are both identification. Edges (user,
+        // 2026-08-27), canonical order_cardinality (1,2),(1,3),(2,3): (1,3) Like–Identification =
+        // Attraction, (2,3) Dislike–Identification = Repulsion; (1,2) Like–Dislike TBD.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Identification",
+            3,
+            &slugs(&["like", "dislike", "identification"]),
+            &slugs(&["identification_edge_1", "attraction", "repulsion"]),
+        );
+        // Self-Remembering triad [Ouspensky, The Fourth Way] — Imagination (+) ·
+        // Negative emotion (−) · Identification (=) (user, 2026-08-27; corrected from the
+        // mislabelled "Negative Emotion" layout). Shares the `identification` character
+        // with the Identification triad (same term, reused across systems).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Self Remembering",
+            3,
+            &slugs(&["imagination", "negative_emotion", "identification"]),
+            &slugs(&["sr_edge_1", "sr_edge_2", "sr_edge_3"]),
+        );
+        // Ouspensky tetrad on emotion [The Fourth Way] (user, 2026-08-27): Positive (++) ·
+        // Negative (−−) · Pleasant (+−) · Unpleasant (−+). (`negative_emotion` char reused.)
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Emotion",
+            4,
+            &slugs(&[
+                "positive_emotion",
+                "negative_emotion",
+                "pleasant_emotion",
+                "unpleasant_emotion",
+            ]),
+            &edge_slugs("emo", 4),
+        );
+
+        // ---- AI-agent harness cluster (user, 2026-08-27) [levelup.gitconnected
+        // "Your AI Agent Isn't Broken, Your Harness Is"]. Assignments TENTATIVE — user
+        // unsure; likely a dodecad to complete from the article's harness components. ----
+        // Harness-engineering triad: Prompt (+, what the model reads) · Context (−, what
+        // enters the window & when) · Harness (=, the full app infrastructure).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Harness Engineering",
+            3,
+            &slugs(&["prompt", "context", "harness"]),
+            &edge_slugs("he", 3),
+        );
+        // Harness loop — the agent's cycle: Act (+) · Think (−) · Observe (=). "All is here."
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Harness Loop",
+            3,
+            &slugs(&["act", "think", "observe"]),
+            &edge_slugs("hl", 3),
+        );
+        // Agent triad — "Agents = Model + Harness": Agent (+) · Harness (−) · Model (=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Agent",
+            3,
+            &slugs(&["agent", "harness", "model"]),
+            &edge_slugs("ag", 3),
+        );
+
+        // ---- Graph-theory / topology scaffold (user, 2026-08-13) [architecture] ----
+        // The construction triad — how we build a system for examining property graphs:
+        // Semantic Projection (+) · Structural Topology (−) · Graph Template (=). Matrix
+        // names (validated 2026-08-26): Line graph (+) · Adjacency graph (−) · Incidence
+        // graph (=). Its edges are the **category-theory axioms**, grounded in incidence
+        // `B` (edge order_cardinality (1,2),(1,3),(2,3) over the nodes above):
+        //   (1,2) Line–Adjacency      = identity      (duals, same up to iso — an orbital)
+        //   (1,3) Line–Incidence      = associativity (A·B = B·L, assoc. of B·Bᵀ·B)
+        //   (2,3) Adjacency–Incidence = composition   (A = B·Bᵀ)
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Graph Construction",
+            3,
+            &slugs(&[
+                "semantic_projection",
+                "structural_topology",
+                "graph_template",
+            ]),
+            &slugs(&["identity", "associativity", "composition"]),
+        );
+        // The dyad on each construction node: what that impulse defines.
+        // Graph Template (=) → order_cardinality · size.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "OrderCardinality Size",
+            2,
+            &slugs(&["order_cardinality", "size"]),
+            &edge_slugs("os", 2),
+        );
+        // Structural Topology (−) → vertex · edge (the adjacency pair).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Vertex Edge",
+            2,
+            &slugs(&["vertex", "edge"]),
+            &edge_slugs("ve", 2),
+        );
+        // Semantic Projection (+) → term · connective (the characters).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Term Connective",
+            2,
+            &slugs(&["term", "connective"]),
+            &edge_slugs("tc", 2),
+        );
+        // Navigation dyad [architecture / graph-theory monad]: path · distance.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Path Distance",
+            2,
+            &slugs(&["path", "distance"]),
+            &edge_slugs("pd", 2),
+        );
+        // Graph-theory holding heptad — terms to sort later (order_cardinality=#nodes, size=#edges).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Graph Theory",
+            7,
+            &slugs(&[
+                "order_cardinality",
+                "degree",
+                "index",
+                "adjacency",
+                "neighbourhood",
+                "location",
+                "ordinality",
+            ]),
+            &edge_slugs("gt", 7),
+        );
+        // Topology · Geometry · Ordinality · Location tetrad — the topology/geometry split
+        // (ordinality = combinatorial/topological adjacency; location = geometric).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Topology Geometry",
+            4,
+            &slugs(&["topology", "geometry", "ordinality", "location"]),
+            &edge_slugs("tg", 4),
+        );
+        // Provenance pentad (generalises the citation triad): Source · Distributer ·
+        // Expression · Artefact · Lookup (user swapped artefact/expression order_cardinality).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Provenance",
+            5,
+            &slugs(&["source", "distributer", "expression", "artefact", "lookup"]),
+            &edge_slugs("prov", 5),
+        );
+
+        // The six laws of three as a Hexad — the Controller laid out as DATA (the laws
+        // named as nodes). Terms in Hexad-ordinality order_cardinality (1 identity · 2 expansion ·
+        // 3 order_cardinality · 4 freedom · 5 interaction[SPO] · 6 concentration), matching
+        // `core::laws::Law::HEXAD`. Edges = the S₃ group relations between laws, TBD →
+        // placeholder for now. The morphism logic (permutation/read/compose) lives in
+        // `core/laws.rs`; this seed is the in-graph, addressable form of the same six.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Six Laws of Three",
+            6,
+            &slugs(&[
+                "identity",
+                "expansion",
+                "order_cardinality",
+                "freedom",
+                "interaction",
+                "concentration",
+            ]),
+            &edge_slugs("law", 6),
+        );
+
+        // Harness triad — what a harness *is* (the Controller-as-harness). Impulse →
+        // ordinality: pos1 = + (tools), pos2 = − (constraints), pos3 = = (environment).
+        // Edges TBD → placeholder.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Harness",
+            3,
+            &slugs(&["tools", "constraints", "environment"]),
+            &edge_slugs("harness", 3),
+        );
+
+        // Interface triad — how the Controller's morphisms are expressed in Rust:
+        // struct (+, instance) · enum (−, kinds) · trait (=, interface/behaviour).
+        // Edges TBD → placeholder. (Impulse assignment tentative.)
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Interface",
+            3,
+            &slugs(&["struct", "enum", "trait"]),
+            &edge_slugs("interface", 3),
+        );
+
+        // Metadata dodecads (user, 2026-08-20; composed-from-source 2026-08-27) — the 12
+        // values per metadata dimension as order_cardinality-12 systems, to fill the view's metadata
+        // sections. **Composed from the single source** (`core::hexadicsystems`) so they
+        // can't drift from the hexad; designations 9–12 are still "Needs Research". Edges
+        // TBD → placeholder.
+        push_metadata_dodecad(
+            &mut content,
+            &mut have_char,
+            "Coherence Attributes",
+            "coh",
+            crate::core::hexadicsystems::coherence,
+        );
+        push_metadata_dodecad(
+            &mut content,
+            &mut have_char,
+            "Term Designations",
+            "tdes",
+            crate::core::hexadicsystems::term_designation,
+        );
+        push_metadata_dodecad(
+            &mut content,
+            &mut have_char,
+            "Connective Designations",
+            "cdes",
+            crate::core::hexadicsystems::connective_designation,
+        );
+
+        // ---- Systematics library additions (user, 2026-09-01) ----
+
+        // Elementary Systematics **pentad** (JGB) — 1 Quintessence · 2 Source · 3 Value
+        // Nature · 4 Factual Nature · 5 End. Edges in canonical K5 order; (1,2) TBD.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Elementary Systematics Pentad",
+            5,
+            &slugs(&[
+                "quintessence",
+                "source",
+                "value_nature",
+                "factual_nature",
+                "end",
+            ]),
+            &slugs(&[
+                "es5_edge_1",                        // (1,2) quintessence–source (TBD)
+                "what_i_might_become",               // (1,3)
+                "what_i_inescapably_am",             // (1,4)
+                "reality_of_fulfilment",             // (1,5)
+                "substantiality_of_meaning",         // (2,3)
+                "realisation_of_material_potential", // (2,4)
+                "range_of_potential_in_the_world",   // (2,5)
+                "inner_levels_of_existence",         // (3,4)
+                "condition_of_fulfilment",           // (3,5)
+                "actuality_of_fulfilment",           // (4,5)
+            ]),
+        );
+
+        // Potency dodecad (Bennett) — the 12 grades of potency.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Potency",
+            12,
+            &slugs(&[
+                "universal_field",
+                "elemental_complexes",
+                "elemental_structures",
+                "soil_and_ocean",
+                "phytovegetation",
+                "germ_cells",
+                "animals",
+                "humans",
+                "planets",
+                "stars_and_solar_systems",
+                "galaxies",
+                "unfathomable_totality",
+            ]),
+            &edge_slugs("pot", 12),
+        );
+
+        // Levels of Energy — Hodgson articulation (e6/e7 corrected per the slides: e6
+        // organismic = animal body, e7 regenerative = germinal).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Levels of Energy",
+            12,
+            &slugs(&[
+                "zero_point_energy",
+                "patterning_energy",
+                "cohesive_energy",
+                "adaptive_energy",
+                "constructive_energy",
+                "organismic_energy",
+                "regenerative_energy",
+                "sensitive_energy",
+                "conscious_energy",
+                "creative_energy",
+                "unitive_energy",
+                "transcendent_energy",
+            ]),
+            &edge_slugs("energy_h", 12),
+        );
+
+        // Levels of Energy — Bennett originals (where they differ from Hodgson).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Levels of Energy (Bennett)",
+            12,
+            &slugs(&[
+                "dispersive_energy",
+                "directed_energy",
+                "cohesive_energy",
+                "plastic_energy",
+                "constructive_energy",
+                "vital_energy",
+                "automatic_energy",
+                "sensitive_energy",
+                "conscious_energy",
+                "creative_energy",
+                "unitive_energy",
+                "transcendent_energy",
+            ]),
+            &edge_slugs("energy_b", 12),
+        );
+
+        // Work — a dyad of anabolic / catabolic.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Work",
+            2,
+            &slugs(&["anabolic", "catabolic"]),
+            &edge_slugs("work", 2),
+        );
+
+        // Workspace — a triad of tabs · panes · agents (the app's own workspace).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Workspace",
+            3,
+            &slugs(&["tabs", "panes", "agents"]),
+            &edge_slugs("wksp", 3),
+        );
+
+        // Monad — the total content of a moment of awareness.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Total Content of a Moment of Awareness",
+            1,
+            &slugs(&["total_content_of_a_moment_of_awareness"]),
+            &edge_slugs("moment", 1),
+        );
+
+        // A **pentad of dodecads** — names the five 12-fold systems (nodes not yet linked to
+        // their dodecads; naming only for now).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Dodecads Pentad",
+            5,
+            &slugs(&[
+                "the_12_energies",
+                "the_12_sources_of_the_world_mandala",
+                "the_12_values",
+                "the_12_potencies",
+                "the_12_levels_of_society",
+            ]),
+            &edge_slugs("dodp", 5),
+        );
+
+        // Tetrad (Hodgson) — preserves the previous canonical tetrad edges (from Hodgson's
+        // book) now that the canonical Tetrad carries the JGB / Elementary-Systematics edges.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Tetrad (Hodgson)",
+            4,
+            &slugs(&["ideal", "ground", "directive", "instrumental"]),
+            &slugs(&[
+                "motivational_imperative",
+                "receptive_regard",
+                "effectual_compatibility",
+                "material_mastery",
+                "technical_power",
+                "demonstrable_activity",
+            ]),
+        );
+
+        // Society dodecad (Bennett) — the 12 grades of society, ordinality 1→12.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Society",
+            12,
+            &slugs(&[
+                "dependents",
+                "producers",
+                "craftsmen",
+                "psychostatic_leaders",
+                "candidates",
+                "specialists",
+                "counsellors",
+                "psychokinetic_initiates",
+                "guides",
+                "saints",
+                "prophets",
+                "psychoteleios_messengers",
+            ]),
+            &edge_slugs("soc", 12),
+        );
+
+        // Values dodecad (Bennett) — the 12 values, ordinality 1→12.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Values",
+            12,
+            &slugs(&[
+                "contingency",
+                "conflict",
+                "concern",
+                "joy",
+                "hope",
+                "need",
+                "discernment",
+                "serenity",
+                "transcendence",
+                "holiness",
+                "love",
+                "fulfillment",
+            ]),
+            &edge_slugs("val", 12),
+        );
+
+        // ---- Holochain architecture, recorded as systems (refactor deferred to v0.6) ----
+
+        // Holochain Zomes — a dyad of integrity (static) / coordinator (dynamic).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Holochain Zomes",
+            2,
+            &slugs(&["integrity", "coordinator"]),
+            &edge_slugs("hcz", 2),
+        );
+
+        // Integrity zome — a triad: validation rules · entries · links (the static schema).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Integrity Zome",
+            3,
+            &slugs(&["validation_rules", "entries", "links"]),
+            &edge_slugs("intz", 3),
+        );
+
+        // Coordinator zome — a triad: function calls (+) · signal handlers (−) · host calls (=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Coordinator Zome",
+            3,
+            &slugs(&["function_calls", "signal_handlers", "host_calls"]),
+            &edge_slugs("coordz", 3),
+        );
+
+        // Holochain Link — a triad: base (content address / identity) · type (namespace /
+        // composition) · target (topological anchor: cardinality + ordinality).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Holochain Link",
+            3,
+            &slugs(&["base", "type", "target"]),
+            &edge_slugs("hcl", 3),
+        );
+
+        // Graph Products (user, 2026-09-01) — the four ways to combine two graphs, by
+        // increasing richness = the realisation direction ground→goal (−− → ++), and the
+        // operational vocabulary for the coalescence / tensor-product arc:
+        //   Cartesian (ground −−, the lattice) · Tensor (instrument −+, the categorical
+        //   product) · Strong (directive +−) · Lexicographic (goal ++, node→subsystem =
+        //   realisation). Relates to the architecture tetrad (Substrate/Model/View/Controller).
+        //   Our K_n topologies are **lexicographically organised**: complete graphs are
+        //   closed under the lexicographic product, K_m[K_n] = K_{mn} (e.g. K2[K4] = K8, 28
+        //   edges) — a node of K2 realised as a whole K4.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Graph Products",
+            4,
+            &slugs(&["cartesian", "tensor", "strong", "lexicographic"]),
+            &edge_slugs("gprod", 4),
+        );
+
+        // Knowledge triad (user, 2026-09-07) — belief(−) · knowledge(=) · truth(+),
+        // ordered +/−/= onto K3 positions 1/2/3: truth(1) · belief(2) · knowledge(3).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Knowledge",
+            3,
+            &slugs(&["truth", "belief", "knowledge"]),
+            &edge_slugs("know", 3),
+        );
+
+        // Discourse triad (user, 2026-09-07) — vocabulary(−) · grammar(+) · language(=);
+        // Language = Grammar + Vocabulary reconciled (the ontology dyad → triad).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Discourse",
+            3,
+            &slugs(&["grammar", "vocabulary", "language"]),
+            &edge_slugs("disc", 3),
+        );
+
+        // Common Noun triad (user, 2026-09-07) — people(+) · places(−) · things(=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Common Noun",
+            3,
+            &slugs(&["people", "places", "things"]),
+            &edge_slugs("noun", 3),
+        );
+
+        // Verbs triad (user, 2026-09-07) — actions(+) · states(−) · occurrences(=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Verbs",
+            3,
+            &slugs(&["actions", "states", "occurrences"]),
+            &edge_slugs("verb", 3),
+        );
+
+        // Registry — Field of Action tetrad (user, 2026-09-07) — the app IS a registry
+        // with two views + store/read operations. Store (ideal) · Read (ground) ·
+        // Graph (directive) · List (instrumental), onto the K4 tetrad positions 1–4.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Field of Action",
+            4,
+            &slugs(&["store", "read", "graph", "list"]),
+            &edge_slugs("foa", 4),
+        );
+
+        // Registry — Core tetrad (user, 2026-09-07) — the alternative registry tetrad:
+        // Store · Read · Sort · Filter as the core components (store=ideal, read=ground).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Registry Core",
+            4,
+            &slugs(&["store", "read", "sort", "filter"]),
+            &edge_slugs("reg", 4),
+        );
+
+        // --- Store/load & compositional dyads (user, 2026-09-08) ---
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Import Export",
+            2,
+            &slugs(&["import", "export"]),
+            &edge_slugs("impexp", 2),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Store Load",
+            2,
+            &slugs(&["store", "load"]),
+            &edge_slugs("storeload", 2),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Semantics Syntax",
+            2,
+            &slugs(&["semantics", "syntax"]),
+            &edge_slugs("semsyn", 2),
+        );
+
+        // --- Blue Earth (user, 2026-09-08): monad → dyads → triads → tetrad, grouped by
+        //     the Blue Earth sequence (data/perspectives/blue_earth.json). ---
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Blue Earth",
+            1,
+            &slugs(&["blue_earth"]),
+            &edge_slugs("be", 1),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Hosting Facilitation",
+            2,
+            &slugs(&["hosting", "facilitation"]),
+            &edge_slugs("behf", 2),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Niche National",
+            2,
+            &slugs(&["niche", "national"]),
+            &edge_slugs("benn", 2),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Deals Deployment",
+            2,
+            &slugs(&["deal_making", "deployment"]),
+            &edge_slugs("bedd", 2),
+        );
+        // Triad: hosting(+, 1) · coordination(−, 2) · facilitation(=, 3).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Delivery",
+            3,
+            &slugs(&["hosting", "coordination", "facilitation"]),
+            &edge_slugs("bedel", 3),
+        );
+        // Triad: systems change(+, 1) · disruption(−, 2) · funding(=, 3).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Impact",
+            3,
+            &slugs(&["systems_change", "disruption", "funding"]),
+            &edge_slugs("beimp", 3),
+        );
+        // Tetrad from the two dyads: Ideal=national · Ground=niche · Directive=deals ·
+        // Instrumental=deployment (canonical tetrad term order Ideal/Ground/Directive/Instrumental).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Blue Earth Strategy",
+            4,
+            &slugs(&["national", "niche", "deal_making", "deployment"]),
+            &edge_slugs("bestrat", 4),
+        );
+
+        // --- Fitness (user, 2026-09-08) ---
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Fitness Exercise",
+            2,
+            &slugs(&["fitness", "exercise"]),
+            &edge_slugs("fitex", 2),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Stretching Mobility",
+            2,
+            &slugs(&["stretching", "mobility"]),
+            &edge_slugs("strmob", 2),
+        );
+        // Pentad — health-related fitness. Performance fitness (power, agility, balance,
+        // coordination, speed, reaction time) are possible links (edges), TBD.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Physical Fitness",
+            5,
+            &slugs(&[
+                "body_composition",
+                "cardiorespiratory_endurance",
+                "flexibility_mobility",
+                "muscle_strength",
+                "muscle_endurance",
+            ]),
+            &edge_slugs("fitpent", 5),
+        );
+
+        // Interface State Model (user, 2026-09-09) — the canvas state machine dogfooded as a
+        // system: a monad heading the Viewing/Editing dyad. Grouped by its own sequence
+        // (data/perspectives/interface_state_model.json). Viewing=read; Editing unfolds into
+        // create/update/delete (the CRUD tetrad) — that articulation is a later round.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Interface State Model",
+            1,
+            &slugs(&["interface_state_model"]),
+            &edge_slugs("ism", 1),
+        );
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Viewing Editing",
+            2,
+            &slugs(&["viewing", "editing"]),
+            &edge_slugs("view_edit", 2),
+        );
+        // The state model's tetrad (user order 1–4): Create · Delete · Update · Read.
+        // Viewing = Read; Editing unfolds into Create/Update/Delete. A member of the Interface
+        // State Model sequence.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "CRUD",
+            4,
+            &slugs(&["create", "delete", "update", "read"]),
+            &edge_slugs("crud", 4),
+        );
+
+        // --- Library systems (user, 2026-09-10) ---
+        // Material Science tetrad (the materials tetrahedron): Performance · Processing ·
+        // Properties · Structure. The Engineer edge joins Performance–Processing (edge 1,2);
+        // the Scientist edge joins Properties–Structure (edge 3,4); the rest are placeholders.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Material Science",
+            4,
+            &slugs(&["performance", "processing", "properties", "structure"]),
+            &slugs(&[
+                "engineer",
+                "matsci_edge_2",
+                "matsci_edge_3",
+                "matsci_edge_4",
+                "matsci_edge_5",
+                "scientist",
+            ]),
+        );
+        // Information Science tetrad: Efficacy · Attributes · Representations · Methods
+        // (workflows), characterised by evaluations.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Information Science",
+            4,
+            &slugs(&["efficacy", "attributes", "representations", "methods"]),
+            &edge_slugs("infsci", 4),
+        );
+        // FAIR data principles tetrad: Findable · Accessible · Interoperable · Reusable.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "FAIR",
+            4,
+            &slugs(&["findable", "accessible", "interoperable", "reusable"]),
+            &edge_slugs("fair", 4),
+        );
+        // Convening triad: Hosting · Facilitating · Coordinating.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Convening",
+            3,
+            &slugs(&["hosting", "facilitating", "coordinating"]),
+            &edge_slugs("conv", 3),
+        );
+        // Proof of Stake triad: Delegators(+) · Validators(−) · Stakeholders(=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Proof of Stake",
+            3,
+            &slugs(&["delegators", "validators", "stakeholders"]),
+            &edge_slugs("pos", 3),
+        );
+        // The Interface State Model's (tentative) triad: Standardisation(+) · Representation(−)
+        // · Interpretation(=). Named "Semiotics"; a member of the Interface State Model sequence.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Semiotics",
+            3,
+            &slugs(&["standardisation", "representation", "interpretation"]),
+            &edge_slugs("sem", 3),
+        );
+        // Decomposition / Assembly dyad — the compose operation's poles (parallels Sort/Filter).
+        // Assembly(+) builds up; Decomposition(−) breaks down.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Assembly Decomposition",
+            2,
+            &slugs(&["assembly", "decomposition"]),
+            &edge_slugs("asmdec", 2),
+        );
+
+        // --- Blue Earth Ventures (user, 2026-09-11): a monad heading a sequence
+        //     (data/perspectives/blue_earth_ventures.json). ---
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Blue Earth Ventures",
+            1,
+            &slugs(&["blue_earth_ventures"]),
+            &edge_slugs("bev", 1),
+        );
+        // Dyad: World(+) · Businesses(−).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "World Businesses",
+            2,
+            &slugs(&["world", "businesses"]),
+            &edge_slugs("bevwb", 2),
+        );
+        // Triad: Find(+) · Fund(−) · Support(=).
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Backing",
+            3,
+            &slugs(&["find", "fund", "support"]),
+            &edge_slugs("bevbk", 3),
+        );
+        // Tetrad: Founders · Investors · Corporate · Opportunities.
+        push_triadic_system(
+            &mut content,
+            &mut have_char,
+            "Venture Ecosystem",
+            4,
+            &slugs(&["founders", "investors", "corporate", "opportunities"]),
+            &edge_slugs("bevve", 4),
+        );
+
+        content
+    }
+
+    // =============================================================================
+    // Canonical vocabulary data
+    // =============================================================================
+
+    /// Term-character values in ordinality order_cardinality for each canonical system.
+    fn get_term_characters(order_cardinality: u8) -> Vec<&'static str> {
+        match order_cardinality {
+            1 => vec!["Unity"],
+            2 => vec!["Essence", "Existence"],
+            3 => vec!["Will", "Function", "Being"],
+            4 => vec!["Ideal", "Ground", "Directive", "Instrumental"],
+            5 => vec![
+                "Quintessence",
+                "Source",
+                "Higher Potential",
+                "Lower Potential",
+                "Purpose",
+            ],
+            6 => vec![
+                "Priorities",
+                "Criteria",
+                "Values",
+                "Resources",
+                "Options",
+                "Facts",
+            ],
+            7 => vec![
+                "Insight",
+                "Application",
+                "Design",
+                "Research",
+                "Synthesis",
+                "Delivery",
+                "Value",
+            ],
+            8 => vec![
+                "Inherent Values",
+                "Critical Functions",
+                "Organisational Modes",
+                "Necessary Resourcing",
+                "Intrinsic Nature",
+                "Smallest Significant Holon",
+                "Integrative Totality",
+                "Supportive Platform",
+            ],
+            9 => vec![
+                "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+                "Term 9",
+            ],
+            10 => vec![
+                "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+                "Term 9", "Term 10",
+            ],
+            11 => vec![
+                "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+                "Term 9", "Term 10", "Term 11",
+            ],
+            12 => vec![
+                "Term 1", "Term 2", "Term 3", "Term 4", "Term 5", "Term 6", "Term 7", "Term 8",
+                "Term 9", "Term 10", "Term 11", "Term 12",
+            ],
+            _ => vec![],
         }
     }
-}
 
-fn slugify(s: &str) -> String {
-    s.to_lowercase().replace(' ', "_")
-}
+    fn get_term_character_slugs(order_cardinality: u8) -> Vec<String> {
+        get_term_characters(order_cardinality)
+            .into_iter()
+            .map(slugify)
+            .collect()
+    }
 
-fn word_from_slug(slug: &str) -> String {
-    slug.split('_')
-        .map(|part| {
-            let mut chars = part.chars();
-            match chars.next() {
-                None => String::new(),
-                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+    /// Canonical connective slugs in canonical topological order_cardinality (p1 < p2).
+    fn get_canonical_connective_slugs(order_cardinality: u8) -> Vec<String> {
+        match order_cardinality {
+            1 => vec![],
+            2 => vec!["force_1_needs_research".into()],
+            3 => vec!["generation".into(), "decision".into(), "consent".into()],
+            // Canonical tetrad edges from **Elementary Systematics** (JGB), in canonical
+            // edge order over 1=Ideal · 2=Ground · 3=Directive · 4=Instrumental:
+            //   (1,2) realisation · (1,3) participation · (1,4) transformation
+            //   (2,3) perception · (2,4) conservation · (3,4) understanding
+            4 => vec![
+                "realisation".into(),
+                "participation".into(),
+                "transformation".into(),
+                "perception".into(),
+                "conservation".into(),
+                "understanding".into(),
+            ],
+            5 => vec![
+                "quantitative_match".into(),
+                "aspiration".into(),
+                "operation".into(),
+                "qualitative_match".into(),
+                "function".into(),
+                "input".into(),
+                "range_of_significance".into(),
+                "range_of_potential".into(),
+                "output".into(),
+                "form".into(),
+            ],
+            _ => {
+                let prefix = match order_cardinality {
+                    6 => "step",
+                    7 => "interval",
+                    8 => "component",
+                    9 => "transmutation",
+                    10 => "progression",
+                    11 => "correlation",
+                    12 => "harmony",
+                    _ => return vec![],
+                };
+                let n = order_cardinality as usize;
+                let count = n * (n - 1) / 2;
+                (1..=count)
+                    .map(|i| format!("{}_{}_needs_research", prefix, i))
+                    .collect()
             }
-        })
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-pub fn canonical_system_name(order_cardinality: u8) -> &'static str {
-    match order_cardinality {
-        1 => "Monad",
-        2 => "Dyad",
-        3 => "Triad",
-        4 => "Tetrad",
-        5 => "Pentad",
-        6 => "Hexad",
-        7 => "Heptad",
-        8 => "Octad",
-        9 => "Ennead",
-        10 => "Decad",
-        11 => "Undecad",
-        12 => "Dodecad",
-        _ => "Unknown",
+        }
     }
-}
 
-// The canonical metadata is single-sourced in `core::hexadicsystems` (the hexad model);
-// these seed-side helpers delegate to it.
-fn canonical_coherence(order_cardinality: u8) -> &'static str {
-    crate::core::hexadicsystems::coherence(order_cardinality)
-}
-
-fn canonical_term_designation(order_cardinality: u8) -> &'static str {
-    crate::core::hexadicsystems::term_designation(order_cardinality)
-}
-
-fn canonical_connective_designation(order_cardinality: u8) -> &'static str {
-    crate::core::hexadicsystems::connective_designation(order_cardinality)
-}
-
-// =============================================================================
-// Coordinate data — same geometry as the pre-refactor codebase.
-// =============================================================================
-
-fn get_coordinates(order_cardinality: u8) -> Vec<Point3d> {
-    match order_cardinality {
-        1 => vec![Point3d::new(0.0, 0.0, 0.0)],
-        2 => vec![
-            Point3d::new(-1.0, 0.0, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-        ],
-        3 => vec![
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(0.0, -1.0, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-        ],
-        4 => vec![
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(0.0, -1.0, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-            Point3d::new(-1.0, 0.0, 0.0),
-        ],
-        5 => vec![
-            Point3d::new(-0.75, 0.0, 0.0),
-            Point3d::new(1.0, -0.75, 0.0),
-            Point3d::new(0.0, 0.5, 0.0),
-            Point3d::new(0.0, -0.5, 0.0),
-            Point3d::new(1.0, 0.75, 0.0),
-        ],
-        6 => vec![
-            Point3d::new(-0.866, -0.5, 0.0),
-            Point3d::new(0.866, -0.5, 0.0),
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(-0.866, 0.5, 0.0),
-            Point3d::new(0.866, 0.5, 0.0),
-            Point3d::new(0.0, -1.0, 0.0),
-        ],
-        7 => vec![
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(-0.433884, -0.900969, 0.0),
-            Point3d::new(0.974370, -0.222521, 0.0),
-            Point3d::new(0.781831, 0.623489, 0.0),
-            Point3d::new(0.433884, -0.900969, 0.0),
-            Point3d::new(-0.974370, -0.222521, 0.0),
-            Point3d::new(-0.781831, 0.623489, 0.0),
-        ],
-        8 => vec![
-            Point3d::new(
-                -std::f64::consts::FRAC_1_SQRT_2,
-                std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ),
-            Point3d::new(
-                std::f64::consts::FRAC_1_SQRT_2,
-                -std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ),
-            Point3d::new(
-                std::f64::consts::FRAC_1_SQRT_2,
-                std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ),
-            Point3d::new(
-                -std::f64::consts::FRAC_1_SQRT_2,
-                -std::f64::consts::FRAC_1_SQRT_2,
-                0.0,
-            ),
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-            Point3d::new(-1.0, 0.0, 0.0),
-            Point3d::new(0.0, -1.0, 0.0),
-        ],
-        9 => vec![
-            Point3d::new(-0.64278760968, 0.76604444311, 0.0),
-            Point3d::new(0.86602540378, -0.5, 0.0),
-            Point3d::new(0.64278760968, 0.76604444311, 0.0),
-            Point3d::new(-0.34202014333, -0.93969262079, 0.0),
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(0.98480775301, 0.17364817767, 0.0),
-            Point3d::new(-0.98480775301, 0.17364817767, 0.0),
-            Point3d::new(0.34202014333, -0.93969262079, 0.0),
-            Point3d::new(-0.86602540378, -0.5, 0.0),
-        ],
-        10 => vec![
-            Point3d::new(-0.80901699437, 0.58778525229, 0.0),
-            Point3d::new(0.80901699437, -0.58778525229, 0.0),
-            Point3d::new(0.30901699437, 0.95105651630, 0.0),
-            Point3d::new(-0.30901699437, -0.95105651630, 0.0),
-            Point3d::new(-0.30901699437, 0.95105651630, 0.0),
-            Point3d::new(0.80901699437, 0.58778525229, 0.0),
-            Point3d::new(-1.0, 0.0, 0.0),
-            Point3d::new(0.30901699437, -0.95105651630, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-            Point3d::new(-0.80901699437, -0.58778525229, 0.0),
-        ],
-        11 => vec![
-            Point3d::new(-0.909632, 0.415415, 0.0),
-            Point3d::new(0.755750, -0.654861, 0.0),
-            Point3d::new(0.54064081745, 0.84125353283, 0.0),
-            Point3d::new(-0.281733, -0.959493, 0.0),
-            Point3d::new(-0.54064081745, 0.84125353283, 0.0),
-            Point3d::new(0.909632, 0.415415, 0.0),
-            Point3d::new(-0.989821, -0.142315, 0.0),
-            Point3d::new(0.281733, -0.959493, 0.0),
-            Point3d::new(0.989821, -0.142315, 0.0),
-            Point3d::new(-0.755750, -0.654861, 0.0),
-            Point3d::new(0.0, 1.0, 0.0),
-        ],
-        12 => vec![
-            Point3d::new(-0.5, 0.86602540378, 0.0),
-            Point3d::new(0.86602540378, -0.5, 0.0),
-            Point3d::new(0.86602540378, 0.5, 0.0),
-            Point3d::new(-0.86602540378, -0.5, 0.0),
-            Point3d::new(1.0, 0.0, 0.0),
-            Point3d::new(0.5, 0.86602540378, 0.0),
-            Point3d::new(0.0, -1.0, 0.0),
-            Point3d::new(-0.5, -0.86602540378, 0.0),
-            Point3d::new(0.0, 1.0, 0.0),
-            Point3d::new(0.5, -0.86602540378, 0.0),
-            Point3d::new(-1.0, 0.0, 0.0),
-            Point3d::new(-0.86602540378, 0.5, 0.0),
-        ],
-        _ => vec![],
+    fn slugify(s: &str) -> String {
+        s.to_lowercase().replace(' ', "_")
     }
-}
 
-fn get_colours(order_cardinality: u8) -> Vec<&'static str> {
-    const RED: &str = "#FF0000";
-    const BLUE: &str = "#0000FF";
-    const YELLOW: &str = "#FFFF00";
-    const GREEN: &str = "#099902";
-    const PURPLE: &str = "#9900FF";
-    const ORANGE: &str = "#FFA500";
-    const LIGHT_BLUE: &str = "#00FFFF";
-    const BROWN: &str = "#8B4513";
-    const MAGENTA: &str = "#FF00FF";
-    const WHITE: &str = "#FFFFFF";
-    const SILVER: &str = "#C0C0C0";
-    const GOLD: &str = "#FFD700";
-
-    match order_cardinality {
-        1 => vec![RED],
-        2 => vec![RED, BLUE],
-        3 => vec![RED, BLUE, YELLOW],
-        4 => vec![RED, BLUE, YELLOW, GREEN],
-        5 => vec![RED, BLUE, YELLOW, GREEN, PURPLE],
-        6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
-        7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
-        8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
-        9 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA],
-        10 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE],
-        11 => vec![
-            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
-        ],
-        12 => vec![
-            RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
-            GOLD,
-        ],
-        _ => vec![],
+    fn word_from_slug(slug: &str) -> String {
+        slug.split('_')
+            .map(|part| {
+                let mut chars = part.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
     }
-}
+
+    pub fn canonical_system_name(order_cardinality: u8) -> &'static str {
+        match order_cardinality {
+            1 => "Monad",
+            2 => "Dyad",
+            3 => "Triad",
+            4 => "Tetrad",
+            5 => "Pentad",
+            6 => "Hexad",
+            7 => "Heptad",
+            8 => "Octad",
+            9 => "Ennead",
+            10 => "Decad",
+            11 => "Undecad",
+            12 => "Dodecad",
+            _ => "Unknown",
+        }
+    }
+
+    // The canonical metadata is single-sourced in `core::hexadicsystems` (the hexad model);
+    // these seed-side helpers delegate to it.
+    fn canonical_coherence(order_cardinality: u8) -> &'static str {
+        crate::core::hexadicsystems::coherence(order_cardinality)
+    }
+
+    fn canonical_term_designation(order_cardinality: u8) -> &'static str {
+        crate::core::hexadicsystems::term_designation(order_cardinality)
+    }
+
+    fn canonical_connective_designation(order_cardinality: u8) -> &'static str {
+        crate::core::hexadicsystems::connective_designation(order_cardinality)
+    }
+
+    // =============================================================================
+    // Coordinate data — same geometry as the pre-refactor codebase.
+    // =============================================================================
+
+    fn get_coordinates(order_cardinality: u8) -> Vec<Point3d> {
+        match order_cardinality {
+            1 => vec![Point3d::new(0.0, 0.0, 0.0)],
+            2 => vec![Point3d::new(-1.0, 0.0, 0.0), Point3d::new(1.0, 0.0, 0.0)],
+            3 => vec![
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(0.0, -1.0, 0.0),
+                Point3d::new(1.0, 0.0, 0.0),
+            ],
+            4 => vec![
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(0.0, -1.0, 0.0),
+                Point3d::new(1.0, 0.0, 0.0),
+                Point3d::new(-1.0, 0.0, 0.0),
+            ],
+            5 => vec![
+                Point3d::new(-0.75, 0.0, 0.0),
+                Point3d::new(1.0, -0.75, 0.0),
+                Point3d::new(0.0, 0.5, 0.0),
+                Point3d::new(0.0, -0.5, 0.0),
+                Point3d::new(1.0, 0.75, 0.0),
+            ],
+            6 => vec![
+                Point3d::new(-0.866, -0.5, 0.0),
+                Point3d::new(0.866, -0.5, 0.0),
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(-0.866, 0.5, 0.0),
+                Point3d::new(0.866, 0.5, 0.0),
+                Point3d::new(0.0, -1.0, 0.0),
+            ],
+            7 => vec![
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(-0.433884, -0.900969, 0.0),
+                Point3d::new(0.974370, -0.222521, 0.0),
+                Point3d::new(0.781831, 0.623489, 0.0),
+                Point3d::new(0.433884, -0.900969, 0.0),
+                Point3d::new(-0.974370, -0.222521, 0.0),
+                Point3d::new(-0.781831, 0.623489, 0.0),
+            ],
+            8 => vec![
+                Point3d::new(
+                    -std::f64::consts::FRAC_1_SQRT_2,
+                    std::f64::consts::FRAC_1_SQRT_2,
+                    0.0,
+                ),
+                Point3d::new(
+                    std::f64::consts::FRAC_1_SQRT_2,
+                    -std::f64::consts::FRAC_1_SQRT_2,
+                    0.0,
+                ),
+                Point3d::new(
+                    std::f64::consts::FRAC_1_SQRT_2,
+                    std::f64::consts::FRAC_1_SQRT_2,
+                    0.0,
+                ),
+                Point3d::new(
+                    -std::f64::consts::FRAC_1_SQRT_2,
+                    -std::f64::consts::FRAC_1_SQRT_2,
+                    0.0,
+                ),
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(1.0, 0.0, 0.0),
+                Point3d::new(-1.0, 0.0, 0.0),
+                Point3d::new(0.0, -1.0, 0.0),
+            ],
+            9 => vec![
+                Point3d::new(-0.64278760968, 0.76604444311, 0.0),
+                Point3d::new(0.86602540378, -0.5, 0.0),
+                Point3d::new(0.64278760968, 0.76604444311, 0.0),
+                Point3d::new(-0.34202014333, -0.93969262079, 0.0),
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(0.98480775301, 0.17364817767, 0.0),
+                Point3d::new(-0.98480775301, 0.17364817767, 0.0),
+                Point3d::new(0.34202014333, -0.93969262079, 0.0),
+                Point3d::new(-0.86602540378, -0.5, 0.0),
+            ],
+            10 => vec![
+                Point3d::new(-0.80901699437, 0.58778525229, 0.0),
+                Point3d::new(0.80901699437, -0.58778525229, 0.0),
+                Point3d::new(0.30901699437, 0.95105651630, 0.0),
+                Point3d::new(-0.30901699437, -0.95105651630, 0.0),
+                Point3d::new(-0.30901699437, 0.95105651630, 0.0),
+                Point3d::new(0.80901699437, 0.58778525229, 0.0),
+                Point3d::new(-1.0, 0.0, 0.0),
+                Point3d::new(0.30901699437, -0.95105651630, 0.0),
+                Point3d::new(1.0, 0.0, 0.0),
+                Point3d::new(-0.80901699437, -0.58778525229, 0.0),
+            ],
+            11 => vec![
+                Point3d::new(-0.909632, 0.415415, 0.0),
+                Point3d::new(0.755750, -0.654861, 0.0),
+                Point3d::new(0.54064081745, 0.84125353283, 0.0),
+                Point3d::new(-0.281733, -0.959493, 0.0),
+                Point3d::new(-0.54064081745, 0.84125353283, 0.0),
+                Point3d::new(0.909632, 0.415415, 0.0),
+                Point3d::new(-0.989821, -0.142315, 0.0),
+                Point3d::new(0.281733, -0.959493, 0.0),
+                Point3d::new(0.989821, -0.142315, 0.0),
+                Point3d::new(-0.755750, -0.654861, 0.0),
+                Point3d::new(0.0, 1.0, 0.0),
+            ],
+            12 => vec![
+                Point3d::new(-0.5, 0.86602540378, 0.0),
+                Point3d::new(0.86602540378, -0.5, 0.0),
+                Point3d::new(0.86602540378, 0.5, 0.0),
+                Point3d::new(-0.86602540378, -0.5, 0.0),
+                Point3d::new(1.0, 0.0, 0.0),
+                Point3d::new(0.5, 0.86602540378, 0.0),
+                Point3d::new(0.0, -1.0, 0.0),
+                Point3d::new(-0.5, -0.86602540378, 0.0),
+                Point3d::new(0.0, 1.0, 0.0),
+                Point3d::new(0.5, -0.86602540378, 0.0),
+                Point3d::new(-1.0, 0.0, 0.0),
+                Point3d::new(-0.86602540378, 0.5, 0.0),
+            ],
+            _ => vec![],
+        }
+    }
+
+    fn get_colours(order_cardinality: u8) -> Vec<&'static str> {
+        const RED: &str = "#FF0000";
+        const BLUE: &str = "#0000FF";
+        const YELLOW: &str = "#FFFF00";
+        const GREEN: &str = "#099902";
+        const PURPLE: &str = "#9900FF";
+        const ORANGE: &str = "#FFA500";
+        const LIGHT_BLUE: &str = "#00FFFF";
+        const BROWN: &str = "#8B4513";
+        const MAGENTA: &str = "#FF00FF";
+        const WHITE: &str = "#FFFFFF";
+        const SILVER: &str = "#C0C0C0";
+        const GOLD: &str = "#FFD700";
+
+        match order_cardinality {
+            1 => vec![RED],
+            2 => vec![RED, BLUE],
+            3 => vec![RED, BLUE, YELLOW],
+            4 => vec![RED, BLUE, YELLOW, GREEN],
+            5 => vec![RED, BLUE, YELLOW, GREEN, PURPLE],
+            6 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE],
+            7 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE],
+            8 => vec![RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN],
+            9 => vec![
+                RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA,
+            ],
+            10 => vec![
+                RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE,
+            ],
+            11 => vec![
+                RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE, SILVER,
+            ],
+            12 => vec![
+                RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, LIGHT_BLUE, BROWN, MAGENTA, WHITE,
+                SILVER, GOLD,
+            ],
+            _ => vec![],
+        }
+    }
 } // mod regen
 
 #[cfg(test)]
 mod tests {
+    use super::regen::{
+        build_canonical_from_tables, build_citation_from_tables, canonical_system_name,
+    };
     use super::*;
-    use super::regen::{build_canonical_from_tables, build_citation_from_tables, canonical_system_name};
 
     #[test]
     fn test_build_graph_substrate() {

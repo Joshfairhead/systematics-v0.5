@@ -56,7 +56,9 @@ async fn export_then_load_round_trips_through_the_schema() {
 
     let loaded = data["loadPerspective"]["loaded"].as_array().unwrap();
     assert!(
-        loaded.iter().any(|v| v == "perspective_dramatic_universe_vol_3"),
+        loaded
+            .iter()
+            .any(|v| v == "perspective_dramatic_universe_vol_3"),
         "DU3 must be reported as loaded, got {loaded:?}"
     );
     // The canonical systems DU3 depends on are present in the seed → nothing
@@ -101,8 +103,7 @@ async fn load_reports_dangling_manifest_dependencies() {
 
     assert_eq!(data["loadPerspective"]["loaded"][0], "perspective_orphan");
     assert_eq!(
-        data["loadPerspective"]["unresolved"][0],
-        "system:system_does_not_exist_9",
+        data["loadPerspective"]["unresolved"][0], "system:system_does_not_exist_9",
         "an unresolved manifest dep must be reported (tolerated, not an error)"
     );
 }

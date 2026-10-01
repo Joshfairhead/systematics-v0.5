@@ -98,9 +98,9 @@ impl Ordinality {
 /// A topological anchor at a single vertex of the K_n system.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Point {
-    pub id: String,       // "point_{order_cardinality}_{ordinality}"
+    pub id: String, // "point_{order_cardinality}_{ordinality}"
     #[serde(rename = "order")]
-    pub order_cardinality: String,    // "order_{order_cardinality}"
+    pub order_cardinality: String, // "order_{order_cardinality}"
     pub ordinality: String, // "position_{ordinality}"
 }
 
@@ -132,10 +132,10 @@ impl Point {
 /// produces the same ID as `Line::new(3, 1, 2)`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Line {
-    pub id: String,                 // "line_{order_cardinality}_{p1}_{p2}" with p1 < p2
+    pub id: String, // "line_{order_cardinality}_{p1}_{p2}" with p1 < p2
     #[serde(rename = "order")]
-    pub order_cardinality: String,              // "order_{order_cardinality}"
-    pub ordinality: String,           // "position_{p1}"
+    pub order_cardinality: String, // "order_{order_cardinality}"
+    pub ordinality: String, // "position_{p1}"
     pub position_secondary: String, // "position_{p2}"
 }
 

@@ -55,7 +55,10 @@ async fn create_read_delete_sequence() {
         .await;
     let data = resp.data.into_json().unwrap();
     assert_eq!(data["sequence"]["name"], "Test Run");
-    assert_eq!(data["sequence"]["members"][0], "system:system_canonical_monad_1");
+    assert_eq!(
+        data["sequence"]["members"][0],
+        "system:system_canonical_monad_1"
+    );
 
     // Delete.
     let resp = schema
@@ -82,7 +85,11 @@ async fn auto_id_extracts_disambiguate() {
     "#;
 
     let first = schema.execute(extract).await;
-    assert!(first.errors.is_empty(), "first extract errors: {:?}", first.errors);
+    assert!(
+        first.errors.is_empty(),
+        "first extract errors: {:?}",
+        first.errors
+    );
     let first_id = first.data.into_json().unwrap()["createSequence"]["id"]
         .as_str()
         .unwrap()
@@ -99,8 +106,15 @@ async fn auto_id_extracts_disambiguate() {
         .unwrap()
         .to_string();
 
-    assert_ne!(first_id, second_id, "repeated Extract must yield distinct ids");
-    assert_eq!(second_id, format!("{first_id}_2"), "disambiguation appends _2");
+    assert_ne!(
+        first_id, second_id,
+        "repeated Extract must yield distinct ids"
+    );
+    assert_eq!(
+        second_id,
+        format!("{first_id}_2"),
+        "disambiguation appends _2"
+    );
 }
 
 #[tokio::test]

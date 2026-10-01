@@ -148,7 +148,6 @@ pub struct DecomposeRequest {
     pub system_ref: String,
 }
 
-
 /// A selectable column — one **tag key**. The view is composed by choosing which
 /// keys to show (the Tag reconciler's own by-key action). Everything is a tag, so
 /// a column is just a tag key surfaced.
@@ -219,7 +218,11 @@ impl Row<'_> {
             Row::Seq(s) => format!("{} {}", s.name, s.members.join(" ")).to_lowercase(),
             Row::Ref(r) => format!(
                 "{} {} {} {} {} {}",
-                persp(r), src(r), art(r), loc(r), r.target,
+                persp(r),
+                src(r),
+                art(r),
+                loc(r),
+                r.target,
                 r.note.clone().unwrap_or_default()
             )
             .to_lowercase(),
@@ -247,7 +250,7 @@ fn passes_row(row: Row, filter_order: Option<i32>, needle: &str) -> bool {
 fn in_scope(row: &Row, scope: Option<&[String]>) -> bool {
     match scope {
         None => true,
-        Some(members) => row.system_addr().is_some_and(|a| members.iter().any(|m| *m == a)),
+        Some(members) => row.system_addr().is_some_and(|a| members.contains(&a)),
     }
 }
 /// A row's **deletable address** (`system:` / `sequence:` / `reference:`), used by
@@ -371,12 +374,25 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     };
 
     // ---- Editor form: author a System from custom values ----
-    let toggle_editor = { let o = editor_open.clone(); Callback::from(move |_: MouseEvent| o.set(!*o)) };
-    let on_ed_name = { let s = ed_name.clone(); Callback::from(move |e: InputEvent| s.set(e.target_unchecked_into::<HtmlInputElement>().value())) };
+    let toggle_editor = {
+        let o = editor_open.clone();
+        Callback::from(move |_: MouseEvent| o.set(!*o))
+    };
+    let on_ed_name = {
+        let s = ed_name.clone();
+        Callback::from(move |e: InputEvent| {
+            s.set(e.target_unchecked_into::<HtmlInputElement>().value())
+        })
+    };
     let on_ed_order = {
         let (ed_order, ed_terms, ed_conns) = (ed_order.clone(), ed_terms.clone(), ed_conns.clone());
         Callback::from(move |e: InputEvent| {
-            let n = e.target_unchecked_into::<HtmlInputElement>().value().parse::<i32>().unwrap_or(3).clamp(1, 12);
+            let n = e
+                .target_unchecked_into::<HtmlInputElement>()
+                .value()
+                .parse::<i32>()
+                .unwrap_or(3)
+                .clamp(1, 12);
             ed_order.set(n);
             ed_terms.set(vec![String::new(); n as usize]);
             ed_conns.set(vec![String::new(); (n * (n - 1) / 2) as usize]);
@@ -389,14 +405,21 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         let oninput = Callback::from(move |e: InputEvent| {
             let v = e.target_unchecked_into::<HtmlInputElement>().value();
             let mut next = (*state).clone();
-            if i < next.len() { next[i] = v; }
+            if i < next.len() {
+                next[i] = v;
+            }
             state.set(next);
         });
         html! { <input class="ed-input" placeholder={ph} value={ val } oninput={ oninput } /> }
     };
     let ed_order_val = *ed_order;
     let on_create = {
-        let (on_author, ed_name, ed_terms, ed_conns) = (props.on_author.clone(), ed_name.clone(), ed_terms.clone(), ed_conns.clone());
+        let (on_author, ed_name, ed_terms, ed_conns) = (
+            props.on_author.clone(),
+            ed_name.clone(),
+            ed_terms.clone(),
+            ed_conns.clone(),
+        );
         Callback::from(move |_: MouseEvent| {
             on_author.emit(AuthorRequest {
                 name: (*ed_name).clone(),
@@ -408,8 +431,12 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     };
     // Prefill from the canonical system of the current order_cardinality ("open the canonical").
     let on_prefill = {
-        let (templates, ed_order, ed_terms, ed_conns) =
-            (props.templates.clone(), ed_order.clone(), ed_terms.clone(), ed_conns.clone());
+        let (templates, ed_order, ed_terms, ed_conns) = (
+            props.templates.clone(),
+            ed_order.clone(),
+            ed_terms.clone(),
+            ed_conns.clone(),
+        );
         Callback::from(move |_: MouseEvent| {
             if let Some(t) = templates.iter().find(|t| t.order_cardinality == *ed_order) {
                 ed_terms.set(t.terms.clone());
@@ -434,7 +461,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             let text = wasm_bindgen_futures::JsFuture::from(file.text());
             wasm_bindgen_futures::spawn_local(async move {
                 match text.await {
-                    Ok(js) => match serde_json::from_str::<SystemFile>(&js.as_string().unwrap_or_default()) {
+                    Ok(js) => match serde_json::from_str::<SystemFile>(
+                        &js.as_string().unwrap_or_default(),
+                    ) {
                         Ok(sf) => on_author.emit(AuthorRequest {
                             name: sf.name,
                             order_cardinality: sf.order,
@@ -458,7 +487,10 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
         let name = extract_name.clone();
         let members = extract_members.clone();
         Callback::from(move |_: MouseEvent| {
-            on_extract.emit(ExtractRequest { name: name.clone(), members: members.clone() })
+            on_extract.emit(ExtractRequest {
+                name: name.clone(),
+                members: members.clone(),
+            })
         })
     };
     let extract_title = format!(
@@ -486,7 +518,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 .filter_map(|a| a.strip_prefix("system:").map(|s| s.to_string()))
                 .collect();
             if ids.is_empty() {
-                notice.set(Some("Select a system (tick its box) to export.".to_string()));
+                notice.set(Some(
+                    "Select a system (tick its box) to export.".to_string(),
+                ));
                 return;
             }
             notice.set(None);
@@ -769,7 +803,9 @@ fn table_view(ctx: TableCtx) -> Html {
     let objects: Vec<ChipItem> = pred_objects_scoped(triples, &active_pred_key, spo_constraints)
         .into_iter()
         .map(|v| ChipItem {
-            on: spo_constraints.get(&active_pred_key).is_some_and(|s| s.contains(&v)),
+            on: spo_constraints
+                .get(&active_pred_key)
+                .is_some_and(|s| s.contains(&v)),
             key: v.clone(),
             label: v,
         })
@@ -789,7 +825,10 @@ fn table_view(ctx: TableCtx) -> Html {
     };
     let active_pred_label = pred_label(&active_pred_key);
     // Visible columns in canonical order_cardinality (independent of toggle order_cardinality).
-    let cols: Vec<ColKey> = ALL_COLS.into_iter().filter(|c| visible_cols.contains(c)).collect();
+    let cols: Vec<ColKey> = ALL_COLS
+        .into_iter()
+        .filter(|c| visible_cols.contains(c))
+        .collect();
 
     let cell = |k: ColKey, row: &Row| -> Html {
         let order_cell = |o: Option<i32>| html! { { o.map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } };
@@ -832,7 +871,11 @@ fn table_view(ctx: TableCtx) -> Html {
                 }
             }
             (ColKey::Name, Row::Raw(e)) => {
-                let cls = if e.is_edge { "tag tag-locator" } else { "tag tag-perspective" };
+                let cls = if e.is_edge {
+                    "tag tag-locator"
+                } else {
+                    "tag tag-perspective"
+                };
                 html! { <span class={ cls }>{ &e.name }</span> }
             }
             (ColKey::Cites, Row::Raw(e)) => html! { { if e.is_edge { "edge" } else { "node" } } },
@@ -853,7 +896,8 @@ fn table_view(ctx: TableCtx) -> Html {
                 let name_tag = if s.members.iter().any(|m| m.starts_with("system:")) {
                     let on_view_sequence = on_view_sequence.clone();
                     let members = s.members.clone();
-                    let onclick = Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
+                    let onclick =
+                        Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
                     html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this sequence — header buttons navigate its members">{ label }</button> }
                 } else {
                     html! { <span class="tag tag-monad">{ label }</span> }
@@ -870,8 +914,16 @@ fn table_view(ctx: TableCtx) -> Html {
             (ColKey::Citation, Row::Ref(r)) => citation_tags(r),
             (ColKey::Cites, Row::Ref(r)) => {
                 let f = frag(r);
-                let cites = if f.is_empty() { "whole system".to_string() } else { f };
-                let target_label = r.target_system.as_ref().map(|s| s.name.clone()).unwrap_or_else(|| r.target.clone());
+                let cites = if f.is_empty() {
+                    "whole system".to_string()
+                } else {
+                    f
+                };
+                let target_label = r
+                    .target_system
+                    .as_ref()
+                    .map(|s| s.name.clone())
+                    .unwrap_or_else(|| r.target.clone());
                 html! { <span title={ target_label }>{ cites }</span> }
             }
             (ColKey::Note, Row::Ref(r)) => html! { { r.note.clone().unwrap_or_default() } },
@@ -886,8 +938,14 @@ fn table_view(ctx: TableCtx) -> Html {
         let search = search.clone();
         Callback::from(move |v: String| search.set(v))
     };
-    let on_toggle_sort = { let s = sort_open.clone(); Callback::from(move |_: ()| s.set(!*s)) };
-    let on_toggle_filter = { let s = filter_open.clone(); Callback::from(move |_: ()| s.set(!*s)) };
+    let on_toggle_sort = {
+        let s = sort_open.clone();
+        Callback::from(move |_: ()| s.set(!*s))
+    };
+    let on_toggle_filter = {
+        let s = filter_open.clone();
+        Callback::from(move |_: ()| s.set(!*s))
+    };
     let scoped = !spo_constraints.is_empty();
 
     // Reciprocal traversal — a pinned SUBJECT advertising its values (S → P·O·source).
@@ -916,8 +974,14 @@ fn table_view(ctx: TableCtx) -> Html {
         }
         // Systematics predicate order_cardinality; any others appended after.
         const ORDER: [&str; 8] = [
-            "name", "order_cardinality", "coherence", "term-designation", "connective-designation",
-            "term", "connective", "source",
+            "name",
+            "order_cardinality",
+            "coherence",
+            "term-designation",
+            "connective-designation",
+            "term",
+            "connective",
+            "source",
         ];
         let mut preds: Vec<String> = ORDER
             .iter()
@@ -1138,9 +1202,14 @@ fn citation_tags(r: &ReferenceView) -> Html {
 
     let source_tag = (!source.is_empty())
         .then(|| html! { <span class="tag tag-source" title="Source">{ source }</span> });
-    let artefact_url = r.artefact.as_ref().and_then(|a| a.url.clone()).unwrap_or_default();
-    let artefact_tag = (!artefact.is_empty())
-        .then(|| html! { <span class="tag tag-artefact" title={ artefact_url }>{ artefact }</span> });
+    let artefact_url = r
+        .artefact
+        .as_ref()
+        .and_then(|a| a.url.clone())
+        .unwrap_or_default();
+    let artefact_tag = (!artefact.is_empty()).then(
+        || html! { <span class="tag tag-artefact" title={ artefact_url }>{ artefact }</span> },
+    );
     let locator_tag = (!locator.is_empty())
         .then(|| html! { <span class="tag tag-locator" title="Lookup">{ locator }</span> });
 
@@ -1175,7 +1244,14 @@ fn download_system_json(sys: &InstanceSystem) {
         .chars()
         .map(|c| if c.is_alphanumeric() { c } else { '-' })
         .collect();
-    let filename = format!("{}.json", if slug.is_empty() { "system".into() } else { slug });
+    let filename = format!(
+        "{}.json",
+        if slug.is_empty() {
+            "system".into()
+        } else {
+            slug
+        }
+    );
 
     if let Some(doc) = web_sys::window().and_then(|w| w.document()) {
         if let Ok(el) = doc.create_element("a") {

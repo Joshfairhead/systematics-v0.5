@@ -44,8 +44,10 @@ async fn all_references_exposes_resolved_browser_fields() {
     // value ("Structure") as the reference's SPO `object`.
     let du1_heptad = refs
         .iter()
-        .find(|r| r["target"] == "system:system_canonical_heptad_7#coherence"
-            && r["perspectiveName"] == "Dramatic Universe Vol 1")
+        .find(|r| {
+            r["target"] == "system:system_canonical_heptad_7#coherence"
+                && r["perspectiveName"] == "Dramatic Universe Vol 1"
+        })
         .expect("DU1 heptad coherence citation onto canonical present");
 
     assert_eq!(du1_heptad["targetFragment"], "coherence");

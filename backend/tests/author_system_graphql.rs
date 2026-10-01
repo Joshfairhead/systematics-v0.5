@@ -35,7 +35,12 @@ async fn author_triad_from_values() {
         .await;
     assert!(r.errors.is_empty(), "render errors: {:?}", r.errors);
     let d = r.data.into_json().unwrap();
-    let terms: Vec<String> = d["renderSystem"]["terms"].as_array().unwrap().iter().map(|t| t["value"].as_str().unwrap().to_string()).collect();
+    let terms: Vec<String> = d["renderSystem"]["terms"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["value"].as_str().unwrap().to_string())
+        .collect();
     assert_eq!(terms, vec!["Alpha", "Beta", "Gamma"]);
 }
 
@@ -53,7 +58,10 @@ async fn join_combines_selected_systems_into_a_kn() {
     let seq = r#"mutation { createSequence(input:{name:"Unity Assoc", members:["system:system_essence_1","system:system_existence_1"]}){ id } }"#;
     let r = schema.execute(seq).await;
     assert!(r.errors.is_empty(), "createSequence: {:?}", r.errors);
-    let seq_id = r.data.into_json().unwrap()["createSequence"]["id"].as_str().unwrap().to_string();
+    let seq_id = r.data.into_json().unwrap()["createSequence"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     let join = format!(
         r#"mutation {{ joinSystems(input:{{ name:"Essence Existence", members:["system:system_essence_1","system:system_existence_1"], sequenceRef:"{seq_id}" }}){{ id orderCardinality }} }}"#
@@ -61,12 +69,17 @@ async fn join_combines_selected_systems_into_a_kn() {
     let r = schema.execute(join).await;
     assert!(r.errors.is_empty(), "join: {:?}", r.errors);
     let d = r.data.into_json().unwrap();
-    assert_eq!(d["joinSystems"]["orderCardinality"], 2, "two distinct terms → a dyad");
+    assert_eq!(
+        d["joinSystems"]["orderCardinality"], 2,
+        "two distinct terms → a dyad"
+    );
     let new_id = d["joinSystems"]["id"].as_str().unwrap().to_string();
 
     // The joined dyad renders with the two distinct terms (order preserved).
     let r = schema
-        .execute(format!(r#"{{ renderSystem(systemId:"{new_id}"){{ terms {{ value }} }} }}"#))
+        .execute(format!(
+            r#"{{ renderSystem(systemId:"{new_id}"){{ terms {{ value }} }} }}"#
+        ))
         .await;
     let terms: Vec<String> = r.data.into_json().unwrap()["renderSystem"]["terms"]
         .as_array()
@@ -87,7 +100,10 @@ async fn join_combines_selected_systems_into_a_kn() {
                 .iter()
                 .any(|m| m.as_str() == Some(&format!("system:{new_id}")))
     });
-    assert!(appended, "joined system should be appended to the monad's sequence");
+    assert!(
+        appended,
+        "joined system should be appended to the monad's sequence"
+    );
 }
 
 #[tokio::test]
@@ -102,7 +118,10 @@ async fn decompose_tetrad_into_dyads_and_triads() {
         .execute(r#"mutation { decomposeSystem(input:{ systemRef:"system:system_quad_4" }){ id orderCardinality } }"#)
         .await;
     assert!(d.errors.is_empty(), "decompose: {:?}", d.errors);
-    let faces = d.data.into_json().unwrap()["decomposeSystem"].as_array().unwrap().clone();
+    let faces = d.data.into_json().unwrap()["decomposeSystem"]
+        .as_array()
+        .unwrap()
+        .clone();
     assert_eq!(faces.len(), 10, "tetrad decomposes into 10 faces");
     let dyads = faces.iter().filter(|f| f["orderCardinality"] == 2).count();
     let triads = faces.iter().filter(|f| f["orderCardinality"] == 3).count();
@@ -120,8 +139,14 @@ async fn author_same_name_overwrites_in_place() {
         )
     };
 
-    let first = schema.execute(author(r#"["Alpha", "Beta", "Gamma"]"#)).await;
-    assert!(first.errors.is_empty(), "first author errors: {:?}", first.errors);
+    let first = schema
+        .execute(author(r#"["Alpha", "Beta", "Gamma"]"#))
+        .await;
+    assert!(
+        first.errors.is_empty(),
+        "first author errors: {:?}",
+        first.errors
+    );
 
     // Same name + order, different term values — must succeed (overwrite), not error.
     let second = schema.execute(author(r#"["One", "Two", "Three"]"#)).await;
@@ -142,7 +167,11 @@ async fn author_same_name_overwrites_in_place() {
         .iter()
         .map(|t| t["value"].as_str().unwrap().to_string())
         .collect();
-    assert_eq!(terms, vec!["One", "Two", "Three"], "overwrite must replace the term values");
+    assert_eq!(
+        terms,
+        vec!["One", "Two", "Three"],
+        "overwrite must replace the term values"
+    );
 }
 
 #[tokio::test]
@@ -163,13 +192,19 @@ async fn edit_system_is_id_stable_and_keeps_sequence_refs() {
         .execute(r#"mutation { authorSystem(input:{name:"Monad CT", orderCardinality:1, terms:["Monad CT"], connectives:[]}){ id } }"#)
         .await;
     assert!(a.errors.is_empty(), "author: {:?}", a.errors);
-    let id = a.data.into_json().unwrap()["authorSystem"]["id"].as_str().unwrap().to_string();
+    let id = a.data.into_json().unwrap()["authorSystem"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
     let seq = format!(
         r#"mutation {{ createSequence(input:{{name:"CT", members:["system:{id}"]}}){{ id }} }}"#
     );
     let s = schema.execute(&seq).await;
     assert!(s.errors.is_empty(), "createSequence: {:?}", s.errors);
-    let seq_id = s.data.into_json().unwrap()["createSequence"]["id"].as_str().unwrap().to_string();
+    let seq_id = s.data.into_json().unwrap()["createSequence"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
 
     // Rename the monad to "Monoid" via editSystem — id must NOT change.
     let e = format!(
@@ -178,21 +213,39 @@ async fn edit_system_is_id_stable_and_keeps_sequence_refs() {
     let r = schema.execute(&e).await;
     assert!(r.errors.is_empty(), "editSystem: {:?}", r.errors);
     let d = r.data.into_json().unwrap();
-    assert_eq!(d["editSystem"]["id"], id, "id must be stable across a rename");
+    assert_eq!(
+        d["editSystem"]["id"], id,
+        "id must be stable across a rename"
+    );
     assert_eq!(d["editSystem"]["name"], "Monoid", "name updated in place");
 
     // The system still resolves under the same id, now named Monoid…
-    let rr = schema.execute(&format!(r#"{{ renderSystem(systemId:"{id}"){{ terms {{ value }} }} }}"#)).await;
+    let rr = schema
+        .execute(&format!(
+            r#"{{ renderSystem(systemId:"{id}"){{ terms {{ value }} }} }}"#
+        ))
+        .await;
     let dd = rr.data.into_json().unwrap();
     assert_eq!(dd["renderSystem"]["terms"][0]["value"], "Monoid");
 
     // …and the sequence still references it (not orphaned).
     let sq = schema.execute(r#"{ sequences { id members } }"#).await;
     let sd = sq.data.into_json().unwrap();
-    let members: Vec<String> = sd["sequences"].as_array().unwrap().iter()
-        .find(|s| s["id"] == seq_id).unwrap()["members"].as_array().unwrap()
-        .iter().map(|m| m.as_str().unwrap().to_string()).collect();
-    assert!(members.contains(&format!("system:{id}")), "sequence ref survives the rename: {members:?}");
+    let members: Vec<String> = sd["sequences"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|s| s["id"] == seq_id)
+        .unwrap()["members"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|m| m.as_str().unwrap().to_string())
+        .collect();
+    assert!(
+        members.contains(&format!("system:{id}")),
+        "sequence ref survives the rename: {members:?}"
+    );
 
     // No dangling threads: the old (name-derived) vocabulary + character are cleaned up.
     let old = schema
@@ -200,6 +253,12 @@ async fn edit_system_is_id_stable_and_keeps_sequence_refs() {
         .await;
     assert!(old.errors.is_empty(), "cleanup query: {:?}", old.errors);
     let od = old.data.into_json().unwrap();
-    assert!(od["v"].is_null(), "old vocabulary should be cleaned up after a rename");
-    assert!(od["c"].is_null(), "old character should be cleaned up after a rename");
+    assert!(
+        od["v"].is_null(),
+        "old vocabulary should be cleaned up after a rename"
+    );
+    assert!(
+        od["c"].is_null(),
+        "old character should be cleaned up after a rename"
+    );
 }

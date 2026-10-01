@@ -27,7 +27,11 @@ async fn create_theology_triad_end_to_end() {
         }
     "#;
     let resp = schema.execute(create_chars).await;
-    assert!(resp.errors.is_empty(), "create chars errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "create chars errors: {:?}",
+        resp.errors
+    );
     let data = resp.data.into_json().unwrap();
     assert_eq!(data["imm"]["id"], "char_word_immanent");
     assert_eq!(data["omn"]["id"], "char_word_omniscient");
@@ -54,11 +58,18 @@ async fn create_theology_triad_end_to_end() {
         }
     "#;
     let resp = schema.execute(create_sv).await;
-    assert!(resp.errors.is_empty(), "create sv errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "create sv errors: {:?}",
+        resp.errors
+    );
     let data = resp.data.into_json().unwrap();
     let sv_id = data["createVocabulary"]["id"].as_str().unwrap().to_string();
     assert_eq!(data["createVocabulary"]["name"], "Theology Triad");
-    assert_eq!(data["createVocabulary"]["terms"].as_array().unwrap().len(), 3);
+    assert_eq!(
+        data["createVocabulary"]["terms"].as_array().unwrap().len(),
+        3
+    );
     assert!(data["createVocabulary"]["validationErrors"]
         .as_array()
         .unwrap()
@@ -81,7 +92,11 @@ async fn create_theology_triad_end_to_end() {
     let req = async_graphql::Request::new(create_system)
         .variables(async_graphql::Variables::from_json(json!({ "sv": sv_id })));
     let resp = schema.execute(req).await;
-    assert!(resp.errors.is_empty(), "create system errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "create system errors: {:?}",
+        resp.errors
+    );
     let data = resp.data.into_json().unwrap();
     let system_id = data["createSystem"]["id"].as_str().unwrap().to_string();
     assert_eq!(data["createSystem"]["name"], "Theology Triad");
@@ -90,8 +105,9 @@ async fn create_theology_triad_end_to_end() {
 
     // Validate returns no errors.
     let validate = r#"query Validate($id: String!) { validateSystem(id: $id) }"#;
-    let req = async_graphql::Request::new(validate)
-        .variables(async_graphql::Variables::from_json(json!({ "id": system_id })));
+    let req = async_graphql::Request::new(validate).variables(async_graphql::Variables::from_json(
+        json!({ "id": system_id }),
+    ));
     let resp = schema.execute(req).await;
     assert!(resp.errors.is_empty(), "validate errors: {:?}", resp.errors);
     let data = resp.data.into_json().unwrap();
@@ -118,13 +134,16 @@ async fn create_theology_triad_end_to_end() {
             s: deleteVocabulary(id: $sv)
         }
     "#;
-    let req = async_graphql::Request::new(cleanup).variables(
-        async_graphql::Variables::from_json(json!({ "system": system_id, "sv": sv_id })),
-    );
+    let req = async_graphql::Request::new(cleanup).variables(async_graphql::Variables::from_json(
+        json!({ "system": system_id, "sv": sv_id }),
+    ));
     let resp = schema.execute(req).await;
     let data = resp.data.into_json().unwrap();
     assert_eq!(data["g"], true);
-    assert_eq!(data["s"], false, "deleteSystem already cascaded the vocabulary");
+    assert_eq!(
+        data["s"], false,
+        "deleteSystem already cascaded the vocabulary"
+    );
 }
 
 #[tokio::test]
@@ -134,7 +153,11 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
         query { __type(name: "MutationRoot") { fields { name } } }
     "#;
     let resp = schema.execute(introspect).await;
-    assert!(resp.errors.is_empty(), "introspect errors: {:?}", resp.errors);
+    assert!(
+        resp.errors.is_empty(),
+        "introspect errors: {:?}",
+        resp.errors
+    );
     let data = resp.data.into_json().unwrap();
     let fields: Vec<String> = data["__type"]["fields"]
         .as_array()

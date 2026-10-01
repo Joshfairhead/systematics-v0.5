@@ -43,7 +43,10 @@ async fn run_six_laws_over_canonical_triad() {
     let base = expansion["reading"].as_array().unwrap();
     assert_eq!(base.len(), 3);
     let spo = interaction["reading"].as_array().unwrap();
-    assert_eq!(spo, &vec![base[0].clone(), base[2].clone(), base[1].clone()]);
+    assert_eq!(
+        spo,
+        &vec![base[0].clone(), base[2].clone(), base[1].clone()]
+    );
 }
 
 #[tokio::test]
@@ -84,7 +87,8 @@ async fn run_six_laws_empty_for_bad_input() {
     assert!(r1.errors.is_empty());
     assert_eq!(r1.data.into_json().unwrap()["runSixLaws"], json!([]));
     // Wrong number of positions → empty (needs exactly 3 to be a triad).
-    let q2 = r#"query { runSixLaws(systemId: "system_canonical_triad_3", positions: [1,2]) { law } }"#;
+    let q2 =
+        r#"query { runSixLaws(systemId: "system_canonical_triad_3", positions: [1,2]) { law } }"#;
     let r2 = schema.execute(q2).await;
     assert!(r2.errors.is_empty());
     assert_eq!(r2.data.into_json().unwrap()["runSixLaws"], json!([]));
