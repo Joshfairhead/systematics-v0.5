@@ -48,10 +48,11 @@ fn assembled_graph() -> (Graph, usize) {
 fn all_modules_load() {
     let (graph, modules) = assembled_graph();
     assert_eq!(
-        modules, 21,
-        "expected 21 module files to load (14 sources + the Architecture Pentad \
+        modules, 24,
+        "expected 24 module files to load (14 sources + the Architecture Pentad \
          + the Architectural Monad, Blue Earth, Interface State Model, and Blue Earth \
-         Ventures registries + the Plato and Bennett sequences); got {modules}"
+         Ventures registries + the Plato, Bennett, Rheomode and DU1 sequences + the \
+         standalone concepts module); got {modules}"
     );
     assert_eq!(
         graph.perspectives().len(),
@@ -131,10 +132,12 @@ fn module_owned_systems_present() {
     // Then 110 → 112 (2026-09-17): the Bennett sequence — its monad head + the Mind triad.
     // Then 112 → 113 (2026-09-17): the Browser triad (the sort/filter module as a system —
     // Query·List·View / Sort·Search·Filter) added to the Architectural Monad registry.
+    // Then 113 → 125 (2026-09-30): durabilised the Rheomode monad (+5), DU1 monad (+2),
+    // the Consent pentad + Argument triad (concepts), and Blue Earth's Impact Thesis triad.
     assert_eq!(
         graph.systems.len(),
-        113,
-        "expected 12 canonical + 1 citation + 88 fragment + 12 module systems"
+        125,
+        "expected 12 canonical + 1 citation + 88 fragment + 24 module systems"
     );
 }
 

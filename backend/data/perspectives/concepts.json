@@ -1,0 +1,172 @@
+{
+  "characters": [
+    {
+      "id": "char_word_consent_t1",
+      "kind": "word",
+      "value": "Capacity"
+    },
+    {
+      "id": "char_word_consent_t2",
+      "kind": "word",
+      "value": "Disclosure"
+    },
+    {
+      "id": "char_word_consent_t3",
+      "kind": "word",
+      "value": "Comprehension"
+    },
+    {
+      "id": "char_word_consent_t4",
+      "kind": "word",
+      "value": "Voluntariness"
+    },
+    {
+      "id": "char_word_consent_t5",
+      "kind": "word",
+      "value": "Authorisation"
+    },
+    {
+      "id": "char_word_consent_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c4",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c5",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c6",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c7",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c8",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c9",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_consent_c10",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_argument_t1",
+      "kind": "word",
+      "value": "Claim"
+    },
+    {
+      "id": "char_word_argument_t2",
+      "kind": "word",
+      "value": "Warrant"
+    },
+    {
+      "id": "char_word_argument_t3",
+      "kind": "word",
+      "value": "Data"
+    },
+    {
+      "id": "char_word_argument_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_argument_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_argument_c3",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_consent_5",
+      "name": "Consent",
+      "order": 5,
+      "terms": [
+        "char_word_consent_t1",
+        "char_word_consent_t2",
+        "char_word_consent_t3",
+        "char_word_consent_t4",
+        "char_word_consent_t5"
+      ],
+      "connectives": [
+        "char_word_consent_c1",
+        "char_word_consent_c2",
+        "char_word_consent_c3",
+        "char_word_consent_c4",
+        "char_word_consent_c5",
+        "char_word_consent_c6",
+        "char_word_consent_c7",
+        "char_word_consent_c8",
+        "char_word_consent_c9",
+        "char_word_consent_c10"
+      ]
+    },
+    {
+      "id": "vocab_argument_3",
+      "name": "Argument",
+      "order": 3,
+      "terms": [
+        "char_word_argument_t1",
+        "char_word_argument_t2",
+        "char_word_argument_t3"
+      ],
+      "connectives": [
+        "char_word_argument_c1",
+        "char_word_argument_c2",
+        "char_word_argument_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_consent_5",
+      "name": "Consent",
+      "order": 5,
+      "coherence": "Significance and Potential",
+      "term_designation": "Limits",
+      "connective_designation": "Mutualities",
+      "grammar_ref": "grammar_5",
+      "vocabulary_ref": "vocab_consent_5"
+    },
+    {
+      "id": "system_argument_3",
+      "name": "Argument",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_argument_3"
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "characters": [
+    {
+      "id": "char_word_du1_t1",
+      "kind": "word",
+      "value": "DU1"
+    },
+    {
+      "id": "char_word_temporalities_t1",
+      "kind": "word",
+      "value": "Eternity"
+    },
+    {
+      "id": "char_word_temporalities_t2",
+      "kind": "word",
+      "value": "Hyparxis"
+    },
+    {
+      "id": "char_word_temporalities_t3",
+      "kind": "word",
+      "value": "Chronos"
+    },
+    {
+      "id": "char_word_temporalities_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_temporalities_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_temporalities_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_will_t1",
+      "kind": "word",
+      "value": "Suspension"
+    },
+    {
+      "id": "char_word_will_t2",
+      "kind": "word",
+      "value": "Tension"
+    },
+    {
+      "id": "char_word_will_t3",
+      "kind": "word",
+      "value": "Gesture"
+    },
+    {
+      "id": "char_word_will_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_will_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_will_c3",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_du1_1",
+      "name": "DU1",
+      "order": 1,
+      "terms": [
+        "char_word_du1_t1"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_temporalities_3",
+      "name": "Temporalities",
+      "order": 3,
+      "terms": [
+        "char_word_temporalities_t1",
+        "char_word_temporalities_t2",
+        "char_word_temporalities_t3"
+      ],
+      "connectives": [
+        "char_word_temporalities_c1",
+        "char_word_temporalities_c2",
+        "char_word_temporalities_c3"
+      ]
+    },
+    {
+      "id": "vocab_will_3",
+      "name": "Will",
+      "order": 3,
+      "terms": [
+        "char_word_will_t1",
+        "char_word_will_t2",
+        "char_word_will_t3"
+      ],
+      "connectives": [
+        "char_word_will_c1",
+        "char_word_will_c2",
+        "char_word_will_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_du1_1",
+      "name": "DU1",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_du1_1"
+    },
+    {
+      "id": "system_temporalities_3",
+      "name": "Temporalities",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_temporalities_3"
+    },
+    {
+      "id": "system_will_3",
+      "name": "Will",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_will_3"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "sequence_du1",
+      "name": "DU1",
+      "members": [
+        "system:system_du1_1",
+        "system:system_temporalities_3",
+        "system:system_will_3"
+      ]
+    }
+  ]
+}

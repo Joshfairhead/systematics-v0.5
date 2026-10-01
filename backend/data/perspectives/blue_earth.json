@@ -10,8 +10,70 @@
         "system:system_deals_deployment_2",
         "system:system_delivery_3",
         "system:system_impact_3",
-        "system:system_blue_earth_strategy_4"
+        "system:system_blue_earth_strategy_4",
+        "system:system_impact_thesis_3"
       ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_word_impact_thesis_t1",
+      "kind": "word",
+      "value": "Positive Disruption"
+    },
+    {
+      "id": "char_word_impact_thesis_t2",
+      "kind": "word",
+      "value": "Systemic Change"
+    },
+    {
+      "id": "char_word_impact_thesis_t3",
+      "kind": "word",
+      "value": "Tangible Funding"
+    },
+    {
+      "id": "char_word_impact_thesis_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_impact_thesis_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_impact_thesis_c3",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_impact_thesis_3",
+      "name": "Impact Thesis",
+      "order": 3,
+      "terms": [
+        "char_word_impact_thesis_t1",
+        "char_word_impact_thesis_t2",
+        "char_word_impact_thesis_t3"
+      ],
+      "connectives": [
+        "char_word_impact_thesis_c1",
+        "char_word_impact_thesis_c2",
+        "char_word_impact_thesis_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_impact_thesis_3",
+      "name": "Impact Thesis",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_impact_thesis_3"
     }
   ]
 }

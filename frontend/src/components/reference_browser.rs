@@ -794,6 +794,8 @@ fn table_view(ctx: TableCtx) -> Html {
     let cell = |k: ColKey, row: &Row| -> Html {
         let order_cell = |o: Option<i32>| html! { { o.map(|o| format!("{} {}", o, order_name(o))).unwrap_or_default() } };
         match (k, row) {
+            // The blue tags are **sequences** (they head a monad; they are not themselves a monad).
+            (ColKey::OrderCardinality, Row::Seq(_)) => html! { { "sequence" } },
             (ColKey::OrderCardinality, _) => order_cell(row.order_cardinality()),
             (ColKey::Name, Row::Sys(s)) => {
                 let load = {
@@ -846,13 +848,13 @@ fn table_view(ctx: TableCtx) -> Html {
                         e.stop_propagation();
                         on_delete_sequence.emit(id.clone());
                     });
-                    html! { <button class="row-delete" onclick={ onclick } title="Delete this monad">{ "✕" }</button> }
+                    html! { <button class="row-delete" onclick={ onclick } title="Delete this sequence">{ "✕" }</button> }
                 };
                 let name_tag = if s.members.iter().any(|m| m.starts_with("system:")) {
                     let on_view_sequence = on_view_sequence.clone();
                     let members = s.members.clone();
                     let onclick = Callback::from(move |_: MouseEvent| on_view_sequence.emit(members.clone()));
-                    html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this monad — header buttons navigate its members">{ label }</button> }
+                    html! { <button class="tag tag-monad row-open" onclick={ onclick } title="Enter this sequence — header buttons navigate its members">{ label }</button> }
                 } else {
                     html! { <span class="tag tag-monad">{ label }</span> }
                 };

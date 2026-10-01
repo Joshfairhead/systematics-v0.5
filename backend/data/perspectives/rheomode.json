@@ -1,0 +1,285 @@
+{
+  "characters": [
+    {
+      "id": "char_word_rheomode_t1",
+      "kind": "word",
+      "value": "Rheomode"
+    },
+    {
+      "id": "char_word_affixes_t1",
+      "kind": "word",
+      "value": "Prefixes"
+    },
+    {
+      "id": "char_word_affixes_t2",
+      "kind": "word",
+      "value": "Suffixes"
+    },
+    {
+      "id": "char_word_affixes_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_prefixes_t1",
+      "kind": "word",
+      "value": "di-"
+    },
+    {
+      "id": "char_word_prefixes_t2",
+      "kind": "word",
+      "value": "irre-"
+    },
+    {
+      "id": "char_word_prefixes_t3",
+      "kind": "word",
+      "value": "re-"
+    },
+    {
+      "id": "char_word_prefixes_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_prefixes_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_prefixes_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_adjectival_suffixes_t1",
+      "kind": "word",
+      "value": "Fitting"
+    },
+    {
+      "id": "char_word_adjectival_suffixes_t2",
+      "kind": "word",
+      "value": "Non-fitting"
+    },
+    {
+      "id": "char_word_adjectival_suffixes_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_noun_suffixes_t1",
+      "kind": "word",
+      "value": "-ation"
+    },
+    {
+      "id": "char_word_noun_suffixes_t2",
+      "kind": "word",
+      "value": "re-"
+    },
+    {
+      "id": "char_word_noun_suffixes_t3",
+      "kind": "word",
+      "value": "irre-"
+    },
+    {
+      "id": "char_word_noun_suffixes_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_noun_suffixes_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_noun_suffixes_c3",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_rheomode_verb_t1",
+      "kind": "word",
+      "value": "Meaning"
+    },
+    {
+      "id": "char_word_rheomode_verb_t2",
+      "kind": "word",
+      "value": "Movement"
+    },
+    {
+      "id": "char_word_rheomode_verb_t3",
+      "kind": "word",
+      "value": "Function"
+    },
+    {
+      "id": "char_word_rheomode_verb_c1",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_rheomode_verb_c2",
+      "kind": "word",
+      "value": ""
+    },
+    {
+      "id": "char_word_rheomode_verb_c3",
+      "kind": "word",
+      "value": ""
+    }
+  ],
+  "vocabularies": [
+    {
+      "id": "vocab_rheomode_1",
+      "name": "Rheomode",
+      "order": 1,
+      "terms": [
+        "char_word_rheomode_t1"
+      ],
+      "connectives": []
+    },
+    {
+      "id": "vocab_rheomode_verb_3",
+      "name": "Rheomode Verb",
+      "order": 3,
+      "terms": [
+        "char_word_rheomode_verb_t1",
+        "char_word_rheomode_verb_t2",
+        "char_word_rheomode_verb_t3"
+      ],
+      "connectives": [
+        "char_word_rheomode_verb_c1",
+        "char_word_rheomode_verb_c2",
+        "char_word_rheomode_verb_c3"
+      ]
+    },
+    {
+      "id": "vocab_affixes_2",
+      "name": "Affixes",
+      "order": 2,
+      "terms": [
+        "char_word_affixes_t1",
+        "char_word_affixes_t2"
+      ],
+      "connectives": [
+        "char_word_affixes_c1"
+      ]
+    },
+    {
+      "id": "vocab_prefixes_3",
+      "name": "Prefixes",
+      "order": 3,
+      "terms": [
+        "char_word_prefixes_t1",
+        "char_word_prefixes_t2",
+        "char_word_prefixes_t3"
+      ],
+      "connectives": [
+        "char_word_prefixes_c1",
+        "char_word_prefixes_c2",
+        "char_word_prefixes_c3"
+      ]
+    },
+    {
+      "id": "vocab_adjectival_suffixes_2",
+      "name": "Adjectival Suffixes",
+      "order": 2,
+      "terms": [
+        "char_word_adjectival_suffixes_t1",
+        "char_word_adjectival_suffixes_t2"
+      ],
+      "connectives": [
+        "char_word_adjectival_suffixes_c1"
+      ]
+    },
+    {
+      "id": "vocab_noun_suffixes_3",
+      "name": "Noun Suffixes",
+      "order": 3,
+      "terms": [
+        "char_word_noun_suffixes_t1",
+        "char_word_noun_suffixes_t2",
+        "char_word_noun_suffixes_t3"
+      ],
+      "connectives": [
+        "char_word_noun_suffixes_c1",
+        "char_word_noun_suffixes_c2",
+        "char_word_noun_suffixes_c3"
+      ]
+    }
+  ],
+  "systems": [
+    {
+      "id": "system_rheomode_1",
+      "name": "Rheomode",
+      "order": 1,
+      "coherence": "Universality",
+      "term_designation": "Totality",
+      "connective_designation": "Unity",
+      "grammar_ref": "grammar_1",
+      "vocabulary_ref": "vocab_rheomode_1"
+    },
+    {
+      "id": "system_rheomode_verb_3",
+      "name": "Rheomode Verb",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_rheomode_verb_3"
+    },
+    {
+      "id": "system_affixes_2",
+      "name": "Affixes",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_affixes_2"
+    },
+    {
+      "id": "system_prefixes_3",
+      "name": "Prefixes",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_prefixes_3"
+    },
+    {
+      "id": "system_adjectival_suffixes_2",
+      "name": "Adjectival Suffixes",
+      "order": 2,
+      "coherence": "Complementarity",
+      "term_designation": "Poles",
+      "connective_designation": "Force",
+      "grammar_ref": "grammar_2",
+      "vocabulary_ref": "vocab_adjectival_suffixes_2"
+    },
+    {
+      "id": "system_noun_suffixes_3",
+      "name": "Noun Suffixes",
+      "order": 3,
+      "coherence": "Dynamism",
+      "term_designation": "Impulses",
+      "connective_designation": "Acts",
+      "grammar_ref": "grammar_3",
+      "vocabulary_ref": "vocab_noun_suffixes_3"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "sequence_rheomode",
+      "name": "Rheomode",
+      "members": [
+        "system:system_rheomode_1",
+        "system:system_rheomode_verb_3",
+        "system:system_affixes_2",
+        "system:system_prefixes_3",
+        "system:system_adjectival_suffixes_2",
+        "system:system_noun_suffixes_3"
+      ]
+    }
+  ]
+}

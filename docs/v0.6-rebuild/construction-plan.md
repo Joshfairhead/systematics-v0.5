@@ -51,3 +51,27 @@ The load-bearing result is the **cascade as a canonical, deterministic construct
 linearisation principle it uses; the lexicographical *product* is a separate operation that shares
 that principle (enumerate pairs in lex order) but is **defined by its adjacency rule**, not founded
 on the cascade. So: build bases correct-by-construction now; products are unblocked, not implied.
+
+## Lexicographic product — concrete blueprint (Gemma, 2026-09-30; not gospel)
+Gemma's summary gives a buildable `G·H` on the same cascade, via **1D flattening**:
+- **Flatten** the pair `(g, h)` to a single id: `id = g * n_h + h`. So the product's vertex set
+  is `0 .. n_g*n_h`, enumerated in lexicographical (g-major) order — the cascade's native order.
+- **Two edge passes** (both obeying `source < target`, so no dup/omission, state-free validation):
+  1. **Inter-clique / cross edges** — for `u_g < v_g`, wire *every* H-node under `u_g` to *every*
+     H-node under `v_g` (the G-adjacency dominates — a full bipartite join between the two fibres).
+  2. **Intra-clique / local edges** — for each `g`, wire its internal H-copy by the standard
+     cascade (`u_h < v_h`).
+- Same `AssemblyInstruction` stream (`InitNodes`/`AddEdge{batch,source,target}`), **MessagePack**
+  (`rmp-serde`) on the wire for Holochain (not JSON).
+
+This is Phase 2 of the plan above, made concrete: the product is a second instruction generator
+over the flattened pair-space, reusing the cascade + the `source < target` validator. For K_m·K_n
+it yields `K_{mn}` (complete-graph closure). **Treat as a strong draft, not settled** — verify the
+cross/intra decomposition against our topology before adopting.
+
+## Two notes (user, 2026-09-30)
+- **+ / = / − are *impulses*, not polarities** — the three impulses of a triad (active / reconciling
+  / passive). Encoded today by **term order** (position 1/2/3); no separate impulse field yet.
+- **List sorting is a Sort-operation concern.** The alphabetical name sort is a stopgap; ordering
+  (by name, type, …) belongs to the **Sort** edge of the sort/filter module (the Browser triad),
+  configurable — not a hardcoded `sort_by`.
