@@ -172,9 +172,9 @@ pub struct SequenceView {
 }
 
 #[derive(Deserialize, Debug)]
-struct CreateSequenceResponse {
-    #[serde(rename = "createSequence")]
-    create_sequence: Option<SequenceView>,
+struct LoadMonadResponse {
+    #[serde(rename = "loadMonad")]
+    load_monad: Option<SequenceView>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -582,24 +582,24 @@ impl GraphQLClient {
         Ok(response.data.map(|d| d.sequences).unwrap_or_default())
     }
 
-    /// Extract (Nullad → Monad): materialize a selection as a persisted
-    /// `Sequence` (a Monad) via `createSequence`. `members` are addresses
-    /// (`system:<id>`, …). The backend auto-ids from the name and persists to
-    /// the user store — so the scope becomes a real graph object.
-    pub async fn create_sequence(
+    /// Load (ELT): land an extracted selection raw in a named Monad via `loadMonad`.
+    /// The backend authors a K₁ head (a single graph node) and a bucket Sequence whose
+    /// members are `[head, …selected]`, persisting to the user store. `members` are
+    /// addresses (`system:<id>`, …).
+    pub async fn load_monad(
         &self,
         name: &str,
         members: Vec<String>,
     ) -> Result<SequenceView, ApiError> {
         let query = r#"
-            mutation Extract($input: SequenceInput!) {
-                createSequence(input: $input) { id name members }
+            mutation Load($input: LoadMonadInput!) {
+                loadMonad(input: $input) { id name members }
             }
         "#;
         let variables = serde_json::json!({
             "input": { "name": name, "members": members }
         });
-        let response: GraphQLResponse<CreateSequenceResponse> =
+        let response: GraphQLResponse<LoadMonadResponse> =
             self.execute_query(query, Some(variables)).await?;
         if let Some(errors) = response.errors {
             return Err(ApiError::ParseError(
@@ -612,8 +612,8 @@ impl GraphQLClient {
         }
         response
             .data
-            .and_then(|d| d.create_sequence)
-            .ok_or_else(|| ApiError::ParseError("createSequence returned no data".to_string()))
+            .and_then(|d| d.load_monad)
+            .ok_or_else(|| ApiError::ParseError("loadMonad returned no data".to_string()))
     }
 
     /// Delete a Sequence (Monad) by id — removes it from the graph and the user
