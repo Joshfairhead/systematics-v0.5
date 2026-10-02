@@ -168,13 +168,15 @@ async fn mutation_root_exposes_only_new_shape_mutations() {
 
     // Language-layer mutations (Character / Vocabulary / System) plus the
     // referencing layer (Perspective / Link / Source / Artefact / Lookup /
-    // Reference). Structural anchors and grammars remain immutable.
+    // Reference) and the ELT Load operation (Monad). Structural anchors and
+    // grammars remain immutable.
     let allowed = [
         "Character",
         "Vocabulary",
         "System",
         "Functor",
         "Sequence",
+        "Monad",
         "Perspective",
         "Link",
         "Source",
