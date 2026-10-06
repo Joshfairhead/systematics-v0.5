@@ -778,6 +778,11 @@ body {
 }
 .elt-name:disabled { opacity: 0.5; }
 
+/* Filter + ELT share one row as two equal-width bounded boxes. */
+.module-row { display: flex; gap: 0.6rem; align-items: stretch; margin: 0.5rem 0; }
+.module-row > .filter-module,
+.module-row > .elt-module { flex: 1 1 0; min-width: 0; margin: 0; }
+
 /* In-graph system editor. */
 .graph-with-editor { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
 /* Canvas up/down arrows — round & glassy (matching the nav tabs), overlaid on the canvas

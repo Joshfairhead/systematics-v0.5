@@ -79,19 +79,19 @@ pub fn elt_bar(props: &EltBarProps) -> Html {
                 <span class="elt-stage-load">
                     <input
                         class="elt-name"
-                        placeholder="name this monad…"
+                        placeholder="name sequence…"
                         value={ (*name).clone() }
                         oninput={ on_name }
                         disabled={ !can_load }
                     />
                     <button class="elt-pill elt-pill-load" disabled={ !can_load } onclick={ on_load_click }
-                        title="Load (−) — dump the selected systems raw into a named monad (a single node + its bucket).">
+                        title="Load (−) — dump the selected systems raw into a named sequence (a monad-head node + its members).">
                         { "Load" }
                     </button>
                 </span>
                 <span class="elt-arrow">{ "→" }</span>
                 <span class={ transform_cls }
-                    title="Transform (=) — clean up, join, sequence. Available inside a loaded monad.">
+                    title="Transform (=) — clean up, join, sequence. Available inside a loaded sequence.">
                     { "Transform" }
                 </span>
                 if let Some(note) = props.note.as_deref() {

@@ -1099,7 +1099,8 @@ fn table_view(ctx: TableCtx) -> Html {
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }
 
-            // Filter module — the four row-kind pills, in a bounded box under Create.
+            // Filter + ELT share one row — two equal-width bounded boxes under Create.
+            <div class="module-row">
             <div class="filter-module">
                 <span class="filter-module-label">{ "Filter" }</span>
                 <div class="row-pills">
@@ -1132,6 +1133,7 @@ fn table_view(ctx: TableCtx) -> Html {
                 note={ op_note.map(|s| s.to_string()) }
                 on_load={ on_load_selected }
             />
+            </div>
 
             // Reciprocal traversal — the pinned subject's quads (S → P·O·source).
             { inspect_panel }
