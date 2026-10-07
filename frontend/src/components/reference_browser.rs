@@ -27,6 +27,7 @@ use yew::prelude::*;
 
 use crate::api::client::{InstanceSystem, ReferenceView, SequenceView, SystemFile};
 use crate::components::browser_controls::{BrowserControls, ChipItem, PredItem};
+use crate::components::elt::EltBar;
 use crate::components::inspector::{Inspector, ObjCite, PosGroup, PredGroup};
 // The SPO triple store + query API live in their own module (swappable spike).
 use crate::components::spo::{
@@ -46,9 +47,9 @@ pub struct ReferenceBrowserProps {
     /// `None` = Nullad = the whole registry (no order_cardinality filter).
     #[prop_or_default]
     pub filter_order: Option<i32>,
-    /// Extract (Nullad → Monad): materialize the current selection as a Monad.
-    pub on_extract: Callback<ExtractRequest>,
-    /// Feedback from the last Extract / author (shown in the Editor).
+    /// Load (ELT): land the ticked selection in a named Monad (K₁ head + its bucket).
+    pub on_load_monad: Callback<LoadRequest>,
+    /// Feedback from the last operation (shown beside the ELT bar).
     #[prop_or_default]
     pub extract_note: Option<String>,
     /// Author a new System from custom term/connective values (the editor).
@@ -125,10 +126,10 @@ pub struct AuthorRequest {
     pub connectives: Vec<String>,
 }
 
-/// A request to Extract the current selection into a Monad — a provisional name
-/// plus the selected member addresses (`system:<id>`, …).
+/// A request to **Load** the extracted (ticked) selection into a named Monad — the
+/// monad name plus the selected member addresses (`system:<id>`, …).
 #[derive(Clone, PartialEq)]
-pub struct ExtractRequest {
+pub struct LoadRequest {
     pub name: String,
     pub members: Vec<String>,
 }
@@ -355,24 +356,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
     // A bucket monad scopes the view to its members (a group for sorting).
     let scope = props.scope_ids.as_deref();
 
-    // The Extract selection: distinct systems among the currently-filtered rows
-    // (Systems directly; References via their target), as `system:<id>` members.
-    let needle = search.to_lowercase();
-    let mut seen = BTreeSet::new();
-    let extract_members: Vec<String> = all_rows(systems, seqs, refs, raw)
-        .into_iter()
-        .filter(|row| passes_row(*row, filter_order, &needle))
-        .filter(|row| in_scope(row, scope))
-        .filter(|row| passes_constraints(row, &spo_constraints, &triples))
-        .filter_map(|row| row.system_addr())
-        .filter(|m| seen.insert(m.clone()))
-        .collect();
-    // Provisional Monad name (the "integral" naming is a later refinement).
-    let extract_name = match filter_order {
-        Some(o) => format!("Monad — {} {}", o, order_name(o)),
-        None => format!("Monad — Nullad selection ({})", extract_members.len()),
-    };
-
     // ---- Editor form: author a System from custom values ----
     let toggle_editor = {
         let o = editor_open.clone();
@@ -481,23 +464,6 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             input.set_value("");
         })
     };
-    let can_extract = !extract_members.is_empty();
-    let on_extract_click = {
-        let on_extract = props.on_extract.clone();
-        let name = extract_name.clone();
-        let members = extract_members.clone();
-        Callback::from(move |_: MouseEvent| {
-            on_extract.emit(ExtractRequest {
-                name: name.clone(),
-                members: members.clone(),
-            })
-        })
-    };
-    let extract_title = format!(
-        "Extract — materialize this selection ({} systems) into a Monad (Nullad → Monad)",
-        extract_members.len()
-    );
-
     // New (left of Sort) folds the data-entry plane down under the search bar.
     let new_btn = html! {
         <button
@@ -545,20 +511,9 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
             </button>
         </>
     };
-    // Extract · Transform (the old ELT operation edge) — kept but hidden (show_elt=false).
-    let elt_btns = html! {
-        <>
-            <button class="elt-btn" disabled={ !can_extract } onclick={ on_extract_click } title={ extract_title }>
-                { format!("Extract ({})", extract_members.len()) }
-            </button>
-            <button class="elt-btn" disabled=true title="Transform — apply a Functor to a loaded system. Not yet wired.">
-                { "Transform" }
-            </button>
-            if let Some(note) = props.extract_note.as_deref() {
-                <span class="elt-note">{ note }</span>
-            }
-        </>
-    };
+    // The old inline Extract/Transform buttons (passed through BrowserControls, show_elt=false)
+    // are superseded by the EltBar module rendered in `table_view`; nothing goes here now.
+    let elt_btns = html! {};
     // The data-entry plane — folds under the control bar when New is open. Temporary
     // scaffolding until on-graph label editing lands.
     let editor_form = if *editor_open {
@@ -607,6 +562,8 @@ pub fn reference_browser(props: &ReferenceBrowserProps) -> Html {
                 on_delete_rows: &props.on_delete_rows,
                 on_join: &props.on_join,
                 on_decompose: &props.on_decompose,
+                on_load_monad: &props.on_load_monad,
+                op_note: props.extract_note.as_deref(),
                 filter_order,
                 scope,
                 search: &search,
@@ -653,6 +610,10 @@ struct TableCtx<'a> {
     /// Join (addition) the selected systems into a new K_k.
     on_join: &'a Callback<JoinRequest>,
     on_decompose: &'a Callback<DecomposeRequest>,
+    /// Load (ELT): land the ticked system selection in a named Monad.
+    on_load_monad: &'a Callback<LoadRequest>,
+    /// Feedback from the last operation (shown beside the ELT bar).
+    op_note: Option<&'a str>,
     /// OrderCardinality filter from the header (`None` = Nullad = all).
     filter_order: Option<i32>,
     /// Bucket scope — when a bucket monad is entered, show only its members.
@@ -696,6 +657,8 @@ fn table_view(ctx: TableCtx) -> Html {
         on_delete_rows,
         on_join,
         on_decompose,
+        on_load_monad,
+        op_note,
         filter_order,
         scope,
         search,
@@ -1078,6 +1041,30 @@ fn table_view(ctx: TableCtx) -> Html {
     let join_count = selected.iter().filter(|a| a.starts_with("system:")).count();
     let sel_count = selected.len();
 
+    // Load (ELT): land the ticked systems raw in a named monad. The EltBar supplies the
+    // name; a blank name falls back to a provisional one (rename later on the canvas).
+    let on_load_selected = {
+        let selected = selected.clone();
+        let on_load_monad = on_load_monad.clone();
+        Callback::from(move |name: String| {
+            let members: Vec<String> = selected
+                .iter()
+                .filter(|a| a.starts_with("system:"))
+                .cloned()
+                .collect();
+            if members.is_empty() {
+                return;
+            }
+            let name = if name.trim().is_empty() {
+                format!("Monad ({})", members.len())
+            } else {
+                name.trim().to_string()
+            };
+            on_load_monad.emit(LoadRequest { name, members });
+            selected.set(HashSet::new());
+        })
+    };
+
     html! {
         <>
             // Search / sort / filter live in their own decoupled view module
@@ -1112,7 +1099,8 @@ fn table_view(ctx: TableCtx) -> Html {
             // Data-entry plane — folds down under the control bar when New is open.
             { editor_form }
 
-            // Filter module — the four row-kind pills, in a bounded box under Create.
+            // Filter + ELT share one row — two equal-width bounded boxes under Create.
+            <div class="module-row">
             <div class="filter-module">
                 <span class="filter-module-label">{ "Filter" }</span>
                 <div class="row-pills">
@@ -1134,6 +1122,17 @@ fn table_view(ctx: TableCtx) -> Html {
                         .collect::<Html>()
                     }
                 </div>
+            </div>
+
+            // ELT bar — the operation edge as its own module. Extract (+) reflects the
+            // ticked systems; Load (−) lands them in a named monad; Transform (=) is
+            // scope-aware (live only inside a loaded monad).
+            <EltBar
+                count={ join_count }
+                in_monad={ scope.is_some() }
+                note={ op_note.map(|s| s.to_string()) }
+                on_load={ on_load_selected }
+            />
             </div>
 
             // Reciprocal traversal — the pinned subject's quads (S → P·O·source).

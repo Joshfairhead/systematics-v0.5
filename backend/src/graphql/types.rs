@@ -1514,6 +1514,47 @@ impl MutationRoot {
         Ok(GqlSequence::new(sequence))
     }
 
+    /// **Load (ELT)** — land an extracted selection *raw* in a named **Monad**: author a
+    /// K₁ head system named after the monad (a single graph node), then create the bucket
+    /// Sequence whose members are `[head, …selected]`. This is the Load (−) stage: the
+    /// Extract (+) stage is the client-side selection; Transform (=) is the in-monad
+    /// operations (join / decompose / sequence). Store-only; the raw-substrate ingest is a
+    /// fast-follow. The head id is deterministic from the name (upsert), the bucket id is
+    /// disambiguated so repeated Loads don't collide.
+    async fn load_monad(
+        &self,
+        ctx: &Context<'_>,
+        input: LoadMonadInput,
+    ) -> async_graphql::Result<GqlSequence> {
+        if input.members.is_empty() {
+            return Err(Error::new("Load needs at least one extracted system"));
+        }
+        let graph_arc = shared_graph(ctx);
+        let mut graph = graph_arc.write().await;
+
+        // The K₁ head — a single-term monad named after the bucket, so it plots as one node.
+        let (content, head) =
+            build_system_content(&input.name, 1, std::slice::from_ref(&input.name), &[]);
+        graph.apply_content(&content);
+
+        // The bucket: head first, then the extracted members (deduped, order preserved).
+        let head_addr = format!("system:{}", head.id);
+        let mut members = vec![head_addr.clone()];
+        let mut seen = std::collections::HashSet::new();
+        seen.insert(head_addr);
+        for m in &input.members {
+            if seen.insert(m.clone()) {
+                members.push(m.clone());
+            }
+        }
+        let base = crate::core::sequences::Sequence::with_auto_id(&input.name, members);
+        let id = graph.unique_sequence_id(&base.id);
+        let sequence = crate::core::sequences::Sequence::new(id, base.name.clone(), base.members);
+        graph.add_sequence(sequence.clone());
+        persist(ctx, &graph);
+        Ok(GqlSequence::new(sequence))
+    }
+
     async fn update_sequence(
         &self,
         ctx: &Context<'_>,
@@ -2389,6 +2430,15 @@ impl SequenceInput {
             None => Sequence::with_auto_id(self.name, self.members),
         }
     }
+}
+
+/// Input for the **Load** stage of ELT — land an extracted selection in a named Monad.
+#[derive(InputObject)]
+pub struct LoadMonadInput {
+    /// The monad's name — also the K₁ head's single term and the bucket's name.
+    pub name: String,
+    /// The extracted member addresses (`system:<id>`) to land raw in the monad.
+    pub members: Vec<String>,
 }
 
 #[derive(InputObject)]

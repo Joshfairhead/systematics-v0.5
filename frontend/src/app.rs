@@ -3,7 +3,7 @@ use crate::api::client::{
 };
 use crate::components::graph_view::{ApiGraphView, GraphEdit};
 use crate::components::reference_browser::{
-    AuthorRequest, DecomposeRequest, ExtractRequest, JoinRequest, RawElement, ReferenceBrowser,
+    AuthorRequest, DecomposeRequest, JoinRequest, LoadRequest, RawElement, ReferenceBrowser,
     SystemTemplate,
 };
 use crate::components::system_selector::{SystemDisplay, SystemSelector};
@@ -130,8 +130,8 @@ pub enum ApiAppMsg {
     InstanceSystemsLoaded(Vec<InstanceSystem>),
     LoadInstance(String),
     ToggleCanonical,
-    /// Extract the current data-view selection into a Monad (Nullad → Monad).
-    ExtractMonad(ExtractRequest),
+    /// Load (ELT): land the ticked selection in a named Monad (K₁ head + its bucket).
+    LoadMonad(LoadRequest),
     /// Join (addition) the selected systems into a new K_k (the assembly operation).
     JoinSystems(JoinRequest),
     /// Decompose a system into its faces (the inverse of Join).
@@ -661,25 +661,25 @@ impl Component for ApiApp {
                 }
                 true
             }
-            ApiAppMsg::ExtractMonad(req) => {
-                // Extract (Nullad → Monad): materialize the current selection as a
-                // persisted Sequence via GraphQL. The scope becomes a real graph
-                // object rather than a transient client-side key.
+            ApiAppMsg::LoadMonad(req) => {
+                // Load (ELT): land the extracted (ticked) systems raw in a named Monad —
+                // the backend authors a K₁ head (a single graph node) + a bucket Sequence
+                // ([head, …members]), persisted to the user store.
                 if req.members.is_empty() {
-                    self.extract_note = Some("Nothing selected to extract.".to_string());
+                    self.extract_note = Some("Nothing selected to load.".to_string());
                     return true;
                 }
-                self.extract_note = Some(format!("Extracting {}…", req.name));
+                self.extract_note = Some(format!("Loading {}…", req.name));
                 let link = ctx.link().clone();
                 let client = self.graphql_client.clone();
                 let count = req.members.len();
                 spawn_local(async move {
-                    let note = match client.create_sequence(&req.name, req.members).await {
+                    let note = match client.load_monad(&req.name, req.members).await {
                         Ok(seq) => format!(
-                            "Extracted Monad “{}” ({} systems) → {}",
+                            "Loaded Monad “{}” ({} systems) → {}",
                             seq.name, count, seq.id
                         ),
-                        Err(e) => format!("Extract failed: {e}"),
+                        Err(e) => format!("Load failed: {e}"),
                     };
                     link.send_message(ApiAppMsg::MonadExtracted(note));
                 });
@@ -1112,7 +1112,7 @@ impl Component for ApiApp {
         let on_toggle_edge_labels = ctx.link().callback(|_| ApiAppMsg::ToggleEdgeLabels);
         let on_load = ctx.link().callback(ApiAppMsg::LoadInstance);
         let on_toggle_canonical = ctx.link().callback(|_| ApiAppMsg::ToggleCanonical);
-        let on_extract = ctx.link().callback(ApiAppMsg::ExtractMonad);
+        let on_load_monad = ctx.link().callback(ApiAppMsg::LoadMonad);
         let on_author = ctx.link().callback(ApiAppMsg::AuthorSystem);
         let on_view_sequence = ctx.link().callback(ApiAppMsg::ViewSequence);
         let on_delete_sequence = ctx.link().callback(ApiAppMsg::DeleteSequence);
@@ -1255,7 +1255,7 @@ impl Component for ApiApp {
                                 instance_systems={ all_systems }
                                 on_load={ on_load.clone() }
                                 filter_order={ filter_order }
-                                on_extract={ on_extract }
+                                on_load_monad={ on_load_monad }
                                 extract_note={ self.extract_note.clone() }
                                 on_author={ on_author }
                                 templates={ templates }
